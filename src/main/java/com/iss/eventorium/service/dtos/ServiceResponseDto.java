@@ -1,6 +1,8 @@
 package com.iss.eventorium.service.dtos;
 
+import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.eventtype.dtos.EventTypeResponseDto;
 import com.iss.eventorium.service.models.ReservationType;
 import com.iss.eventorium.shared.models.EventType;
 import com.iss.eventorium.shared.models.Status;
@@ -22,8 +24,8 @@ public class ServiceResponseDto {
     private Double price;
     private Double discount;
     private Status status;
-    private List<EventType> eventTypes;
-    private Category category;
+    private List<EventTypeResponseDto> eventTypes;
+    private CategoryResponseDto category;
     private ReservationType type;
     private LocalDate reservationDeadline;
     private LocalDate cancellationDeadline;
