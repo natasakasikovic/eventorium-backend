@@ -97,20 +97,33 @@ public class ServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceResponseDto>> getAllFilteredServices(ServiceFilter filter) {
+    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilter filter) {
         return ResponseEntity
                 .ok()
                 .body(services.stream().map(ServiceMapper::toResponse).toList());
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceListResponseDto>> getFilteredServicesPaged(ServiceFilter filter, Pageable pageable) {
+    public ResponseEntity<PagedResponse<ServiceListResponseDto>> filteredServicesPaged(ServiceFilter filter, Pageable pageable) {
         return ResponseEntity
                 .ok()
                 .body(new PagedResponse<>(List.of(toListResponse(services.get(0))), 1, 3));
     }
 
+    @GetMapping("/search/all")
+    public ResponseEntity<List<ServiceResponseDto>> searchServices(@RequestParam("keyword") String keyword) {
+        return ResponseEntity
+                .ok()
+                .body(services.stream().map(ServiceMapper::toResponse).toList());
+    }
 
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<ServiceListResponseDto>> searchServicesPaged(
+            @RequestParam("keyword") String keyword,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok().body(new PagedResponse<>(List.of(toListResponse(services.get(0))), 1, 3));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
