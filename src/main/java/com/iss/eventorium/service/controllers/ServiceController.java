@@ -9,6 +9,7 @@ import com.iss.eventorium.service.models.ReservationType;
 import com.iss.eventorium.service.models.Service;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.utils.ServiceFilter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.iss.eventorium.service.mappers.ServiceMapper.toListResponse;
+import static com.iss.eventorium.service.mappers.ServiceMapper.toResponse;
 
 @RestController
 @RequestMapping("api/v1/services")
@@ -89,8 +93,24 @@ public class ServiceController {
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceListResponseDto>> getServicesPaged(Pageable pageable) {
         return ResponseEntity.ok().body(
-                new PagedResponse<>(List.of(ServiceMapper.toListResponse(services.get(0))), 1, 3));
+                new PagedResponse<>(List.of(toListResponse(services.get(0))), 1, 3));
     }
+
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<ServiceResponseDto>> getAllFilteredServices(ServiceFilter filter) {
+        return ResponseEntity
+                .ok()
+                .body(services.stream().map(ServiceMapper::toResponse).toList());
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<PagedResponse<ServiceListResponseDto>> getFilteredServicesPaged(ServiceFilter filter, Pageable pageable) {
+        return ResponseEntity
+                .ok()
+                .body(new PagedResponse<>(List.of(toListResponse(services.get(0))), 1, 3));
+    }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
