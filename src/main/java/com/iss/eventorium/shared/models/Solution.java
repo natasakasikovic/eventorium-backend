@@ -26,6 +26,7 @@ public class Solution {
     private LocalDateTime validFrom;
     private boolean isAvailable;
     private boolean isDeleted;
+    private boolean isVisible;
     private List<EventType> eventTypes;
     private Category category;
 

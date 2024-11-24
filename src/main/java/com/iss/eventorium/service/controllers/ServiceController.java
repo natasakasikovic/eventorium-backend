@@ -33,6 +33,7 @@ public class ServiceController {
                     .discount(10.0)
                     .status(Status.ACCEPTED)
                     .validFrom(LocalDateTime.now())
+                    .isVisible(true)
                     .isAvailable(true)
                     .isDeleted(false)
                     .type(ReservationType.AUTOMATIC)
@@ -50,6 +51,7 @@ public class ServiceController {
                     .discount(20.0)
                     .status(Status.ACCEPTED)
                     .validFrom(LocalDateTime.now())
+                    .isVisible(false)
                     .isAvailable(true)
                     .isDeleted(false)
                     .type(ReservationType.AUTOMATIC)
@@ -67,6 +69,7 @@ public class ServiceController {
                     .discount(0.0)
                     .status(Status.ACCEPTED)
                     .validFrom(LocalDateTime.now())
+                    .isVisible(true)
                     .isAvailable(true)
                     .isDeleted(false)
                     .type(ReservationType.MANUAL)
@@ -85,12 +88,17 @@ public class ServiceController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceListResponseDto>> getServicesPaged(Pageable pageable) {
-        return ResponseEntity.ok().body(new PagedResponse<>());
+        return ResponseEntity.ok().body(
+                new PagedResponse<>(List.of(ServiceMapper.toListResponse(services.get(0))), 1, 3));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
-        return ResponseEntity.ok().body(new ServiceResponseDto());
+        return services.stream()
+                .filter(service -> service.getId().equals(id))
+                .findFirst()
+                .map(service -> ResponseEntity.ok(ServiceMapper.toResponse(service)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
