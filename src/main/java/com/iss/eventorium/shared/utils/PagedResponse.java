@@ -1,4 +1,9 @@
 package com.iss.eventorium.shared.utils;
 
-public class PagedResponse {
+import java.util.List;
+
+public class PagedResponse<T> {
+    private List<T> content;
+    private int totalPages;
+    private int totalElements;
 }

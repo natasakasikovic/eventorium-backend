@@ -1,0 +1,10 @@
+package com.iss.eventorium.eventtype.dtos;
+
+import com.iss.eventorium.category.models.Category;
+
+public class EventTypeResponseDto {
+    private Long id;
+    private String name;
+    private String description;
+    private Category category;
+}
