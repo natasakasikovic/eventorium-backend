@@ -4,12 +4,18 @@ import com.iss.eventorium.service.dtos.CreateServiceRequestDto;
 import com.iss.eventorium.service.dtos.ServiceListResponseDto;
 import com.iss.eventorium.service.dtos.ServiceRequestDto;
 import com.iss.eventorium.service.dtos.ServiceResponseDto;
+import com.iss.eventorium.service.mappers.ServiceMapper;
+import com.iss.eventorium.service.models.ReservationType;
+import com.iss.eventorium.service.models.Service;
+import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +23,64 @@ import java.util.List;
 @RequestMapping("api/v1/services")
 public class ServiceController {
 
+    private final List<Service> services = List.of(
+            Service.builder()
+                    .id(1L)
+                    .name("Haircut Service")
+                    .description("A professional haircut and styling service")
+                    .specialties("Hair Cutting")
+                    .price(50.0)
+                    .discount(10.0)
+                    .status(Status.ACCEPTED)
+                    .validFrom(LocalDateTime.now())
+                    .isAvailable(true)
+                    .isDeleted(false)
+                    .type(ReservationType.AUTOMATIC)
+                    .reservationDeadline(LocalDate.now().plusDays(1))
+                    .cancellationDeadline(LocalDate.now().plusDays(2))
+                    .minDuration(30)
+                    .maxDuration(60)
+                    .build(),
+            Service.builder()
+                    .id(2L)
+                    .name("Massage Therapy")
+                    .description("Relaxing therapeutic massage")
+                    .specialties("Massage")
+                    .price(100.0)
+                    .discount(20.0)
+                    .status(Status.ACCEPTED)
+                    .validFrom(LocalDateTime.now())
+                    .isAvailable(true)
+                    .isDeleted(false)
+                    .type(ReservationType.AUTOMATIC)
+                    .reservationDeadline(LocalDate.now().plusDays(2))
+                    .cancellationDeadline(LocalDate.now().plusDays(3))
+                    .minDuration(60)
+                    .maxDuration(90)
+                    .build(),
+            Service.builder()
+                    .id(3L)
+                    .name("Yoga Class")
+                    .description("Group yoga classes for all levels")
+                    .specialties("Yoga")
+                    .price(25.0)
+                    .discount(0.0)
+                    .status(Status.ACCEPTED)
+                    .validFrom(LocalDateTime.now())
+                    .isAvailable(true)
+                    .isDeleted(false)
+                    .type(ReservationType.MANUAL)
+                    .reservationDeadline(LocalDate.now().plusDays(3))
+                    .cancellationDeadline(LocalDate.now().plusDays(4))
+                    .minDuration(45)
+                    .maxDuration(60)
+                    .build()
+    );
+
+
     @GetMapping("/all")
     public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
-        return ResponseEntity.ok().body(new ArrayList<>());
+        return ResponseEntity.ok().body(services.stream().map(ServiceMapper::toResponse).toList());
     }
 
     @GetMapping
@@ -36,15 +97,22 @@ public class ServiceController {
     public ResponseEntity<ServiceResponseDto> createService(
             @RequestBody CreateServiceRequestDto createServiceRequestDto
     ) {
-        return new ResponseEntity<>(new ServiceResponseDto(), HttpStatus.CREATED);
+        Service service = ServiceMapper.fromCreateRequest(createServiceRequestDto);
+        service.setId(100L);
+        return new ResponseEntity<>(ServiceMapper.toResponse(service), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> updateService(
             @PathVariable Long id,
-            @RequestBody ServiceRequestDto service
+            @RequestBody ServiceRequestDto serviceDto
     ) {
-        return new ResponseEntity<>(new ServiceResponseDto(), HttpStatus.OK);
+        if(id > services.size()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Service toUpdate = services.get(Math.toIntExact(id - 1));
+        toUpdate.setName(serviceDto.getName());
+        return new ResponseEntity<>(ServiceMapper.toResponse(toUpdate), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
