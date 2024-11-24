@@ -1,6 +1,9 @@
 package com.iss.eventorium.users.controllers;
 
+import com.iss.eventorium.users.dtos.ActivationRequestDto;
+import com.iss.eventorium.users.dtos.GetAccountDto;
 import com.iss.eventorium.users.dtos.LoginRequestDto;
+import com.iss.eventorium.users.dtos.RegistrationRequestDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +29,19 @@ public class AuthController {
             return ResponseEntity.ok("Login successful");
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+    }
+
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetAccountDto> createAccount(@RequestBody RegistrationRequestDto user) throws  Exception {
+        GetAccountDto savedUser = new GetAccountDto(); // TODO: call service
+
+        if (savedUser == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+        return new ResponseEntity<GetAccountDto>(savedUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/send-activation-link")
+    public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
+        return ResponseEntity.ok("Activation link sent successfully.");
     }
 }
