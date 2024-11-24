@@ -15,5 +15,4 @@ public class Person {
     private String lastname;
     private String address; // street and number
     private City city;
-    private User account;
 }
