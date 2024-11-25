@@ -29,7 +29,7 @@ public class CompanyController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreatedCompanyDto> createCompany(@PathVariable Long id, @RequestBody CreateCompanyDto companyDto) throws Exception {
+    public ResponseEntity<CreatedCompanyDto> createCompany(@RequestBody CreateCompanyDto companyDto) throws Exception {
         CreatedCompanyDto createdCompanyDto = new CreatedCompanyDto();
         // TODO: Call service
 
