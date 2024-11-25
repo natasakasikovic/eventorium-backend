@@ -1,9 +1,9 @@
 package com.iss.eventorium.users.models;
 
 public enum Role {
-    AU, // Authenticated user
-    UU, // Unauthenticated user
+    AUTHENTICATED_USER,
+    UNAUTHENTICATED_USER,
     ADMIN,
-    SPP, // Service and Product Provide
-    EO // Event Organizer
+    PROVIDER,
+    EVENT_ORGANIZER
 }
