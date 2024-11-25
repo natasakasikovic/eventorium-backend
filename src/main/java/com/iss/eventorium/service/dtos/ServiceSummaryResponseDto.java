@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceListResponseDto {
+public class ServiceSummaryResponseDto {
     private Long id;
     private String name;
     private Double price;
