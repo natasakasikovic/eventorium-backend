@@ -6,6 +6,7 @@ import com.iss.eventorium.service.models.ReservationType;
 import com.iss.eventorium.service.models.Service;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.utils.ServiceFilter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+
+import static com.iss.eventorium.service.mappers.ServiceMapper.toSummaryResponse;
 
 @RestController
 @RequestMapping("api/v1/services")
@@ -86,7 +89,36 @@ public class ServiceController {
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getServicesPaged(Pageable pageable) {
         return ResponseEntity.ok().body(
-                new PagedResponse<>(List.of(ServiceMapper.toSummaryResponse(services.get(0))), 1, 3));
+                new PagedResponse<>(List.of(toSummaryResponse(services.get(0))), 1, 3));
+    }
+
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilter filter) {
+        return ResponseEntity
+                .ok()
+                .body(services.stream().map(ServiceMapper::toResponse).toList());
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilter filter, Pageable pageable) {
+        return ResponseEntity
+                .ok()
+                .body(new PagedResponse<>(List.of(toSummaryResponse(services.get(0))), 1, 3));
+    }
+
+    @GetMapping("/search/all")
+    public ResponseEntity<List<ServiceResponseDto>> searchServices(@RequestParam("keyword") String keyword) {
+        return ResponseEntity
+                .ok()
+                .body(services.stream().map(ServiceMapper::toResponse).toList());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchServicesPaged(
+            @RequestParam("keyword") String keyword,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok().body(new PagedResponse<>(List.of(toSummaryResponse(services.get(0))), 1, 3));
     }
 
     @GetMapping("/{id}")
