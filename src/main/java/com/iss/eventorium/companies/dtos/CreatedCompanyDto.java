@@ -24,5 +24,5 @@ public class CreatedCompanyDto {
     private ArrayList<String> photos;
     private Time openingHours;
     private Time closingHours;
-    private Long companyId;
+    private Long providerId;
 }
