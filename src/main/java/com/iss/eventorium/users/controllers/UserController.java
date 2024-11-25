@@ -15,10 +15,10 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/users")
-public class UsersController {
+public class UserController {
     private final Collection<GetAccountDto> accounts;
 
-    public UsersController() {
+    public UserController() {
         accounts = new ArrayList<>();
         City city = new City(1, "Belgrade");
         accounts.add(new GetAccountDto(1L, "user1@example.com", "John", "Doe", "123456789", "Address 1", city, Role.AUTHENTICATED_USER));
