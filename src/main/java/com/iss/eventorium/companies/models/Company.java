@@ -1,6 +1,7 @@
 package com.iss.eventorium.companies.models;
 
 import com.iss.eventorium.users.models.City;
+import com.iss.eventorium.users.models.Person;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +27,5 @@ public class Company {
     private Time openingHours;
     private Time closingHours;
     private boolean deleted;
+    private Person provider;
 }
