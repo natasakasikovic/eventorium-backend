@@ -1,7 +1,7 @@
 package com.iss.eventorium.service.mappers;
 
 import com.iss.eventorium.service.dtos.CreateServiceRequestDto;
-import com.iss.eventorium.service.dtos.ServiceListResponseDto;
+import com.iss.eventorium.service.dtos.ServiceSummaryResponseDto;
 import com.iss.eventorium.service.dtos.ServiceRequestDto;
 import com.iss.eventorium.service.dtos.ServiceResponseDto;
 import com.iss.eventorium.service.models.Service;
@@ -30,8 +30,7 @@ public class ServiceMapper {
         return modelMapper.map(service, ServiceResponseDto.class);
     }
 
-    public static ServiceListResponseDto toListResponse(Service service) {
-        return modelMapper.map(service, ServiceListResponseDto.class);
+    public static ServiceSummaryResponseDto toSummaryResponse(Service service) {
+        return modelMapper.map(service, ServiceSummaryResponseDto.class);
     }
-
 }
