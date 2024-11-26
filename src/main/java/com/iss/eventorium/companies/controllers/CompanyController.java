@@ -21,8 +21,8 @@ public class CompanyController {
         this.companies = new ArrayList<>();
 
         // NOTE: for testing
-        CreatedCompanyDto company1 = new CreatedCompanyDto(1L, "Example Company1", "123 Main Street", new City(1, "Example City"), "123-456-7890", "A great company!", "contact1@example.com", new ArrayList<>(), Time.valueOf("09:00:00"), Time.valueOf("17:00:00"));
-        CreatedCompanyDto company2 = new CreatedCompanyDto(2L, "Example Company2", "123 Main Street", new City(1, "Example City"), "123-456-7890", "A great company!", "contact2@example.com", new ArrayList<>(), Time.valueOf("09:00:00"), Time.valueOf("17:00:00"));
+        CreatedCompanyDto company1 = new CreatedCompanyDto(1L, "Example Company1", "123 Main Street", new City(1, "Example City"), "123-456-7890", "A great company!", "contact1@example.com", new ArrayList<>(), Time.valueOf("09:00:00"), Time.valueOf("17:00:00"), 1L);
+        CreatedCompanyDto company2 = new CreatedCompanyDto(2L, "Example Company2", "123 Main Street", new City(1, "Example City"), "123-456-7890", "A great company!", "contact2@example.com", new ArrayList<>(), Time.valueOf("09:00:00"), Time.valueOf("17:00:00"), 1L);
 
         companies.add(company1);
         companies.add(company2);
