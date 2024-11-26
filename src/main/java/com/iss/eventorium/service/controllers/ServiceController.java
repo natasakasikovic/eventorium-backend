@@ -6,7 +6,7 @@ import com.iss.eventorium.service.models.ReservationType;
 import com.iss.eventorium.service.models.Service;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.shared.utils.ServiceFilter;
+import com.iss.eventorium.service.util.ServiceFilter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package com.iss.eventorium.service.dtos;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.eventtype.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
 import com.iss.eventorium.service.models.ReservationType;
 import lombok.*;
 
