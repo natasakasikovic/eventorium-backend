@@ -1,14 +1,17 @@
 package com.iss.eventorium.product.controllers;
 
+import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.product.dtos.CreateProductRequestDto;
+import com.iss.eventorium.product.dtos.ProductRequestDto;
+import com.iss.eventorium.product.dtos.ProductResponseDto;
 import com.iss.eventorium.product.dtos.ProductSummaryResponseDto;
+import com.iss.eventorium.shared.models.EventType;
+import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.shared.utils.ProductFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
@@ -17,6 +20,55 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/products")
 public class ProductController {
+
+    private final List<ProductResponseDto> products;
+
+    public ProductController() {
+        // TODO: delete data below
+        ProductResponseDto product1 = new ProductResponseDto(1L, "Wedding Package", "Complete wedding planning package", "Decoration, Catering, Venue", 5000.0, 10.0, Status.ACCEPTED, List.of(new EventType()), new Category());
+        ProductResponseDto product2 = new ProductResponseDto(2L, "Birthday Party Special", "Customized birthday party organization", "Entertainment, Food, Balloons", 1000.0, 5.0, Status.ACCEPTED, List.of(new EventType()), new Category());
+        ProductResponseDto product3 = new ProductResponseDto(3L, "Corporate Event Package", "Professional corporate event planning", "AV Equipment, Catering, Guest Management", 3000.0, 15.0, Status.ACCEPTED, List.of(new EventType()), new Category());
+        this.products = List.of(product1, product2, product3);
+    }
+
+    @GetMapping("/{id}")
+    public  ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long id) {
+        // ProductResponseDto product = productsService.get(id);
+        // TODO: uncomment line above once service is implemented and also delete the expression below
+
+        ProductResponseDto product = products.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (product == null) { return new ResponseEntity<>(HttpStatus.NOT_FOUND); }
+
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody CreateProductRequestDto createProductRequestDto) {
+        ProductResponseDto responseDto = new ProductResponseDto();
+        // TODO: call service and map
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto) {
+        ProductResponseDto product = products.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+        if (product == null) { return new ResponseEntity<>(HttpStatus.NOT_FOUND); }
+
+        // TODO: call service and map
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/top-five-products")
     public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts(){
