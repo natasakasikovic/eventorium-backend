@@ -1,4 +1,4 @@
-package com.iss.eventorium.eventtype.dtos;
+package com.iss.eventorium.event.dtos;
 
 import com.iss.eventorium.category.models.Category;
 import lombok.*;
