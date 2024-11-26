@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
+import com.iss.eventorium.shared.utils.EventFilter;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -53,16 +54,7 @@ public class EventController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Collection<EventSummaryResponseDto>> filterEvents(
-            @RequestParam (required = false)  String name,
-            @RequestParam (required = false)  String description,
-            @RequestParam (required = false)  String eventType,
-            @RequestParam (required = false) String location,
-            @RequestParam (required = false) int maxParticipants,
-            @RequestParam (required = false)  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam (required = false)   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            Pageable pageable
-    ) {
+    public ResponseEntity<Collection<EventSummaryResponseDto>> filterEvents(EventFilter filter, Pageable pageable) {
 
         Collection<EventSummaryResponseDto> filteredEvents =  // TODO: delete 2 lines below and change with -> service.filterEvents(..params)
                 List.of( new EventSummaryResponseDto(1L, "Music Festival", "Belgrade"),
