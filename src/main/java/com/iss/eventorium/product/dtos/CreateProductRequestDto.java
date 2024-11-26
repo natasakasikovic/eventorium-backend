@@ -1,7 +1,7 @@
 package com.iss.eventorium.product.dtos;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.eventtype.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

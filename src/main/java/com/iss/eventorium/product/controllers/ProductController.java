@@ -1,6 +1,8 @@
 package com.iss.eventorium.product.controllers;
 
+import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
 import com.iss.eventorium.product.dtos.CreateProductRequestDto;
 import com.iss.eventorium.product.dtos.ProductRequestDto;
 import com.iss.eventorium.product.dtos.ProductResponseDto;
@@ -14,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,10 +28,50 @@ public class ProductController {
     private final List<ProductResponseDto> products;
 
     public ProductController() {
-        // TODO: delete data below
-        ProductResponseDto product1 = new ProductResponseDto(1L, "Wedding Package", "Complete wedding planning package", "Decoration, Catering, Venue", 5000.0, 10.0, Status.ACCEPTED, List.of(new EventType()), new Category());
-        ProductResponseDto product2 = new ProductResponseDto(2L, "Birthday Party Special", "Customized birthday party organization", "Entertainment, Food, Balloons", 1000.0, 5.0, Status.ACCEPTED, List.of(new EventType()), new Category());
-        ProductResponseDto product3 = new ProductResponseDto(3L, "Corporate Event Package", "Professional corporate event planning", "AV Equipment, Catering, Guest Management", 3000.0, 15.0, Status.ACCEPTED, List.of(new EventType()), new Category());
+        ProductResponseDto product1 = new ProductResponseDto(
+                1L,
+                "Wedding Package A",
+                "A premium wedding package with full services.",
+                "Luxury venue, gourmet catering, premium decor",
+                5000.00,
+                10.0,
+                Status.PENDING,
+                LocalDateTime.of(2024, 1, 15, 9, 0),
+                true,
+                true,
+                List.of(),
+                new CategoryResponseDto()
+        );
+
+        ProductResponseDto product2 = new ProductResponseDto(
+                2L,
+                "Corporate Conference Kit",
+                "Everything you need for a corporate event.",
+                "Custom branding, audio-visual equipment, team building",
+                1500.00,
+                15.0,
+                Status.DECLINED,
+                LocalDateTime.of(2024, 3, 10, 8, 0),
+                true,
+                true,
+                List.of(new EventTypeResponseDto()),
+                new CategoryResponseDto()
+        );
+
+        ProductResponseDto product3 = new ProductResponseDto(
+                3L,
+                "Outdoor Party Set",
+                "Outdoor event setup with furniture and lighting.",
+                "Tents, lounge seating, party lights",
+                800.00,
+                5.0,
+                Status.ACCEPTED,
+                LocalDateTime.of(2024, 6, 1, 12, 0),
+                false,
+                false,
+                List.of(new EventTypeResponseDto()),
+                new CategoryResponseDto()
+        );
         this.products = List.of(product1, product2, product3);
     }
 
