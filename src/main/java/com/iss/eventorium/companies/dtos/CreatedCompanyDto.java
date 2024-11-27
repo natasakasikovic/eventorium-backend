@@ -17,7 +17,7 @@ public class CreatedCompanyDto {
     private Long id;
     private String name;
     private String address;
-    private City city;
+    private String city;
     private String phoneNumber;
     private String description;
     private String email;

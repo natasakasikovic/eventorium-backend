@@ -1,7 +1,5 @@
 package com.iss.eventorium.users.dtos;
 
-
-import com.iss.eventorium.users.models.City;
 import com.iss.eventorium.users.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +17,6 @@ public class GetAccountDto {
     private String lastname;
     private String phoneNumber;
     private String address;
-    private City city;
+    private String city;
     private Role role;
 }
