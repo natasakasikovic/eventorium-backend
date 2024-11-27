@@ -1,6 +1,5 @@
 package com.iss.eventorium.companies.dtos;
 
-import com.iss.eventorium.users.models.City;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 public class CreateCompanyDto {
     private String name;
     private String address;
-    private City city;
+    private String city;
     private String phoneNumber;
     private String description;
     private String email;
