@@ -1,22 +1,17 @@
 package com.iss.eventorium.solution.controllers;
 
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
-import com.iss.eventorium.solution.mappers.ServiceMapper;
-import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/profile/services")
-public class ProfileServiceController {
+@RequestMapping("api/v1/account/services")
+public class AccountServiceController {
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceSummaryResponseDto>> getProfileServices() {
@@ -30,28 +25,23 @@ public class ProfileServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> getProfileServicesFiltered() {
+    public ResponseEntity<List<ServiceSummaryResponseDto>> filterAccountServices() {
         return ResponseEntity.ok().body(List.of(new ServiceSummaryResponseDto()));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getProfileServicesFilteredPaged(Pageable pageable) {
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filerAccountServicesPaged(Pageable pageable) {
         return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ServiceSummaryResponseDto()), 3, 100));
     }
 
     @GetMapping("/search/all")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> getProfileServicesSearched(@RequestParam String keyword) {
+    public ResponseEntity<List<ServiceSummaryResponseDto>> searchAccountServices(@RequestParam String keyword) {
         return ResponseEntity.ok().body(List.of(new ServiceSummaryResponseDto()));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getProfileServicesSearched(@RequestParam String keyword, Pageable pageable) {
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchAccountServicesPaged(@RequestParam String keyword, Pageable pageable) {
         return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ServiceSummaryResponseDto()), 3, 100));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ServiceResponseDto> getProfileService(@PathVariable Long id) {
-        return ResponseEntity.ok().body(new ServiceResponseDto());
     }
 
     @GetMapping("/favourites/all")
@@ -64,28 +54,6 @@ public class ProfileServiceController {
         return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ServiceSummaryResponseDto()), 3, 100));
     }
 
-    @GetMapping("/favourites/{id}")
-    public ResponseEntity<ServiceResponseDto> getFavouriteService(@PathVariable Long id) {
-        return ResponseEntity.ok().body(new ServiceResponseDto());
-    }
-
-    @PostMapping
-    public ResponseEntity<ServiceResponseDto> createProfileService(@RequestBody CreateServiceRequestDto serviceRequestDto) {
-        Service service = ServiceMapper.fromCreateRequest(serviceRequestDto);
-        service.setId(5523L);
-        return new ResponseEntity<>(ServiceMapper.toResponse(service), HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ServiceResponseDto> updateProfileService(
-            @PathVariable Long id,
-            @RequestBody ServiceRequestDto serviceRequestDto
-    ) {
-        Service service = ServiceMapper.fromRequest(serviceRequestDto);
-        service.setId(id);
-        return new ResponseEntity<>(ServiceMapper.toResponse(service), HttpStatus.OK);
-    }
-
     @PutMapping("/favourites/{id}")
     public ResponseEntity<ServiceResponseDto> addFavouriteService(@PathVariable Long id) {
         return ResponseEntity.ok().body(new ServiceResponseDto());
@@ -96,8 +64,4 @@ public class ProfileServiceController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProfileService(@PathVariable Long id) {
-        return ResponseEntity.noContent().build();
-    }
 }
