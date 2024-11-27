@@ -1,8 +1,7 @@
-package com.iss.eventorium.companies.controllers;
+package com.iss.eventorium.company.controllers;
 
-import com.iss.eventorium.companies.dtos.CreateCompanyDto;
-import com.iss.eventorium.companies.dtos.CreatedCompanyDto;
-import com.iss.eventorium.users.models.City;
+import com.iss.eventorium.company.dtos.CreateCompanyDto;
+import com.iss.eventorium.company.dtos.CreatedCompanyDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

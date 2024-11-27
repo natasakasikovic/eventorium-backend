@@ -1,6 +1,6 @@
-package com.iss.eventorium.users.dtos;
+package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.users.models.Role;
+import com.iss.eventorium.user.models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAccountDto {
-    private Long id;
+public class UpdateAccountDto {
     private String email;
+    private String password;
     private String name;
     private String lastname;
     private String phoneNumber;

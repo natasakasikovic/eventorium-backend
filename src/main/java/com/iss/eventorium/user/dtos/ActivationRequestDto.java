@@ -1,4 +1,4 @@
-package com.iss.eventorium.users.dtos;
+package com.iss.eventorium.user.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportRequestDto {
-    private String reason;
-    private Long respondentId;
-    private Long complainantId;
+public class ActivationRequestDto {
+    private String email;
 }

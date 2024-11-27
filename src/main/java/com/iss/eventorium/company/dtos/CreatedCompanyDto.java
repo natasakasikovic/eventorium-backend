@@ -1,4 +1,4 @@
-package com.iss.eventorium.companies.dtos;
+package com.iss.eventorium.company.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,8 @@ import java.util.ArrayList;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCompanyDto {
+public class CreatedCompanyDto {
+    private Long id;
     private String name;
     private String address;
     private String city;

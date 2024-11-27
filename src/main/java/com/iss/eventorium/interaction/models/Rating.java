@@ -1,7 +1,7 @@
 package com.iss.eventorium.interaction.models;
 
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.users.models.Person;
+import com.iss.eventorium.user.models.Person;
 import lombok.*;
 
 import java.time.LocalDateTime;

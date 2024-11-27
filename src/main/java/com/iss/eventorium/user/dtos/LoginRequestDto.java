@@ -1,4 +1,4 @@
-package com.iss.eventorium.users.dtos;
+package com.iss.eventorium.user.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivationRequestDto {
+public class LoginRequestDto {
     private String email;
+    private String password;
 }

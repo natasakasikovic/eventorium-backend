@@ -1,4 +1,4 @@
-package com.iss.eventorium.users.models;
+package com.iss.eventorium.user.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person {
+public class City {
     private int id;
     private String name;
-    private String lastname;
-    private String address; // street and number
-    private City city;
 }

@@ -1,4 +1,4 @@
-package com.iss.eventorium.users.models;
+package com.iss.eventorium.user.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

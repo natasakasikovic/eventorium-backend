@@ -1,9 +1,9 @@
-package com.iss.eventorium.users.controllers;
+package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.users.dtos.ActivationRequestDto;
-import com.iss.eventorium.users.dtos.GetAccountDto;
-import com.iss.eventorium.users.dtos.LoginRequestDto;
-import com.iss.eventorium.users.dtos.RegistrationRequestDto;
+import com.iss.eventorium.user.dtos.ActivationRequestDto;
+import com.iss.eventorium.user.dtos.GetAccountDto;
+import com.iss.eventorium.user.dtos.LoginRequestDto;
+import com.iss.eventorium.user.dtos.RegistrationRequestDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

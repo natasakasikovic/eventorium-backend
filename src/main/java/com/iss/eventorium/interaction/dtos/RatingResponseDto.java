@@ -1,9 +1,6 @@
 package com.iss.eventorium.interaction.dtos;
 
-import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.users.models.Person;
 import lombok.*;
-import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDateTime;
 

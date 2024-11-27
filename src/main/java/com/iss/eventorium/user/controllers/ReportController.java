@@ -1,9 +1,9 @@
-package com.iss.eventorium.users.controllers;
+package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.users.dtos.ReportRequestDto;
-import com.iss.eventorium.users.dtos.ReportResponseDto;
-import com.iss.eventorium.users.dtos.UpdateReportStatusDto;
+import com.iss.eventorium.user.dtos.ReportRequestDto;
+import com.iss.eventorium.user.dtos.ReportResponseDto;
+import com.iss.eventorium.user.dtos.UpdateReportStatusDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

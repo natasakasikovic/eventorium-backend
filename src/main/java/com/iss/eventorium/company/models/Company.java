@@ -1,8 +1,7 @@
-package com.iss.eventorium.companies.models;
+package com.iss.eventorium.company.models;
 
-import com.iss.eventorium.users.models.City;
-import com.iss.eventorium.users.models.Person;
-import jakarta.persistence.Entity;
+import com.iss.eventorium.user.models.City;
+import com.iss.eventorium.user.models.Person;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,11 +1,10 @@
-package com.iss.eventorium.users.controllers;
+package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.users.dtos.GetAccountDto;
-import com.iss.eventorium.users.dtos.ResetPasswordRequestDto;
-import com.iss.eventorium.users.dtos.UpdateAccountDto;
-import com.iss.eventorium.users.dtos.UpdatedAccountDto;
-import com.iss.eventorium.users.models.City;
-import com.iss.eventorium.users.models.Role;
+import com.iss.eventorium.user.dtos.GetAccountDto;
+import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
+import com.iss.eventorium.user.dtos.UpdateAccountDto;
+import com.iss.eventorium.user.dtos.UpdatedAccountDto;
+import com.iss.eventorium.user.models.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
