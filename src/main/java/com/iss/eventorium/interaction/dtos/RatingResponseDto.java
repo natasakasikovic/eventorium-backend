@@ -17,5 +17,4 @@ public class RatingResponseDto {
     private LocalDateTime creationDate;
     private Integer rating;
     private String feedback;
-    private Status status;
 }
