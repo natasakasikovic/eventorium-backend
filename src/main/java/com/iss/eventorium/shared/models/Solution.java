@@ -1,6 +1,7 @@
 package com.iss.eventorium.shared.models;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.interaction.models.Rating;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,5 +1,6 @@
 package com.iss.eventorium.shared.models;
 
+import com.iss.eventorium.event.models.EventType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
