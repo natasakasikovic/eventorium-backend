@@ -1,4 +1,4 @@
-package com.iss.eventorium.service.dtos;
+package com.iss.eventorium.solution.dtos.products;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceSummaryResponseDto {
+public class ProductSummaryResponseDto {
     private Long id;
     private String name;
     private Double price;

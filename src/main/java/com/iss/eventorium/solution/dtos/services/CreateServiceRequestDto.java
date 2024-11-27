@@ -1,8 +1,8 @@
-package com.iss.eventorium.service.dtos;
+package com.iss.eventorium.solution.dtos.services;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
-import com.iss.eventorium.service.models.ReservationType;
+import com.iss.eventorium.solution.models.ReservationType;
 import lombok.*;
 
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package com.iss.eventorium.product.models;
+package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.shared.models.Solution;
 

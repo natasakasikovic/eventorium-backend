@@ -1,10 +1,10 @@
-package com.iss.eventorium.service.mappers;
+package com.iss.eventorium.solution.mappers;
 
-import com.iss.eventorium.service.dtos.CreateServiceRequestDto;
-import com.iss.eventorium.service.dtos.ServiceSummaryResponseDto;
-import com.iss.eventorium.service.dtos.ServiceRequestDto;
-import com.iss.eventorium.service.dtos.ServiceResponseDto;
-import com.iss.eventorium.service.models.Service;
+import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
+import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
+import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.models.Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,4 +33,5 @@ public class ServiceMapper {
     public static ServiceSummaryResponseDto toSummaryResponse(Service service) {
         return modelMapper.map(service, ServiceSummaryResponseDto.class);
     }
+
 }

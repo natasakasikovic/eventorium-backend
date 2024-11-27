@@ -1,12 +1,15 @@
-package com.iss.eventorium.service.controllers;
+package com.iss.eventorium.solution.controllers;
 
-import com.iss.eventorium.service.dtos.*;
-import com.iss.eventorium.service.mappers.ServiceMapper;
-import com.iss.eventorium.service.models.ReservationType;
-import com.iss.eventorium.service.models.Service;
+import com.iss.eventorium.solution.mappers.ServiceMapper;
+import com.iss.eventorium.solution.models.ReservationType;
+import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.service.util.ServiceFilter;
+import com.iss.eventorium.solution.util.ServiceFilter;
+import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
+import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
+import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-import static com.iss.eventorium.service.mappers.ServiceMapper.toSummaryResponse;
+import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryResponse;
 
 @RestController
 @RequestMapping("api/v1/services")

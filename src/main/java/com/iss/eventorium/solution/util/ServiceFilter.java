@@ -1,4 +1,4 @@
-package com.iss.eventorium.service.util;
+package com.iss.eventorium.solution.util;
 
 import lombok.*;
 

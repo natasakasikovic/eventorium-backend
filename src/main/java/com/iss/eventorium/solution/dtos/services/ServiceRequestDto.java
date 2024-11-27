@@ -1,8 +1,8 @@
-package com.iss.eventorium.service.dtos;
+package com.iss.eventorium.solution.dtos.services;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
-import com.iss.eventorium.service.models.ReservationType;
+import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 

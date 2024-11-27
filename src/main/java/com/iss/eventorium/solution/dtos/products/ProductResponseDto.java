@@ -1,9 +1,7 @@
-package com.iss.eventorium.product.dtos;
+package com.iss.eventorium.solution.dtos.products;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
-import com.iss.eventorium.shared.models.EventType;
 import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 

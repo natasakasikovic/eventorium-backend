@@ -1,4 +1,4 @@
-package com.iss.eventorium.service.models;
+package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.shared.models.Solution;
 import lombok.AllArgsConstructor;

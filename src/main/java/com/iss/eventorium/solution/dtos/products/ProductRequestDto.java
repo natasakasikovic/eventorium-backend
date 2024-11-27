@@ -1,4 +1,4 @@
-package com.iss.eventorium.product.dtos;
+package com.iss.eventorium.solution.dtos.products;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;

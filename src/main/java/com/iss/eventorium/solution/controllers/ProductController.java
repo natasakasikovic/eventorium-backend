@@ -1,13 +1,11 @@
-package com.iss.eventorium.product.controllers;
+package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
-import com.iss.eventorium.product.dtos.CreateProductRequestDto;
-import com.iss.eventorium.product.dtos.ProductRequestDto;
-import com.iss.eventorium.product.dtos.ProductResponseDto;
-import com.iss.eventorium.product.dtos.ProductSummaryResponseDto;
-import com.iss.eventorium.shared.models.EventType;
+import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
+import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
+import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.shared.utils.ProductFilter;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
