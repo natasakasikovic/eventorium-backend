@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateRatingRequestDto {
+public class CreateReviewRequestDto {
     private String feedback;
     private Integer rating;
 }
