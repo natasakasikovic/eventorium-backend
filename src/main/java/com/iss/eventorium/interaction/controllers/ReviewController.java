@@ -67,4 +67,41 @@ public class ReviewController {
         return new ResponseEntity<>(ReviewMapper.toResponse(review), HttpStatus.CREATED);
     }
 
+    @PutMapping("/product/{product-id}/reviews/{review-id}")
+    public ResponseEntity<UpdatedReviewDto> updateProductReview(
+            @PathVariable("product-id") Long productId,
+            @PathVariable("review-id") Long reviewId,
+            @RequestBody UpdateReviewDto review) throws Exception {
+        // TODO: Call -> reviewService.updateReview(productId, reviewId, review);
+        UpdatedReviewDto updatedReview = new UpdatedReviewDto();
+        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
+    }
+
+    @PutMapping("/service/{service-id}/reviews/{review-id}")
+    public ResponseEntity<UpdatedReviewDto> updateServiceReview(
+            @PathVariable("service-id") Long serviceId,
+            @PathVariable("review-id") Long reviewId,
+            @RequestBody UpdateReviewDto review) throws Exception {
+        // TODO: Call -> reviewService.updateReview(serviceId, reviewId, review);
+        UpdatedReviewDto updatedReview = new UpdatedReviewDto();
+        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/product/{product-id}/reviews/{review-id}")
+    public ResponseEntity<?> deleteProductReview(
+            @PathVariable("product-id") Long productId,
+            @PathVariable("review-id") Long reviewId) {
+        // TODO: call service -> reviewService.delete(productId, reviewId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/service/{service-id}/reviews/{review-id}")
+    public ResponseEntity<?> deleteServiceReview(
+            @PathVariable("service-id") Long serviceId,
+            @PathVariable("review-id") Long reviewId) {
+        // TODO: call service -> reviewService.delete(serviceId, reviewId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }
