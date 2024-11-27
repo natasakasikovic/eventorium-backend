@@ -2,7 +2,6 @@ package com.iss.eventorium.shared.models;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.interaction.models.Rating;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +30,7 @@ public class Solution {
     private boolean isVisible;
     private List<EventType> eventTypes;
     private Category category;
-    private List<Rating> ratings;
+    private List<Review> reviews;
 
     public void restore(SolutionMemento memento) {
         this.name = memento.name();
