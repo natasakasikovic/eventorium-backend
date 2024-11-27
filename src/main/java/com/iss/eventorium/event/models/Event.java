@@ -23,5 +23,6 @@ public class Event {
     private Privacy privacy;
     private EventType type;
     private Location location;
+    private Budget budget;
     // NOTE: add missing attributes as classes are implemented!
 }
