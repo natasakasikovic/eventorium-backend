@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Rating {
+public class Review {
     private Long id;
     private LocalDateTime creationDate;
     private Integer rating;
