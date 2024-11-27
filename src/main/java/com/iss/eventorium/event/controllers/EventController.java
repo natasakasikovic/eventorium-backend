@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-import static com.iss.eventorium.service.mappers.ServiceMapper.toSummaryResponse;
 
 @RestController
 @RequestMapping("api/v1/events")

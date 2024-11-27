@@ -3,7 +3,6 @@ package com.iss.eventorium.interaction.mappers;
 import com.iss.eventorium.interaction.dtos.CreateRatingRequestDto;
 import com.iss.eventorium.interaction.dtos.RatingResponseDto;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.service.mappers.ServiceMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
