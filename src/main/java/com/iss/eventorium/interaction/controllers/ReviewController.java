@@ -67,7 +67,7 @@ public class ReviewController {
         return new ResponseEntity<>(ReviewMapper.toResponse(review), HttpStatus.CREATED);
     }
 
-    @PutMapping("/product/{product-id}/reviews/{review-id}")
+    @PutMapping("/products/{product-id}/reviews/{review-id}")
     public ResponseEntity<UpdatedReviewDto> updateProductReview(
             @PathVariable("product-id") Long productId,
             @PathVariable("review-id") Long reviewId,
@@ -77,7 +77,7 @@ public class ReviewController {
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 
-    @PutMapping("/service/{service-id}/reviews/{review-id}")
+    @PutMapping("/services/{service-id}/reviews/{review-id}")
     public ResponseEntity<UpdatedReviewDto> updateServiceReview(
             @PathVariable("service-id") Long serviceId,
             @PathVariable("review-id") Long reviewId,
@@ -88,7 +88,7 @@ public class ReviewController {
     }
 
 
-    @DeleteMapping("/product/{product-id}/reviews/{review-id}")
+    @DeleteMapping("/products/{product-id}/reviews/{review-id}")
     public ResponseEntity<?> deleteProductReview(
             @PathVariable("product-id") Long productId,
             @PathVariable("review-id") Long reviewId) {
@@ -96,7 +96,7 @@ public class ReviewController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/service/{service-id}/reviews/{review-id}")
+    @DeleteMapping("/services/{service-id}/reviews/{review-id}")
     public ResponseEntity<?> deleteServiceReview(
             @PathVariable("service-id") Long serviceId,
             @PathVariable("review-id") Long reviewId) {
