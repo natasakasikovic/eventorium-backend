@@ -20,9 +20,9 @@ public class ReportController {
     public ResponseEntity<Collection<ReportResponseDto>> getReports() {
         // TODO: call service -> reportService.getAll();
         // NOTE: When fetching, make sure not to fetch reports from those who are suspended.
-        Collection<ReportResponseDto> events = List.of( new ReportResponseDto(1L, "Reason 1", 1L, 2L),
+        Collection<ReportResponseDto> reports = List.of( new ReportResponseDto(1L, "Reason 1", 1L, 2L),
                                                         new ReportResponseDto(2L, "Reason 2", 2L, 4L));
-        return new ResponseEntity<>(events, HttpStatus.OK);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping
@@ -38,7 +38,7 @@ public class ReportController {
         return new ResponseEntity<>(reportCreated, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}/status")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable Long id, @RequestBody UpdateReportStatusDto status) {
         // reportService.updateStatus(status);
         return ResponseEntity.ok("Status updated successfully!");
