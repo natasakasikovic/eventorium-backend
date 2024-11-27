@@ -33,4 +33,5 @@ public class ServiceMapper {
     public static ServiceSummaryResponseDto toSummaryResponse(Service service) {
         return modelMapper.map(service, ServiceSummaryResponseDto.class);
     }
+
 }

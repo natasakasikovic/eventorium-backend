@@ -1,6 +1,6 @@
 package com.iss.eventorium.event.dtos;
 
-import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.shared.models.Location;
 import lombok.*;
 
 @Getter
@@ -8,9 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventTypeResponseDto {
+public class EventSummaryResponseDto {
     private Long id;
     private String name;
-    private String description;
-    private Category category;
+    private String city;
 }

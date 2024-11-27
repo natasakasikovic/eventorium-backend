@@ -3,6 +3,8 @@ package com.iss.eventorium.event.controllers;
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.shared.utils.EventFilter;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("api/v1/events")
