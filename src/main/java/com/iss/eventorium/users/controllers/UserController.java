@@ -1,6 +1,7 @@
 package com.iss.eventorium.users.controllers;
 
 import com.iss.eventorium.users.dtos.GetAccountDto;
+import com.iss.eventorium.users.dtos.ResetPasswordRequestDto;
 import com.iss.eventorium.users.dtos.UpdateAccountDto;
 import com.iss.eventorium.users.dtos.UpdatedAccountDto;
 import com.iss.eventorium.users.models.City;
@@ -23,6 +24,14 @@ public class UserController {
         accounts.add(new GetAccountDto(1L, "user1@example.com", "John", "Doe", "123456789", "Address 1", "Belgrade", Role.AUTHENTICATED_USER));
         accounts.add(new GetAccountDto(2L, "user2@example.com", "Jane", "Smith", "987654321", "Address 2", "Belgrade", Role.EVENT_ORGANIZER));
         accounts.add(new GetAccountDto(3L, "admin@example.com", "Admin", "User", "555555555", "Admin Street", "Belgrade", Role.ADMIN));
+    }
+
+    @PostMapping("/reset-password/{id}")
+    public ResponseEntity<Void> resetPassword(@PathVariable Long id,
+                                              @RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
+        // TODO: Implement service to validate old password, match new and confirm passwords,
+        //  and return Bad Request if validation fails
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/all")
