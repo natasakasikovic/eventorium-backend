@@ -16,5 +16,6 @@ public class Rating {
     private LocalDateTime creationDate;
     private Integer rating;
     private String feedback;
+    private Status status;
     private Person person;
 }
