@@ -1,4 +1,4 @@
-package com.iss.eventorium.service.models;
+package com.iss.eventorium.solution.models;
 
 public enum ReservationType {
     MANUAL,

@@ -1,4 +1,4 @@
-package com.iss.eventorium.service.dtos;
+package com.iss.eventorium.solution.dtos.services;
 
 import lombok.*;
 

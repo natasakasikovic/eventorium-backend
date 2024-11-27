@@ -1,8 +1,9 @@
-package com.iss.eventorium.service.dtos;
+package com.iss.eventorium.solution.dtos.services;
 
-import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.eventtype.dtos.EventTypeResponseDto;
-import com.iss.eventorium.service.models.ReservationType;
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.solution.models.ReservationType;
+import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,14 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateServiceRequestDto {
+public class ServiceRequestDto {
     private String name;
     private String description;
     private String specialties;
-    private double price;
-    private double discount;
+    private Double price;
+    private Double discount;
+    private Status status;
     private List<EventTypeResponseDto> eventTypes;
-    private CategoryResponseDto category;
+    private CategoryRequestDto category;
     private ReservationType type;
     private LocalDate reservationDeadline;
     private LocalDate cancellationDeadline;
