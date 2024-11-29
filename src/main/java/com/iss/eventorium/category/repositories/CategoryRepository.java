@@ -13,6 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByDeletedFalse();
     Page<Category> findByDeletedFalse(Pageable pageable);
     Optional<Category> findByIdAndDeletedFalse(Long id);
-    List<Category> findByStatus(Status status);
-    Page<Category> findByStatus(Status status, Pageable pageable);
+    List<Category> findByStatusAndDeletedFalse(Status status);
+    Page<Category> findByStatusAndDeletedFalse(Status status, Pageable pageable);
 }

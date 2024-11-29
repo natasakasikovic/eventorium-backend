@@ -31,6 +31,7 @@ public class CategoryService {
     }
 
     public Category createCategory(Category category) {
+        category.setStatus(Status.ACCEPTED);
         return categoryRepository.save(category);
     }
 
@@ -51,10 +52,10 @@ public class CategoryService {
     }
 
     public List<Category> getPendingCategories() {
-        return categoryRepository.findByStatus(Status.PENDING);
+        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING);
     }
 
     public Page<Category> getPendingCategoriesPaged(Pageable pageable) {
-        return categoryRepository.findByStatus(Status.PENDING, pageable);
+        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING, pageable);
     }
 }

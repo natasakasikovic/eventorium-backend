@@ -11,5 +11,4 @@ import lombok.*;
 public class CategoryRequestDto {
     private String name;
     private String description;
-    private Status status;
 }

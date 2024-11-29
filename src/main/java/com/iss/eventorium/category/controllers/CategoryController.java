@@ -17,6 +17,7 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 @RestController
 @RequestMapping("api/v1/categories")
 @RequiredArgsConstructor
+@CrossOrigin
 public class CategoryController {
 
     private final CategoryService categoryService;
