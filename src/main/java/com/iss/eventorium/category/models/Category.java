@@ -28,8 +28,5 @@ public class Category {
     private Status status;
 
     @Column(nullable = false)
-    private boolean activated;
-
-    @Column(nullable = false)
     private boolean deleted;
 }

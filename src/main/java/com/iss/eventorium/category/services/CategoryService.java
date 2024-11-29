@@ -18,11 +18,11 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public List<Category> getCategories() {
-        return categoryRepository.findByDeletedFalse();
+        return categoryRepository.findByStatusAndDeletedFalse(Status.ACCEPTED);
     }
 
     public Page<Category> getCategoriesPaged(Pageable pageable) {
-        return categoryRepository.findByDeletedFalse(pageable);
+        return categoryRepository.findByStatusAndDeletedFalse(pageable, Status.ACCEPTED);
     }
 
     public Category getCategory(Long id) {
@@ -56,6 +56,6 @@ public class CategoryService {
     }
 
     public Page<Category> getPendingCategoriesPaged(Pageable pageable) {
-        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING, pageable);
+        return categoryRepository.findByStatusAndDeletedFalse(pageable, Status.PENDING);
     }
 }

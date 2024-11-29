@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findByDeletedFalse();
-    Page<Category> findByDeletedFalse(Pageable pageable);
     Optional<Category> findByIdAndDeletedFalse(Long id);
     List<Category> findByStatusAndDeletedFalse(Status status);
-    Page<Category> findByStatusAndDeletedFalse(Status status, Pageable pageable);
+    Page<Category> findByStatusAndDeletedFalse(Pageable pageable, Status status);
 }
