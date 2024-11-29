@@ -12,5 +12,5 @@ import java.util.List;
 public class PagedResponse<T> {
     private List<T> content;
     private int totalPages;
-    private int totalElements;
+    private long totalElements;
 }
