@@ -2,9 +2,9 @@ package com.iss.eventorium.category.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
+import com.iss.eventorium.shared.models.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class CategoryService {
 
     public Category getCategory(Long id) {
         return categoryRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
     }
 
     public Category createCategory(Category category) {
@@ -36,7 +36,7 @@ public class CategoryService {
 
     public Category updateCategory(Long id, Category category) {
         Category toUpdate = categoryRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         toUpdate.setName(category.getName());
         toUpdate.setDescription(category.getDescription());
         return categoryRepository.save(toUpdate);
@@ -44,9 +44,17 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category toDelete = categoryRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         // TODO: Check if it is possible to delete
         toDelete.setDeleted(true);
         categoryRepository.save(toDelete);
+    }
+
+    public List<Category> getPendingCategories() {
+        return categoryRepository.findByStatus(Status.PENDING);
+    }
+
+    public Page<Category> getPendingCategoriesPaged(Pageable pageable) {
+        return categoryRepository.findByStatus(Status.PENDING, pageable);
     }
 }

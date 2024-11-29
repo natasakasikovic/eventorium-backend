@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.iss.eventorium.category.mappers.CategoryMapper.fromRequest;
-import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
+import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 
 @RestController
 @RequestMapping("api/v1/categories")
@@ -34,8 +33,22 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<PagedResponse<CategoryResponseDto>> getCategoriesPaged(Pageable pageable) {
         return ResponseEntity
-                .ok(CategoryMapper
-                        .toPagedResponse(categoryService.getCategoriesPaged(pageable)));
+                .ok(toPagedResponse(categoryService.getCategoriesPaged(pageable)));
+    }
+
+    @GetMapping("/pending/all")
+    public ResponseEntity<List<CategoryResponseDto>> getPendingCategories() {
+        return ResponseEntity
+                .ok(categoryService
+                        .getPendingCategories().stream()
+                        .map(CategoryMapper::toResponse)
+                        .toList());
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<PagedResponse<CategoryResponseDto>> getPendingCategoriesPaged(Pageable pageable) {
+        return ResponseEntity
+                .ok(toPagedResponse(categoryService.getPendingCategoriesPaged(pageable)));
     }
 
     @GetMapping("/{id}")
