@@ -1,6 +1,6 @@
 package com.iss.eventorium.category.dtos;
 
-import com.iss.eventorium.shared.models.Status;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -9,7 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CategoryRequestDto {
+    @NotBlank(message = "Name is mandatory")
     private String name;
+
+    @NotBlank(message = "Description is mandatory")
     private String description;
-    private Status status;
 }

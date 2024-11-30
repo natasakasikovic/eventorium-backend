@@ -11,5 +11,4 @@ public class CategoryResponseDto {
     private Long id;
     private String name;
     private String description;
-    private Boolean activated;
 }
