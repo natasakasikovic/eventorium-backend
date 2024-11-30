@@ -1,15 +1,21 @@
 package com.iss.eventorium.category.services;
 
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
+import com.iss.eventorium.category.dtos.CategoryResponseDto;
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.iss.eventorium.category.mappers.CategoryMapper.toPagedResponse;
+import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -17,30 +23,35 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public List<Category> getCategories() {
-        return categoryRepository.findByStatusAndDeletedFalse(Status.ACCEPTED);
+    public List<CategoryResponseDto> getCategories() {
+        return categoryRepository.findByStatusAndDeletedFalse(Status.ACCEPTED).stream()
+                .map(CategoryMapper::toResponse)
+                .toList();
     }
 
-    public Page<Category> getCategoriesPaged(Pageable pageable) {
-        return categoryRepository.findByStatusAndDeletedFalse(pageable, Status.ACCEPTED);
+    public PagedResponse<CategoryResponseDto> getCategoriesPaged(Pageable pageable) {
+        return CategoryMapper
+                .toPagedResponse(categoryRepository.findByStatusAndDeletedFalse(pageable, Status.ACCEPTED));
     }
 
-    public Category getCategory(Long id) {
-        return categoryRepository.findByIdAndDeletedFalse(id)
+    public CategoryResponseDto getCategory(Long id) {
+        Category category = categoryRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+        return toResponse(category);
     }
 
-    public Category createCategory(Category category) {
-        category.setStatus(Status.ACCEPTED);
-        return categoryRepository.save(category);
+    public CategoryResponseDto createCategory(CategoryRequestDto category) {
+        Category created = CategoryMapper.fromRequest(category);
+        created.setStatus(Status.ACCEPTED);
+        return toResponse(categoryRepository.save(created));
     }
 
-    public Category updateCategory(Long id, Category category) {
+    public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
         Category toUpdate = categoryRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         toUpdate.setName(category.getName());
         toUpdate.setDescription(category.getDescription());
-        return categoryRepository.save(toUpdate);
+        return toResponse(categoryRepository.save(toUpdate));
     }
 
     public void deleteCategory(Long id) {
@@ -51,11 +62,14 @@ public class CategoryService {
         categoryRepository.save(toDelete);
     }
 
-    public List<Category> getPendingCategories() {
-        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING);
+    public List<CategoryResponseDto> getPendingCategories() {
+        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING).stream()
+                .map(CategoryMapper::toResponse)
+                .toList();
     }
 
-    public Page<Category> getPendingCategoriesPaged(Pageable pageable) {
-        return categoryRepository.findByStatusAndDeletedFalse(pageable, Status.PENDING);
+    public PagedResponse<CategoryResponseDto> getPendingCategoriesPaged(Pageable pageable) {
+        return toPagedResponse(categoryRepository.findByStatusAndDeletedFalse(pageable, Status.PENDING));
     }
+
 }

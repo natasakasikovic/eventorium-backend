@@ -25,44 +25,32 @@ public class CategoryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<CategoryResponseDto>> getCategories() {
-        return  ResponseEntity
-                .ok(categoryService
-                        .getCategories().stream()
-                        .map(CategoryMapper::toResponse)
-                        .toList());
+        return  ResponseEntity.ok(categoryService.getCategories());
     }
 
     @GetMapping
     public ResponseEntity<PagedResponse<CategoryResponseDto>> getCategoriesPaged(Pageable pageable) {
-        return ResponseEntity
-                .ok(toPagedResponse(categoryService.getCategoriesPaged(pageable)));
+        return ResponseEntity.ok(categoryService.getCategoriesPaged(pageable));
     }
 
     @GetMapping("/pending/all")
     public ResponseEntity<List<CategoryResponseDto>> getPendingCategories() {
-        return ResponseEntity
-                .ok(categoryService
-                        .getPendingCategories().stream()
-                        .map(CategoryMapper::toResponse)
-                        .toList());
+        return ResponseEntity.ok(categoryService.getPendingCategories());
     }
 
     @GetMapping("/pending")
     public ResponseEntity<PagedResponse<CategoryResponseDto>> getPendingCategoriesPaged(Pageable pageable) {
-        return ResponseEntity
-                .ok(toPagedResponse(categoryService.getPendingCategoriesPaged(pageable)));
+        return ResponseEntity.ok(categoryService.getPendingCategoriesPaged(pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> getCategory(@PathVariable Long id) {
-        return ResponseEntity
-                .ok(toResponse(categoryService.getCategory(id)));
+        return ResponseEntity.ok(categoryService.getCategory(id));
     }
 
     @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto requestDto) {
-        return ResponseEntity
-                .ok(toResponse(categoryService.createCategory(fromRequest(requestDto))));
+        return ResponseEntity.ok(categoryService.createCategory(requestDto));
     }
 
     @PutMapping("/{id}")
@@ -70,8 +58,7 @@ public class CategoryController {
             @Valid @RequestBody CategoryRequestDto requestDto,
             @PathVariable Long id
     ) {
-        return ResponseEntity
-                .ok(toResponse(categoryService.updateCategory(id, fromRequest(requestDto))));
+        return ResponseEntity.ok(categoryService.updateCategory(id, requestDto));
     }
 
     @DeleteMapping("/{id}")
