@@ -5,6 +5,7 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -59,14 +60,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody CategoryRequestDto requestDto) {
+    public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto requestDto) {
         return ResponseEntity
                 .ok(toResponse(categoryService.createCategory(fromRequest(requestDto))));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
-            @RequestBody CategoryRequestDto requestDto,
+            @Valid @RequestBody CategoryRequestDto requestDto,
             @PathVariable Long id
     ) {
         return ResponseEntity
