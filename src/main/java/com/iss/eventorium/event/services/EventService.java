@@ -44,9 +44,9 @@ public class EventService {
         return EventMapper.toPagedResponse(repository.findAll(pageable));
     }
 
-//    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilter filter, Pageable pageable) {
-//        Specification<Event> specification = EventSpecification.filterBy(filter);
-//        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
-//    }
+    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilter filter, Pageable pageable) {
+        Specification<Event> specification = EventSpecification.filterBy(filter);
+        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
 
 }

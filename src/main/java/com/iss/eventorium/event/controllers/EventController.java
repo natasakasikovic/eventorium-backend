@@ -2,6 +2,7 @@ package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.shared.utils.EventFilter;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,10 @@ public class EventController {
         return ResponseEntity.ok(service.getEventsPaged(pageable));
     }
 
-//    @GetMapping("/filter")
-//    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilter filter, Pageable pageable) {
-//        return ResponseEntity.ok(service.filterEvents(filter, pageable));
-//    }
+    @GetMapping("/filter")
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilter filter, Pageable pageable) {
+        return ResponseEntity.ok(service.filterEvents(filter, pageable));
+    }
 
     @GetMapping("/search")
     public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword, Pageable pageable){

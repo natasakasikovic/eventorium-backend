@@ -1,10 +1,7 @@
 package com.iss.eventorium.event.repositories;
 
 import com.iss.eventorium.event.models.Event;
-import jakarta.annotation.Nullable;
-import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +18,4 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findTopFiveUpcomingEvents(@Param("city") String city, Pageable pageable);
 
     Page<Event> findByNameContaining(String name, Pageable pageable);
-//    Page<Event> findAll(@Nullable Specification<Event> specification, @NonNull Pageable pageable);
-
 }
