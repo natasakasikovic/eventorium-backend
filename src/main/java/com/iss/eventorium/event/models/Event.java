@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.shared.models.Location;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,15 +15,33 @@ import java.util.Date;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table (name = "events")
+@Entity
 public class Event {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column (nullable = false)
     private String name;
+
+    @Column (nullable = false)
     private String description;
-    private int maxParticipants;
+
+    @Column (nullable = false)
     private Date date;
+
+    @Enumerated(EnumType.STRING)
     private Privacy privacy;
-    private EventType type;
+
+    @Column(name = "max_participants", nullable = false)
+    private Integer maxParticipants;
+
+    @Embedded
     private Location location;
-    private Budget budget;
-    // NOTE: add missing attributes as classes are implemented!
+
+//    private Budget budget;
+//    private EventType type;
+// NOTE: add missing attributes as classes are implemented!
 }
