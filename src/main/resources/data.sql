@@ -11,7 +11,7 @@ INSERT INTO category (name, description, status, deleted) VALUES
  ('Marketing', 'Promotions and event advertising', 'ACCEPTED',  false);
 
 INSERT INTO events (name, description, date, privacy, max_participants, city, address, latitude, longitude) VALUES
- ('Tech Conference 2024', 'A conference for tech enthusiasts.', '2025-05-15', 'OPEN', 500, 'New York', '123 Event St.', 40.7128, -74.0060),
+ ('Tech Conference 2025', 'A conference for tech enthusiasts.', '2025-05-15', 'OPEN', 500, 'New York', '123 Event St.', 40.7128, -74.0060),
  ('Web Development Workshop', 'A workshop on modern web development techniques.', '2026-06-01', 'CLOSED', 50, 'Novi Sad', '45 Saviceva Street', 45.2671, 19.8335),
  ('Music Festival', 'An annual music festival with local and international bands.', '2027-07-10', 'OPEN', 1000, 'Novi Sad', '22 Park Road', 45.2675, 19.8338),
  ('Startup Pitch Event', 'A pitching event for emerging tech startups.', '2026-08-20', 'CLOSED', 100, 'Novi Sad', '10 Startup Blvd.', 45.2680, 19.8340),
