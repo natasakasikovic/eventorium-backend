@@ -12,8 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventTypeResponseDto {
-    private Long id;
+public class EventTypeRequestDto {
     private String name;
     private String description;
     private List<CategoryResponseDto> suggestedCategories;
