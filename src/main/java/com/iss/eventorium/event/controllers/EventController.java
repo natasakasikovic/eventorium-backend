@@ -1,8 +1,10 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
+import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.utils.EventFilter;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -18,19 +20,12 @@ import java.util.List;
 @RequestMapping("api/v1/events")
 public class EventController {
 
+    @Autowired
+    private EventService service;
+
     @GetMapping("/top-five-events")
-    public ResponseEntity<Collection<EventSummaryResponseDto>> getTopEvents() {
-
-        // Collection<EventSummaryResponseDto> topEvents = eventService.getTopEvents();
-        // TODO: uncomment line above once service is implemented and also delete dummy services below
-        Collection<EventSummaryResponseDto> topEvents = List.of(
-                new EventSummaryResponseDto(1L, "Event 1", "Novi Sad"),
-                new EventSummaryResponseDto(2L, "Event 2", "Novi Sad"),
-                new EventSummaryResponseDto(3L, "Event 3", "Novi Sad"),
-                new EventSummaryResponseDto(4L, "Event 4", "Novi Sad"),
-                new EventSummaryResponseDto(5L, "Event 5", "Novi Sad")
-        );
-
+    public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents(@RequestParam String city) {
+        List<EventSummaryResponseDto> topEvents = service.getTopEvents(city);
         return new ResponseEntity<>(topEvents, HttpStatus.OK);
     }
 

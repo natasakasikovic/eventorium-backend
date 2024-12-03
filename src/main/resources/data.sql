@@ -10,6 +10,16 @@ INSERT INTO category (name, description, status, deleted) VALUES
  ('Guest Management', 'Handling guest invitations and RSVP', 'PENDING',  false),
  ('Marketing', 'Promotions and event advertising', 'ACCEPTED',  false);
 
+INSERT INTO events (name, description, date, privacy, max_participants, city, address, latitude, longitude) VALUES
+ ('Tech Conference 2024', 'A conference for tech enthusiasts.', '2025-05-15', 'OPEN', 500, 'New York', '123 Event St.', 40.7128, -74.0060),
+ ('Web Development Workshop', 'A workshop on modern web development techniques.', '2026-06-01', 'CLOSED', 50, 'Novi Sad', '45 Saviceva Street', 45.2671, 19.8335),
+ ('Music Festival', 'An annual music festival with local and international bands.', '2027-07-10', 'OPEN', 1000, 'Novi Sad', '22 Park Road', 45.2675, 19.8338),
+ ('Startup Pitch Event', 'A pitching event for emerging tech startups.', '2026-08-20', 'CLOSED', 100, 'Novi Sad', '10 Startup Blvd.', 45.2680, 19.8340),
+ ('Film Screening', 'An exclusive screening of a new indie film.', '2024-09-05', 'OPEN', 200, 'Novi Sad', '88 Film Street', 45.2673, 19.8342),
+ ('Art Exhibition', 'A contemporary art exhibition featuring local artists.', '2025-10-12', 'OPEN', 150, 'Novi Sad', '11 Exhibition Avenue', 45.2669, 19.8343),
+ ('Gaming Tournament', 'A tournament for competitive video gamers.', '2026-11-01', 'CLOSED', 200, 'Novi Sad', '50 Gamer’s Lane', 45.2682, 19.8339),
+ ('Tech Meetup 2025', 'A meetup for tech professionals to share knowledge and network.', '2025-03-15', 'OPEN', 300, 'Novi Sad', '30 Innovation Avenue', 45.2678, 19.8350);
+
 INSERT INTO event_type (name, description, deleted) VALUES
 ('Wedding', 'Event type for organizing weddings', false),
 ('Corporate Event', 'Event type for organizing corporate events', false),
