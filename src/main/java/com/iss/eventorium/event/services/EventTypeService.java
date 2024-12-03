@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.event.dtos.EventTypeRequestDto;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
@@ -12,11 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EventTypeService {
     private final EventTypeRepository eventTypeRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<EventTypeResponseDto> getEventTypes() {
         return eventTypeRepository.findByDeletedFalse().stream()
@@ -43,9 +47,15 @@ public class EventTypeService {
         EventType eventType = eventTypeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
 
-        eventType.setName(eventTypeRequestDto.getName());
         eventType.setDescription(eventTypeRequestDto.getDescription());
 
+        // NOTE: Not sure if it's best practice to call CategoryRepository directly here for conversion
+        List<Category> categories = eventTypeRequestDto.getSuggestedCategories().stream()
+                .map(categoryResponseDto -> categoryRepository.findById(categoryResponseDto.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryResponseDto.getId() + " not found")))
+                .collect(Collectors.toList());
+
+        eventType.setSuggestedCategories(categories);
         return EventTypeMapper.toResponse(eventTypeRepository.save(eventType));
     }
 
