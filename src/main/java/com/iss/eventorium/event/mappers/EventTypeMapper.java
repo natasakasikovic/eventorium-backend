@@ -1,8 +1,8 @@
-package com.iss.eventorium.event_type.mappers;
+package com.iss.eventorium.event.mappers;
 
-import com.iss.eventorium.event_type.dtos.EventTypeRequestDto;
-import com.iss.eventorium.event_type.dtos.EventTypeResponseDto;
-import com.iss.eventorium.event_type.models.EventType;
+import com.iss.eventorium.event.dtos.EventTypeRequestDto;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

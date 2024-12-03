@@ -1,10 +1,10 @@
-package com.iss.eventorium.event_type.services;
+package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event_type.dtos.EventTypeRequestDto;
-import com.iss.eventorium.event_type.mappers.EventTypeMapper;
-import com.iss.eventorium.event_type.dtos.EventTypeResponseDto;
-import com.iss.eventorium.event_type.models.EventType;
-import com.iss.eventorium.event_type.repositories.EventTypeRepository;
+import com.iss.eventorium.event.dtos.EventTypeRequestDto;
+import com.iss.eventorium.event.mappers.EventTypeMapper;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

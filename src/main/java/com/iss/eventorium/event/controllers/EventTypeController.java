@@ -1,8 +1,8 @@
-package com.iss.eventorium.event_type.controllers;
+package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event_type.dtos.EventTypeRequestDto;
-import com.iss.eventorium.event_type.dtos.EventTypeResponseDto;
-import com.iss.eventorium.event_type.services.EventTypeService;
+import com.iss.eventorium.event.dtos.EventTypeRequestDto;
+import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
