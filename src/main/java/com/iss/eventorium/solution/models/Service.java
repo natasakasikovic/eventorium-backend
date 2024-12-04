@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.shared.models.Solution;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +15,23 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table (name = "services")
 public class Service extends Solution {
+
+    @Enumerated(EnumType.STRING)
     private ReservationType type;
+
+    @Column(nullable = false)
     private LocalDate reservationDeadline;
+
+    @Column(nullable = false)
     private LocalDate cancellationDeadline;
+
+    @Column(nullable = false)
     private Integer minDuration;
+
+    @Column(nullable = false)
     private Integer maxDuration;
+
 }

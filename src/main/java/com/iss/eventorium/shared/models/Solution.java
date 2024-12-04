@@ -1,8 +1,6 @@
 package com.iss.eventorium.shared.models;
 
-import com.iss.eventorium.category.models.Category;
-import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.interaction.models.Review;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,28 +8,54 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Solution {
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Solution {
+
+    @Id
+    @SequenceGenerator(name = "solutionSeqGen", sequenceName = "solutionSequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "solutionSeqGen")
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private String specialties;
-    private double price;
-    private double discount;
+
+    @Column(nullable = false)
+    private Double price;
+
+    @Column(nullable = false)
+    private Double discount;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Column(name="valid_from")
     private LocalDateTime validFrom;
-    private boolean isAvailable;
-    private boolean isDeleted;
-    private boolean isVisible;
-    private List<EventType> eventTypes;
-    private Category category;
-    private List<Review> reviews;
+
+    @Column(name="is_available")
+    private Boolean isAvailable;
+
+    @Column(name="is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name="is_visible")
+    private Boolean isVisible;
+
+//    private List<EventType> eventTypes;
+//    private Category category;
+//    private List<Review> reviews;
 
     public void restore(SolutionMemento memento) {
         this.name = memento.name();
@@ -39,6 +63,6 @@ public class Solution {
         this.discount = memento.discount();
         this.isAvailable = memento.isAvailable();
         this.isDeleted = memento.isDeleted();
-        this.eventTypes = memento.eventTypes();
+//        this.eventTypes = memento.eventTypes();
     }
 }
