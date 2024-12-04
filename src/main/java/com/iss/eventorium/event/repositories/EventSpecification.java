@@ -2,23 +2,23 @@ package com.iss.eventorium.event.repositories;
 
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
-import com.iss.eventorium.shared.utils.EventFilter;
+import com.iss.eventorium.event.dtos.EventFilterDto;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 
 public class EventSpecification {
 
-    public static Specification<Event> filterBy(EventFilter eventFilter) {
+    public static Specification<Event> filterBy(EventFilterDto filter) {
         return Specification
-                .where(hasName(eventFilter.getName()))
-                .and(hasDescription(eventFilter.getDescription()))
-                .and(hasEventType(eventFilter.getEventType()))
-                .and(hasLocationCity(eventFilter.getLocation()))
-                .and(hasMaxParticipants(eventFilter.getMaxParticipants()))
-                .and(hasDateAfter(eventFilter.getFrom()))
-                .and(hasDateBefore(eventFilter.getTo()))
-                .and(hasPrivacy(eventFilter.getPrivacy()));
+                .where(hasName(filter.getName()))
+                .and(hasDescription(filter.getDescription()))
+                .and(hasEventType(filter.getEventType()))
+                .and(hasLocationCity(filter.getLocation()))
+                .and(hasMaxParticipants(filter.getMaxParticipants()))
+                .and(hasDateAfter(filter.getFrom()))
+                .and(hasDateBefore(filter.getTo()))
+                .and(hasPrivacy(filter.getPrivacy()));
     }
 
     private static Specification<Event> hasName(String name) {

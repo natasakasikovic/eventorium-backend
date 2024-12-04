@@ -1,4 +1,4 @@
-package com.iss.eventorium.shared.utils;
+package com.iss.eventorium.event.dtos;
 
 import com.iss.eventorium.event.models.Privacy;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventFilter {
+public class EventFilterDto {
     private String name;
     private String description;
     private String eventType;

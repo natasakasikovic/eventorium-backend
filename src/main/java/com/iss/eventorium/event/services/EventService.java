@@ -5,7 +5,7 @@ import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventSpecification;
-import com.iss.eventorium.shared.utils.EventFilter;
+import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +44,7 @@ public class EventService {
         return EventMapper.toPagedResponse(repository.findAll(pageable));
     }
 
-    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilter filter, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilterDto filter, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterBy(filter);
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
