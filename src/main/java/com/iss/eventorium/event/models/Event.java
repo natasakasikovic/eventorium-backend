@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -30,7 +30,7 @@ public class Event {
     private String description;
 
     @Column (nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     private Privacy privacy;
@@ -38,10 +38,12 @@ public class Event {
     @Column(name = "max_participants", nullable = false)
     private Integer maxParticipants;
 
-    @Embedded
+    @ManyToOne
+    private EventType type;
+
+    @Embedded   // NOTE: this may not be @Embedded, think about it when you figure out if longitude and latitude is redudant
     private Location location;
 
 //    private Budget budget;
-//    private EventType type;
 // NOTE: add missing attributes as classes are implemented!
 }

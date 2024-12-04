@@ -2,8 +2,10 @@ package com.iss.eventorium.event.mappers;
 
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.shared.utils.PagedResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +20,14 @@ public class EventMapper {
 
     public static EventSummaryResponseDto toSummaryResponse(Event event) {
         return new EventSummaryResponseDto(event.getId(), event.getName(), event.getLocation().getCity());
+    }
+
+    public static PagedResponse<EventSummaryResponseDto> toPagedResponse(Page<Event> page) {
+        return new PagedResponse<>(
+                page.stream().map(EventMapper::toSummaryResponse).toList(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
     }
 
 }

@@ -1,5 +1,6 @@
-package com.iss.eventorium.shared.utils;
+package com.iss.eventorium.event.dtos;
 
+import com.iss.eventorium.event.models.Privacy;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,12 +10,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventFilter {
+public class EventFilterDto {
     private String name;
     private String description;
-    private  String eventType;
+    private String eventType;
     private String location;
-    private int maxParticipants;
+    private Integer maxParticipants;
+    private Privacy privacy;
     private LocalDate from;
     private LocalDate to;
 }
