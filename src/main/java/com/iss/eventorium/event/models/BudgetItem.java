@@ -1,11 +1,10 @@
 package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.category.models.Category;
-import com.iss.eventorium.shared.models.Solution;
+import com.iss.eventorium.solution.models.Solution;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter

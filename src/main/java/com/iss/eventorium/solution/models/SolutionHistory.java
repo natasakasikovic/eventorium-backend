@@ -1,4 +1,4 @@
-package com.iss.eventorium.shared.models;
+package com.iss.eventorium.solution.models;
 
 import lombok.Getter;
 
