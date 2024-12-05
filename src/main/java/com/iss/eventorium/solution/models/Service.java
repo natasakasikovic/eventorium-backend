@@ -23,16 +23,16 @@ public class Service extends Solution {
     @Enumerated(EnumType.STRING)
     private ReservationType type;
 
-    @Column(nullable = false)
+    @Column(name="reservation_deadline", nullable = false)
     private LocalDate reservationDeadline;
 
-    @Column(nullable = false)
+    @Column(name="cancellation_deadline", nullable = false)
     private LocalDate cancellationDeadline;
 
-    @Column(nullable = false)
+    @Column(name="min_duration", nullable = false)
     private Integer minDuration;
 
-    @Column(nullable = false)
+    @Column(name="max_duration", nullable = false)
     private Integer maxDuration;
 
 }
