@@ -5,11 +5,13 @@ import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.services.ServiceService;
 import com.iss.eventorium.solution.util.ServiceFilter;
 import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,9 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryRespons
 @RestController
 @RequestMapping("api/v1/services")
 public class ServiceController {
+
+    @Autowired
+    private ServiceService service; //TODO: when services attribute is deleted, remove this annotation and do it as in other controllers
 
     private final List<Service> services = List.of(
             Service.builder()
@@ -162,17 +167,7 @@ public class ServiceController {
 
     @GetMapping("/top-five-services")
     public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
-        //Collection<ServiceSummaryResponseDto> topServices = serviceService.getTopServices();
-        // TODO: uncomment line above once service is implemented and also delete dummy services below
-
-        Collection<ServiceSummaryResponseDto> topServices = List.of(
-                new ServiceSummaryResponseDto(1L, "Service 1", 4.5, true, true),
-                new ServiceSummaryResponseDto(2L, "Service 2", 4.3, true, true),
-                new ServiceSummaryResponseDto(3L, "Service 3", 4.0, true, true),
-                new ServiceSummaryResponseDto(4L, "Service 4", 3.9, true, true),
-                new ServiceSummaryResponseDto(5L, "Service 5", 3.8, true, true)
-        );
-
-        return new ResponseEntity<>(topServices, HttpStatus.OK);
+        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
     }
+
 }
