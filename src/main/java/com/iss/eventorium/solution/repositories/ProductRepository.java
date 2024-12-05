@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT p FROM Product p JOIN p.reviews r WHERE p.status = 'APPROVED' GROUP BY p.id ORDER BY AVG(r.rating) DESC")
+    @Query("SELECT p FROM Product p JOIN p.reviews r WHERE p.status = 'ACCEPTED' GROUP BY p.id ORDER BY AVG(r.rating) DESC")
     public List<Product> findTopFiveProducts(Pageable pageable);
 
 }
