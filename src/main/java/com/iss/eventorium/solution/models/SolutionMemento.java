@@ -1,6 +1,7 @@
-package com.iss.eventorium.shared.models;
+package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.shared.models.Status;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
