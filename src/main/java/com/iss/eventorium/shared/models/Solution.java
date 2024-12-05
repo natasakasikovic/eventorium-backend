@@ -1,13 +1,16 @@
 package com.iss.eventorium.shared.models;
 
+import com.iss.eventorium.interaction.models.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@SQLRestriction("is_deleted = false")
 public abstract class Solution {
 
     @Id
@@ -53,9 +57,12 @@ public abstract class Solution {
     @Column(name="is_visible")
     private Boolean isVisible;
 
+    @OneToMany (fetch = FetchType.LAZY)
+    @JoinColumn (name = "solution_id")
+    private List<Review> reviews;
+
 //    private List<EventType> eventTypes;
 //    private Category category;
-//    private List<Review> reviews;
 
     public void restore(SolutionMemento memento) {
         this.name = memento.name();
