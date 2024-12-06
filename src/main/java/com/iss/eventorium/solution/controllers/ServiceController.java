@@ -24,6 +24,7 @@ import java.util.List;
 
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryResponse;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/v1/services")
 public class ServiceController {
@@ -96,8 +97,7 @@ public class ServiceController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getServicesPaged(Pageable pageable) {
-        return ResponseEntity.ok().body(
-                new PagedResponse<>(List.of(toSummaryResponse(services.get(0))), 1, 3));
+        return ResponseEntity.ok(service.getServicesPaged(pageable));
     }
 
     @GetMapping("/filter/all")

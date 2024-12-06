@@ -1,10 +1,12 @@
 package com.iss.eventorium.solution.services;
 
+import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +24,8 @@ public class ServiceService {
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
+        Page<Service> services = repository.findAll(pageable);
+        return ServiceMapper.toPagedResponse(services);
+    }
 }
