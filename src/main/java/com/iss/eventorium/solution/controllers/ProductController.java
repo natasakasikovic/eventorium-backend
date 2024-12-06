@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/v1/products")
 public class ProductController {
@@ -128,11 +129,12 @@ public class ProductController {
                 new ProductSummaryResponseDto(2L, "Product 2", 5.4, true, true));
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
+
     @GetMapping
     public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> getProductsPaged(Pageable pageable) {
-        // TODO: call service -> productService.get(pageable)
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto(1L, "Product", 8.5, true, true)), 1, 3));
+        return ResponseEntity.ok(service.getProducts(pageable));
     }
+
     @GetMapping("/filter")
     public ResponseEntity<Collection<ProductSummaryResponseDto>> filterProducts(
             ProductFilter filter,
