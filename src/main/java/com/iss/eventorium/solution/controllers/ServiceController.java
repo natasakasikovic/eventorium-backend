@@ -13,10 +13,12 @@ import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryRespons
 public class ServiceController {
 
     private final ServiceService service;
+
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
@@ -76,6 +79,15 @@ public class ServiceController {
             @RequestBody CreateServiceRequestDto createServiceRequestDto
     ) {
         return ResponseEntity.ok(service.createService(createServiceRequestDto));
+    }
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<String> uploadServiceImages(
+            @PathVariable Long id,
+            @RequestParam("images") List<MultipartFile> images
+    ) {
+        service.uploadImages(id, images);
+        return ResponseEntity.ok(String.format("Uploaded images for %s service", id));
     }
 
     @PutMapping("/{id}")
