@@ -64,7 +64,7 @@ public abstract class Solution {
     @JoinColumn (name = "solution_id")
     private List<Review> reviews;
 
-    @ManyToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn (name="category_id")
     private Category category;
 
