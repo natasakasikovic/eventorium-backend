@@ -14,6 +14,7 @@ import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,11 @@ public class ServiceController {
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
         return null;
+    }
+
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<byte[]>> getImages(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getImages(id));
     }
 
     @PostMapping

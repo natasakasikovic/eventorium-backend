@@ -20,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -76,6 +78,23 @@ public class ServiceService {
         }
         service.getImagePaths().addAll(paths);
         repository.save(service);
+    }
+
+    public List<byte[]> getImages(Long serviceId) {
+        Service service = repository.findById(serviceId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+
+        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
+        List<byte[]> images = new ArrayList<>();
+        for(ImagePath imagePath : service.getImagePaths()) {
+            try {
+                File file = new File(uploadDir + imagePath.getPath());
+                images.add(Files.readAllBytes(file.toPath()));
+            } catch (IOException e) {
+                System.err.println("Fail to read image " + imagePath.getPath() + ": " + e.getMessage());
+            }
+        }
+        return images;
     }
 
 
