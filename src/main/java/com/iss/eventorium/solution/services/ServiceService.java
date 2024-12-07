@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
@@ -15,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
@@ -43,6 +45,11 @@ public class ServiceService {
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
         List<Service> services = repository.findTopFiveServices(pageable);
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
+        Page<Service> services = repository.findAll(pageable);
+        return ServiceMapper.toPagedResponse(services);
     }
 
     public ServiceResponseDto createService(CreateServiceRequestDto createServiceRequestDto) {

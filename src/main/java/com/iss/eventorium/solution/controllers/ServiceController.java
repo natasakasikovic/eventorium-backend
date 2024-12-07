@@ -36,7 +36,6 @@ public class ServiceController {
 
     private final ServiceService service;
 
-
     @GetMapping("/all")
     public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
         return null;
@@ -44,7 +43,7 @@ public class ServiceController {
 
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getServicesPaged(Pageable pageable) {
-        return null;
+        return ResponseEntity.ok(service.getServicesPaged(pageable));
     }
 
     @GetMapping("/filter/all")

@@ -1,16 +1,16 @@
 package com.iss.eventorium.solution.mappers;
 
 import com.iss.eventorium.category.mappers.CategoryMapper;
-import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
+import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.models.Service;
-import com.iss.eventorium.solution.models.Solution;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -59,4 +59,11 @@ public class ServiceMapper {
         return modelMapper.map(service, ServiceSummaryResponseDto.class);
     }
 
+    public static PagedResponse<ServiceSummaryResponseDto> toPagedResponse(Page<Service> page) {
+        return new PagedResponse<>(
+                page.stream().map(ServiceMapper::toSummaryResponse).toList(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+    }
 }
