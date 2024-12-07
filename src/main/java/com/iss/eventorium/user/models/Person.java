@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.models;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +11,20 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Person {
-    private int id;
+
+    @Column
     private String name;
+
+    @Column
     private String lastname;
-    private String address; // street and number
+
+    @Column
+    private String address;
+
+    @Column
+    private String phoneNumber;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
 }
