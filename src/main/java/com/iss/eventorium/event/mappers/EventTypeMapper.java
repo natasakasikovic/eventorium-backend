@@ -33,4 +33,8 @@ public class EventTypeMapper {
                 page.getTotalElements()
         );
     }
+
+    public static EventType fromResponse(EventTypeResponseDto eventTypeResponseDto) {
+        return modelMapper.map(eventTypeResponseDto, EventType.class);
+    }
 }
