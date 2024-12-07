@@ -1,15 +1,16 @@
 package com.iss.eventorium.category.models;
 
-import com.iss.eventorium.shared.models.Status;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "category")
+@Table(name = "categories")
+@SQLDelete(sql = "UPDATE categories SET is_deleted = true WHERE id = ?")
 @Entity
 public class Category {
 
@@ -17,16 +18,13 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    private boolean suggested;
 
-    @Column(nullable = false)
     private boolean deleted;
 }

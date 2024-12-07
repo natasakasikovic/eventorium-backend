@@ -5,7 +5,6 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
-import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,30 +23,30 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     public List<CategoryResponseDto> getCategories() {
-        return categoryRepository.findByStatusAndDeletedFalse(Status.ACCEPTED).stream()
+        return categoryRepository.findBySuggestedFalse().stream()
                 .map(CategoryMapper::toResponse)
                 .toList();
     }
 
     public PagedResponse<CategoryResponseDto> getCategoriesPaged(Pageable pageable) {
         return CategoryMapper
-                .toPagedResponse(categoryRepository.findByStatusAndDeletedFalse(pageable, Status.ACCEPTED));
+                .toPagedResponse(categoryRepository.findBySuggestedFalse(pageable));
     }
 
     public CategoryResponseDto getCategory(Long id) {
-        Category category = categoryRepository.findByIdAndDeletedFalse(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         return toResponse(category);
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
         Category created = CategoryMapper.fromRequest(category);
-        created.setStatus(Status.ACCEPTED);
+        created.setSuggested(false);
         return toResponse(categoryRepository.save(created));
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
-        Category toUpdate = categoryRepository.findByIdAndDeletedFalse(id)
+        Category toUpdate = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         toUpdate.setName(category.getName());
         toUpdate.setDescription(category.getDescription());
@@ -55,7 +54,7 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long id) {
-        Category toDelete = categoryRepository.findByIdAndDeletedFalse(id)
+        Category toDelete = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         // TODO: Check if it is possible to delete
         toDelete.setDeleted(true);
@@ -63,13 +62,13 @@ public class CategoryService {
     }
 
     public List<CategoryResponseDto> getPendingCategories() {
-        return categoryRepository.findByStatusAndDeletedFalse(Status.PENDING).stream()
+        return categoryRepository.findBySuggestedTrue().stream()
                 .map(CategoryMapper::toResponse)
                 .toList();
     }
 
     public PagedResponse<CategoryResponseDto> getPendingCategoriesPaged(Pageable pageable) {
-        return toPagedResponse(categoryRepository.findByStatusAndDeletedFalse(pageable, Status.PENDING));
+        return toPagedResponse(categoryRepository.findBySuggestedTrue(pageable));
     }
 
 }
