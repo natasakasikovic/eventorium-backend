@@ -36,6 +36,10 @@ public class WebSecurityConfiguration {
                 .requestMatchers("api/v1/account/**").authenticated()
                 .requestMatchers("api/v1/account/services").hasRole("PROVIDER")
                 .requestMatchers("api/v1/account/products").hasRole("PROVIDER")
+                .requestMatchers("/api/v1/products/top-five-products").permitAll()
+                .requestMatchers("/api/v1/services/top-five-services").permitAll()
+                .requestMatchers("/api/v1/events/top-five-events").permitAll()
+                .requestMatchers("api/v1/home").permitAll()
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {

@@ -25,6 +25,7 @@ import java.util.List;
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryResponse;
 
 @RestController
+@CrossOrigin
 @RequestMapping("api/v1/services")
 public class ServiceController {
 

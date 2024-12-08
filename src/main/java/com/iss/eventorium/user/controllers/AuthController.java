@@ -60,7 +60,7 @@ public class AuthController {
                     person.getAddress(),
                     person.getCity().getName(),
                     authenticatedUser.getRole(),
-                    jwtTokenUtil.generateToken(authenticatedUser.getEmail())
+                    jwtTokenUtil.generateToken(authenticatedUser.getEmail(), authenticatedUser.getRole())
             );
 
             return ResponseEntity.ok(accountDto);
