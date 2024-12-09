@@ -1,5 +1,6 @@
 package com.iss.eventorium.category.controllers;
 
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.dtos.UpdateStatusRequestDto;
 import com.iss.eventorium.category.services.CategoryService;
@@ -38,4 +39,21 @@ public class CategoryProposalController {
     ) {
         return ResponseEntity.ok(categoryService.updateCategoryStatus(id, dto.getStatus()));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDto> updateCategoryProposal(
+            @PathVariable Long id,
+            @RequestBody CategoryRequestDto dto
+    ) {
+        return ResponseEntity.ok(categoryService.updateCategoryProposal(id, dto));
+    }
+
+    @PutMapping("/{id}/change")
+    public ResponseEntity<CategoryResponseDto> changeCategoryProposal(
+            @PathVariable Long id,
+            @RequestBody CategoryRequestDto dto
+    ) {
+        return ResponseEntity.ok(categoryService.changeCategoryProposal(id, dto));
+    }
+
 }

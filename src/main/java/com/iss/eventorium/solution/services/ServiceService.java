@@ -67,6 +67,9 @@ public class ServiceService {
     }
 
     public void uploadImages(Long serviceId, List<MultipartFile> images) {
+        if(images == null || images.isEmpty()) {
+            return;
+        }
         Service service = repository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
         List<ImagePath> paths = new ArrayList<>();

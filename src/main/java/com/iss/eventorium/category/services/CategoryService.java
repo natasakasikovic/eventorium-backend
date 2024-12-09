@@ -15,8 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.iss.eventorium.category.mappers.CategoryMapper.toPagedResponse;
-import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
+import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -75,10 +74,8 @@ public class CategoryService {
     }
 
     public CategoryResponseDto updateCategoryStatus(Long categoryId, Status status) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
-        Service service = serviceRepository.findByCategoryId(categoryId).orElseThrow(
-                () -> new EntityNotFoundException("Service with category '" + category.getName() + "' not found"));
+        Category category = getCategoryProposal(categoryId);
+        Service service = getServiceProposal(category);
 
         service.setStatus(status);
         if(status == Status.DECLINED) {
@@ -90,5 +87,52 @@ public class CategoryService {
         service.setCategory(category);
         serviceRepository.save(service);
         return toResponse(categoryRepository.save(category));
+    }
+
+    public CategoryResponseDto updateCategoryProposal(Long categoryId, CategoryRequestDto dto) {
+        Category category = getCategoryProposal(categoryId);
+        Service service = getServiceProposal(category);
+
+        category.setSuggested(false);
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+
+        Category response = categoryRepository.save(category);
+        service.setStatus(Status.ACCEPTED);
+        serviceRepository.save(service);
+
+        return toResponse(response);
+    }
+
+    public CategoryResponseDto changeCategoryProposal(Long categoryId, CategoryRequestDto dto) {
+        Category category = getCategoryProposal(categoryId);
+        Service service = getServiceProposal(category);
+
+        service.setStatus(Status.ACCEPTED);
+        service.setCategory(categoryRepository.findByName(dto.getName())
+                .orElseThrow(() -> new EntityNotFoundException("Category with name " + dto.getName() + " not found")));
+
+        categoryRepository.delete(category);
+        serviceRepository.save(service);
+
+        return toResponse(service.getCategory());
+    }
+
+    private Category getCategoryProposal(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
+        if(!category.isSuggested()) {
+            throw new EntityNotFoundException("Category with id " + categoryId + " is not suggested");
+        }
+        return category;
+    }
+
+    private Service getServiceProposal(Category category) {
+        Service service = serviceRepository.findByCategoryId(category.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Service with category '" + category.getName() + "' not found"));
+        if(!service.getStatus().equals(Status.PENDING)) {
+            throw new EntityNotFoundException("Service with category '" + category.getName() + "' is not pending");
+        }
+        return service;
     }
 }

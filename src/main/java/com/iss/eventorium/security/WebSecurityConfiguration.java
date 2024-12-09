@@ -31,15 +31,13 @@ public class WebSecurityConfiguration {
         .cors(cors -> {})
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-//                .requestMatchers("**").permitAll()
                 .requestMatchers("/*").permitAll()
                 .requestMatchers("/*/*").permitAll()
                 .requestMatchers("/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/users/reset-password/**").authenticated()
-                .requestMatchers("/api/v1/categories/*").authenticated()
-                .requestMatchers("/api/v1/event-types/*").authenticated()
-                .requestMatchers("/api/v1/categories/pending/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/account/**").authenticated()
+                .requestMatchers("/api/v1/categories").authenticated()
+                .requestMatchers("/api/v1/categories/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/account/services").hasRole("PROVIDER")
                 .requestMatchers("/api/v1/account/products").hasRole("PROVIDER")
                 .requestMatchers("/api/v1/products/top-five-products").permitAll()
@@ -47,7 +45,6 @@ public class WebSecurityConfiguration {
                 .requestMatchers("/api/v1/events/top-five-events").permitAll()
                 .requestMatchers("/api/v1/home").permitAll()
                 .requestMatchers("/api/v1/services/**").permitAll()
-
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
