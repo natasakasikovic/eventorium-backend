@@ -75,7 +75,6 @@ public class ServiceService {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
 
-            System.out.println(uploadDir);
             try {
                 ImageUpload.saveImage(uploadDir, fileName, image);
                 paths.add(ImagePath.builder().path(fileName).build());
