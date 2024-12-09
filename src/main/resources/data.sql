@@ -10,16 +10,6 @@ INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Guest Management', 'Handling guest invitations and RSVP',   false, false),
  ('Marketing', 'Promotions and event advertising',   false, false);
 
-INSERT INTO events (name, description, date, privacy, max_participants, city, address, latitude, longitude) VALUES
- ('Tech Conference 2025', 'A conference for tech enthusiasts.', '2025-05-15', 'OPEN', 500, 'New York', '123 Event St.', 40.7128, -74.0060),
- ('Web Development Workshop', 'A workshop on modern web development techniques.', '2026-06-01', 'CLOSED', 50, 'Novi Sad', '45 Saviceva Street', 45.2671, 19.8335),
- ('Music Festival', 'An annual music festival with local and international bands.', '2027-07-10', 'OPEN', 1000, 'Novi Sad', '22 Park Road', 45.2675, 19.8338),
- ('Startup Pitch Event', 'A pitching event for emerging tech startups.', '2026-08-20', 'CLOSED', 100, 'Novi Sad', '10 Startup Blvd.', 45.2680, 19.8340),
- ('Film Screening', 'An exclusive screening of a new indie film.', '2024-09-05', 'OPEN', 200, 'Novi Sad', '88 Film Street', 45.2673, 19.8342),
- ('Art Exhibition', 'A contemporary art exhibition featuring local artists.', '2025-10-12', 'OPEN', 150, 'Novi Sad', '11 Exhibition Avenue', 45.2669, 19.8343),
- ('Gaming Tournament', 'A tournament for competitive video gamers.', '2026-11-01', 'CLOSED', 200, 'Novi Sad', '50 Gamer’s Lane', 45.2682, 19.8339),
- ('Tech Meetup 2025', 'A meetup for tech professionals to share knowledge and network.', '2025-03-15', 'OPEN', 300, 'Novi Sad', '30 Innovation Avenue', 45.2678, 19.8350);
-
 INSERT INTO event_type (name, description, deleted) VALUES
 ('Wedding', 'Event type for organizing weddings', false),
 ('Corporate Event', 'Event type for organizing corporate events', false),
@@ -74,3 +64,43 @@ INSERT INTO users (activated, city_id, role, suspended, activation_timestamp, id
    (true, 3, 3, false, '2024-12-06 12:00:00', 3, '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '555-123-4567', 'profile3.jpg'),
    (true, 4, 3, false, '2024-12-05 12:00:00', 4, '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '111-222-3333', 'profile4.jpg'),
    (true, 5, 2, false, '2024-12-06 12:00:00', 5, '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '444-555-6666', 'profile5.jpg');
+
+
+INSERT INTO activities (id, name, description, start_time, end_time, location)
+VALUES
+    (1, 'Wedding Ceremony', 'Exchange of vows and official marriage proceedings.', '15:00:00', '16:00:00', 'Rose Garden Venue'),
+    (2, 'Cocktail Reception', 'A relaxed gathering with drinks and appetizers.', '16:30:00', '18:00:00', 'Garden Terrace'),
+    (3, 'Wedding Dinner', 'Formal dinner for the wedding guests.', '18:30:00', '21:00:00', 'Grand Ballroom'),
+    (4, 'Dance Party', 'Dancing and celebration with live music.', '21:30:00', '23:59:00', 'Ballroom Dance Floor'),
+    (5, 'After Party', 'Late-night gathering for close friends and family.', '00:30:00', '02:00:00', 'Private Lounge'),
+    (6, 'Opening Keynote', 'Kick-off presentation by a renowned speaker.', '09:00:00', '10:00:00', 'Main Auditorium'),
+    (7, 'Panel Discussion', 'Experts discuss the latest trends and innovations.', '10:15:00', '11:45:00', 'Conference Hall B'),
+    (8, 'Networking Lunch', 'Informal lunch to connect with other attendees.', '12:00:00', '13:30:00', 'Dining Hall'),
+    (9, 'Workshop: AI in Practice', 'Hands-on session on practical AI applications.', '14:00:00', '16:00:00', 'Workshop Room 3'),
+    (10, 'Closing Ceremony', 'Summary and thank-you session for participants.', '16:30:00', '17:00:00', 'Main Auditorium'),
+    (11, 'Welcome Guests', 'Guests arrive and enjoy light refreshments.', '18:00:00', '18:30:00', 'Main Hall Entrance'),
+    (12, 'Birthday Speech', 'Host delivers a speech to thank guests.', '18:45:00', '19:00:00', 'Banquet Hall'),
+    (13, 'Dinner and Cake Cutting', 'Formal dinner followed by cutting the birthday cake.', '19:15:00', '21:00:00', 'Dining Area'),
+    (14, 'Games and Entertainment', 'Fun games and entertainment for all guests.', '21:15:00', '22:30:00', 'Activity Room');
+
+INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id)
+VALUES
+    ('John and Janes Wedding', 'A beautiful celebration of love and commitment.', '2024-06-15', 'CLOSED', 150, 1, 'Rose Garden Venue, Central Park', 1),
+    ('Tech Summit 2024', 'A gathering of tech enthusiasts to explore new trends and innovations.', '2024-03-20', 'OPEN', 500, 2, 'Grand Conference Hall, Tech City', 3),
+    ('Emilys 30th Birthday Bash', 'A fun-filled birthday party with games and live music.', '2024-07-05', 'CLOSED', 50, 3, 'Banquet Hall, Riverside', 2),
+    ('Corporate Annual Meet', 'Yearly gathering of the companys employees and stakeholders.', '2024-04-10', 'CLOSED', 300, 2, 'Downtown Business Center, Metropolis', 4),
+    ('Outdoor Wedding Celebration', 'A romantic outdoor wedding under the stars.', '2024-08-12', 'CLOSED', 200, 1, 'Meadow Fields, Green Valley', 5);
+
+
+INSERT INTO events_activities (event_id, activities_id)
+VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (2, 5),
+    (2, 6),
+    (2, 7),
+    (2, 8),
+    (3, 9),
+    (3, 10);
