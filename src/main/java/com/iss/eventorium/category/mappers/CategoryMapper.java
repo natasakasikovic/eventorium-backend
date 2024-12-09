@@ -35,4 +35,7 @@ public class CategoryMapper {
         );
     }
 
+    public static Category fromResponse(CategoryResponseDto category) {
+        return modelMapper.map(category, Category.class);
+    }
 }

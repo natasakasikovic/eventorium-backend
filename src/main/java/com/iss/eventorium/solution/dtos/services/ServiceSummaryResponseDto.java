@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.dtos.services;
 
+import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 
 @Getter
@@ -13,4 +14,5 @@ public class ServiceSummaryResponseDto {
     private Double price;
     private Boolean available;
     private Boolean visible;
+    private Status status;
 }

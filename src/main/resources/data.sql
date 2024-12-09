@@ -1,14 +1,14 @@
-INSERT INTO category (name, description, status, deleted) VALUES
- ('Event Planning', 'Category for organizing event-related tasks', 'ACCEPTED',  false),
- ('Catering', 'Food and beverages arrangements', 'PENDING',  false),
- ('Venue Booking', 'Booking venues for events', 'DECLINED',  true),
- ('Photography', 'Photography and videography services', 'ACCEPTED',  false),
- ('Entertainment', 'Music, shows, and performances', 'PENDING',  false),
- ('Logistics', 'Transport and materials management', 'ACCEPTED',  false),
- ('Decoration', 'Venue decoration and themes', 'DECLINED',  true),
- ('Security', 'Security and crowd control', 'ACCEPTED',  false),
- ('Guest Management', 'Handling guest invitations and RSVP', 'PENDING',  false),
- ('Marketing', 'Promotions and event advertising', 'ACCEPTED',  false);
+INSERT INTO categories (name, description, deleted, suggested) VALUES
+ ('Event Planning', 'Category for organizing event-related tasks',  false, false),
+ ('Catering', 'Food and beverages arrangements',   false, false),
+ ('Venue Booking', 'Booking venues for events',   true, false),
+ ('Photography', 'Photography and videography services',   false, false),
+ ('Entertainment', 'Music, shows, and performances',   false, false),
+ ('Logistics', 'Transport and materials management',   false, false),
+ ('Decoration', 'Venue decoration and themes',   true, false),
+ ('Security', 'Security and crowd control',   false, true),
+ ('Guest Management', 'Handling guest invitations and RSVP',   false, false),
+ ('Marketing', 'Promotions and event advertising',   false, false);
 
 INSERT INTO events (name, description, date, privacy, max_participants, city, address, latitude, longitude) VALUES
  ('Tech Conference 2025', 'A conference for tech enthusiasts.', '2025-05-15', 'OPEN', 500, 'New York', '123 Event St.', 40.7128, -74.0060),

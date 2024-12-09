@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.models;
 
+import com.iss.eventorium.shared.models.ImagePath;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,5 +37,4 @@ public class Service extends Solution {
 
     @Column(name="max_duration", nullable = false)
     private Integer maxDuration;
-
 }

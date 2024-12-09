@@ -10,6 +10,6 @@ import java.util.List;
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("SELECT s FROM Service s JOIN s.reviews r WHERE s.status = 'ACCEPTED' GROUP BY s.id ORDER BY AVG(r.rating) DESC")
-    public List<Service> findTopFiveServices(Pageable pageable);
+    List<Service> findTopFiveServices(Pageable pageable);
 
 }
