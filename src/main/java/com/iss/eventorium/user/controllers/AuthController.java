@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -35,7 +37,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetAccountDto> login(@RequestBody LoginRequestDto user) throws  Exception {
+    public ResponseEntity<GetAccountDto> login(@RequestBody LoginRequestDto user) {
 
         UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(user.getEmail(),
                 user.getPassword());
@@ -44,28 +46,13 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         try {
-            User authenticatedUser = userService.getUserByEmail(user.getEmail());
-
-            if (!authenticatedUser.isActivated()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-            }
-
-            Person person = authenticatedUser.getPerson();
-            GetAccountDto accountDto = new GetAccountDto(
-                    authenticatedUser.getId(),
-                    authenticatedUser.getEmail(),
-                    person.getName(),
-                    person.getLastname(),
-                    person.getPhoneNumber(),
-                    person.getAddress(),
-                    person.getCity().getName(),
-                    authenticatedUser.getRole(),
-                    jwtTokenUtil.generateToken(authenticatedUser.getEmail(), authenticatedUser.getRole())
-            );
-
+            GetAccountDto accountDto = userService.getUserByEmail(user.getEmail());
             return ResponseEntity.ok(accountDto);
+
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
     }
