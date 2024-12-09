@@ -19,7 +19,7 @@ public class EventMapper {
     }
 
     public static EventSummaryResponseDto toSummaryResponse(Event event) {
-        return new EventSummaryResponseDto(event.getId(), event.getName(), event.getLocation().getCity());
+        return new EventSummaryResponseDto(event.getId(), event.getName(), event.getCity().getName());
     }
 
     public static PagedResponse<EventSummaryResponseDto> toPagedResponse(Page<Event> page) {
