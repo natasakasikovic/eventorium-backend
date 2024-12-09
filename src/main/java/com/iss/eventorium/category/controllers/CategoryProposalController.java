@@ -3,6 +3,7 @@ package com.iss.eventorium.category.controllers;
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.dtos.UpdateStatusRequestDto;
+import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("api/v1/categories/pending")
 public class CategoryProposalController {
 
+    private final CategoryProposalService categoryProposalService;
     private final CategoryService categoryService;
 
     @GetMapping("/all")
@@ -37,7 +39,7 @@ public class CategoryProposalController {
             @PathVariable Long id,
             @RequestBody UpdateStatusRequestDto dto
     ) {
-        return ResponseEntity.ok(categoryService.updateCategoryStatus(id, dto.getStatus()));
+        return ResponseEntity.ok(categoryProposalService.updateCategoryStatus(id, dto.getStatus()));
     }
 
     @PutMapping("/{id}")
@@ -45,7 +47,7 @@ public class CategoryProposalController {
             @PathVariable Long id,
             @RequestBody CategoryRequestDto dto
     ) {
-        return ResponseEntity.ok(categoryService.updateCategoryProposal(id, dto));
+        return ResponseEntity.ok(categoryProposalService.updateCategoryProposal(id, dto));
     }
 
     @PutMapping("/{id}/change")
@@ -53,7 +55,7 @@ public class CategoryProposalController {
             @PathVariable Long id,
             @RequestBody CategoryRequestDto dto
     ) {
-        return ResponseEntity.ok(categoryService.changeCategoryProposal(id, dto));
+        return ResponseEntity.ok(categoryProposalService.changeCategoryProposal(id, dto));
     }
 
 }
