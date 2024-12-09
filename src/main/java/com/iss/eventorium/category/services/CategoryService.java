@@ -5,22 +5,25 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
+import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.solution.repositories.ServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.toPagedResponse;
 import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ServiceRepository serviceRepository;
 
     public List<CategoryResponseDto> getCategories() {
         return categoryRepository.findBySuggestedFalse().stream()
@@ -71,4 +74,21 @@ public class CategoryService {
         return toPagedResponse(categoryRepository.findBySuggestedTrue(pageable));
     }
 
+    public CategoryResponseDto updateCategoryStatus(Long categoryId, Status status) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
+        Service service = serviceRepository.findByCategoryId(categoryId).orElseThrow(
+                () -> new EntityNotFoundException("Service with category '" + category.getName() + "' not found"));
+
+        service.setStatus(status);
+        if(status == Status.DECLINED) {
+            category.setDeleted(true);
+        } else {
+            category.setSuggested(false);
+        }
+        categoryRepository.save(category);
+        service.setCategory(category);
+        serviceRepository.save(service);
+        return toResponse(categoryRepository.save(category));
+    }
 }
