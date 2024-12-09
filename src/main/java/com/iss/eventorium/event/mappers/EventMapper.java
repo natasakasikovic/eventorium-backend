@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.mappers;
 
+import com.iss.eventorium.event.dtos.EventRequestDto;
+import com.iss.eventorium.event.dtos.EventResponseDto;
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.utils.PagedResponse;
@@ -28,6 +30,14 @@ public class EventMapper {
                 page.getTotalPages(),
                 page.getTotalElements()
         );
+    }
+
+    public static Event fromRequest(EventRequestDto eventRequestDto) {
+        return modelMapper.map(eventRequestDto, Event.class);
+    }
+
+    public static EventResponseDto toResponse(Event event) {
+        return modelMapper.map(event, EventResponseDto.class);
     }
 
 }
