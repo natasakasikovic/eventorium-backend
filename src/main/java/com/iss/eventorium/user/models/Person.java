@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.models;
 
+import com.iss.eventorium.shared.models.City;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
