@@ -83,13 +83,13 @@ VALUES
     (13, 'Dinner and Cake Cutting', 'Formal dinner followed by cutting the birthday cake.', '19:15:00', '21:00:00', 'Dining Area'),
     (14, 'Games and Entertainment', 'Fun games and entertainment for all guests.', '21:15:00', '22:30:00', 'Activity Room');
 
-INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id)
+INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id)
 VALUES
-    ('John and Janes Wedding', 'A beautiful celebration of love and commitment.', '2024-06-15', 'CLOSED', 150, 1, 'Rose Garden Venue, Central Park', 1),
-    ('Tech Summit 2024', 'A gathering of tech enthusiasts to explore new trends and innovations.', '2024-03-20', 'OPEN', 500, 2, 'Grand Conference Hall, Tech City', 3),
-    ('Emilys 30th Birthday Bash', 'A fun-filled birthday party with games and live music.', '2024-07-05', 'CLOSED', 50, 3, 'Banquet Hall, Riverside', 2),
-    ('Corporate Annual Meet', 'Yearly gathering of the companys employees and stakeholders.', '2024-04-10', 'CLOSED', 300, 2, 'Downtown Business Center, Metropolis', 4),
-    ('Outdoor Wedding Celebration', 'A romantic outdoor wedding under the stars.', '2024-08-12', 'CLOSED', 200, 1, 'Meadow Fields, Green Valley', 5);
+    ('John and Janes Wedding', 'A beautiful celebration of love and commitment.', '2024-06-15', 'CLOSED', 150, 1, 'Rose Garden Venue, Central Park', 1, 1),
+    ('Tech Summit 2024', 'A gathering of tech enthusiasts to explore new trends and innovations.', '2024-03-20', 'OPEN', 500, 2, 'Grand Conference Hall, Tech City', 3, 1),
+    ('Emilys 30th Birthday Bash', 'A fun-filled birthday party with games and live music.', '2024-07-05', 'CLOSED', 50, 3, 'Banquet Hall, Riverside', 2, 1),
+    ('Corporate Annual Meet', 'Yearly gathering of the companys employees and stakeholders.', '2024-04-10', 'CLOSED', 300, 2, 'Downtown Business Center, Metropolis', 4, 1),
+    ('Outdoor Wedding Celebration', 'A romantic outdoor wedding under the stars.', '2024-08-12', 'CLOSED', 200, 1, 'Meadow Fields, Green Valley', 5, 1);
 
 
 INSERT INTO events_activities (event_id, activities_id)
