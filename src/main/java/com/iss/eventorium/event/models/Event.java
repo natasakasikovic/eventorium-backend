@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public class Event {
     private Integer maxParticipants;
 
     @ManyToOne
-    private EventType type;
+    private EventType type; // NOTE: If eventType is null, it indicates that the user selected "all"
 
     @ManyToOne
     private City city;
@@ -50,6 +51,9 @@ public class Event {
 
     @OneToMany
     private List<Activity> activities;
+
+    @ManyToOne
+    private User organizer;
 
 //    private Budget budget;
 // NOTE: add missing attributes as classes are implemented!
