@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.models;
+package com.iss.eventorium.shared.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

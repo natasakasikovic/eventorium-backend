@@ -1,9 +1,12 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.dtos.EventRequestDto;
+import com.iss.eventorium.event.dtos.EventResponseDto;
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,4 +50,8 @@ public class EventController {
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 
+    @PostMapping()
+    public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
+        return ResponseEntity.ok(service.createEvent(eventRequestDto));
+    }
 }

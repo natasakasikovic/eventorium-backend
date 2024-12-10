@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.event.dtos.EventRequestDto;
+import com.iss.eventorium.event.dtos.EventResponseDto;
 import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Event;
@@ -47,6 +49,11 @@ public class EventService {
     public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilterDto filter, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterBy(filter);
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public EventResponseDto createEvent(EventRequestDto eventRequestDto) {
+        Event created = EventMapper.fromRequest(eventRequestDto);
+        return EventMapper.toResponse(repository.save(created));
     }
 
 }
