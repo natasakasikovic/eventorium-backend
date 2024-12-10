@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.models;
 
-import com.iss.eventorium.shared.models.Location;
+import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,10 +41,19 @@ public class Event {
     private Integer maxParticipants;
 
     @ManyToOne
-    private EventType type;
+    private EventType type; // NOTE: If eventType is null, it indicates that the user selected "all"
 
-    @Embedded   // NOTE: this may not be @Embedded, think about it when you figure out if longitude and latitude is redudant
-    private Location location;
+    @ManyToOne
+    private City city;
+
+    @Column
+    private String address;
+
+    @OneToMany
+    private List<Activity> activities;
+
+    @ManyToOne
+    private User organizer;
 
 //    private Budget budget;
 // NOTE: add missing attributes as classes are implemented!

@@ -1,6 +1,6 @@
 package com.iss.eventorium.company.models;
 
-import com.iss.eventorium.user.models.City;
+import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.user.models.Person;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
