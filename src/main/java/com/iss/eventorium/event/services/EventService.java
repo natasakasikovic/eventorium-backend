@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository repository;
+    private final InvitationService invitationService;
 
     public List<EventSummaryResponseDto> getTopEvents(String city) {
         Pageable pageable = PageRequest.of(0, 5);
@@ -51,9 +52,10 @@ public class EventService {
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public EventResponseDto createEvent(EventRequestDto eventRequestDto) {
-        Event created = EventMapper.fromRequest(eventRequestDto);
-        return EventMapper.toResponse(repository.save(created));
+    public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
+        Event created = repository.save(EventMapper.fromRequest(eventRequestDto));
+        invitationService.sendInvitations(eventRequestDto.getInvitations(), created);
+        return EventMapper.toResponse(created);
     }
 
 }

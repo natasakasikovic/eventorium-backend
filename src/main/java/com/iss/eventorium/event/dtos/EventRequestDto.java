@@ -27,4 +27,5 @@ public class EventRequestDto {
     private String address;
     private List<ActivityResponseDto> activities;
     private Long userId;
+    private List<InvitationRequestDto> invitations;
 }

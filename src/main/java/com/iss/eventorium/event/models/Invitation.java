@@ -20,6 +20,9 @@ public class Invitation {
     @Column(nullable = false)
     private String email;
 
-    @Column (nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id")
+    private Event event;
+
     private String hash;
 }
