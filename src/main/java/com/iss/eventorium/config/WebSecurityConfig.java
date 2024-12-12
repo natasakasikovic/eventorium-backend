@@ -4,6 +4,7 @@ import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
 import com.iss.eventorium.user.services.UserService;
+import com.iss.eventorium.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ public class WebSecurityConfig {
 
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private UserService userService;
-    private final JwtRequestFilter jwtRequestFilter;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -68,33 +69,13 @@ public class WebSecurityConfig {
         http.csrf((csrf) -> csrf.disable());
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers(new AntPathRequestMatcher("/*")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/*/*")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/auth/login")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/users/reset-password/**")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/account/**")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/categories")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**")).hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/account/services")).hasRole("PROVIDER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/account/products")).hasRole("PROVIDER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/events/event-creation")).hasRole("ORGANIZER")
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/cities/all")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("api/v1/account/**")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("api/v1/account/services")).hasRole("PROVIDER")
-                        .requestMatchers(new AntPathRequestMatcher("api/v1/account/products")).hasRole("PROVIDER")
-                        .requestMatchers(new AntPathRequestMatcher("api/v1/event-types/all")).authenticated()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/products/top-five-products")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/services/top-five-services")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/events/top-five-events")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/home")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/services/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("**")).permitAll()
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         })
-        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new JwtRequestFilter(jwtTokenUtil, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
         http.authenticationProvider(authenticationProvider());
         return http.build();
     }
