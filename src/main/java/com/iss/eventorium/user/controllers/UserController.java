@@ -4,23 +4,26 @@ import com.iss.eventorium.user.dtos.GetAccountDto;
 import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
 import com.iss.eventorium.user.dtos.UpdateAccountDto;
 import com.iss.eventorium.user.dtos.UpdatedAccountDto;
-import com.iss.eventorium.user.models.Role;
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
-    private final Collection<GetAccountDto> accounts;
+    private final UserService userService;
 
-    public UserController() {
-        accounts = new ArrayList<>();
-    }
+    private final Collection<GetAccountDto> accounts = new ArrayList<>();
 
     @PostMapping("/reset-password/{id}")
     public ResponseEntity<Void> resetPassword(@PathVariable Long id,
@@ -31,10 +34,18 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Collection<GetAccountDto>> getAccounts() {
         // TODO: call service
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/whoami")
+    public User user(Principal user) {
+        return this.userService.findByUsername(user.getName());
+    }
+
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetAccountDto> getAccount(@PathVariable Long id) {
