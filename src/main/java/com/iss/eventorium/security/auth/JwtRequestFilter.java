@@ -22,7 +22,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     protected final Log LOGGER = LogFactory.getLog(getClass());
 
     @Override
