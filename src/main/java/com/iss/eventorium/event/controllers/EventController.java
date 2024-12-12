@@ -50,7 +50,7 @@ public class EventController {
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 
-    @PostMapping()
+    @PostMapping("/event-creation")
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
         return ResponseEntity.ok(service.createEvent(eventRequestDto));
     }

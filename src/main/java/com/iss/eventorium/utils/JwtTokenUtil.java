@@ -28,7 +28,7 @@ public class JwtTokenUtil {
     private String AUTH_HEADER;
 
     private static final String AUDIENCE_WEB = "web";
-    private SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
+    private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
 
     public String generateToken(User user) {
         return Jwts.builder()

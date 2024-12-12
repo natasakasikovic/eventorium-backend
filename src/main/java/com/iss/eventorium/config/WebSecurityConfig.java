@@ -78,6 +78,7 @@ public class WebSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/categories/**")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/account/services")).hasRole("PROVIDER")
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/account/products")).hasRole("PROVIDER")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/events/event-creation")).hasRole("ORGANIZER")
                         .requestMatchers(new AntPathRequestMatcher("/api/v1/cities/all")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("api/v1/account/**")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("api/v1/account/services")).hasRole("PROVIDER")

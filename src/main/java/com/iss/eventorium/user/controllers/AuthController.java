@@ -4,7 +4,6 @@ import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +28,7 @@ public class AuthController {
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> createAuthenticationToken(
-            @RequestBody LoginRequestDto authenticationRequest, HttpServletResponse response) {
+            @RequestBody LoginRequestDto authenticationRequest) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
