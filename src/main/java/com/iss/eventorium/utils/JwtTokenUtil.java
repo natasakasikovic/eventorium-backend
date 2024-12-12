@@ -1,5 +1,6 @@
 package com.iss.eventorium.utils;
 
+import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.models.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import io.jsonwebtoken.Claims;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Jwts;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
@@ -36,7 +38,9 @@ public class JwtTokenUtil {
                 .setSubject(user.getEmail())
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
-                .claim("roles", user.getRoles().toString())
+                .claim("roles", user.getRoles().stream()
+                        .map(Role::getAuthority)
+                        .collect(Collectors.toList()))
                 .setExpiration(generateExpirationDate())
                 .signWith(SIGNATURE_ALGORITHM, SECRET.getBytes()).compact();
     }
