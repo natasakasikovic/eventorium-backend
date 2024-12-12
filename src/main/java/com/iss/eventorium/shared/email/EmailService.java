@@ -1,31 +1,32 @@
 package com.iss.eventorium.shared.email;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class EmailService {
 
-    @Autowired private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
     @Value("${spring.mail.username}") private String sender;
 
-    public String sendSimpleMail(EmailDetails details) {
+    public void sendSimpleMail(EmailDetails emailDetails) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
         try {
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(sender);
+            helper.setTo(emailDetails.getRecipient());
+            helper.setSubject(emailDetails.getSubject());
+            helper.setText(emailDetails.getMsgBody(), true);
 
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipient());
-            mailMessage.setText(details.getMsgBody());
-            mailMessage.setSubject(details.getSubject());
-
-            javaMailSender.send(mailMessage);
-            return "Mail Sent Successfully..."; // NOTE: for now, it will stay this way
-        }
-        catch (Exception e) {
-            return "Error while Sending Mail " + e.getMessage();
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();  // TODO: Consider to handle and display error messages to the user if email sending fails
         }
     }
 
