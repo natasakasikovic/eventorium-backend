@@ -1,3 +1,9 @@
+INSERT INTO roles (name) VALUES ('USER');
+INSERT INTO roles (name) VALUES ('UNAUTHENTICATED_USER');
+INSERT INTO roles (name) VALUES ('ADMIN');
+INSERT INTO roles (name) VALUES ('PROVIDER');
+INSERT INTO roles (name) VALUES ('EVENT_ORGANIZER');
+
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
  ('Catering', 'Food and beverages arrangements',   false, false),
@@ -48,7 +54,6 @@ INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUE
  ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12),
  ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13);
 
--- Insert cities
 INSERT INTO cities (name) VALUES
     ('Beograd'),
     ('Novi Sad'),
@@ -57,13 +62,18 @@ INSERT INTO cities (name) VALUES
     ('Kraljevo'),
     ('Kragujevac');
 
--- Insert users
-INSERT INTO users (activated, city_id, role, suspended, activation_timestamp, id, address, email, lastname, name, password, phone_number, profile_picture) VALUES
-   (true, 1, 4, false, '2024-12-07 12:00:00', 1, '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '123-456-7890', 'profile1.jpg'),
-   (true, 2, 4, false, '2024-12-06 12:00:00', 2, '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '987-654-3210', 'profile2.jpg'),
-   (true, 3, 3, false, '2024-12-06 12:00:00', 3, '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '555-123-4567', 'profile3.jpg'),
-   (true, 4, 3, false, '2024-12-05 12:00:00', 4, '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '111-222-3333', 'profile4.jpg'),
-   (true, 5, 2, false, '2024-12-06 12:00:00', 5, '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2b$12$87YVdd.ESS6FJGh4JG6hf.psB4eqnvW2Ug/JmC8dvRALyUoAiTsIS', '444-555-6666', 'profile5.jpg');
+INSERT INTO users (activated, city_id, suspended, activation_timestamp, id, address, email, lastname, name, password, phone_number, profile_picture, last_password_reset) VALUES
+   (true, 1,  false, '2024-12-07 12:00:00', 1, '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', 'profile1.jpg', '2017-10-01 21:58:58.508-07'),
+   (true, 2,  false, '2024-12-06 12:00:00', 2, '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', 'profile2.jpg', '2017-10-01 21:58:58.508-07'),
+   (true, 3,  false, '2024-12-06 12:00:00', 3, '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', 'profile3.jpg', '2017-10-01 21:58:58.508-07'),
+   (true, 4,  false, '2024-12-05 12:00:00', 4, '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', 'profile4.jpg', '2017-10-01 21:58:58.508-07'),
+   (true, 5,  false, '2024-12-06 12:00:00', 5, '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', 'profile5.jpg', '2017-10-01 21:58:58.508-07');
+
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (3, 4);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (4, 4);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
 
 
 INSERT INTO activities (id, name, description, start_time, end_time, location)
