@@ -9,13 +9,13 @@
 <p>Dear Eventorium user,</p>
 <p>You are warmly invited to the following event:</p>
 <ul>
-    <li><strong>Event Name:</strong> [[${eventName}]]</li>
-    <li><strong>Event Type:</strong> [[${eventType}]]</li>
-    <li><strong>Date:</strong> [[${eventDate}]]</li>
-    <li><strong>Address:</strong> [[${eventAddress}]]</li>
+    <li><strong>Event Name:</strong> <span th:text="${eventName}"></span></li>
+    <li><strong>Event Type:</strong> <span th:text="${eventType}"></span></li>
+    <li><strong>Date:</strong> <span th:text="${eventDate}"></span></li>
+    <li><strong>Address:</strong> <span th:text="${eventAddress}"></span></li>
 </ul>
 <p>To view your invitation and manage your participation, please log in by clicking the link below:</p>
-<a href="[[${link}]]" style="color: blue; text-decoration: underline;">Click here to log in</a>
+<a th:href="${link}" style="color: blue; text-decoration: underline;">Click here to log in</a>
 <p>We look forward to seeing you at the event!</p>
 <p>Warm regards,<br>Eventorium Team</p>
 </body>
