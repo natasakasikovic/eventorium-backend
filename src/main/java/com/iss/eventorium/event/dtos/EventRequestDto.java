@@ -9,7 +9,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -22,9 +21,8 @@ public class EventRequestDto {
     private LocalDate date;
     private Privacy privacy;
     private Integer maxParticipants;
-    private EventTypeResponseDto type;
+    private EventTypeResponseDto eventType = null;
     private City city;
     private String address;
-    private List<ActivityResponseDto> activities;
-    private Long userId;
+//    private List<ActivityResponseDto> activities;
 }
