@@ -33,16 +33,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoriesPaged(pageable));
     }
 
-    @GetMapping("/pending/all")
-    public ResponseEntity<List<CategoryResponseDto>> getPendingCategories() {
-        return ResponseEntity.ok(categoryService.getPendingCategories());
-    }
-
-    @GetMapping("/pending")
-    public ResponseEntity<PagedResponse<CategoryResponseDto>> getPendingCategoriesPaged(Pageable pageable) {
-        return ResponseEntity.ok(categoryService.getPendingCategoriesPaged(pageable));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> getCategory(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategory(id));

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +20,6 @@ public class GetAccountDto {
     private String phoneNumber;
     private String address;
     private String city;
-    private Role role;
+    private List<Role> role;
     private String jwt;
 }

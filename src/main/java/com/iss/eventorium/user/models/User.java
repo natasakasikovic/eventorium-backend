@@ -1,12 +1,17 @@
 package com.iss.eventorium.user.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,7 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,8 +30,11 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role", nullable = false)
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private List<Role> roles;
 
     @Column(name = "profile_picture", nullable = true)
     private String profilePicture;
@@ -37,6 +45,9 @@ public class User {
     @Column(name = "activation_timestamp", nullable = false)
     private Date activationTimestamp;
 
+    @Column(name = "last_password_reset", nullable = false)
+    private Date lastPasswordReset;
+
     @Column(name = "suspended", nullable = false)
     private boolean suspended;
 
@@ -45,4 +56,13 @@ public class User {
 
     @Transient
     private String jwt;
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles;
+    }
+    public String getUsername() {
+        return email;
+    }
 }
