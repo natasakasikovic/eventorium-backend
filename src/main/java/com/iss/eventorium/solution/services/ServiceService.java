@@ -107,4 +107,7 @@ public class ServiceService {
     }
 
 
+    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
+        return repository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
 }

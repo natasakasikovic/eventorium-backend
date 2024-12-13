@@ -68,6 +68,14 @@ public class ServiceController {
         return ResponseEntity.ok(service.getImages(id));
     }
 
+    @GetMapping("/suggestions")
+    public ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
+        @RequestParam("categoryId") Long id,
+        @RequestParam("price") Double price
+    ) {
+        return ResponseEntity.ok(service.getBudgetSuggestions(id, price));
+    }
+
     @PostMapping
     public ResponseEntity<ServiceResponseDto> createService(
             @RequestBody CreateServiceRequestDto createServiceRequestDto
