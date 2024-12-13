@@ -10,13 +10,12 @@
 <p>We are delighted to inform you that you have received this invitation from Eventorium, your premium event planner.</p>
 <p>You are warmly invited to the following event:</p>
 <ul>
-    <li><strong>Event Name:</strong> <span th:text="${eventName}"></span></li>
-    <li><strong>Event Type:</strong> <span th:text="${eventType}"></span></li>
-    <li><strong>Date:</strong> <span th:text="${eventDate}"></span></li>
-    <li><strong>Address:</strong> <span th:text="${eventAddress}"></span></li>
+    <li><strong>Event name:</strong> <span th:text="${EVENT_NAME}"></span></li>
+    <li><strong>Date:</strong> <span th:text="${EVENT_DATE}"></span></li>
+    <li><strong>Address:</strong> <span th:text="${EVENT_ADDRESS}"></span></li>
 </ul>
 <p>We noticed you are not yet one of our registered users. You can quickly and easily register by clicking the link below:</p>
-<a th:href="${link}" style="color: blue; text-decoration: underline;">Click here to register</a>
+<a th:href="${LINK}" style="color: blue; text-decoration: underline;">Click here to register</a>
 <p>We look forward to seeing you at the event!</p>
 <p>Warm regards,<br>Eventorium Team</p>
 </body>

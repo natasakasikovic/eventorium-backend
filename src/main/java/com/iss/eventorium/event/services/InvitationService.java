@@ -27,8 +27,11 @@ public class InvitationService {
     private final EmailService emailService;
     private final SpringTemplateEngine templateEngine;
 
-    // TODO: EXTRACT HARDCODED VALUES IN CODE INTO CONSTANTS!
-    String baseURI = "http://localhost:8080/api/v1/";
+    // NOTE: If constants are used in other files as well, consider creating a dedicated constants class!
+    public static final String BASE_URI = "http://localhost:8080/api/v1/";
+    public static final String EVENT_INVITATION_AUTHENTICATED_TEMPLATE = "event-invitation-authenticated";
+    public static final String EVENT_INVITATION_UNAUTHENTICATED_TEMPLATE = "event-invitation-unauthenticated";
+    public static final String EMAIL_SUBJECT = "Invitation from Eventorium";
 
     public void sendInvitations(List<InvitationRequestDto> invitationsDto, Event event) {
         List<Invitation> invitations = invitationsDto.stream()
@@ -48,7 +51,7 @@ public class InvitationService {
     private EmailDetails createEmailDetails(Invitation invitation) {
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setRecipient(invitation.getEmail());
-        emailDetails.setSubject("Invitation from Eventorium");
+        emailDetails.setSubject(EMAIL_SUBJECT);
         emailDetails.setMsgBody(generateEmailContent(invitation));
         return emailDetails;
     }
@@ -56,18 +59,17 @@ public class InvitationService {
     public String generateEmailContent(Invitation invitation) {
         Context context = new Context();
         context.setVariables(getContextVariables(invitation));
-        String emailTemplate = (invitation.getHash() == null) ? "event-invitation-authenticated" : "event-invitation-unauthenticated";
+        String emailTemplate = (invitation.getHash() == null) ? EVENT_INVITATION_AUTHENTICATED_TEMPLATE : EVENT_INVITATION_UNAUTHENTICATED_TEMPLATE;
         return templateEngine.process(emailTemplate, context);
     }
 
     private Map<String, Object> getContextVariables(Invitation invitation) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("eventName", invitation.getEvent().getName());
-        variables.put("eventType", invitation.getEvent().getType());
-        variables.put("eventDate", invitation.getEvent().getDate());
-        variables.put("eventAddress", invitation.getEvent().getAddress());
-        String link = (invitation.getHash() == null) ? baseURI + "login" : baseURI + invitation.getHash();
-        variables.put("link", link);
+        variables.put("EVENT_NAME", invitation.getEvent().getName());
+        variables.put("EVENT_DATE", invitation.getEvent().getDate());
+        variables.put("EVENT_ADDRESS", invitation.getEvent().getAddress());
+        String link = (invitation.getHash() == null) ? BASE_URI + "login" : BASE_URI + invitation.getHash();
+        variables.put("LINK", link);
         return variables;
     }
 
