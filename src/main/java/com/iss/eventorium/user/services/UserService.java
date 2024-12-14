@@ -26,4 +26,8 @@ public class UserService {
     public List<User> findAll() throws AccessDeniedException {
         return userRepository.findAll();
     }
+
+    public boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
 }

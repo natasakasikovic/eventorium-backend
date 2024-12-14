@@ -56,6 +56,6 @@ public class Event {
     @ManyToOne
     private User organizer;
 
-//    private Budget budget;
-// NOTE: add missing attributes as classes are implemented!
+    @OneToOne
+    private Budget budget;
 }

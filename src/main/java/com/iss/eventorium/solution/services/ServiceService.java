@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
@@ -14,6 +15,7 @@ import com.iss.eventorium.solution.models.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -22,9 +24,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,7 +84,8 @@ public class ServiceService {
 
             try {
                 ImageUpload.saveImage(uploadDir, fileName, image);
-                paths.add(ImagePath.builder().path(fileName).build());
+                String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+                paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
             } catch (IOException e) {
                 System.err.println("Fail to upload image " + fileName + ": " + e.getMessage());
             }
@@ -89,16 +94,16 @@ public class ServiceService {
         repository.save(service);
     }
 
-    public List<byte[]> getImages(Long serviceId) {
+    public List<ImageResponseDto> getImages(Long serviceId) {
         Service service = repository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
 
         String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
-        List<byte[]> images = new ArrayList<>();
+        List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : service.getImagePaths()) {
             try {
                 File file = new File(uploadDir + imagePath.getPath());
-                images.add(Files.readAllBytes(file.toPath()));
+                images.add(new ImageResponseDto(Files.readAllBytes(file.toPath()), imagePath.getContentType()));
             } catch (IOException e) {
                 System.err.println("Fail to read image " + imagePath.getPath() + ": " + e.getMessage());
             }
@@ -107,4 +112,27 @@ public class ServiceService {
     }
 
 
+    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
+        return repository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public ImagePath getImagePath(Long serviceId) {
+        Service service = repository.findById(serviceId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        if(service.getImagePaths().isEmpty()) {
+            throw new IllegalArgumentException("No such image found");
+        }
+        return service.getImagePaths().get(0);
+    }
+
+    public byte[] getImage(Long serviceId, ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
+        try {
+            File file = new File(uploadDir + path.getPath());
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            System.err.println("Fail to read image " + path.getPath() + ": " + e.getMessage());
+        }
+        throw new IllegalArgumentException("No such image found");
+    }
 }

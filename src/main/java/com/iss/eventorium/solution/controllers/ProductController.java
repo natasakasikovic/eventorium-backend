@@ -154,5 +154,13 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/suggestions")
+    public ResponseEntity<List<ProductSummaryResponseDto>> getBudgetSuggestions(
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("price") Double price
+    ) {
+        return ResponseEntity.ok(service.getBudgetSuggestions(categoryId, price));
+    }
+
 }
 

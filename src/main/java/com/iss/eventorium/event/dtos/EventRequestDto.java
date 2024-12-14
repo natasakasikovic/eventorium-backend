@@ -26,4 +26,5 @@ public class EventRequestDto {
     private City city;
     private String address;
     private List<ActivityRequestDto> activities;
+    private List<InvitationRequestDto> invitations;
 }
