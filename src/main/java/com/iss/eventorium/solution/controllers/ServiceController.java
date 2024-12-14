@@ -1,5 +1,7 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.services.ServiceService;
 import com.iss.eventorium.solution.util.ServiceFilter;
@@ -10,6 +12,7 @@ import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,8 +67,17 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}/images")
-    public ResponseEntity<List<byte[]>> getImages(@PathVariable Long id) {
+    public ResponseEntity<List<ImageResponseDto>> getImages(@PathVariable Long id) {
         return ResponseEntity.ok(service.getImages(id));
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable("id") Long id) {
+        ImagePath path = service.getImagePath(id);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(path.getContentType()))
+                .body(service.getImage(id, path));
     }
 
     @GetMapping("/suggestions")

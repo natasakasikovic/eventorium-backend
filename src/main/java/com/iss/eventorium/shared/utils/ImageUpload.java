@@ -20,11 +20,16 @@ public class ImageUpload {
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileName);
-
-
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
             throw new IOException("Could not save image file: " + fileName, ioe);
         }
     }
+
+    public static String getImageContentType(String uploadDir, String fileName) throws IOException {
+        Path uploadPath = Paths.get(uploadDir);
+        Path filePath = uploadPath.resolve(fileName);
+        return Files.probeContentType(filePath);
+    }
+
 }

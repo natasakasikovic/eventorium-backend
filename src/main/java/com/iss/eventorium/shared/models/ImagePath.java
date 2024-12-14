@@ -18,4 +18,7 @@ public class ImagePath {
 
     @Column(nullable = false)
     private String path;
+
+    @Column(nullable = false)
+    private String contentType;
 }
