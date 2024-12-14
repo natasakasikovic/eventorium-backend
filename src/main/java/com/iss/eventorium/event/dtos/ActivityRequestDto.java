@@ -1,6 +1,6 @@
-package com.iss.eventorium.event.models;
+package com.iss.eventorium.event.dtos;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,26 +14,12 @@ import java.time.LocalTime;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "activities")
-@Entity
-public class Activity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+public class ActivityRequestDto {
     private String name;
-
-    @Column(nullable = false)
     private String description;
-
-    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime startTime;
-
-    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime endTime;
-
-    @Column(nullable = false)
     private String location;
 }
