@@ -25,11 +25,11 @@ public class CategoryProposalService {
         Service service = getServiceProposal(category);
 
         service.setStatus(status);
+        category.setSuggested(false);
         if(status == Status.DECLINED) {
             category.setDeleted(true);
-        } else {
-            category.setSuggested(false);
         }
+
         categoryRepository.save(category);
         service.setCategory(category);
         serviceRepository.save(service);
@@ -55,11 +55,13 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Service service = getServiceProposal(category);
 
+        category.setSuggested(false);
+        category.setDeleted(true);
         service.setStatus(Status.ACCEPTED);
         service.setCategory(categoryRepository.findByName(dto.getName())
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + dto.getName() + " not found")));
 
-        categoryRepository.delete(category);
+        categoryRepository.save(category);
         serviceRepository.save(service);
 
         return toResponse(service.getCategory());

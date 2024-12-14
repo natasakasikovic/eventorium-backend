@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.EventTypeRequestDto;
 import com.iss.eventorium.event.dtos.EventTypeResponseDto;
 import com.iss.eventorium.event.services.EventTypeService;

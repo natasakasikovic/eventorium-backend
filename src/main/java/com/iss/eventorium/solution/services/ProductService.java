@@ -30,4 +30,7 @@ public class ProductService {
         return ProductMapper.toPagedResponse(products);
     }
 
+    public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
+        return repository.getBudgetSuggestions(categoryId, price).stream().map(ProductMapper::toSummaryResponse).toList();
+    }
 }
