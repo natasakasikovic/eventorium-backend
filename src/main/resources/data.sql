@@ -103,7 +103,7 @@ VALUES
     ( 'Dinner and Cake Cutting', 'Formal dinner followed by cutting the birthday cake.', '19:15:00', '21:00:00', 'Dining Area', 3),
     ( 'Games and Entertainment', 'Fun games and entertainment for all guests.', '21:15:00', '22:30:00', 'Activity Room', 3);
 
-INSERT INTO event_classifications (solution_id, event_type_id) VALUES
+INSERT INTO solution_classifications (solution_id, event_type_id) VALUES
 (1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (3, 3), (4, 1), (4, 2), (5, 1), (5, 2),
 (6, 3), (7, 1), (7, 2), (8, 3), (9, 1), (10, 2), (11, 3), (12, 1), (13, 2),
 (14, 3), (15, 1);
