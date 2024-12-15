@@ -9,7 +9,6 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventSpecification;
 import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +27,16 @@ public class EventService {
     private final InvitationService invitationService;
     private final AuthService authService;
 
-    public List<EventSummaryResponseDto> getTopEvents(String city) {
+    public List<EventSummaryResponseDto> getTopEvents() {
         Pageable pageable = PageRequest.of(0, 5);
-        List<Event> events = repository.findTopFiveUpcomingEvents(city, pageable);
+        List<Event> events = repository.findTopFiveUpcomingEvents(getUserCity(), pageable);
         return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
+    }
+
+    private String getUserCity(){  // If the user is logged in, it returns the city from the profile, otherwise defaults to "Novi Sad".
+        if (authService.getCurrentUser() != null)
+            return authService.getCurrentUser().getPerson().getCity().getName();
+        return "Novi Sad";
     }
 
     public List<EventSummaryResponseDto> getAll(){

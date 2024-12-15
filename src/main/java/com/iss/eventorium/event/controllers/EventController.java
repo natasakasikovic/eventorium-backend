@@ -6,11 +6,8 @@ import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.utils.JwtTokenUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +25,8 @@ public class EventController {
     private final EventService service;
 
     @GetMapping("/top-five-events")
-    public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents(@RequestParam String city) {
-        return new ResponseEntity<>(service.getTopEvents(city), HttpStatus.OK);
+    public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents() {
+        return new ResponseEntity<>(service.getTopEvents(), HttpStatus.OK);
     }
 
     @GetMapping("/all")
