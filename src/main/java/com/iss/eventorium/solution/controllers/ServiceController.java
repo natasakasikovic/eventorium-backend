@@ -63,7 +63,7 @@ public class ServiceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
-        return null;
+        return ResponseEntity.ok(service.getService(id));
     }
 
     @GetMapping("/{id}/images")
