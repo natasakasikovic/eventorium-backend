@@ -49,7 +49,8 @@ public class Event {
     @Column
     private String address;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
     private List<Activity> activities;
 
     @ManyToOne

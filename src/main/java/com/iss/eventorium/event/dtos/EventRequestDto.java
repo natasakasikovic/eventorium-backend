@@ -25,6 +25,6 @@ public class EventRequestDto {
     private EventTypeResponseDto eventType = null;
     private City city;
     private String address;
-//     private List<ActivityResponseDto> activities;
+    private List<ActivityRequestDto> activities;
     private List<InvitationRequestDto> invitations;
 }
