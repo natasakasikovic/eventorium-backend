@@ -2,6 +2,8 @@ package com.iss.eventorium.solution.repositories;
 
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.models.Person;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("SELECT s FROM Service s JOIN s.category c WHERE c.id = :categoryId AND s.price <= :price ORDER BY s.price DESC")
     List<Service> getBudgetSuggestions(Long categoryId, Double price);
+
+    List<Service> findByProviderId(Long providerId);
+    Page<Service> findByProviderId(Long providerId, Pageable pageable);
 }

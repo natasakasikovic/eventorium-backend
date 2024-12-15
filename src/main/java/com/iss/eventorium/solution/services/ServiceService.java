@@ -13,6 +13,7 @@ import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -39,6 +40,8 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ServiceService {
+
+    private final AuthService authService;
 
     private final ServiceRepository repository;
     private final ServiceRepository serviceRepository;
@@ -70,6 +73,7 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
+        service.setProvider(authService.getCurrentUser());
         repository.save(service);
         return toResponse(service);
     }

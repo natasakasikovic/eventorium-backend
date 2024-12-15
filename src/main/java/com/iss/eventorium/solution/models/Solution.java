@@ -5,6 +5,8 @@ import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.user.models.Person;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -75,6 +77,9 @@ public abstract class Solution {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ImagePath> imagePaths;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private User provider;
 
     public void restore(SolutionMemento memento) {
         this.name = memento.name();
