@@ -102,15 +102,10 @@ public class ServiceService {
         Service service = repository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
 
-        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
         List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : service.getImagePaths()) {
-            try {
-                File file = new File(uploadDir + imagePath.getPath());
-                images.add(new ImageResponseDto(Files.readAllBytes(file.toPath()), imagePath.getContentType()));
-            } catch (IOException e) {
-                System.err.println("Fail to read image " + imagePath.getPath() + ": " + e.getMessage());
-            }
+            byte[] image = getImage(serviceId, imagePath);
+            images.add(new ImageResponseDto(image, imagePath.getContentType()));
         }
         return images;
     }
