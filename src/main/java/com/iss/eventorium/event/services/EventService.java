@@ -40,7 +40,7 @@ public class EventService {
         if (keyword.isBlank()) {
             return EventMapper.toPagedResponse(repository.findAll(pageable));
         }
-        return EventMapper.toPagedResponse(repository.findByNameContaining(keyword, pageable));
+        return EventMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged (Pageable pageable) {
