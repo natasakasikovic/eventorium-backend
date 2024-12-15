@@ -107,3 +107,23 @@ INSERT INTO event_classifications (solution_id, event_type_id) VALUES
 (1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (3, 3), (4, 1), (4, 2), (5, 1), (5, 2),
 (6, 3), (7, 1), (7, 2), (8, 3), (9, 1), (10, 2), (11, 3), (12, 1), (13, 2),
 (14, 3), (15, 1);
+
+INSERT INTO images (content_type, path) VALUES
+('image/jpeg', 'image1.jpg'),
+('image/jpeg', 'image2.jpg'),
+('image/jpeg', 'image3.jpg'),
+('image/jpg', 'image4.jpg'),
+('image/png', 'image5.png');
+
+INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
+(1, 14),
+(2, 14),
+(3, 14),
+(4, 14),
+(5, 12);
+
+
+
+
+
+
