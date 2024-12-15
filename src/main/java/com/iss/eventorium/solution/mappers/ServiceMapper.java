@@ -2,6 +2,7 @@ package com.iss.eventorium.solution.mappers;
 
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
+import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
@@ -52,11 +53,25 @@ public class ServiceMapper {
     }
 
     public static ServiceResponseDto toResponse(Service service) {
-        return modelMapper.map(service, ServiceResponseDto.class);
+        ServiceResponseDto dto = modelMapper.map(service, ServiceResponseDto.class);
+        dto.setCategory(CategoryMapper.toResponse(service.getCategory()));
+        dto.setEventTypes(service.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
+        try {
+            dto.setRating(service.getReviews().stream().mapToInt(Review::getRating).average().orElse(0.0));
+        } catch (NullPointerException e) {
+            dto.setRating(0.0d);
+        }
+        return dto;
     }
 
     public static ServiceSummaryResponseDto toSummaryResponse(Service service) {
-        return modelMapper.map(service, ServiceSummaryResponseDto.class);
+        ServiceSummaryResponseDto dto = modelMapper.map(service, ServiceSummaryResponseDto.class);
+        try {
+            dto.setRating(service.getReviews().stream().mapToInt(Review::getRating).average().orElse(0.0));
+        } catch (NullPointerException e) {
+            dto.setRating(0.0d);
+        }
+        return dto;
     }
 
     public static PagedResponse<ServiceSummaryResponseDto> toPagedResponse(Page<Service> page) {

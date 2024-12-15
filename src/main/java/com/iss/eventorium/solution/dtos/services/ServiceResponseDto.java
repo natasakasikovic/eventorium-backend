@@ -23,6 +23,7 @@ public class ServiceResponseDto {
     private Double discount;
     private Status status;
     private List<EventTypeResponseDto> eventTypes;
+    private Double rating;
     private CategoryResponseDto category;
     private ReservationType type;
     private LocalDate reservationDeadline;
