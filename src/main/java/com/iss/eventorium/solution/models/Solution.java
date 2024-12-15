@@ -70,7 +70,7 @@ public abstract class Solution {
     private Category category;
 
     @ManyToMany(fetch = FetchType.LAZY)  // event_classification is a join table linking event and event_type in a many-to-many relationship
-    @JoinTable(name="event_classifications", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
+    @JoinTable(name="event_classifications", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
     private List<EventType> eventTypes;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
