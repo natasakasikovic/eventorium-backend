@@ -9,6 +9,8 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventSpecification;
 import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ public class EventService {
 
     private final EventRepository repository;
     private final InvitationService invitationService;
+    private final AuthService authService;
 
     public List<EventSummaryResponseDto> getTopEvents(String city) {
         Pageable pageable = PageRequest.of(0, 5);
@@ -53,9 +56,15 @@ public class EventService {
     }
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
-        Event created = repository.save(EventMapper.fromRequest(eventRequestDto));
+        Event created = repository.save(prepareEvent(eventRequestDto));
         invitationService.sendInvitations(eventRequestDto.getInvitations(), created);
         return EventMapper.toResponse(created);
+    }
+
+    private Event prepareEvent(EventRequestDto eventRequestDto) {
+        Event event = EventMapper.fromRequest(eventRequestDto);
+        event.setOrganizer(authService.getCurrentUser());
+        return event;
     }
 
 }
