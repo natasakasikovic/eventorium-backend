@@ -33,4 +33,11 @@ public class ProductService {
     public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
         return repository.getBudgetSuggestions(categoryId, price).stream().map(ProductMapper::toSummaryResponse).toList();
     }
+
+    public PagedResponse<ProductSummaryResponseDto> search(String keyword, Pageable pageable) {
+        if (keyword.isBlank()){
+            return ProductMapper.toPagedResponse(repository.findAll(pageable));
+        }
+        return  ProductMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
+    }
 }
