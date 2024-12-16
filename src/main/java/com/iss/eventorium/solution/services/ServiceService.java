@@ -17,7 +17,6 @@ import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,11 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -142,5 +139,11 @@ public class ServiceService {
     public ServiceResponseDto getService(Long id) {
         return toResponse(serviceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id))));
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
+        if (keyword.isBlank())
+            return ServiceMapper.toPagedResponse(repository.findAll(pageable));
+        return ServiceMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 }

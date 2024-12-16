@@ -50,11 +50,8 @@ public class ServiceController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchServicesPaged(
-            @RequestParam("keyword") String keyword,
-            Pageable pageable
-    ) {
-        return null;
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>>searchServicesPaged(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(service.searchServices(keyword, pageable));
     }
 
     @GetMapping("/{id}")
