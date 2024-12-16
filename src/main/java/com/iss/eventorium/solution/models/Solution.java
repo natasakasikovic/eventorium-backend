@@ -79,6 +79,7 @@ public abstract class Solution {
     private List<ImagePath> imagePaths;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "provider_id")
     private User provider;
 
     public void restore(SolutionMemento memento) {

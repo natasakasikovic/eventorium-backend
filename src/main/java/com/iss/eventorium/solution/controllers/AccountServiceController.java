@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
@@ -30,23 +31,31 @@ public class AccountServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> filterAccountServices() {
-        return ResponseEntity.ok(accountService.filterServices());
+    public ResponseEntity<List<ServiceSummaryResponseDto>> filterAccountServices(
+            @ModelAttribute ServiceFilterDto filter
+    ) {
+        return ResponseEntity.ok(accountService.filterServices(filter));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filerAccountServicesPaged(Pageable pageable) {
-        return ResponseEntity.ok(accountService.filterServicesPaged(pageable));
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filerAccountServicesPaged(
+            @ModelAttribute ServiceFilterDto filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(accountService.filterServicesPaged(filter, pageable));
     }
 
     @GetMapping("/search/all")
     public ResponseEntity<List<ServiceSummaryResponseDto>> searchAccountServices(@RequestParam String keyword) {
-        return ResponseEntity.ok().body(List.of(new ServiceSummaryResponseDto()));
+        return ResponseEntity.ok(accountService.searchServices(keyword));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchAccountServicesPaged(@RequestParam String keyword, Pageable pageable) {
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ServiceSummaryResponseDto()), 3, 100));
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchAccountServicesPaged(
+            @RequestParam String keyword,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(accountService.searchServicesPaged(keyword, pageable));
     }
 
     @GetMapping("/favourites/all")

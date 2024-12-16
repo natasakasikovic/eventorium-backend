@@ -4,6 +4,23 @@ INSERT INTO roles (name) VALUES ('ADMIN');
 INSERT INTO roles (name) VALUES ('PROVIDER');
 INSERT INTO roles (name) VALUES ('EVENT_ORGANIZER');
 
+INSERT INTO cities (name) VALUES
+('Beograd'),
+('Novi Sad'),
+('Trebinje'),
+('Sremska Mitrovica'),
+('Kraljevo'),
+('Kragujevac');
+
+
+INSERT INTO users (activated, city_id, suspended, activation_timestamp, id, address, email, lastname, name, password, phone_number, profile_picture, last_password_reset) VALUES
+(true, 1,  false, '2024-12-07 12:00:00', 1, '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', 'profile1.jpg', '2017-10-01 21:58:58.508-07'),
+(true, 2,  false, '2024-12-06 12:00:00', 2, '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', 'profile2.jpg', '2017-10-01 21:58:58.508-07'),
+(true, 3,  false, '2024-12-06 12:00:00', 3, '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', 'profile3.jpg', '2017-10-01 21:58:58.508-07'),
+(true, 4,  false, '2024-12-05 12:00:00', 4, '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', 'profile4.jpg', '2017-10-01 21:58:58.508-07'),
+(true, 5,  false, '2024-12-06 12:00:00', 5, '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', 'profile5.jpg', '2017-10-01 21:58:58.508-07');
+
+
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
  ('Catering', 'Food and beverages arrangements',   false, false),
@@ -33,14 +50,14 @@ INSERT INTO products (id, name, description, specialties, price, discount, statu
  (nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 'Mugs, Personalized', 5.00, 1.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 9),
  (nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 'Frames, Customizable', 8.00, 1.50, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 9);
 
-INSERT INTO services (id, name, description, specialties, price, discount, status, valid_from, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id) VALUES
- (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-01', '2024-04-15', 2, 6, 4),
- (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-10', '2024-04-25', 3, 8, 2),
- (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 200.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-01', '2024-05-15', 4, 10, 1),
- (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-05', '2024-04-20', 1, 5, 5),
- (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-04-25', '2024-04-10', 2, 4, 7),
- (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-15', '2024-06-01', 6, 12, 3),
- (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-15', '2024-05-01', 3, 7, 8);
+INSERT INTO services (id, name, description, specialties, price, discount, status, valid_from, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
+ (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-01', '2024-04-15', 2, 6, 4, 3),
+ (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-10', '2024-04-25', 3, 8, 2, 3),
+ (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 200.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-01', '2024-05-15', 4, 10, 1, 3),
+ (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-05', '2024-04-20', 1, 5, 5, 3),
+ (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-04-25', '2024-04-10', 2, 4, 7, 3),
+ (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-15', '2024-06-01', 6, 12, 3, 3),
+ (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', '2024-01-01 09:00:00', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-15', '2024-05-01', 3, 7, 8, 3);
 
 INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUES
  ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1),
@@ -53,21 +70,6 @@ INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUE
  ('2024-12-03 11:45:00', 3, 'The event planner was okay, but some details were overlooked during the event.', 'PENDING', 11),
  ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12),
  ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13);
-
-INSERT INTO cities (name) VALUES
-    ('Beograd'),
-    ('Novi Sad'),
-    ('Trebinje'),
-    ('Sremska Mitrovica'),
-    ('Kraljevo'),
-    ('Kragujevac');
-
-INSERT INTO users (activated, city_id, suspended, activation_timestamp, id, address, email, lastname, name, password, phone_number, profile_picture, last_password_reset) VALUES
-   (true, 1,  false, '2024-12-07 12:00:00', 1, '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', 'profile1.jpg', '2017-10-01 21:58:58.508-07'),
-   (true, 2,  false, '2024-12-06 12:00:00', 2, '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', 'profile2.jpg', '2017-10-01 21:58:58.508-07'),
-   (true, 3,  false, '2024-12-06 12:00:00', 3, '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', 'profile3.jpg', '2017-10-01 21:58:58.508-07'),
-   (true, 4,  false, '2024-12-05 12:00:00', 4, '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', 'profile4.jpg', '2017-10-01 21:58:58.508-07'),
-   (true, 5,  false, '2024-12-06 12:00:00', 5, '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', 'profile5.jpg', '2017-10-01 21:58:58.508-07');
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
