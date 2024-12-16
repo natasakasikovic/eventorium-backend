@@ -11,7 +11,8 @@ public class ServiceSpecification {
                 .where(hasCategory(filter.getCategory()))
                 .and(hasProvider(providerId))
                 .and(hasEventType(filter.getEventType()))
-                .and(hasPriceBetween(filter.getMinPrice(), filter.getMaxPrice()))
+                .and(hasMinPrice(filter.getMinPrice()))
+                .and(hasMaxPrice(filter.getMaxPrice()))
                 .and(hasAvailability(filter.getAvailability()));
     }
 
@@ -35,16 +36,23 @@ public class ServiceSpecification {
 
     private static Specification<Service> hasAvailability(Boolean available) {
         return (root, query, cb) ->
-                available == null
+                !available
                         ? cb.conjunction()
-                        : cb.equal(root.get("isAvailable"), available);
+                        : cb.equal(root.get("isAvailable"), true);
     }
 
     private static Specification<Service> hasEventType(String eventType) {
         return (root, query, cb) ->
                 eventType == null || eventType.isEmpty()
                         ? cb.conjunction()
-                        : cb.equal(cb.lower(root.get("eventType").get("name")), eventType.toLowerCase());
+                        : cb.isTrue(
+                                cb.literal(eventType).in(
+                                    root.join("eventTypes")
+                                        .get("name")
+                                        .as(String.class)
+                                        .alias("eventTypeLower")
+                                )
+                );
     }
 
     private static Specification<Service> hasCategory(String category) {
@@ -66,10 +74,6 @@ public class ServiceSpecification {
                 maxPrice == null
                         ? cb.conjunction()
                         : cb.lessThanOrEqualTo(root.get("price"), maxPrice);
-    }
-
-    public static Specification<Service> hasPriceBetween(Double minPrice, Double maxPrice) {
-        return Specification.where(hasMinPrice(minPrice)).and(hasMaxPrice(maxPrice));
     }
 
 }
