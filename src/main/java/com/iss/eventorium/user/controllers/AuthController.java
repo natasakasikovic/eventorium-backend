@@ -4,6 +4,7 @@ import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -48,13 +50,16 @@ public class AuthController {
         }
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetAccountDto> createAccount(@RequestBody RegistrationRequestDto user) throws  Exception {
-        GetAccountDto savedUser = new GetAccountDto(); // TODO: call service
+    @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createAccount(@Valid @RequestBody AuthRequestDto user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessages = new StringBuilder();
+            bindingResult.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append(" "));
+            return new ResponseEntity<>(errorMessages.toString().trim(), HttpStatus.BAD_REQUEST);
+        }
 
-        if (savedUser == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-
-        return new ResponseEntity<GetAccountDto>(savedUser, HttpStatus.CREATED);
+        User created = userService.createAccount(user);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PostMapping("/send-activation-link")
