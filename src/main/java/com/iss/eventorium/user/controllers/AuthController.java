@@ -6,6 +6,7 @@ import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +56,17 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessages = new StringBuilder();
             bindingResult.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append(" "));
-            return new ResponseEntity<>(errorMessages.toString().trim(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessages.toString().trim());
         }
 
-        User created = userService.createAccount(user);
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+        try {
+            userService.create(user);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IllegalStateException | DuplicateKeyException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
+
 
     @PostMapping("/send-activation-link")
     public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
