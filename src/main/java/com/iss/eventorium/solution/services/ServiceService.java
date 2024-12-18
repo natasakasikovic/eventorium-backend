@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
@@ -11,6 +12,7 @@ import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
+import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
 import jakarta.persistence.EntityManager;
@@ -40,6 +42,7 @@ public class ServiceService {
 
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
+    private final HistoryService historyService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -69,6 +72,7 @@ public class ServiceService {
             service.setCategory(category);
         }
         service.setValidFrom(LocalDateTime.now());
+        historyService.addServiceMemento(service);
         serviceRepository.save(service);
         return toResponse(service);
     }
@@ -157,6 +161,7 @@ public class ServiceService {
         Service service = ServiceMapper.fromUpdateRequest(serviceDto, toUpdate);
         service.setEventTypes(eventTypes);
 
+        historyService.addServiceMemento(service);
         serviceRepository.save(service);
         return toResponse(service);
     }

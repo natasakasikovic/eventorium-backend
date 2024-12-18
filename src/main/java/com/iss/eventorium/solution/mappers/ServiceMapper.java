@@ -5,6 +5,7 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
+import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,10 @@ public class ServiceMapper {
         service.setImagePaths(toUpdate.getImagePaths());
         service.setIsDeleted(toUpdate.getIsDeleted());
         return service;
+    }
+
+    public static Memento toMemento(Service service) {
+        return modelMapper.map(service, Memento.class);
     }
 
     public static ServiceResponseDto toResponse(Service service) {

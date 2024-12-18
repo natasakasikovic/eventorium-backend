@@ -115,6 +115,8 @@ INSERT INTO images (content_type, path) VALUES
 ('image/jpg', 'image4.jpg'),
 ('image/png', 'image5.png');
 
+INSERT INTO solutions_history VALUES (1);
+
 INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (1, 14),
 (2, 14),

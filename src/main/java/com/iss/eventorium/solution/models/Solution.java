@@ -76,13 +76,5 @@ public abstract class Solution {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ImagePath> imagePaths;
 
-    public void restore(SolutionMemento memento) {
-        this.name = memento.name();
-        this.price = memento.price();
-        this.discount = memento.discount();
-        this.isAvailable = memento.isAvailable();
-        this.isDeleted = memento.isDeleted();
-        this.eventTypes = memento.eventTypes();
-    }
-
+    public abstract void restore(Memento memento);
 }
