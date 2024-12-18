@@ -109,6 +109,7 @@ public class ServiceController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteService(@PathVariable("id") Long id) {
+        serviceService.deleteService(id);
         return ResponseEntity.noContent().build();
     }
 

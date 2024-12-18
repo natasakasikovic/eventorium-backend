@@ -11,8 +11,10 @@ import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
+import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
-import com.iss.eventorium.solution.models.Memento;
+import com.iss.eventorium.solution.models.Reservation;
+import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
 import jakarta.persistence.EntityManager;
@@ -42,6 +44,7 @@ public class ServiceService {
 
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
+    private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
 
     @PersistenceContext
@@ -164,5 +167,15 @@ public class ServiceService {
         historyService.addServiceMemento(service);
         serviceRepository.save(service);
         return toResponse(service);
+    }
+
+    public void deleteService(Long id) {
+        Service service = serviceRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        if(reservationRepository.existsByServiceId(id)) {
+            throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
+        }
+        service.setIsDeleted(true);
+        serviceRepository.save(service);
     }
 }
