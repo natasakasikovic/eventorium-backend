@@ -3,12 +3,9 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
 import com.iss.eventorium.solution.util.ServiceFilter;
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,6 +24,7 @@ import java.util.List;
 public class ServiceController {
 
     private final ServiceService service;
+    private final ServiceService serviceService;
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
@@ -104,9 +102,9 @@ public class ServiceController {
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> updateService(
             @PathVariable Long id,
-            @RequestBody ServiceRequestDto serviceDto
+            @RequestBody UpdateServiceRequestDto serviceDto
     ) {
-        return null;
+        return ResponseEntity.ok(serviceService.updateService(id, serviceDto));
     }
 
     @DeleteMapping("/{id}")

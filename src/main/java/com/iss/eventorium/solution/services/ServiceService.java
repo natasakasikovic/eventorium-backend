@@ -1,15 +1,15 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,8 +38,8 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @RequiredArgsConstructor
 public class ServiceService {
 
-    private final ServiceRepository repository;
     private final ServiceRepository serviceRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -48,12 +49,12 @@ public class ServiceService {
 
     public List<ServiceSummaryResponseDto> getTopServices(){
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
-        List<Service> services = repository.findTopFiveServices(pageable);
+        List<Service> services = serviceRepository.findTopFiveServices(pageable);
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
-        Page<Service> services = repository.findAll(pageable);
+        Page<Service> services = serviceRepository.findAll(pageable);
         return ServiceMapper.toPagedResponse(services);
     }
 
@@ -67,7 +68,8 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
-        repository.save(service);
+        service.setValidFrom(LocalDateTime.now());
+        serviceRepository.save(service);
         return toResponse(service);
     }
 
@@ -75,7 +77,7 @@ public class ServiceService {
         if(images == null || images.isEmpty()) {
             return;
         }
-        Service service = repository.findById(serviceId).orElseThrow(
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
         List<ImagePath> paths = new ArrayList<>();
 
@@ -92,11 +94,11 @@ public class ServiceService {
             }
         }
         service.getImagePaths().addAll(paths);
-        repository.save(service);
+        serviceRepository.save(service);
     }
 
     public List<ImageResponseDto> getImages(Long serviceId) {
-        Service service = repository.findById(serviceId).orElseThrow(
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
 
         List<ImageResponseDto> images = new ArrayList<>();
@@ -109,11 +111,11 @@ public class ServiceService {
 
 
     public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
-        return repository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public ImagePath getImagePath(Long serviceId) {
-        Service service = repository.findById(serviceId).orElseThrow(
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
         if(service.getImagePaths().isEmpty()) {
             throw new ImageNotFoundException("Image not found");
@@ -139,7 +141,23 @@ public class ServiceService {
 
     public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
         if (keyword.isBlank())
-            return ServiceMapper.toPagedResponse(repository.findAll(pageable));
-        return ServiceMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
+            return ServiceMapper.toPagedResponse(serviceRepository.findAll(pageable));
+        return ServiceMapper.toPagedResponse(serviceRepository.findByNameContainingAllIgnoreCase(keyword, pageable));
+    }
+
+    public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
+        Service toUpdate = serviceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+
+        List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
+        if (eventTypes.size() != serviceDto.getEventTypesIds().size()) {
+            throw new EntityNotFoundException("One or more event type IDs are invalid.");
+        }
+
+        Service service = ServiceMapper.fromUpdateRequest(serviceDto, toUpdate);
+        service.setEventTypes(eventTypes);
+
+        serviceRepository.save(service);
+        return toResponse(service);
     }
 }
