@@ -51,6 +51,8 @@ public class ServiceMapper {
 
     public static Service fromUpdateRequest(UpdateServiceRequestDto request, Service toUpdate) {
         Service service = modelMapper.map(request, Service.class);
+        service.setIsAvailable(request.getAvailable());
+        service.setIsVisible(request.getVisible());
         service.setId(toUpdate.getId());
         service.setStatus(toUpdate.getStatus());
         service.setCategory(toUpdate.getCategory());
