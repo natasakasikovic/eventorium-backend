@@ -74,7 +74,6 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
-        service.setValidFrom(LocalDateTime.now());
         historyService.addServiceMemento(service);
         serviceRepository.save(service);
         return toResponse(service);

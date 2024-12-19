@@ -24,7 +24,6 @@ import java.util.List;
 public class ServiceController {
 
     private final ServiceService service;
-    private final ServiceService serviceService;
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
@@ -104,12 +103,12 @@ public class ServiceController {
             @PathVariable Long id,
             @RequestBody UpdateServiceRequestDto serviceDto
     ) {
-        return ResponseEntity.ok(serviceService.updateService(id, serviceDto));
+        return ResponseEntity.ok(service.updateService(id, serviceDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteService(@PathVariable("id") Long id) {
-        serviceService.deleteService(id);
+        service.deleteService(id);
         return ResponseEntity.noContent().build();
     }
 

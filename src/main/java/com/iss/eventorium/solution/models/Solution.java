@@ -49,9 +49,6 @@ public abstract class Solution {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name="valid_from")
-    private LocalDateTime validFrom;
-
     @Column(name="is_available")
     private Boolean isAvailable;
 
@@ -70,7 +67,7 @@ public abstract class Solution {
     private Category category;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name="solution_classifications", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
+    @JoinTable(name="solution_event_types", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
     private List<EventType> eventTypes;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
