@@ -41,7 +41,6 @@ public class ServiceMapper {
                 .specialties(request.getSpecialties())
                 .type(request.getType())
                 .category(CategoryMapper.fromResponse(request.getCategory()))
-                .validFrom(LocalDateTime.now())
                 .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
                 .build();
     }
@@ -54,7 +53,6 @@ public class ServiceMapper {
         Service service = modelMapper.map(request, Service.class);
         service.setId(toUpdate.getId());
         service.setStatus(toUpdate.getStatus());
-        service.setValidFrom(LocalDateTime.now());
         service.setCategory(toUpdate.getCategory());
         service.setReviews(toUpdate.getReviews());
         service.setImagePaths(toUpdate.getImagePaths());

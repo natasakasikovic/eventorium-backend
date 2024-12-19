@@ -42,7 +42,6 @@ public class Service extends Solution {
         setDescription(memento.getDescription());
         setDiscount(memento.getDiscount());
         setEventTypes(memento.getEventTypes());
-        setValidFrom(memento.getValidFrom());
         setIsVisible(memento.isVisible());
         setIsAvailable(memento.isAvailable());
         setReservationDeadline(memento.getReservationDeadline());

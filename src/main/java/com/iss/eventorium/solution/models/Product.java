@@ -16,7 +16,6 @@ public class Product extends Solution {
         setDescription(memento.getDescription());
         setDiscount(memento.getDiscount());
         setEventTypes(memento.getEventTypes());
-        setValidFrom(memento.getValidFrom());
         setIsVisible(memento.isVisible());
         setIsAvailable(memento.isAvailable());
     }
