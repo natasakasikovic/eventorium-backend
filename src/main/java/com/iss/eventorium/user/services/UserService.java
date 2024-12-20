@@ -1,24 +1,36 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
+import com.iss.eventorium.user.dtos.AuthResponseDto;
+import com.iss.eventorium.user.dtos.GetAccountDto;
 import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+
+    @Value("${image-path}")
+    private String imagePath;
 
     public User findByEmail(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
@@ -32,21 +44,20 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public void create(AuthRequestDto authRequestDto) throws DuplicateKeyException, IllegalStateException {
+    public AuthResponseDto create(AuthRequestDto authRequestDto) throws DuplicateKeyException, IllegalStateException {
         User existingUser = userRepository.findByEmail(authRequestDto.getEmail()).orElse(null);
 
         if (existingUser == null) {
-            createNewRegistrationRequest(authRequestDto);
-            return;
+            return UserMapper.toResponse(createNewRegistrationRequest(authRequestDto));
         }
 
         checkActivationStatus(existingUser);
         checkRequestExpired(existingUser);
 
-        recreateRegistrationRequest(existingUser, authRequestDto);
+        return UserMapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
     }
 
-    private void createNewRegistrationRequest(AuthRequestDto authRequestDto) {
+    private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
 
         prepareRegistrationRequest(created);
@@ -54,7 +65,7 @@ public class UserService {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         created.setPassword(encoder.encode(authRequestDto.getPassword()));
 
-        userRepository.save(created);
+        return userRepository.save(created);
     }
 
     private void prepareRegistrationRequest(User user) {
@@ -82,9 +93,26 @@ public class UserService {
         }
     }
 
-    private void recreateRegistrationRequest(User existingUser, AuthRequestDto newUserDto) {
+    private User recreateRegistrationRequest(User existingUser, AuthRequestDto newUserDto) {
         delete(existingUser.getId());
         createNewRegistrationRequest(newUserDto);
-        userRepository.save(existingUser);
+        return userRepository.save(existingUser);
+    }
+
+    public void uploadProfilePhoto(Long userId, MultipartFile photo) {
+        if (photo == null) return;
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not fount."));
+
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
+        String uploadDir = StringUtils.cleanPath(imagePath + "profilePhotos/");
+
+        try {
+            ImageUpload.saveImage(uploadDir, fileName, photo);
+            user.getPerson().setProfilePhoto(fileName);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to save the photo.", e);
+        }
     }
 }
