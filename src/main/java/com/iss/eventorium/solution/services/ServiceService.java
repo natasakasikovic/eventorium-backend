@@ -13,10 +13,10 @@ import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -25,11 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +37,8 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ServiceService {
+
+    private final AuthService authService;
 
     private final ServiceRepository repository;
     private final ServiceRepository serviceRepository;
@@ -70,6 +70,7 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
+        service.setProvider(authService.getCurrentUser());
         repository.save(service);
         return toResponse(service);
     }
@@ -138,5 +139,11 @@ public class ServiceService {
     public ServiceResponseDto getService(Long id) {
         return toResponse(serviceRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id))));
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
+        if (keyword.isBlank())
+            return ServiceMapper.toPagedResponse(repository.findAll(pageable));
+        return ServiceMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 }

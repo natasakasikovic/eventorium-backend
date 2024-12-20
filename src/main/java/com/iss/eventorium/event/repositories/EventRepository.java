@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
-    @Query("SELECT e FROM Event e WHERE e.city.name = :city AND e.date > CURRENT_DATE ORDER BY e.date DESC")
+    @Query("SELECT e FROM Event e WHERE e.city.name = :city AND e.privacy = 'OPEN' AND e.date > CURRENT_DATE ORDER BY e.date DESC")
     List<Event> findTopFiveUpcomingEvents(@Param("city") String city, Pageable pageable);
 
     Page<Event> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);

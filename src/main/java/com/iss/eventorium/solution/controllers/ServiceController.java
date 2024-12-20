@@ -3,12 +3,8 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
-import com.iss.eventorium.solution.util.ServiceFilter;
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -39,12 +35,12 @@ public class ServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilter filter) {
+    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilterDto filter) {
         return null;
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilter filter, Pageable pageable) {
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilterDto filter, Pageable pageable) {
         return null;
     }
 
@@ -54,11 +50,8 @@ public class ServiceController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchServicesPaged(
-            @RequestParam("keyword") String keyword,
-            Pageable pageable
-    ) {
-        return null;
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>>searchServicesPaged(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(service.searchServices(keyword, pageable));
     }
 
     @GetMapping("/{id}")
