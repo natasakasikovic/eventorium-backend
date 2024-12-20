@@ -45,6 +45,8 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = (User) authentication.getPrincipal();
+            if (!user.isActivated()) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
             String jwt = jwtTokenUtil.generateToken(user);
             Long expiresIn = jwtTokenUtil.getExpiredIn();
 
