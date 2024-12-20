@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> getBudgetSuggestions(Long categoryId, Double price);
 
     Page<Product> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
+
+    boolean existsByCategory_Id(Long id);
 }
