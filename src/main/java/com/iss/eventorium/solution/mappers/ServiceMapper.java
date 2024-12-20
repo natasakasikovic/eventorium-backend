@@ -59,6 +59,7 @@ public class ServiceMapper {
         service.setReviews(toUpdate.getReviews());
         service.setImagePaths(toUpdate.getImagePaths());
         service.setIsDeleted(toUpdate.getIsDeleted());
+        service.setProvider(toUpdate.getProvider());
         return service;
     }
 
