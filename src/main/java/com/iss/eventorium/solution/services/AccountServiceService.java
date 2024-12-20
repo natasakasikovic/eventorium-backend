@@ -99,4 +99,11 @@ public class AccountServiceService {
         favouriteService.remove(service);
         userRepository.save(authService.getCurrentUser());
     }
+
+    public Boolean isFavouriteService(Long id) {
+        Service service = serviceRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Service with id " + id + " not found")
+        );
+        return authService.getCurrentUser().getPerson().getFavouriteServices().contains(service);
+    }
 }
