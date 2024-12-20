@@ -1,7 +1,6 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
-import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
@@ -13,10 +12,10 @@ import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
-import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -31,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +39,8 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ServiceService {
+
+    private final AuthService authService;
 
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
@@ -74,6 +74,8 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
+        service.setProvider(authService.getCurrentUser());
+
         historyService.addServiceMemento(service);
         serviceRepository.save(service);
         return toResponse(service);

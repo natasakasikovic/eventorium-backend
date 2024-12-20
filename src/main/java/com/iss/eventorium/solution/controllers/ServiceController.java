@@ -5,7 +5,6 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
-import com.iss.eventorium.solution.util.ServiceFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -36,12 +35,12 @@ public class ServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilter filter) {
+    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilterDto filter) {
         return null;
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilter filter, Pageable pageable) {
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilterDto filter, Pageable pageable) {
         return null;
     }
 
