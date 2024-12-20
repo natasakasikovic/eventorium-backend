@@ -1,4 +1,4 @@
-package com.iss.eventorium.solution.util;
+package com.iss.eventorium.solution.dtos.services;
 
 import lombok.*;
 
@@ -7,9 +7,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceFilter {
-    private Long categoryId;
-    private Long eventTypeId;
+public class ServiceFilterDto {
+    private String category;
+    private String eventType;
     private Boolean availability;
     private Double minPrice;
     private Double maxPrice;
