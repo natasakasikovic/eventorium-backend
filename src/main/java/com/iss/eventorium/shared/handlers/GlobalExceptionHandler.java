@@ -2,6 +2,7 @@ package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
+import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(ServiceAlreadyReservedException.class)
+    public ResponseEntity<ExceptionResponse> handleServiceAlreadyReserved(ServiceAlreadyReservedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error("Service Already Reserved")
                         .message(ex.getMessage())
                         .build());
     }
