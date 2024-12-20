@@ -13,4 +13,5 @@ public class ProductSummaryResponseDto {
     private Double price;
     private Boolean available;
     private Boolean visible;
+    private Double rating;
 }
