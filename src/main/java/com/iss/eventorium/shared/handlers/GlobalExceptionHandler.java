@@ -44,9 +44,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CategoryInUseException.class)
     public ResponseEntity<ExceptionResponse> handleCategoryInUseException(CategoryInUseException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }
