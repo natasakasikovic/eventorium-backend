@@ -111,6 +111,7 @@ public class UserService {
         try {
             ImageUpload.saveImage(uploadDir, fileName, photo);
             user.getPerson().setProfilePhoto(fileName);
+            userRepository.save(user);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to save the photo.", e);
         }
