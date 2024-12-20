@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.InvitationResponseDto;
 import com.iss.eventorium.event.mappers.InvitationMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Invitation;
@@ -9,6 +10,7 @@ import com.iss.eventorium.shared.email.EmailDetails;
 import com.iss.eventorium.shared.email.EmailService;
 import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -28,7 +30,7 @@ public class InvitationService {
     private final SpringTemplateEngine templateEngine;
 
     // NOTE: If constants are used in other files as well, consider creating a dedicated constants class!
-    public static final String BASE_URI = "http://localhost:8080/api/v1/";
+    public static final String BASE_URI = "http://localhost:4200/";
     public static final String EVENT_INVITATION_AUTHENTICATED_TEMPLATE = "event-invitation-authenticated";
     public static final String EVENT_INVITATION_UNAUTHENTICATED_TEMPLATE = "event-invitation-unauthenticated";
     public static final String EMAIL_SUBJECT = "Invitation from Eventorium";
@@ -68,9 +70,14 @@ public class InvitationService {
         variables.put("EVENT_NAME", invitation.getEvent().getName());
         variables.put("EVENT_DATE", invitation.getEvent().getDate());
         variables.put("EVENT_ADDRESS", invitation.getEvent().getAddress());
-        String link = (invitation.getHash() == null) ? BASE_URI + "login" : BASE_URI + invitation.getHash();
+        String link = (invitation.getHash() == null) ? BASE_URI + "login" : BASE_URI + "quick-registration/" + invitation.getHash();
         variables.put("LINK", link);
         return variables;
     }
 
+    public InvitationResponseDto verifyInvitation(String hash) {
+        Invitation invitation = repository.findByHash(hash)
+                .orElseThrow(() -> new EntityNotFoundException("Invitation with hash " + hash + " not found"));
+        return InvitationMapper.toResponse(invitation);
+    }
 }
