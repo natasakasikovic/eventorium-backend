@@ -1,11 +1,14 @@
 package com.iss.eventorium.user.models;
 
 import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.solution.models.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,4 +31,7 @@ public class Person {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
+
+    @ManyToMany
+    private List<Product> favouriteProducts;
 }

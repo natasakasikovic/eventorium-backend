@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.mappers;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.models.Product;
 
@@ -27,5 +28,9 @@ public class ProductMapper {
                 page.getTotalPages(),
                 page.getTotalElements()
         );
+    }
+
+    public static ProductResponseDto toResponse(Product product) {
+        return modelMapper.map(product, ProductResponseDto.class);
     }
 }
