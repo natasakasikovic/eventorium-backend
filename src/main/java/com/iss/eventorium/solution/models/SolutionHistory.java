@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +22,20 @@ public class SolutionHistory {
     private List<Memento> serviceHistories = new ArrayList<>();
 
     public void addServiceMemento(Memento memento) {
-        serviceHistories.add(memento);
-        if(serviceHistories.size() > 1) {
-            serviceHistories.get(serviceHistories.size() - 2).setValidTo(memento.getValidFrom());
-        }
+        addSolutionMemento(memento, serviceHistories);
     }
     public void addProductMemento(Memento memento) {
+        addSolutionMemento(memento, productHistories);
+    }
+
+    private void addSolutionMemento(Memento memento, List<Memento> productHistories) {
         productHistories.add(memento);
         if(productHistories.size() > 1) {
-            productHistories.get(productHistories.size() - 2).setValidTo(memento.getValidFrom());
+            for(int i = productHistories.size() - 2; i >= 0; i--) {
+                if(productHistories.get(i).getSolutionId().equals(memento.getSolutionId())) {
+                    productHistories.get(i).setValidTo(LocalDateTime.now());
+                }
+            }
         }
     }
 }

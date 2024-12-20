@@ -20,6 +20,7 @@ public class Memento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long solutionId;
     private String name;
     private String description;
     private double price;

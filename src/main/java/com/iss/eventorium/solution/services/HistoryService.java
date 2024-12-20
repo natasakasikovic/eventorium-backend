@@ -29,6 +29,7 @@ public class HistoryService {
     public void addServiceMemento(Service service) {
         Memento memento = ServiceMapper.toMemento(service);
         memento.setId(null);
+        memento.setSolutionId(service.getId());
         memento.setValidFrom(LocalDateTime.now());
         SolutionHistory solutionHistory = getSolutionHistory();
 
