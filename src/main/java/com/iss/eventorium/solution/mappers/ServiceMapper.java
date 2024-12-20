@@ -4,10 +4,8 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.dtos.services.*;
+import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +41,30 @@ public class ServiceMapper {
                 .specialties(request.getSpecialties())
                 .type(request.getType())
                 .category(CategoryMapper.fromResponse(request.getCategory()))
-                .validFrom(LocalDateTime.now())
                 .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
                 .build();
     }
 
     public static Service fromRequest(ServiceRequestDto request) {
         return modelMapper.map(request, Service.class);
+    }
+
+    public static Service fromUpdateRequest(UpdateServiceRequestDto request, Service toUpdate) {
+        Service service = modelMapper.map(request, Service.class);
+        service.setIsAvailable(request.getAvailable());
+        service.setIsVisible(request.getVisible());
+        service.setId(toUpdate.getId());
+        service.setStatus(toUpdate.getStatus());
+        service.setCategory(toUpdate.getCategory());
+        service.setReviews(toUpdate.getReviews());
+        service.setImagePaths(toUpdate.getImagePaths());
+        service.setIsDeleted(toUpdate.getIsDeleted());
+        service.setProvider(toUpdate.getProvider());
+        return service;
+    }
+
+    public static Memento toMemento(Service service) {
+        return modelMapper.map(service, Memento.class);
     }
 
     public static ServiceResponseDto toResponse(Service service) {
