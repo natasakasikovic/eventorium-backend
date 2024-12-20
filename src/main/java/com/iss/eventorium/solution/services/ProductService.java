@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -82,5 +83,9 @@ public class ProductService {
             System.err.println("Fail to read image " + path.getPath() + ": " + e.getMessage());
         }
         throw new ImageNotFoundException("Image not found");
+    }
+
+    public Collection<ProductSummaryResponseDto> getProducts() {
+        return repository.findAll().stream().map(ProductMapper::toSummaryResponse).toList();
     }
 }

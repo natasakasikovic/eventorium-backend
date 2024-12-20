@@ -11,6 +11,7 @@ import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.shared.utils.ProductFilter;
 import com.iss.eventorium.solution.services.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,21 +26,14 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("api/v1/products")
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired  //TODO: when products attribute is deleted, remove this annotation and do it as in other controllers
-    private ProductService service;
-
-    private final List<ProductResponseDto> products = new ArrayList<>();
-    @Autowired
-    private ProductService productService;
-
-    public ProductController() {
-    }
+    private final ProductService service;
 
     @GetMapping("/{id}")
     public  ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(productService.getProduct(id));
+        return ResponseEntity.ok(service.getProduct(id));
     }
 
     @PostMapping
@@ -51,14 +45,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto) {
-        ProductResponseDto product = products.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        if (product == null) { return new ResponseEntity<>(HttpStatus.NOT_FOUND); }
-
-        // TODO: call service and map
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        return null;
     }
 
     @DeleteMapping("/{id}")
@@ -73,7 +60,7 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductSummaryResponseDto>> getProducts() {
-        return null;
+        return ResponseEntity.ok(service.getProducts());
     }
 
     @GetMapping
