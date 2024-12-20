@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -59,5 +61,11 @@ public class AuthController {
     @PostMapping("/send-activation-link")
     public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
         return ResponseEntity.ok("Activation link sent successfully.");
+    }
+
+    @PostMapping("/quick-registration")
+    public ResponseEntity<String> quickRegister(@RequestBody QuickRegistrationRequestDto request) {
+        userService.quickRegister(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User successfully registered");
     }
 }

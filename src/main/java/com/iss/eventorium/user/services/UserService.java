@@ -1,5 +1,7 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
+import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +31,10 @@ public class UserService {
 
     public boolean existsByEmail(String email){
         return userRepository.existsByEmail(email);
+    }
+
+    public void quickRegister(QuickRegistrationRequestDto request){
+        User user = UserMapper.fromRequest(request);
+        userRepository.save(user);
     }
 }
