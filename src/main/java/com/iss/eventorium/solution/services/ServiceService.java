@@ -1,16 +1,21 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.solution.dtos.services.CreateServiceRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.services.*;
+import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
+import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -29,11 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
+
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ServiceService {
 
-    private final ServiceRepository repository;
+    private final AuthService authService;
+
+    private final ServiceRepository serviceRepository;
+    private final EventTypeRepository eventTypeRepository;
+    private final ReservationRepository reservationRepository;
+    private final HistoryService historyService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -43,12 +55,12 @@ public class ServiceService {
 
     public List<ServiceSummaryResponseDto> getTopServices(){
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
-        List<Service> services = repository.findTopFiveServices(pageable);
+        List<Service> services = serviceRepository.findTopFiveServices(pageable);
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
-        Page<Service> services = repository.findAll(pageable);
+        Page<Service> services = serviceRepository.findAll(pageable);
         return ServiceMapper.toPagedResponse(services);
     }
 
@@ -62,15 +74,18 @@ public class ServiceService {
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
         }
-        repository.save(service);
-        return ServiceMapper.toResponse(service);
+        service.setProvider(authService.getCurrentUser());
+
+        historyService.addServiceMemento(service);
+        serviceRepository.save(service);
+        return toResponse(service);
     }
 
     public void uploadImages(Long serviceId, List<MultipartFile> images) {
         if(images == null || images.isEmpty()) {
             return;
         }
-        Service service = repository.findById(serviceId).orElseThrow(
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
         List<ImagePath> paths = new ArrayList<>();
 
@@ -80,31 +95,88 @@ public class ServiceService {
 
             try {
                 ImageUpload.saveImage(uploadDir, fileName, image);
-                paths.add(ImagePath.builder().path(fileName).build());
+                String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+                paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
             } catch (IOException e) {
                 System.err.println("Fail to upload image " + fileName + ": " + e.getMessage());
             }
         }
         service.getImagePaths().addAll(paths);
-        repository.save(service);
+        serviceRepository.save(service);
     }
 
-    public List<byte[]> getImages(Long serviceId) {
-        Service service = repository.findById(serviceId).orElseThrow(
+    public List<ImageResponseDto> getImages(Long serviceId) {
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
 
-        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
-        List<byte[]> images = new ArrayList<>();
+        List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : service.getImagePaths()) {
-            try {
-                File file = new File(uploadDir + imagePath.getPath());
-                images.add(Files.readAllBytes(file.toPath()));
-            } catch (IOException e) {
-                System.err.println("Fail to read image " + imagePath.getPath() + ": " + e.getMessage());
-            }
+            byte[] image = getImage(serviceId, imagePath);
+            images.add(new ImageResponseDto(image, imagePath.getContentType()));
         }
         return images;
     }
 
 
+    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
+        return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public ImagePath getImagePath(Long serviceId) {
+        Service service = serviceRepository.findById(serviceId).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        if(service.getImagePaths().isEmpty()) {
+            throw new ImageNotFoundException("Image not found");
+        }
+        return service.getImagePaths().get(0);
+    }
+
+    public byte[] getImage(Long serviceId, ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
+        try {
+            File file = new File(uploadDir + path.getPath());
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            System.err.println("Fail to read image " + path.getPath() + ": " + e.getMessage());
+        }
+        throw new ImageNotFoundException("Image not found");
+    }
+
+    public ServiceResponseDto getService(Long id) {
+        return toResponse(serviceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id))));
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
+        if (keyword.isBlank())
+            return ServiceMapper.toPagedResponse(serviceRepository.findAll(pageable));
+        return ServiceMapper.toPagedResponse(serviceRepository.findByNameContainingAllIgnoreCase(keyword, pageable));
+    }
+
+    public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
+        Service toUpdate = serviceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+
+        List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
+        if (eventTypes.size() != serviceDto.getEventTypesIds().size()) {
+            throw new EntityNotFoundException("One or more event type IDs are invalid.");
+        }
+
+        Service service = ServiceMapper.fromUpdateRequest(serviceDto, toUpdate);
+        service.setEventTypes(eventTypes);
+
+        historyService.addServiceMemento(service);
+        serviceRepository.save(service);
+        return toResponse(service);
+    }
+
+    public void deleteService(Long id) {
+        Service service = serviceRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        if(reservationRepository.existsByServiceId(id)) {
+            throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
+        }
+        service.setIsDeleted(true);
+        serviceRepository.save(service);
+    }
 }

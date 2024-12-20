@@ -5,6 +5,8 @@ import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.user.models.Person;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -69,20 +71,16 @@ public abstract class Solution {
     @JoinColumn(name="category_id")
     private Category category;
 
-    @ManyToMany(fetch = FetchType.LAZY)  // event_classification is a join table linking event and event_type in a many-to-many relationship
-    @JoinTable(name="event_classifications", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="solution_event_types", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
     private List<EventType> eventTypes;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ImagePath> imagePaths;
 
-    public void restore(SolutionMemento memento) {
-        this.name = memento.name();
-        this.price = memento.price();
-        this.discount = memento.discount();
-        this.isAvailable = memento.isAvailable();
-        this.isDeleted = memento.isDeleted();
-        this.eventTypes = memento.eventTypes();
-    }
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "provider_id")
+    private User provider;
 
+    public abstract void restore(Memento memento);
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.sql.Time;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -22,18 +22,18 @@ public class Activity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String description;
 
-    @Column
-    private Time startTime;
+    @Column(nullable = false)
+    private LocalTime startTime;
 
-    @Column
-    private Time endTime;
+    @Column(nullable = false)
+    private LocalTime endTime;
 
-    @Column
+    @Column(nullable = false)
     private String location;
 }

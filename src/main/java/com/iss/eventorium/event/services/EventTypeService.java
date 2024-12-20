@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.category.dtos.CategoryResponseDto;
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.event.dtos.EventTypeRequestDto;
@@ -66,4 +68,12 @@ public class EventTypeService {
         eventType.setDeleted(true);
         eventTypeRepository.save(eventType);
     }
+
+    public List<CategoryResponseDto> getSuggestedCategories(Long id) {
+        EventType eventType = eventTypeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
+
+        return eventType.getSuggestedCategories().stream().map(CategoryMapper::toResponse).toList();
+    }
+
 }

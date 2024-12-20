@@ -36,9 +36,6 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> roles;
 
-    @Column(name = "profile_picture", nullable = true)
-    private String profilePicture;
-
     @Column(name = "activated", nullable = false)
     private boolean activated;
 

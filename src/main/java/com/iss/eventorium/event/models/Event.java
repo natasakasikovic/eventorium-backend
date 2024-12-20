@@ -49,12 +49,13 @@ public class Event {
     @Column
     private String address;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
     private List<Activity> activities;
 
     @ManyToOne
     private User organizer;
 
-//    private Budget budget;
-// NOTE: add missing attributes as classes are implemented!
+    @OneToOne
+    private Budget budget;
 }

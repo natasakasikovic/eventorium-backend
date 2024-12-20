@@ -147,11 +147,16 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword, Pageable pageable){
-        Collection<ProductSummaryResponseDto> products = List.of( // TODO: delete 2 lines below and change with -> service.searchProducts(keyword, pagable);
-                new ProductSummaryResponseDto(1L, "Product 1", 4.5, true, true),
-                new ProductSummaryResponseDto(2L, "Product 2", 4.5, true, true));
-        return ResponseEntity.ok(products);
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword, Pageable pageable){
+        return ResponseEntity.ok(service.search(keyword, pageable));
+    }
+
+    @GetMapping("/suggestions")
+    public ResponseEntity<List<ProductSummaryResponseDto>> getBudgetSuggestions(
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("price") Double price
+    ) {
+        return ResponseEntity.ok(service.getBudgetSuggestions(categoryId, price));
     }
 
 }

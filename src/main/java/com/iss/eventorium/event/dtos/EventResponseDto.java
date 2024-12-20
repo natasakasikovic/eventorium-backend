@@ -26,6 +26,4 @@ public class EventResponseDto {
     private EventTypeResponseDto type;
     private City city;
     private String address;
-    private List<ActivityResponseDto> activities;
-    private Long userId;
 }
