@@ -21,5 +21,4 @@ public class GetAccountDto {
     private String address;
     private String city;
     private List<Role> role;
-    private String jwt;
 }
