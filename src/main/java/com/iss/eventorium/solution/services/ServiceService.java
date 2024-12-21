@@ -32,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -93,7 +95,8 @@ public class ServiceService {
         List<ImagePath> paths = new ArrayList<>();
 
         for (MultipartFile image : images) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+            String name = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+            String fileName = Instant.now().toEpochMilli() + "_" + name;
             String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
 
             try {
