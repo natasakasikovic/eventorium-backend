@@ -11,6 +11,8 @@ import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,7 @@ import java.util.List;
 @Service
 public class ProductService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository repository;
 
     @Value("${image-path}")
@@ -80,9 +83,8 @@ public class ProductService {
             File file = new File(uploadDir + path.getPath());
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            System.err.println("Fail to read image " + path.getPath() + ": " + e.getMessage());
+            throw new ImageNotFoundException("Fail to read image" + path.getPath() + ":" + e.getMessage());
         }
-        throw new ImageNotFoundException("Image not found");
     }
 
     public Collection<ProductSummaryResponseDto> getProducts() {

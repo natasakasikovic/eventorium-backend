@@ -18,6 +18,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +40,7 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @RequiredArgsConstructor
 public class ServiceService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServiceService.class);
     private final AuthService authService;
 
     private final ServiceRepository repository;
@@ -92,7 +95,7 @@ public class ServiceService {
                 String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
                 paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
             } catch (IOException e) {
-                System.err.println("Fail to upload image " + fileName + ": " + e.getMessage());
+                logger.error("Failed to upload image {}: {}", fileName, e.getMessage(), e);
             }
         }
         service.getImagePaths().addAll(paths);
@@ -131,9 +134,8 @@ public class ServiceService {
             File file = new File(uploadDir + path.getPath());
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            System.err.println("Fail to read image " + path.getPath() + ": " + e.getMessage());
+            throw new ImageNotFoundException("Fail to read image" + path.getPath() + ": + e.getMessage()");
         }
-        throw new ImageNotFoundException("Image not found");
     }
 
     public ServiceResponseDto getService(Long id) {
