@@ -1,6 +1,5 @@
 package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.user.models.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,7 +28,7 @@ public class AuthRequestDto {
     private String confirmPassword;
 
     @NotEmpty(message = "Role is required")
-    private Collection<Role> role;
+    private List<RoleDto> roles;
 
     @Valid
     private PersonRequestDto person;
