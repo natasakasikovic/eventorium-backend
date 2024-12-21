@@ -50,4 +50,8 @@ public class HistoryService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Memento not found! This should never happen"));
     }
+
+    public void addProductMemento(Product product) {
+
+    }
 }

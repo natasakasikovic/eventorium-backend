@@ -31,12 +31,12 @@ public class PriceListController {
 
     @GetMapping("/products/all")
     public ResponseEntity<List<PriceListResponseDto>> getPriceListProducts() {
-        return ResponseEntity.ok(new ArrayList<>());
+        return ResponseEntity.ok(priceListService.getPriceListProducts());
     }
 
     @GetMapping("/products")
     public ResponseEntity<PagedResponse<PriceListResponseDto>> getPriceListProducts(Pageable pageable) {
-        return ResponseEntity.ok(new PagedResponse<>(List.of(new PriceListResponseDto()), 1, 100));
+        return ResponseEntity.ok(priceListService.getPriceListProductsPaged(pageable));
     }
 
     @PatchMapping("/services/{id}")
@@ -52,6 +52,6 @@ public class PriceListController {
             @PathVariable Long id,
             @RequestBody UpdatePriceRequestDto updateRequestDto
     ) {
-        return ResponseEntity.ok(new PriceListResponseDto());
+        return ResponseEntity.ok(priceListService.updateProduct(id, updateRequestDto));
     }
 }
