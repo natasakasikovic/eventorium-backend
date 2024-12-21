@@ -73,7 +73,7 @@ public abstract class Solution {
     private Category category;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name="solution_classifications", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
+    @JoinTable(name="solution_event_types", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
     private List<EventType> eventTypes;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -83,14 +83,7 @@ public abstract class Solution {
     @JoinColumn(name = "provider_id")
     private User provider;
 
-    public void restore(SolutionMemento memento) {
-        this.name = memento.name();
-        this.price = memento.price();
-        this.discount = memento.discount();
-        this.isAvailable = memento.isAvailable();
-        this.isDeleted = memento.isDeleted();
-        this.eventTypes = memento.eventTypes();
-    }
+    public abstract void restore(Memento memento);
 
     @Override
     public boolean equals(Object o) {

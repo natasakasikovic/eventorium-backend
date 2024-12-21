@@ -4,7 +4,6 @@ import com.iss.eventorium.user.dtos.GetAccountDto;
 import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
 import com.iss.eventorium.user.dtos.UpdateAccountDto;
 import com.iss.eventorium.user.dtos.UpdatedAccountDto;
-import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,13 +37,6 @@ public class UserController {
         // TODO: call service
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
-
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/whoami")
-    public User user(Principal user) {
-        return this.userService.findByUsername(user.getName());
-    }
-
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetAccountDto> getAccount(@PathVariable Long id) {

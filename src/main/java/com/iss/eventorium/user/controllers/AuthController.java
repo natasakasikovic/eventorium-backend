@@ -1,10 +1,13 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.user.dtos.*;
+import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +17,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,6 +45,8 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = (User) authentication.getPrincipal();
+            if (!user.isActivated()) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
             String jwt = jwtTokenUtil.generateToken(user);
             Long expiresIn = jwtTokenUtil.getExpiredIn();
 
@@ -48,13 +57,28 @@ public class AuthController {
         }
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetAccountDto> createAccount(@RequestBody RegistrationRequestDto user) throws  Exception {
-        GetAccountDto savedUser = new GetAccountDto(); // TODO: call service
+    @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AuthResponseDto> createAccount(@Valid @RequestBody AuthRequestDto user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
 
-        if (savedUser == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        try {
+            AuthResponseDto response = userService.create(user);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalStateException | DuplicateKeyException e) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        }
+    }
 
-        return new ResponseEntity<GetAccountDto>(savedUser, HttpStatus.CREATED);
+    @PostMapping(value = "/{userId}/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("profilePhoto") MultipartFile file) {
+        try {
+            userService.uploadProfilePhoto(userId, file);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/send-activation-link")

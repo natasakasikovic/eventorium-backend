@@ -21,9 +21,10 @@ public class ProductResponseDto {
     private Double price;
     private Double discount;
     private Status status;
-    private LocalDateTime validFrom;
-    private Boolean isAvailable;
-    private Boolean isVisible;
+    private Boolean available;
+    private Boolean visible;
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
+    private String provider;
+    private Double rating;
 }
