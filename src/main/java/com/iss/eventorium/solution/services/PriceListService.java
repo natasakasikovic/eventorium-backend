@@ -1,0 +1,57 @@
+package com.iss.eventorium.solution.services;
+
+
+import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
+import com.iss.eventorium.solution.dtos.pricelists.PriceListUpdateRequestDto;
+import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.mappers.PriceListMapper;
+import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.solution.repositories.ProductRepository;
+import com.iss.eventorium.solution.repositories.ServiceRepository;
+import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Objects;
+
+@org.springframework.stereotype.Service
+@RequiredArgsConstructor
+public class PriceListService {
+
+    private final HistoryService historyService;
+    private final AuthService authService;
+
+    private final ServiceRepository serviceRepository;
+
+    public List<PriceListResponseDto> getPriceListServices() {
+        return serviceRepository.findByProvider_Id(authService.getCurrentUser().getId()).stream()
+                .map(PriceListMapper::toResponse)
+                .toList();
+    }
+
+    public PagedResponse<PriceListResponseDto> getPriceListServicesPaged(Pageable pageable) {
+        return PriceListMapper.toPagedResponse(
+                serviceRepository.findByProvider_Id(authService.getCurrentUser().getId(), pageable)
+        );
+    }
+
+    public PriceListResponseDto updateService(Long id, PriceListUpdateRequestDto updateRequestDto) {
+        Service service = serviceRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Service with id " + id + " not found")
+        );
+
+        if(Objects.equals(service.getPrice(), updateRequestDto.getPrice())
+                && Objects.equals(service.getDiscount(), updateRequestDto.getDiscount())) {
+            return PriceListMapper.toResponse(service);
+        }
+
+        service.setPrice(updateRequestDto.getPrice());
+        service.setDiscount(updateRequestDto.getDiscount());
+        historyService.addServiceMemento(service);
+
+        return PriceListMapper.toResponse(serviceRepository.save(service));
+    }
+}
