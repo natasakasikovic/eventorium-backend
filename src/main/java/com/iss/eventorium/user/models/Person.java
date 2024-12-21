@@ -2,6 +2,7 @@ package com.iss.eventorium.user.models;
 
 import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.solution.models.Product;
+import com.iss.eventorium.solution.models.Service;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,22 +17,28 @@ import java.util.List;
 @AllArgsConstructor
 public class Person {
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String lastname;
 
-    @Column
+    @Column(nullable = false)
     private String address;
 
-    @Column
+    @Column(nullable = false)
     private String phoneNumber;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
 
-    @ManyToMany
+    @Column(name = "profile_photo")
+    private String profilePhoto;
+
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Product> favouriteProducts;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Service> favouriteServices;
 }

@@ -1,7 +1,5 @@
 package com.iss.eventorium.solution.models;
 
-import com.iss.eventorium.interaction.models.Review;
-import com.iss.eventorium.shared.models.ImagePath;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,8 +9,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -38,4 +34,20 @@ public class Service extends Solution {
 
     @Column(name="max_duration", nullable = false)
     private Integer maxDuration;
+
+    @Override
+    public void restore(Memento memento) {
+        setName(memento.getName());
+        setPrice(memento.getPrice());
+        setDescription(memento.getDescription());
+        setDiscount(memento.getDiscount());
+        setEventTypes(memento.getEventTypes());
+        setIsVisible(memento.isVisible());
+        setIsAvailable(memento.isAvailable());
+        setReservationDeadline(memento.getReservationDeadline());
+        setType(memento.getType());
+        setCancellationDeadline(memento.getCancellationDeadline());
+        setMinDuration(memento.getMinDuration());
+        setMaxDuration(memento.getMaxDuration());
+    }
 }

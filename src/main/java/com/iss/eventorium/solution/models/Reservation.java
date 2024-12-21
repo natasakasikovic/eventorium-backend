@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.event.models.Event;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +15,15 @@ import java.sql.Time;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Reservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
     private Event event;
+    @ManyToOne
     private Service service;
-    private Time from;
-    private Time to;
+    private Time startingTime;
+    private Time endingTime;
 }

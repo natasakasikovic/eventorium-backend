@@ -58,23 +58,24 @@ public class AccountServiceController {
         return ResponseEntity.ok(accountService.searchServicesPaged(keyword, pageable));
     }
 
-    @GetMapping("/favourites/all")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> getFavouriteServices() {
-        return ResponseEntity.ok().body(List.of(new ServiceSummaryResponseDto()));
-    }
-
     @GetMapping("/favourites")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getFavouriteServicesPaged(Pageable pageable) {
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ServiceSummaryResponseDto()), 3, 100));
+    public ResponseEntity<List<ServiceSummaryResponseDto>> getFavouriteServices() {
+        return ResponseEntity.ok(accountService.getFavouriteServices());
     }
 
-    @PutMapping("/favourites/{id}")
+    @GetMapping("/favourites/{id}")
+    public ResponseEntity<Boolean> isFavouriteService(@PathVariable Long id) {
+        return ResponseEntity.ok(accountService.isFavouriteService(id));
+    }
+
+    @PostMapping("/favourites/{id}")
     public ResponseEntity<ServiceResponseDto> addFavouriteService(@PathVariable Long id) {
-        return ResponseEntity.ok().body(new ServiceResponseDto());
+        return ResponseEntity.ok(accountService.addFavouriteService(id));
     }
 
     @DeleteMapping("/favourites/{id}")
     public ResponseEntity<Void> removeFavouriteService(@PathVariable Long id) {
+        accountService.removeFavouriteService(id);
         return ResponseEntity.noContent().build();
     }
 
