@@ -3,11 +3,9 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
-import com.iss.eventorium.solution.dtos.pricelists.PriceListUpdateRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
 import com.iss.eventorium.solution.mappers.PriceListMapper;
 import com.iss.eventorium.solution.models.Service;
-import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,7 +36,7 @@ public class PriceListService {
         );
     }
 
-    public PriceListResponseDto updateService(Long id, PriceListUpdateRequestDto updateRequestDto) {
+    public PriceListResponseDto updateService(Long id, UpdatePriceRequestDto updateRequestDto) {
         Service service = serviceRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Service with id " + id + " not found")
         );

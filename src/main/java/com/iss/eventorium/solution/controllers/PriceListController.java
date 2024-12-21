@@ -2,8 +2,7 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
-import com.iss.eventorium.solution.dtos.pricelists.PriceListUpdateRequestDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
 import com.iss.eventorium.solution.services.PriceListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +42,7 @@ public class PriceListController {
     @PatchMapping("/services/{id}")
     public ResponseEntity<PriceListResponseDto> updateServicePrice(
             @PathVariable Long id,
-            @RequestBody PriceListUpdateRequestDto updateRequestDto
+            @RequestBody UpdatePriceRequestDto updateRequestDto
     ) {
         return ResponseEntity.ok(priceListService.updateService(id, updateRequestDto));
     }
@@ -51,7 +50,7 @@ public class PriceListController {
     @PatchMapping("/products/{id}")
     public ResponseEntity<PriceListResponseDto> updateProductPrice(
             @PathVariable Long id,
-            @RequestBody PriceListUpdateRequestDto updateRequestDto
+            @RequestBody UpdatePriceRequestDto updateRequestDto
     ) {
         return ResponseEntity.ok(new PriceListResponseDto());
     }

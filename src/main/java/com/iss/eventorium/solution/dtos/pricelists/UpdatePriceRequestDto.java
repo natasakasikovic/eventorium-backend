@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PriceListUpdateRequestDto {
+public class UpdatePriceRequestDto {
     private Double price;
     private Double discount;
 }

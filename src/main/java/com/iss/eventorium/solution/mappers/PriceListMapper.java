@@ -23,6 +23,7 @@ public class PriceListMapper {
 
     public static<T extends Solution> PriceListResponseDto toResponse(T solution) {
         return PriceListResponseDto.builder()
+                .id(solution.getId())
                 .name(solution.getName())
                 .price(solution.getPrice())
                 .discount(solution.getDiscount())
