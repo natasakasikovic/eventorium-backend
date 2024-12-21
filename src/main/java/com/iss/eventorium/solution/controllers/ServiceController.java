@@ -100,13 +100,14 @@ public class ServiceController {
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> updateService(
             @PathVariable Long id,
-            @RequestBody ServiceRequestDto serviceDto
+            @RequestBody UpdateServiceRequestDto serviceDto
     ) {
-        return null;
+        return ResponseEntity.ok(service.updateService(id, serviceDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteService(@PathVariable("id") Long id) {
+        service.deleteService(id);
         return ResponseEntity.noContent().build();
     }
 
