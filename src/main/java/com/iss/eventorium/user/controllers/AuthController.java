@@ -84,7 +84,7 @@ public class AuthController {
     }
 
     @PostMapping("/quick-registration")
-    public ResponseEntity<String> quickRegister(@RequestBody QuickRegistrationRequestDto request) {
+    public ResponseEntity<String> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
         userService.quickRegister(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("User successfully registered");
     }

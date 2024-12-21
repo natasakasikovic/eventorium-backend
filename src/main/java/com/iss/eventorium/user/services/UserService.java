@@ -4,7 +4,6 @@ import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
 import com.iss.eventorium.user.dtos.AuthResponseDto;
-import com.iss.eventorium.user.dtos.GetAccountDto;
 import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -29,6 +27,7 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
     @Value("${image-path}")
     private String imagePath;
@@ -43,6 +42,7 @@ public class UserService {
 
     public void quickRegister(QuickRegistrationRequestDto request){
         User user = UserMapper.fromRequest(request);
+        user.setRoles(roleService.findByName("USER"));
         userRepository.save(user);
     }
 
@@ -66,19 +66,10 @@ public class UserService {
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
 
-        prepareRegistrationRequest(created);
-
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         created.setPassword(encoder.encode(authRequestDto.getPassword()));
 
         return userRepository.save(created);
-    }
-
-    private void prepareRegistrationRequest(User user) {
-        user.setActivated(false);
-        user.setSuspended(false);
-        user.setActivationTimestamp(new Date());
-        user.setLastPasswordReset(new Date());
     }
 
     private void checkRequestExpired(User existingUser) throws IllegalStateException {

@@ -37,16 +37,16 @@ public class User implements UserDetails {
     private List<Role> roles;
 
     @Column(name = "activated", nullable = false)
-    private boolean activated;
+    private boolean activated = false;
 
     @Column(name = "activation_timestamp", nullable = false)
-    private Date activationTimestamp;
+    private Date activationTimestamp = new Date();
 
     @Column(name = "last_password_reset", nullable = false)
-    private Date lastPasswordReset;
+    private Date lastPasswordReset = new Date();
 
     @Column(name = "suspended", nullable = false)
-    private boolean suspended;
+    private boolean suspended = false;
 
     @Embedded
     private Person person;
