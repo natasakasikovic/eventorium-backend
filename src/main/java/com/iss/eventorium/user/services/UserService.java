@@ -42,7 +42,11 @@ public class UserService {
 
     public void quickRegister(QuickRegistrationRequestDto request){
         User user = UserMapper.fromRequest(request);
+
         user.setRoles(roleService.findByName("USER"));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        user.setPassword(encoder.encode(user.getPassword()));
+
         userRepository.save(user);
     }
 
