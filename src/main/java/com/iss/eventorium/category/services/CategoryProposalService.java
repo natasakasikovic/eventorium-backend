@@ -5,6 +5,7 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.interaction.models.Notification;
+import com.iss.eventorium.interaction.models.NotificationType;
 import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Service;
@@ -34,9 +35,15 @@ public class CategoryProposalService {
         category.setSuggested(false);
         if(status == Status.DECLINED) {
             category.setDeleted(true);
-            notification = new Notification("Unfortunately, your category suggestion (" + category.getName() + ") has been rejected.");
+            notification = new Notification(
+                    "Unfortunately, your category suggestion (" + category.getName() + ") has been declined.",
+                    NotificationType.DECLINED
+            );
         } else {
-            notification = new Notification("Your category suggestion (" + category.getName() + ") has been accepted.");
+            notification = new Notification(
+                    "Your category suggestion (" + category.getName() + ") has been accepted.",
+                    NotificationType.ACCEPTED
+            );
         }
 
         categoryRepository.save(category);
@@ -60,7 +67,10 @@ public class CategoryProposalService {
         service.setStatus(Status.ACCEPTED);
         serviceRepository.save(service);
 
-        Notification notification = new Notification("Your category suggestion (" + category.getName() + ") has been accepted, but the details have been updated.");
+        Notification notification = new Notification(
+                "Your category suggestion (" + category.getName() + ") has been accepted, but the details have been updated.",
+                NotificationType.ACCEPTED
+        );
         notificationService.sendNotification(service.getProvider().getId(), notification);
 
         return toResponse(response);
@@ -75,6 +85,13 @@ public class CategoryProposalService {
         service.setStatus(Status.ACCEPTED);
         service.setCategory(categoryRepository.findByName(dto.getName())
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + dto.getName() + " not found")));
+
+        Notification notification = new Notification(
+                "Your category suggestion (" + category.getName() + ") has been changed to " + dto.getName() + ".",
+                NotificationType.INFO
+        );
+
+        notificationService.sendNotification(service.getProvider().getId(), notification);
 
         categoryRepository.save(category);
         serviceRepository.save(service);

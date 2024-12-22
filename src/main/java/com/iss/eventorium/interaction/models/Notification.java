@@ -1,5 +1,6 @@
 package com.iss.eventorium.interaction.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,10 @@ public class Notification {
     @Column(nullable = false)
     private Boolean seen;
 
-    public Notification(String message) {
+    @JsonIgnore
+    private NotificationType type;
+
+    public Notification(String message, NotificationType type) {
         this.message = message;
         this.timestamp = LocalDateTime.now();
         this.seen = false;
