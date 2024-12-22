@@ -4,11 +4,14 @@ import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
+import com.iss.eventorium.interaction.models.Notification;
+import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
@@ -17,6 +20,8 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 @org.springframework.stereotype.Service
 public class CategoryProposalService {
 
+    private final NotificationService notificationService;
+
     private final CategoryRepository categoryRepository;
     private final ServiceRepository serviceRepository;
 
@@ -24,15 +29,22 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Service service = getServiceProposal(category);
 
+        Notification notification;
         service.setStatus(status);
         category.setSuggested(false);
         if(status == Status.DECLINED) {
             category.setDeleted(true);
+            notification = new Notification("Unfortunately, your category suggestion (" + category.getName() + ") has been rejected.");
+        } else {
+            notification = new Notification("Your category suggestion (" + category.getName() + ") has been accepted.");
         }
 
         categoryRepository.save(category);
         service.setCategory(category);
         serviceRepository.save(service);
+
+        notificationService.sendNotification(service.getProvider().getId(), notification);
+
         return toResponse(categoryRepository.save(category));
     }
 
@@ -47,6 +59,9 @@ public class CategoryProposalService {
         Category response = categoryRepository.save(category);
         service.setStatus(Status.ACCEPTED);
         serviceRepository.save(service);
+
+        Notification notification = new Notification("Your category suggestion (" + category.getName() + ") has been accepted, but the details have been updated.");
+        notificationService.sendNotification(service.getProvider().getId(), notification);
 
         return toResponse(response);
     }
@@ -63,7 +78,6 @@ public class CategoryProposalService {
 
         categoryRepository.save(category);
         serviceRepository.save(service);
-
         return toResponse(service.getCategory());
     }
 

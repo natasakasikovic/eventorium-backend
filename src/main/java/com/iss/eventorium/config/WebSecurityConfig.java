@@ -67,8 +67,8 @@ public class WebSecurityConfig {
         http.csrf((csrf) -> csrf.disable());
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers(new AntPathRequestMatcher("**")).permitAll()
-                        .requestMatchers("/ws/**")
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("**").permitAll()
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
@@ -94,8 +94,9 @@ public class WebSecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

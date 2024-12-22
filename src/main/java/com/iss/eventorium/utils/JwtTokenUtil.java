@@ -38,6 +38,7 @@ public class JwtTokenUtil {
                 .setSubject(user.getEmail())
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
+                .claim("userId", user.getId())
                 .claim("roles", user.getRoles().stream()
                         .map(Role::getAuthority)
                         .collect(Collectors.toList()))

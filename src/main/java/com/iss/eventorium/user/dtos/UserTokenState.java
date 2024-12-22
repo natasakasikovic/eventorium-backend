@@ -7,8 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserTokenState {
-
     private String jwt;
     private Long expiresIn;
-
 }
