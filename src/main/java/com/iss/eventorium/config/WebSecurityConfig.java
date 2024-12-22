@@ -68,6 +68,7 @@ public class WebSecurityConfig {
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
                         .requestMatchers(new AntPathRequestMatcher("**")).permitAll()
+                        .requestMatchers("/ws/**")
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
