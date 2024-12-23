@@ -25,6 +25,5 @@ public class ProductResponseDto {
     private Boolean visible;
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
-    private String provider;
     private Double rating;
 }
