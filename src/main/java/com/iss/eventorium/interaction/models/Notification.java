@@ -35,5 +35,6 @@ public class Notification {
         this.message = message;
         this.timestamp = LocalDateTime.now();
         this.seen = false;
+        this.type = type;
     }
 }
