@@ -65,7 +65,7 @@ public class AccountProductController {
 
     @PostMapping("/favourites/{id}")
     public ResponseEntity<ProductResponseDto> addFavouriteProduct(@PathVariable Long id) {
-        return ResponseEntity.ok(accountProductService.addFavouriteService(id));
+        return ResponseEntity.ok(accountProductService.addFavouriteProduct(id));
     }
 
     @DeleteMapping("/favourites/{id}")
