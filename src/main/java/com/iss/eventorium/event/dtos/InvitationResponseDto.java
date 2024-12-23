@@ -11,4 +11,5 @@ import lombok.Setter;
 @Setter
 public class InvitationResponseDto {
     private String email;
+    private Boolean isEmailRegistered;
 }

@@ -80,7 +80,15 @@ public class InvitationService {
     }
 
     public InvitationResponseDto getInvitation(String hash){
-        return InvitationMapper.toResponse(findByHash(hash));
+        Invitation invitation = findByHash(hash);
+        InvitationResponseDto response = InvitationMapper.toResponse(invitation);
+        setUpInvitationDto(response);
+        return response;
+    }
+
+    private void setUpInvitationDto(InvitationResponseDto invitation) {
+        boolean isEmailRegistered = userService.existsByEmail(invitation.getEmail());
+        invitation.setIsEmailRegistered(isEmailRegistered);
     }
 
     private Invitation findByHash(String hash){
