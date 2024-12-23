@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class AuthRequestDto {
     private String confirmPassword;
 
     @NotEmpty(message = "Role is required")
-    private Collection<Role> role;
+    private List<RoleDto> roles;
 
     @Valid
     private PersonRequestDto person;
