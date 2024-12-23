@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.dtos;
 
+import com.iss.eventorium.shared.validators.password.PasswordsMatch;
 import com.iss.eventorium.user.models.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@PasswordsMatch(message = "Passwords do not match")
 public class AuthRequestDto {
 
     @NotBlank(message = "Email is required")
@@ -25,7 +27,7 @@ public class AuthRequestDto {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
-    @NotBlank(message = "Confirm password is required") // TODO?: add custom validation for matching pass and confirm pass
+    @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 
     @NotEmpty(message = "Role is required")
