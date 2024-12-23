@@ -1,6 +1,7 @@
 package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
+import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
@@ -49,6 +50,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.CONFLICT.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(AlreadyInFavoritesException.class)
+    public ResponseEntity<ExceptionResponse> handleImageNotFoundException(AlreadyInFavoritesException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }
