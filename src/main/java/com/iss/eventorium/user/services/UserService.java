@@ -42,12 +42,18 @@ public class UserService {
 
     public void quickRegister(QuickRegistrationRequestDto request){
         User user = UserMapper.fromRequest(request);
+        setUserDetails(user);
 
-        user.setRoles(roleService.findByName("USER"));
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        user.setPassword(encoder.encode(user.getPassword()));
+        if (userRepository.existsByEmail(user.getEmail()))
+            throw new DuplicateKeyException("Account with given email already exists.");
 
         userRepository.save(user);
+    }
+
+    private void setUserDetails(User user) {
+        user.setRoles(roleService.findByName("USER"));
+        user.setActivated(true);
+        user.setPassword(encodePassword(user.getPassword()));
     }
 
     public void delete(Long id) {
@@ -69,11 +75,13 @@ public class UserService {
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
-
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        created.setPassword(encoder.encode(authRequestDto.getPassword()));
-
+        created.setPassword(encodePassword(authRequestDto.getPassword()));
         return userRepository.save(created);
+    }
+
+    private String encodePassword(String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
     }
 
     private void checkRequestExpired(User existingUser) throws IllegalStateException {

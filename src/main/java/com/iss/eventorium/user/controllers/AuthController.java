@@ -84,8 +84,12 @@ public class AuthController {
     }
 
     @PostMapping("/quick-registration")
-    public ResponseEntity<String> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
-        userService.quickRegister(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User successfully registered");
+    public ResponseEntity<Void> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
+        try{
+            userService.quickRegister(request);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (DuplicateKeyException e)    {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }

@@ -75,9 +75,15 @@ public class InvitationService {
         return variables;
     }
 
-    public InvitationResponseDto verifyInvitation(String hash) {
-        Invitation invitation = repository.findByHash(hash)
-                .orElseThrow(() -> new EntityNotFoundException("Invitation with hash " + hash + " not found"));
-        return InvitationMapper.toResponse(invitation);
+    public void verifyInvitation(String hash) {
+        findByHash(hash);
+    }
+
+    public InvitationResponseDto getInvitation(String hash){
+        return InvitationMapper.toResponse(findByHash(hash));
+    }
+
+    private Invitation findByHash(String hash){
+        return repository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("Invitation with hash " + hash + " not found"));
     }
 }
