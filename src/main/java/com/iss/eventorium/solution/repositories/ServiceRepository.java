@@ -24,4 +24,6 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
     Page<Service> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
     List<Service> findByProvider_Id(Long id);
     Page<Service> findByProvider_Id(Long id, Pageable pageable);
+
+    boolean existsByCategory_Id(Long categoryId);
 }
