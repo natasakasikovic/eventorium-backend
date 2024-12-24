@@ -89,12 +89,12 @@ public class ServiceController {
     }
 
     @PostMapping("/{id}/images")
-    public ResponseEntity<String> uploadServiceImages(
+    public ResponseEntity<Void> uploadServiceImages(
             @PathVariable Long id,
             @RequestParam("images") List<MultipartFile> images
     ) {
         service.uploadImages(id, images);
-        return ResponseEntity.ok(String.format("Uploaded images for %s service", id));
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
