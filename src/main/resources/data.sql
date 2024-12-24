@@ -45,23 +45,23 @@ INSERT INTO event_type (name, description, deleted) VALUES
 INSERT INTO event_type_suggested_categories VALUES (1, 2),(1, 4),(1,9),(1,7),(2,1),(3,2),(3,4),(3, 7);
 
 INSERT INTO products (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
- (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 'Invitations, Customizable', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
- (nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 'Banners, Event', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
- (nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 'Party, Favors', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
- (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 'Balloons, Decorative', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
- (nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 'T-Shirts, Customizable', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
- (nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 'Party, Hats', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
- (nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 'Mugs, Personalized', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
- (nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 'Frames, Customizable', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 5);
+(nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 'Invitations, Customizable', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 'Banners, Event', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
+(nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 'Party, Favors', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
+(nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 'Balloons, Decorative', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
+(nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 'T-Shirts, Customizable', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 'Party, Hats', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
+(nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 'Mugs, Personalized', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
+(nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 'Frames, Customizable', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 5);
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
- (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-01', '2024-04-15', 2, 6, 4, 3),
- (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-10', '2024-04-25', 3, 8, 2, 3),
- (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-01', '2024-05-15', 4, 10, 1, 3),
- (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-05', '2024-04-20', 1, 5, 5, 3),
- (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-04-25', '2024-04-10', 2, 4, 7, 3),
- (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-15', '2024-06-01', 6, 12, 3, 2),
- (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-15', '2024-05-01', 3, 7, 8, 1);
+(nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 2, 6, 4, 3),
+(nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 3, 8, 2, 3),
+(nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 4, 10, 1, 3),
+(nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 1, 5, 5, 3),
+(nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 2, 4, 7, 3),
+(nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 6, 12, 3, 2),
+(nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 3, 7, 8, 1);
 
 INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUES
  ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1),
