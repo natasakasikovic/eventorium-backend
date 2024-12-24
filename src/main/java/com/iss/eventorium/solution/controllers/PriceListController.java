@@ -4,6 +4,7 @@ import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListUpdateRequestDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class PriceListController {
     @PatchMapping("/services/{id}")
     public ResponseEntity<PriceListResponseDto> updateServicePrice(
             @PathVariable Long id,
-            @RequestBody PriceListUpdateRequestDto updateRequestDto
+            @Valid @RequestBody PriceListUpdateRequestDto updateRequestDto
     ) {
         return ResponseEntity.ok(new PriceListResponseDto());
     }

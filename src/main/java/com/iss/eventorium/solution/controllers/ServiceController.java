@@ -5,6 +5,7 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -83,7 +84,7 @@ public class ServiceController {
 
     @PostMapping
     public ResponseEntity<ServiceResponseDto> createService(
-            @RequestBody CreateServiceRequestDto createServiceRequestDto
+            @Valid @RequestBody CreateServiceRequestDto createServiceRequestDto
     ) {
         return ResponseEntity.ok(service.createService(createServiceRequestDto));
     }
@@ -100,7 +101,7 @@ public class ServiceController {
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponseDto> updateService(
             @PathVariable Long id,
-            @RequestBody UpdateServiceRequestDto serviceDto
+            @Valid @RequestBody UpdateServiceRequestDto serviceDto
     ) {
         return ResponseEntity.ok(service.updateService(id, serviceDto));
     }

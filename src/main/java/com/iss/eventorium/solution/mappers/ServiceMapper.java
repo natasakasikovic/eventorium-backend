@@ -45,10 +45,6 @@ public class ServiceMapper {
                 .build();
     }
 
-    public static Service fromRequest(ServiceRequestDto request) {
-        return modelMapper.map(request, Service.class);
-    }
-
     public static Service fromUpdateRequest(UpdateServiceRequestDto request, Service toUpdate) {
         Service service = modelMapper.map(request, Service.class);
         service.setIsAvailable(request.getAvailable());
