@@ -70,7 +70,7 @@ public class PriceListService {
 
     public PriceListResponseDto updateProduct(Long id, UpdatePriceRequestDto updateRequestDto) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + id + " not found")
+                () -> new EntityNotFoundException("Product with id " + id + " not found")
         );
 
         if(Objects.equals(product.getPrice(), updateRequestDto.getPrice())

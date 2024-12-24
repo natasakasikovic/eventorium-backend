@@ -4,6 +4,9 @@ import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
+import com.iss.eventorium.solution.services.AccountProductService;
+import com.iss.eventorium.solution.services.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/account/products")
+@RequiredArgsConstructor
 public class AccountProductController {
+
+    private final AccountProductService accountProductService;
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
@@ -47,23 +53,24 @@ public class AccountProductController {
         return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto()), 3, 100));
     }
 
-    @GetMapping("/favourites/all")
+    @GetMapping("/favourites")
     public ResponseEntity<List<ProductSummaryResponseDto>> getFavouriteProducts() {
         return ResponseEntity.ok().body(List.of(new ProductSummaryResponseDto()));
     }
 
-    @GetMapping("/favourites")
-    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> getFavouriteProductsPaged(Pageable pageable) {
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto()), 3, 100));
+    @GetMapping("/favourites/{id}")
+    public ResponseEntity<Boolean> isFavouriteProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(accountProductService.isFavouriteProduct(id));
     }
 
-    @PutMapping("/favourites/{id}")
+    @PostMapping("/favourites/{id}")
     public ResponseEntity<ProductResponseDto> addFavouriteProduct(@PathVariable Long id) {
-        return ResponseEntity.ok().body(new ProductResponseDto());
+        return ResponseEntity.ok(accountProductService.addFavouriteProduct(id));
     }
 
     @DeleteMapping("/favourites/{id}")
     public ResponseEntity<Void> removeFavouriteProduct(@PathVariable Long id) {
+        accountProductService.removeFavouriteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
