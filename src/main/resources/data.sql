@@ -32,7 +32,7 @@ INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Photography', 'Photography and videography services',   false, false),
  ('Entertainment', 'Music, shows, and performances',   false, false),
  ('Logistics', 'Transport and materials management',   false, false),
- ('Decoration', 'Venue decoration and themes',   true, false),
+ ('Decoration', 'Venue decoration and themes',   false, false),
  ('Security', 'Security and crowd control',   false, true),
  ('Guest Management', 'Handling guest invitations and RSVP',   false, false),
  ('Marketing', 'Promotions and event advertising',   false, false);
@@ -125,9 +125,3 @@ INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (3, 14),
 (4, 14),
 (5, 12);
-
-
-
-
-
-
