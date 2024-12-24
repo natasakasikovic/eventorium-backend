@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PriceListResponseDto {
+    private Long id;
     private String name;
     private Double price;
     private Double discount;
