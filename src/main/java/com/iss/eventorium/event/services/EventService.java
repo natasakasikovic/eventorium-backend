@@ -62,7 +62,6 @@ public class EventService {
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
         Event created = repository.save(prepareEvent(eventRequestDto));
-        invitationService.sendInvitations(eventRequestDto.getInvitations(), created);
         return EventMapper.toResponse(created);
     }
 
