@@ -61,7 +61,7 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
  (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-05', '2024-04-20', 1, 5, 5, 3),
  (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-04-25', '2024-04-10', 2, 4, 7, 3),
  (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', '2024-06-15', '2024-06-01', 6, 12, 3, 2),
- (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-15', '2024-05-01', 3, 7, 8, 1);
+ (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', '2024-05-15', '2024-05-01', 3, 7, 8, 3);
 
 INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUES
  ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1),
