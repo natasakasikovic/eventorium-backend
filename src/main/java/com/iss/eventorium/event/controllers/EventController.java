@@ -52,10 +52,7 @@ public class EventController {
     }
 
     @PostMapping()
-    public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
         return ResponseEntity.ok(service.createEvent(eventRequestDto));
     }
 }
