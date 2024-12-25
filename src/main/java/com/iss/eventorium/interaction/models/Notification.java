@@ -20,6 +20,9 @@ public class Notification {
     private Long id;
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
     private String message;
 
     @Column(nullable = false)
@@ -28,10 +31,10 @@ public class Notification {
     @Column(nullable = false)
     private Boolean seen;
 
-    @JsonIgnore
     private NotificationType type;
 
-    public Notification(String message, NotificationType type) {
+    public Notification(String title, String message, NotificationType type) {
+        this.title = title;
         this.message = message;
         this.timestamp = LocalDateTime.now();
         this.seen = false;

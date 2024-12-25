@@ -36,13 +36,15 @@ public class CategoryProposalService {
         if(status == Status.DECLINED) {
             category.setDeleted(true);
             notification = new Notification(
+                    "Category",
                     "Unfortunately, your category suggestion (" + category.getName() + ") has been declined.",
-                    NotificationType.DECLINED
+                    NotificationType.INFO
             );
         } else {
             notification = new Notification(
+                    "Category",
                     "Your category suggestion (" + category.getName() + ") has been accepted.",
-                    NotificationType.ACCEPTED
+                    NotificationType.SUCCESS
             );
         }
 
@@ -68,8 +70,9 @@ public class CategoryProposalService {
         serviceRepository.save(service);
 
         Notification notification = new Notification(
+                "Category",
                 "Your category suggestion (" + category.getName() + ") has been accepted, but the details have been updated.",
-                NotificationType.ACCEPTED
+                NotificationType.SUCCESS
         );
         notificationService.sendNotification(service.getProvider().getId(), notification);
 
@@ -87,6 +90,7 @@ public class CategoryProposalService {
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + dto.getName() + " not found")));
 
         Notification notification = new Notification(
+                "Category",
                 "Your category suggestion (" + category.getName() + ") has been changed to " + dto.getName() + ".",
                 NotificationType.INFO
         );

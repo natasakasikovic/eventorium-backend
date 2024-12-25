@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class NotificationResponseDto {
+    private String title;
     private String message;
     private Boolean seen;
     private NotificationType type;
