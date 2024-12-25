@@ -28,12 +28,15 @@ public class SolutionHistory {
         addSolutionMemento(memento, productHistories);
     }
 
-    private void addSolutionMemento(Memento memento, List<Memento> productHistories) {
-        productHistories.add(memento);
-        if(productHistories.size() > 1) {
-            for(int i = productHistories.size() - 2; i >= 0; i--) {
-                if(productHistories.get(i).getSolutionId().equals(memento.getSolutionId())) {
-                    productHistories.get(i).setValidTo(LocalDateTime.now());
+    private void addSolutionMemento(Memento memento, List<Memento> histories) {
+        histories.add(memento);
+        if(histories.size() > 1) {
+            for(int i = histories.size() - 2; i >= 0; i--) {
+                if(histories.get(i).getSolutionId() == null) {
+                    break;
+                }
+                if(histories.get(i).getSolutionId().equals(memento.getSolutionId())) {
+                    histories.get(i).setValidTo(LocalDateTime.now());
                 }
             }
         }
