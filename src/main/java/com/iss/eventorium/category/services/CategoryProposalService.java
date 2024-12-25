@@ -36,13 +36,13 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Service service = getServiceProposal(category);
 
-        Notification notification;
         service.setStatus(status);
         category.setSuggested(false);
+
+        Notification notification;
         if(status == Status.DECLINED) {
             category.setDeleted(true);
-            notification = new Notification(
-                    NOTIFICATION_TITLE,
+            notification = new Notification(NOTIFICATION_TITLE,
                     getMessage(category, "notification.category.declined"),
                     NotificationType.INFO
             );
@@ -138,5 +138,9 @@ public class CategoryProposalService {
                 new Object[] { dto.getName(), category.getName() },
                 Locale.getDefault()
         );
+    }
+
+    private void sendNotification() {
+
     }
 }
