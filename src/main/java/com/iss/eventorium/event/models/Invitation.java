@@ -24,5 +24,6 @@ public class Invitation {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @Column(unique = true)
     private String hash;
 }

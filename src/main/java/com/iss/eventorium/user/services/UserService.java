@@ -1,9 +1,9 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
 import com.iss.eventorium.user.dtos.AuthResponseDto;
-import com.iss.eventorium.user.dtos.GetAccountDto;
 import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -28,6 +27,7 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleService roleService;
 
     @Value("${image-path}")
     private String imagePath;
@@ -38,6 +38,22 @@ public class UserService {
 
     public boolean existsByEmail(String email){
         return userRepository.existsByEmail(email);
+    }
+
+    public void quickRegister(QuickRegistrationRequestDto request){
+        User user = UserMapper.fromRequest(request);
+        setUserDetails(user);
+
+        if (userRepository.existsByEmail(user.getEmail()))
+            throw new DuplicateKeyException("Account with given email already exists.");
+
+        userRepository.save(user);
+    }
+
+    private void setUserDetails(User user) {
+        user.setRoles(roleService.findByName("USER"));
+        user.setActivated(true);
+        user.setPassword(encodePassword(user.getPassword()));
     }
 
     public void delete(Long id) {
@@ -59,20 +75,13 @@ public class UserService {
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
-
-        prepareRegistrationRequest(created);
-
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        created.setPassword(encoder.encode(authRequestDto.getPassword()));
-
+        created.setPassword(encodePassword(authRequestDto.getPassword()));
         return userRepository.save(created);
     }
 
-    private void prepareRegistrationRequest(User user) {
-        user.setActivated(false);
-        user.setSuspended(false);
-        user.setActivationTimestamp(new Date());
-        user.setLastPasswordReset(new Date());
+    private String encodePassword(String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
     }
 
     private void checkRequestExpired(User existingUser) throws IllegalStateException {

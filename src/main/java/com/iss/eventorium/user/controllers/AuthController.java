@@ -1,7 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.user.dtos.*;
-import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
@@ -20,8 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -84,5 +81,15 @@ public class AuthController {
     @PostMapping("/send-activation-link")
     public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
         return ResponseEntity.ok("Activation link sent successfully.");
+    }
+
+    @PostMapping("/quick-registration")
+    public ResponseEntity<Void> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
+        try{
+            userService.quickRegister(request);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (DuplicateKeyException e)    {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }
