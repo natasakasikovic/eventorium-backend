@@ -14,12 +14,18 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
+import java.util.Locale;
+
 import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
 
 @RequiredArgsConstructor
 @org.springframework.stereotype.Service
 public class CategoryProposalService {
+
+    private static final String NOTIFICATION_TITLE = "Category";
+
+    private final MessageSource messageSource;
 
     private final NotificationService notificationService;
 
@@ -30,19 +36,21 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Service service = getServiceProposal(category);
 
-        Notification notification;
         service.setStatus(status);
         category.setSuggested(false);
+
+        Notification notification;
         if(status == Status.DECLINED) {
             category.setDeleted(true);
-            notification = new Notification(
-                    "Unfortunately, your category suggestion (" + category.getName() + ") has been declined.",
-                    NotificationType.DECLINED
+            notification = new Notification(NOTIFICATION_TITLE,
+                    getMessage(category, "notification.category.declined"),
+                    NotificationType.INFO
             );
         } else {
             notification = new Notification(
-                    "Your category suggestion (" + category.getName() + ") has been accepted.",
-                    NotificationType.ACCEPTED
+                    NOTIFICATION_TITLE,
+                    getMessage(category, "notification.category.accepted"),
+                    NotificationType.SUCCESS
             );
         }
 
@@ -66,10 +74,10 @@ public class CategoryProposalService {
         Category response = categoryRepository.save(category);
         service.setStatus(Status.ACCEPTED);
         serviceRepository.save(service);
-
         Notification notification = new Notification(
-                "Your category suggestion (" + category.getName() + ") has been accepted, but the details have been updated.",
-                NotificationType.ACCEPTED
+                NOTIFICATION_TITLE,
+                getMessage(category, "notification.category.updated"),
+                NotificationType.SUCCESS
         );
         notificationService.sendNotification(service.getProvider().getId(), notification);
 
@@ -87,10 +95,10 @@ public class CategoryProposalService {
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + dto.getName() + " not found")));
 
         Notification notification = new Notification(
-                "Your category suggestion (" + category.getName() + ") has been changed to " + dto.getName() + ".",
+                NOTIFICATION_TITLE,
+                getMessage(category, dto),
                 NotificationType.INFO
         );
-
         notificationService.sendNotification(service.getProvider().getId(), notification);
 
         categoryRepository.save(category);
@@ -114,5 +122,25 @@ public class CategoryProposalService {
             throw new EntityNotFoundException("Service with category '" + category.getName() + "' is not pending");
         }
         return service;
+    }
+
+    private String getMessage(Category category, String code) {
+        return messageSource.getMessage(
+                code,
+                new Object[] { category.getName() },
+                Locale.getDefault()
+        );
+    }
+
+    private String getMessage(Category category, CategoryRequestDto dto) {
+        return messageSource.getMessage(
+                "notification.category.change",
+                new Object[] { dto.getName(), category.getName() },
+                Locale.getDefault()
+        );
+    }
+
+    private void sendNotification() {
+
     }
 }

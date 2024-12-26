@@ -1,6 +1,7 @@
 package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
+import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
@@ -41,6 +42,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryInUseException(CategoryInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }

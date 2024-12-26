@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.mappers;
 
+import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
 import com.iss.eventorium.user.dtos.AuthResponseDto;
 import com.iss.eventorium.user.models.User;
@@ -13,6 +14,10 @@ public class UserMapper {
 
     @Autowired
     public UserMapper(ModelMapper modelMapper) { UserMapper.modelMapper = modelMapper; }
+
+    public static User fromRequest(QuickRegistrationRequestDto request) {
+        return modelMapper.map(request, User.class);
+    }
 
     public static User fromRequest(AuthRequestDto requestDto) {
         return modelMapper.map(requestDto, User.class);

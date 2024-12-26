@@ -20,21 +20,22 @@ public class Notification {
     private Long id;
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
     private String message;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private LocalDateTime timestamp = LocalDateTime.now();
 
     @Column(nullable = false)
-    private Boolean seen;
+    private Boolean seen = false;
 
-    @JsonIgnore
     private NotificationType type;
 
-    public Notification(String message, NotificationType type) {
+    public Notification(String title, String message, NotificationType type) {
+        this.title = title;
         this.message = message;
-        this.timestamp = LocalDateTime.now();
-        this.seen = false;
         this.type = type;
     }
 }

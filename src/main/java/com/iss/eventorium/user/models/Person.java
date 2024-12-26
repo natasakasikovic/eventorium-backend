@@ -23,10 +23,8 @@ public class Person {
     @Column(nullable = false)
     private String lastname;
 
-    @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
     private String phoneNumber;
 
     @ManyToOne

@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.mappers;
 
 import com.iss.eventorium.event.dtos.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.InvitationResponseDto;
 import com.iss.eventorium.event.models.Invitation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +19,9 @@ public class InvitationMapper {
 
     public static Invitation fromRequest(InvitationRequestDto invitationRequestDto) {
         return modelMapper.map(invitationRequestDto, Invitation.class);
+    }
+
+    public static InvitationResponseDto toResponse(Invitation invitation) {
+        return modelMapper.map(invitation, InvitationResponseDto.class);
     }
 }

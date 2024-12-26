@@ -3,12 +3,14 @@ package com.iss.eventorium.category.services;
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
+import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ServiceRepository serviceRepository;
+    private final ProductRepository productRepository;
 
     public List<CategoryResponseDto> getCategories() {
         return categoryRepository.findBySuggestedFalse().stream()
@@ -64,7 +68,12 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category toDelete = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
-        // TODO: Check if it is possible to delete
+        if(serviceRepository.existsByCategory_Id(id)) {
+            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active service.");
+        }
+        if(productRepository.existsByCategory_Id(id)) {
+            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active product.");
+        }
         toDelete.setDeleted(true);
         categoryRepository.save(toDelete);
     }

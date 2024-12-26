@@ -58,4 +58,7 @@ public class Event {
 
     @OneToOne
     private Budget budget;
+
+    @Column
+    private boolean isDraft = true;
 }

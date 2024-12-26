@@ -1,26 +1,24 @@
 package com.iss.eventorium.user.dtos;
 
 import com.iss.eventorium.shared.validators.password.PasswordsMatch;
-import com.iss.eventorium.user.models.Role;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @PasswordsMatch(message = "Passwords do not match")
-public class AuthRequestDto {
+public class QuickRegistrationRequestDto {
 
     @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
     @NotBlank(message = "Password is required")
@@ -28,11 +26,8 @@ public class AuthRequestDto {
     private String password;
 
     @NotBlank(message = "Confirm password is required")
-    private String confirmPassword;
-
-    @NotEmpty(message = "Role is required")
-    private List<RoleDto> roles;
+    private String passwordConfirmation;
 
     @Valid
-    private PersonRequestDto person;
+    PersonQuickRegistrationDto person;
 }
