@@ -7,7 +7,6 @@ import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.SolutionHistory;
 import com.iss.eventorium.solution.repositories.HistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,8 @@
 package com.iss.eventorium.solution.dtos.pricelists;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -10,8 +11,12 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UpdatePriceRequestDto {
-    @NotBlank(message = "Price is mandatory")
+    @NotNull(message = "Price is mandatory")
+    @Min(value = 0, message = "Price must be non-negative")
     private Double price;
-    @NotBlank(message = "Discount is mandatory")
+
+    @NotNull(message = "Discount is mandatory")
+    @Min(value = 0, message = "Discount must be non-negative")
+    @Max(value = 100, message = "Discount cannot exceed 100")
     private Double discount;
 }
