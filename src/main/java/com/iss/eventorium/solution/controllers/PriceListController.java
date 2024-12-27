@@ -5,7 +5,10 @@ import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
 import com.iss.eventorium.solution.services.PriceListService;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +56,14 @@ public class PriceListController {
             @RequestBody UpdatePriceRequestDto updateRequestDto
     ) {
         return ResponseEntity.ok(priceListService.updateProduct(id, updateRequestDto));
+    }
+
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> getPdf() throws JRException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=price_list_report.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+        return new ResponseEntity<>(priceListService.generatePdf(), headers, HttpStatus.OK);
     }
 }
