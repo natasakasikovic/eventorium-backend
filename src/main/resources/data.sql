@@ -79,13 +79,13 @@ INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUE
 
 
 
-INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id)
+INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft)
 VALUES
-    ('John and Janes Wedding', 'A beautiful celebration of love and commitment.', '2024-06-15', 'CLOSED', 150, 1, 'Rose Garden Venue, Central Park', 1, 1),
-    ('Tech Summit 2024', 'A gathering of tech enthusiasts to explore new trends and innovations.', '2024-03-20', 'OPEN', 500, 2, 'Grand Conference Hall, Tech City', 3, 1),
-    ('Emilys 30th Birthday Bash', 'A fun-filled birthday party with games and live music.', '2024-07-05', 'CLOSED', 50, 3, 'Banquet Hall, Riverside', 2, 1),
-    ('Corporate Annual Meet', 'Yearly gathering of the companys employees and stakeholders.', '2024-04-10', 'CLOSED', 300, 2, 'Downtown Business Center, Metropolis', 4, 1),
-    ('Outdoor Wedding Celebration', 'A romantic outdoor wedding under the stars.', '2024-08-12', 'CLOSED', 200, 1, 'Meadow Fields, Green Valley', 5, 1);
+    ('John and Janes Wedding', 'A beautiful celebration of love and commitment.', '2024-06-15', 'CLOSED', 150, 1, 'Rose Garden Venue, Central Park', 1, 1, false),
+    ('Tech Summit 2024', 'A gathering of tech enthusiasts to explore new trends and innovations.', '2024-03-20', 'OPEN', 500, 2, 'Grand Conference Hall, Tech City', 3, 1, false),
+    ('Emilys 30th Birthday Bash', 'A fun-filled birthday party with games and live music.', '2024-07-05', 'CLOSED', 50, 3, 'Banquet Hall, Riverside', 2, 1, false),
+    ('Corporate Annual Meet', 'Yearly gathering of the companys employees and stakeholders.', '2024-04-10', 'CLOSED', 300, 2, 'Downtown Business Center, Metropolis', 4, 1, false),
+    ('Outdoor Wedding Celebration', 'A romantic outdoor wedding under the stars.', '2024-08-12', 'CLOSED', 200, 1, 'Meadow Fields, Green Valley', 5, 1, false);
 
 
 INSERT INTO activities (name, description, start_time, end_time, location, event_id)

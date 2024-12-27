@@ -1,16 +1,12 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.EventRequestDto;
-import com.iss.eventorium.event.dtos.EventResponseDto;
-import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.*;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
@@ -25,6 +21,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService service;
+    private final EventService eventService;
 
     @GetMapping("/top-five-events")
     public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents() {
@@ -54,5 +51,12 @@ public class EventController {
     @PostMapping()
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
         return ResponseEntity.ok(service.createEvent(eventRequestDto));
+    }
+
+    @PutMapping("/{id}/agenda")
+    public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
+                                          @PathVariable Long id) {
+        eventService.createAgenda(id, requestDto);
+        return ResponseEntity.ok().build();
     }
 }
