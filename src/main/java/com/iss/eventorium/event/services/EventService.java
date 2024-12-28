@@ -1,15 +1,17 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.EventRequestDto;
-import com.iss.eventorium.event.dtos.EventResponseDto;
-import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.*;
+import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
+import com.iss.eventorium.event.models.Activity;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.models.Privacy;
+import com.iss.eventorium.event.repositories.ActivityRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventSpecification;
-import com.iss.eventorium.event.dtos.EventFilterDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final EventRepository repository;
+    private final ActivityRepository activityRepository;
     private final InvitationService invitationService;
     private final AuthService authService;
     private final EventRepository eventRepository;
@@ -70,6 +73,21 @@ public class EventService {
         Event event = EventMapper.fromRequest(eventRequestDto);
         event.setOrganizer(authService.getCurrentUser());
         return event;
+    }
+
+    public void createAgenda(Long id, List<ActivityRequestDto> request) {
+        Event event = repository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Event not found with ID: " + id));
+
+        List<Activity> activities = request.stream()
+                .map(ActivityMapper::fromRequest)
+                .toList();
+
+        event.getActivities().clear();
+        event.getActivities().addAll(activities);
+
+        if (event.getPrivacy().equals(Privacy.OPEN)) event.setDraft(false);
+        repository.save(event);
     }
 
     public List<EventResponseDto> getDraftedEvents() {
