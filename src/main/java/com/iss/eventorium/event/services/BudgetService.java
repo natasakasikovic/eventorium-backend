@@ -2,6 +2,7 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
 import com.iss.eventorium.event.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
@@ -48,6 +49,9 @@ public class BudgetService {
 
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
+        if(budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(item.getCategory())) {
+            throw new AlreadyPurchasedException("Product with the same category is already purchased!");
+        }
         item.setPurchased(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
