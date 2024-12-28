@@ -1,15 +1,16 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
+import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.BudgetRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
+import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Solution;
@@ -19,13 +20,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
 
     private final EventRepository eventRepository;
-    private final BudgetItemRepository budgetItemRepository;
     private final BudgetRepository budgetRepository;
     private final ProductRepository productRepository;
 
@@ -59,7 +61,33 @@ public class BudgetService {
         }
         item.setPurchased(LocalDateTime.now());
         budget.addItem(item);
-
         eventRepository.save(event);
+    }
+
+    public List<ProductSummaryResponseDto> getPurchasedProducts(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
+        );
+        Budget budget = event.getBudget();
+        if(budget == null) {
+            return new ArrayList<>();
+        }
+
+        return budget.getItems().stream()
+                .filter(item -> item.getPurchased() != null)
+                .map(item -> ProductMapper.toSummaryResponse((Product) item.getSolution()))
+                .toList();
+    }
+
+    public BudgetResponseDto getBudget(Long eventId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
+        );
+        Budget budget = event.getBudget();
+        if(budget == null) {
+            return null;
+        }
+
+        return BudgetMapper.toResponse(budget);
     }
 }
