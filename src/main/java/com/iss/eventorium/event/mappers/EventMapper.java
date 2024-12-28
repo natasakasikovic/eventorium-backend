@@ -40,7 +40,8 @@ public class EventMapper {
         EventResponseDto dto = modelMapper.map(event, EventResponseDto.class);
         if(event.getBudget() != null)
             dto.setBudget(BudgetMapper.toResponse(event.getBudget()));
-        dto.setType(EventTypeMapper.toResponse(event.getType()));
+        if(event.getType() != null)
+            dto.setType(EventTypeMapper.toResponse(event.getType()));
         return dto;
     }
 
