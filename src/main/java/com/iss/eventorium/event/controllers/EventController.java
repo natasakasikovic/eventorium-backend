@@ -21,7 +21,6 @@ import java.util.List;
 public class EventController {
 
     private final EventService service;
-    private final EventService eventService;
 
     @GetMapping("/top-five-events")
     public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents() {
@@ -56,7 +55,7 @@ public class EventController {
     @PutMapping("/{id}/agenda")
     public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
                                           @PathVariable Long id) {
-        eventService.createAgenda(id, requestDto);
+        service.createAgenda(id, requestDto);
         return ResponseEntity.ok().build();
     }
 }
