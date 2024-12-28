@@ -36,7 +36,7 @@ public class ServiceSpecification {
 
     private static Specification<Service> hasAvailability(Boolean available) {
         return (root, query, cb) ->
-                !available
+                available == null || !available
                         ? cb.conjunction()
                         : cb.equal(root.get("isAvailable"), true);
     }

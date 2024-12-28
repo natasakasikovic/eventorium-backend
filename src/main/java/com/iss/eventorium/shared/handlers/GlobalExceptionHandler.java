@@ -1,5 +1,6 @@
 package com.iss.eventorium.shared.handlers;
 
+import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -73,6 +74,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error("Service Already Reserved")
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error("Category already exists!")
                         .message(ex.getMessage())
                         .build());
     }

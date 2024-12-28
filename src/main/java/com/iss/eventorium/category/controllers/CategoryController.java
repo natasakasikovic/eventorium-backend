@@ -2,7 +2,6 @@ package com.iss.eventorium.category.controllers;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;
@@ -12,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 
 @RestController
 @RequestMapping("api/v1/categories")
