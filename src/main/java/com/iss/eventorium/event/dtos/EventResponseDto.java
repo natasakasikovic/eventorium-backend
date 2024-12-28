@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.dtos;
 
+import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.shared.models.City;
 import lombok.AllArgsConstructor;
@@ -25,4 +26,5 @@ public class EventResponseDto {
     private EventTypeResponseDto type;
     private City city;
     private String address;
+    private BudgetResponseDto budget;
 }

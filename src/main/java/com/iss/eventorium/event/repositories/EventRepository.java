@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.repositories;
 
+import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findTopFiveUpcomingEvents(@Param("city") String city, Pageable pageable);
 
     Page<Event> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
+
+    List<Event> findByIsDraftTrueAndOrganizer_Id(Long organizerId);
 }

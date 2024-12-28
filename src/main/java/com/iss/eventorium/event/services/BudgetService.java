@@ -42,23 +42,12 @@ public class BudgetService {
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException("Event with id " + eventId + " not found")
         );
-        updateBudget(event, createBudgetItem(product, dto));
+        updateBudget(event, BudgetMapper.fromRequest(dto, product));
         return ProductMapper.toResponse(product);
     }
 
-    private BudgetItem createBudgetItem(Solution solution, BudgetItemRequestDto dto) {
-        BudgetItem item = BudgetMapper.fromRequest(dto);
-        item.setCategory(solution.getCategory());
-        item.setSolution(solution);
-        return item;
-    }
-
     private void updateBudget(Event event, BudgetItem item) {
-        Budget budget =  event.getBudget();
-        if(budget == null) {
-            budget = new Budget();
-            event.setBudget(budget);
-        }
+        Budget budget = event.getBudget();
         item.setPurchased(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
@@ -85,7 +74,9 @@ public class BudgetService {
         );
         Budget budget = event.getBudget();
         if(budget == null) {
-            return null;
+            budget = new Budget();
+            event.setBudget(budget);
+            eventRepository.save(event);
         }
 
         return BudgetMapper.toResponse(budget);

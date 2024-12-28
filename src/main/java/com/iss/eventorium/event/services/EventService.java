@@ -26,6 +26,7 @@ public class EventService {
     private final EventRepository repository;
     private final InvitationService invitationService;
     private final AuthService authService;
+    private final EventRepository eventRepository;
 
     public List<EventSummaryResponseDto> getTopEvents() {
         Pageable pageable = PageRequest.of(0, 5);
@@ -71,4 +72,10 @@ public class EventService {
         return event;
     }
 
+    public List<EventResponseDto> getDraftedEvents() {
+        return eventRepository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
+                .stream()
+                .map(EventMapper::toResponse)
+                .toList();
+    }
 }
