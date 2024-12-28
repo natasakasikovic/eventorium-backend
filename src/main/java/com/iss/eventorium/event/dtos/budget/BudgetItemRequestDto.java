@@ -1,4 +1,4 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.budget;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import lombok.*;
@@ -10,6 +10,6 @@ import lombok.*;
 @Builder
 public class BudgetItemRequestDto {
     private Double plannedAmount;
-    private Long solutionId;
+    private Long itemId;
     private CategoryResponseDto category;
 }

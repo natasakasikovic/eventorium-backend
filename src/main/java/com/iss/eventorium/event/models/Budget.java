@@ -3,6 +3,7 @@ package com.iss.eventorium.event.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,9 +20,16 @@ public class Budget {
     private Long id;
 
     @Column(nullable = false, name = "total_budget")
-    private Double totalBudget;
+    private Double totalBudget = 0.0;
 
     @Column(nullable = false)
-    @OneToMany
-    private List<BudgetItem> items;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<BudgetItem> items = new ArrayList<>();
+
+    public void addItem(BudgetItem item) {
+        this.items.add(item);
+        if(item.getPurchased() != null) {
+            this.totalBudget += item.getPlannedAmount();
+        }
+    }
 }

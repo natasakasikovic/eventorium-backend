@@ -1,9 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.BudgetRequestDto;
+import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.services.BudgetService;
-import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,19 @@ public class BudgetController {
     @GetMapping
     public ResponseEntity<ProductResponseDto> getBudget(@PathVariable("event-id") Long eventId) {
         return null;
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createBudget(@PathVariable("event-id") Long eventId){
+        return null;
+    }
+
+    @PostMapping("/purchase")
+    public ResponseEntity<ProductResponseDto> purchaseProduct(
+            @PathVariable("event-id") Long eventId,
+            @RequestBody BudgetItemRequestDto budgetItemRequestDto
+    ) {
+        return ResponseEntity.ok(budgetService.purchaseProduct(eventId, budgetItemRequestDto));
     }
 
     @GetMapping("/purchased")
