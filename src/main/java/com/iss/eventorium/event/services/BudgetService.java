@@ -8,13 +8,11 @@ import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.event.repositories.BudgetRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +27,6 @@ import java.util.List;
 public class BudgetService {
 
     private final EventRepository eventRepository;
-    private final BudgetRepository budgetRepository;
     private final ProductRepository productRepository;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto dto) {
