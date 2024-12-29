@@ -12,12 +12,12 @@ INSERT INTO cities (name) VALUES
                               ('Kraljevo'),
                               ('Kragujevac');
 
-INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, profile_photo, last_password_reset) VALUES
-                                (true, 1,  false, '2024-12-07 12:00:00', '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', null, '2017-10-01 21:58:58.508-07'),
-                                (true, 2,  false, '2024-12-06 12:00:00', '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', null, '2017-10-01 21:58:58.508-07'),
-                                (true, 3,  false, '2024-12-06 12:00:00', '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', null, '2017-10-01 21:58:58.508-07'),
-                                (true, 4,  false, '2024-12-05 12:00:00', '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', null, '2017-10-01 21:58:58.508-07'),
-                                (true, 5,  false, '2024-12-06 12:00:00', '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', null, '2017-10-01 21:58:58.508-07');
+INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, profile_photo, last_password_reset, hash) VALUES
+                                (true, 1,  false, '2024-12-07 12:00:00', '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', null, '2017-10-01 21:58:58.508-07', '1'),
+                                (true, 2,  false, '2024-12-06 12:00:00', '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', null, '2017-10-01 21:58:58.508-07', '2'),
+                                (true, 3,  false, '2024-12-06 12:00:00', '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', null, '2017-10-01 21:58:58.508-07', '3'),
+                                (true, 4,  false, '2024-12-05 12:00:00', '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', null, '2017-10-01 21:58:58.508-07', '4'),
+                                (true, 5,  false, '2024-12-06 12:00:00', '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', null, '2017-10-01 21:58:58.508-07', '5');
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
