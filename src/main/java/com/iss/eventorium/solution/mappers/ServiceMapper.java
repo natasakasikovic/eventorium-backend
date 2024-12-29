@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -43,10 +42,6 @@ public class ServiceMapper {
                 .category(CategoryMapper.fromResponse(request.getCategory()))
                 .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
                 .build();
-    }
-
-    public static Service fromRequest(ServiceRequestDto request) {
-        return modelMapper.map(request, Service.class);
     }
 
     public static Service fromUpdateRequest(UpdateServiceRequestDto request, Service toUpdate) {

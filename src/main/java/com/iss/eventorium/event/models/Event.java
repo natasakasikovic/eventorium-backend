@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -51,7 +52,7 @@ public class Event {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
-    private List<Activity> activities;
+    private List<Activity> activities = new ArrayList<>();;
 
     @ManyToOne
     private User organizer;
@@ -59,6 +60,6 @@ public class Event {
     @OneToOne
     private Budget budget;
 
-    @Column
+    @Column(name = "is_draft")
     private boolean isDraft = true;
 }

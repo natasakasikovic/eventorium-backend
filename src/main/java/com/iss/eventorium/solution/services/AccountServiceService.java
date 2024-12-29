@@ -10,7 +10,6 @@ import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.repositories.ServiceSpecification;
-import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;

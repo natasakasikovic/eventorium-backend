@@ -2,13 +2,12 @@ package com.iss.eventorium.category.services;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
+import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
-import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,12 +44,18 @@ public class CategoryService {
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
+        if(categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        }
         Category created = CategoryMapper.fromRequest(category);
         created.setSuggested(false);
         return toResponse(categoryRepository.save(created));
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
+        if(categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        }
         Category toUpdate = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
         toUpdate.setName(category.getName());

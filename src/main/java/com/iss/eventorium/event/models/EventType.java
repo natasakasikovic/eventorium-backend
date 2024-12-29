@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "event_type")
+@Table(name = "event_types")
 @Entity
 public class EventType {
     @Id
