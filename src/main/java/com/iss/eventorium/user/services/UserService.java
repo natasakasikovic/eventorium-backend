@@ -1,5 +1,7 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.shared.utils.HashUtils;
+import com.iss.eventorium.user.controllers.ReportController;
 import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
@@ -20,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
+    private final AccountActivationService accountActivationService;
 
     @Value("${image-path}")
     private String imagePath;
@@ -75,7 +80,9 @@ public class UserService {
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
+        created.setHash(HashUtils.generateHash());
         created.setPassword(encodePassword(authRequestDto.getPassword()));
+        accountActivationService.sendActivationEmail(created);
         return userRepository.save(created);
     }
 
@@ -125,4 +132,22 @@ public class UserService {
             throw new IllegalStateException("Failed to save the photo.", e);
         }
     }
+
+    private User findByHash(String hash) {
+        return userRepository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("User not fount."));
+    }
+
+    public void activateAccount(String hash) throws TimeoutException {
+        User user = findByHash(hash);
+        if (isHashValid(user.getActivationTimestamp())) {
+            user.setActivated(true);
+            userRepository.save(user);
+        }
+        else throw new TimeoutException("Activation time has expired.");
+    }
+
+    private boolean isHashValid(Date activationTimestamp) {
+        return (System.currentTimeMillis() - activationTimestamp.getTime()) / (1000 * 60 * 60) < 24;
+    }
+
 }
