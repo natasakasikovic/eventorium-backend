@@ -3,9 +3,11 @@ package com.iss.eventorium.user.controllers;
 import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
+import com.iss.eventorium.user.services.AccountActivationService;
 import com.iss.eventorium.utils.JwtTokenUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,9 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +33,10 @@ public class AuthController {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final UserService userService;
+    private final AccountActivationService accountActivationService;
+
+    @Value("${frontend.url}")
+    private String FRONTEND_URL;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> createAuthenticationToken(
@@ -55,11 +62,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthResponseDto> createAccount(@Valid @RequestBody AuthRequestDto user, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<AuthResponseDto> createAccount(@Valid @RequestBody AuthRequestDto user) {
         try {
             AuthResponseDto response = userService.create(user);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -78,11 +81,6 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/send-activation-link")
-    public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
-        return ResponseEntity.ok("Activation link sent successfully.");
-    }
-
     @PostMapping("/quick-registration")
     public ResponseEntity<Void> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
         try{
@@ -90,6 +88,19 @@ public class AuthController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (DuplicateKeyException e)    {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+
+    @GetMapping("activation/{hash}")
+    public ResponseEntity<Void> activateAccount(@PathVariable String hash) {
+        try {
+            userService.activateAccount(hash);
+            String redirectUrl = FRONTEND_URL + "/login";
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .header("Location", redirectUrl)
+                    .build();
+        } catch (TimeoutException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 }

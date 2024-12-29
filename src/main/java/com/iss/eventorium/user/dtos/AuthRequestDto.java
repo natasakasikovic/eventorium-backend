@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@PasswordsMatch(message = "Passwords do not match")
 public class AuthRequestDto {
 
     @NotBlank(message = "Email is required")

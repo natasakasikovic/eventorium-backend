@@ -54,6 +54,9 @@ public class User implements UserDetails {
     @Transient
     private String jwt;
 
+    @Column(unique = true)
+    private String hash;
+
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
