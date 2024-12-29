@@ -5,7 +5,6 @@ import com.iss.eventorium.event.dtos.EventTypeResponseDto;
 import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter

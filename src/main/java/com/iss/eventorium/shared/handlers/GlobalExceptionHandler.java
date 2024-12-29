@@ -1,5 +1,6 @@
 package com.iss.eventorium.shared.handlers;
 
+import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
 import com.iss.eventorium.event.exceptions.InsufficientFundsException;
@@ -79,6 +80,7 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+
     @ExceptionHandler(InsufficientFundsException.class)
     public ResponseEntity<ExceptionResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -97,4 +99,12 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error("Category already exists!")
+                        .message(ex.getMessage())
+                        .build());
+    }
 }

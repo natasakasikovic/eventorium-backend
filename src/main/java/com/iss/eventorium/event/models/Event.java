@@ -60,6 +60,6 @@ public class Event {
     @OneToOne(cascade = CascadeType.ALL)
     private Budget budget;
 
-    @Column
+    @Column(name = "is_draft")
     private boolean isDraft = true;
 }
