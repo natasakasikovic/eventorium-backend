@@ -26,8 +26,8 @@ public class ServiceController {
     private final ServiceService service;
 
     @GetMapping("/all")
-    public ResponseEntity<List<ServiceResponseDto>> getAllServices() {
-        return null;
+    public ResponseEntity<List<ServiceSummaryResponseDto>> getAllServices() {
+        return ResponseEntity.ok(service.getServices());
     }
 
     @GetMapping
