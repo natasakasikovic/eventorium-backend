@@ -1,7 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.InvitationRequestDto;
-import com.iss.eventorium.event.dtos.InvitationResponseDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.services.InvitationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

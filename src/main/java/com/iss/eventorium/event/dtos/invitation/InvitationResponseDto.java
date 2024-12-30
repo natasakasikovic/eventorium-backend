@@ -1,4 +1,4 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.invitation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

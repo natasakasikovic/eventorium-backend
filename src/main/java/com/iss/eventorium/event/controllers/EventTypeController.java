@@ -1,8 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.event.dtos.EventTypeRequestDto;
-import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;

@@ -1,7 +1,7 @@
 package com.iss.eventorium.solution.dtos.services;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.validators.DurationConstraint;
 import com.iss.eventorium.solution.validators.NotInPast;

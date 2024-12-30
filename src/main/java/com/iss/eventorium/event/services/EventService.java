@@ -1,6 +1,10 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.*;
+import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.event.EventFilterDto;
+import com.iss.eventorium.event.dtos.event.EventRequestDto;
+import com.iss.eventorium.event.dtos.event.EventResponseDto;
+import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Activity;

@@ -1,8 +1,8 @@
 package com.iss.eventorium.event.mappers;
 
-import com.iss.eventorium.event.dtos.EventRequestDto;
-import com.iss.eventorium.event.dtos.EventResponseDto;
-import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.event.EventRequestDto;
+import com.iss.eventorium.event.dtos.event.EventResponseDto;
+import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import org.modelmapper.ModelMapper;

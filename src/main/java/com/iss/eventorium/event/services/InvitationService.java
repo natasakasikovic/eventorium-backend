@@ -1,7 +1,7 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.InvitationRequestDto;
-import com.iss.eventorium.event.dtos.InvitationResponseDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.mappers.InvitationMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Invitation;
