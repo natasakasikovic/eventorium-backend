@@ -1,10 +1,14 @@
 package com.iss.eventorium.interaction.mappers;
 
+import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
 import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.models.ChatMessage;
+import com.iss.eventorium.user.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class ChatMapper {
@@ -15,11 +19,19 @@ public class ChatMapper {
         ChatMapper.modelMapper = modelMapper;
     }
 
-
     public static ChatMessageResponseDto toResponse(ChatMessage chatMessage) {
         ChatMessageResponseDto dto = modelMapper.map(chatMessage, ChatMessageResponseDto.class);
         dto.setSender(chatMessage.getSender().getPerson().getName());
         dto.setRecipient(chatMessage.getRecipient().getPerson().getName());
         return dto;
+    }
+
+    public static ChatMessage fromRequest(ChatMessageRequestDto dto, User sender, User recipient) {
+        return ChatMessage.builder()
+                .sender(sender)
+                .recipient(recipient)
+                .chatName(dto.getChatName())
+                .message(dto.getMessage())
+                .build();
     }
 }
