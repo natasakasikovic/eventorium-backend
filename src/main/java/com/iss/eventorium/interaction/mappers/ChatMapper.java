@@ -21,8 +21,8 @@ public class ChatMapper {
 
     public static ChatMessageResponseDto toResponse(ChatMessage chatMessage) {
         ChatMessageResponseDto dto = modelMapper.map(chatMessage, ChatMessageResponseDto.class);
-        dto.setSender(chatMessage.getSender().getPerson().getName());
-        dto.setRecipient(chatMessage.getRecipient().getPerson().getName());
+        dto.setSenderId(chatMessage.getSender().getId());
+        dto.setRecipientId(chatMessage.getRecipient().getId());
         return dto;
     }
 

@@ -42,17 +42,17 @@ public class ChatService {
                 () -> new EntityNotFoundException("Recipient not found")
         );
 
+
         messagingTemplate.convertAndSendToUser(
                 chatMessage.getRecipientId().toString(),
                 "/queue/messages",
-                new ChatNotification(
-                        null,
-                        chatMessage.getSenderId(),
-                        chatMessage.getRecipientId(),
-                        chatMessage.getMessage()
+                new ChatMessageResponseDto(
+                    chatMessage.getSenderId(),
+                    chatMessage.getRecipientId(),
+                    chatMessage.getMessage()
                 )
         );
-        chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
+//        chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
     }
 
     public List<ChatMessageResponseDto> getMessages(Long senderId, Long recipientId) {
