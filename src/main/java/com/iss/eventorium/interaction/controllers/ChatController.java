@@ -26,10 +26,10 @@ public class ChatController {
         chatService.sendMessage(chatMessage);
     }
 
-    @GetMapping("/messages/{senderId}/{recipientId}")
+    @GetMapping("/messages/{sender-id}/{recipient-id}")
     public ResponseEntity<List<ChatMessageResponseDto>> getChatMessages(
-            @PathVariable("senderId") Long senderId,
-            @PathVariable("recipientId") Long recipientId
+            @PathVariable("sender-id") Long senderId,
+            @PathVariable("recipient-id") Long recipientId
     ) {
         return ResponseEntity.ok(chatService.getMessages(senderId, recipientId));
     }
