@@ -31,7 +31,7 @@ public class BudgetService {
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto dto) {
         Product product = productRepository.findById(dto.getItemId()).orElseThrow(
-                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
+                () -> new EntityNotFoundException("Product with id " + dto.getItemId() + " not found")
         );
         if(product.getPrice() > dto.getPlannedAmount()) {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
