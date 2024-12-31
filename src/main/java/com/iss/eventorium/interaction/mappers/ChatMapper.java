@@ -28,6 +28,7 @@ public class ChatMapper {
 
     public static ChatMessage fromRequest(ChatMessageRequestDto dto, User sender, User recipient) {
         return ChatMessage.builder()
+                .timestamp(LocalDateTime.now())
                 .sender(sender)
                 .recipient(recipient)
                 .chatName(dto.getChatName())

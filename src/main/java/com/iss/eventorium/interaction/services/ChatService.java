@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.services;
 import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
 import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.mappers.ChatMapper;
+import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.models.ChatNotification;
 import com.iss.eventorium.interaction.models.ChatRoom;
 import com.iss.eventorium.interaction.repositories.ChatMessageRepository;
@@ -42,17 +43,12 @@ public class ChatService {
                 () -> new EntityNotFoundException("Recipient not found")
         );
 
-
+        ChatMessage message = chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
         messagingTemplate.convertAndSendToUser(
                 chatMessage.getRecipientId().toString(),
                 "/queue/messages",
-                new ChatMessageResponseDto(
-                    chatMessage.getSenderId(),
-                    chatMessage.getRecipientId(),
-                    chatMessage.getMessage()
-                )
+                ChatMapper.toResponse(message)
         );
-//        chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
     }
 
     public List<ChatMessageResponseDto> getMessages(Long senderId, Long recipientId) {

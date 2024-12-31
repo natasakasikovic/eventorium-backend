@@ -8,7 +8,6 @@ import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.models.Product;
 
-import com.iss.eventorium.user.dtos.ProviderResponseDto;
 import com.iss.eventorium.user.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
