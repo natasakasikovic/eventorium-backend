@@ -1,11 +1,14 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.InvitationResponseDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.services.InvitationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -26,4 +29,9 @@ public class InvitationController {
         return ResponseEntity.ok(service.getInvitation(hash));
     }
 
+    @PostMapping("/{event-id}")
+    public ResponseEntity<Void> sendInvitations(@RequestBody List<InvitationRequestDto> invitations, @PathVariable("event-id") Long id){
+        service.sendInvitations(invitations, id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -3,7 +3,6 @@ package com.iss.eventorium.user.controllers;
 import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.UserService;
-import com.iss.eventorium.user.services.AccountActivationService;
 import com.iss.eventorium.utils.JwtTokenUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +30,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
-
     private final UserService userService;
-    private final AccountActivationService accountActivationService;
 
     @Value("${frontend.url}")
     private String FRONTEND_URL;

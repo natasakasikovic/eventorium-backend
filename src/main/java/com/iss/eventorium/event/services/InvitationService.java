@@ -1,7 +1,7 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.InvitationRequestDto;
-import com.iss.eventorium.event.dtos.InvitationResponseDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.mappers.InvitationMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Invitation;
@@ -12,6 +12,7 @@ import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -27,15 +28,19 @@ public class InvitationService {
     private final InvitationRepository repository;
     private final UserService userService;
     private final EmailService emailService;
+    private final EventService eventService;
     private final SpringTemplateEngine templateEngine;
 
-    // NOTE: If constants are used in other files as well, consider creating a dedicated constants class!
-    public static final String BASE_URI = "http://localhost:4200/";
+    @Value("${frontend.url}")
+    public String BASE_URI;
+
     public static final String EVENT_INVITATION_AUTHENTICATED_TEMPLATE = "event-invitation-authenticated";
     public static final String EVENT_INVITATION_UNAUTHENTICATED_TEMPLATE = "event-invitation-unauthenticated";
     public static final String EMAIL_SUBJECT = "Invitation from Eventorium";
 
-    public void sendInvitations(List<InvitationRequestDto> invitationsDto, Event event) {
+    public void sendInvitations(List<InvitationRequestDto> invitationsDto, Long id) {
+        Event event = eventService.find(id);
+
         List<Invitation> invitations = invitationsDto.stream()
                 .map(InvitationMapper::fromRequest)
                 .peek(invitation -> invitation.setEvent(event)).toList();
@@ -47,6 +52,7 @@ public class InvitationService {
             EmailDetails emailDetails = createEmailDetails(invitation);
             emailService.sendSimpleMail(emailDetails);
         }
+        eventService.setIsDraftFalse(event);
         repository.saveAll(invitations);
     }
 
