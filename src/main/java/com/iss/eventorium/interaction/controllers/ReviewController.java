@@ -6,7 +6,9 @@ import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
 import com.iss.eventorium.interaction.dtos.UpdatedReviewDto;
 import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
+import com.iss.eventorium.interaction.services.ReviewService;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/v1")
+@RequiredArgsConstructor
 public class ReviewController {
+
+    private final ReviewService reviewService;
 
     @GetMapping("/services/{service-id}/reviews/all")
     public ResponseEntity<List<Review>> getServiceReviews(@PathVariable("service-id") Long serviceId) {
@@ -32,7 +37,7 @@ public class ReviewController {
         return ResponseEntity.ok(new PagedResponse<>(List.of(new Review()), 2, 100));
     }
 
-    @GetMapping("/products/{product-id}/review/all")
+    @GetMapping("/products/{product-id}/reviews/all")
     public ResponseEntity<List<Review>> getProductReviews(@PathVariable("product-id") Long productId) {
         return ResponseEntity.ok(List.of(new Review(), new Review()));
     }
@@ -48,23 +53,17 @@ public class ReviewController {
     @PostMapping("/services/{service-id}/reviews")
     public ResponseEntity<ReviewResponseDto> createServiceReview(
             @RequestBody CreateReviewRequestDto createReviewRequestDto,
-            @PathVariable("service-id") String serviceId
+            @PathVariable("service-id") Long serviceId
     ) {
-        Review review = ReviewMapper.fromCreateRequest(createReviewRequestDto);
-        review.setId(100L);
-        review.setCreationDate(LocalDateTime.now());
-        return new ResponseEntity<>(ReviewMapper.toResponse(review), HttpStatus.CREATED);
+        return new ResponseEntity<>(reviewService.createServiceReview(serviceId, createReviewRequestDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/products/{product-id}/reviews")
     public ResponseEntity<ReviewResponseDto> createProductReview(
             @RequestBody CreateReviewRequestDto createReviewRequestDto,
-            @PathVariable("product-id") String productId
+            @PathVariable("product-id") Long productId
     ) {
-        Review review = ReviewMapper.fromCreateRequest(createReviewRequestDto);
-        review.setId(101L);
-        review.setCreationDate(LocalDateTime.now());
-        return new ResponseEntity<>(ReviewMapper.toResponse(review), HttpStatus.CREATED);
+        return new ResponseEntity<>(reviewService.createProductReview(productId, createReviewRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/products/{product-id}/reviews/{review-id}")

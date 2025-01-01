@@ -2,6 +2,7 @@ package com.iss.eventorium.interaction.models;
 
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.Person;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,5 +33,6 @@ public class Review {
     @Enumerated (EnumType.STRING)
     private Status status;
 
-//    private Person person;
+    @ManyToOne
+    private User user;
 }

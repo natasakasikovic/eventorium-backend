@@ -84,6 +84,10 @@ public abstract class Solution {
 
     public abstract void restore(Memento memento);
 
+    public void addReview(Review review) {
+        getReviews().add(review);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
