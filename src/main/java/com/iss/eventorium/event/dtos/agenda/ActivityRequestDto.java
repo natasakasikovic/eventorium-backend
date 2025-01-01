@@ -1,4 +1,4 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.agenda;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;

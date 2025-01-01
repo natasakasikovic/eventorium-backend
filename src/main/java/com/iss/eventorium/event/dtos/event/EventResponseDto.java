@@ -1,6 +1,7 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.event;
 
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.shared.models.City;
 import lombok.AllArgsConstructor;

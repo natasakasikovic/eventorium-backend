@@ -1,6 +1,5 @@
 package com.iss.eventorium.event.repositories;
 
-import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
