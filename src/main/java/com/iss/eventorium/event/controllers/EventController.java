@@ -1,6 +1,10 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.*;
+import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.event.EventFilterDto;
+import com.iss.eventorium.event.dtos.event.EventRequestDto;
+import com.iss.eventorium.event.dtos.event.EventResponseDto;
+import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;

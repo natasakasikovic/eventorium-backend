@@ -77,6 +77,15 @@ public class ProductService {
         return images;
     }
 
+    public ImagePath getImagePath(Long id) {
+        Product product = repository.findById(id)
+                .orElseThrow( () -> new EntityNotFoundException(String.format("Product with id %s not found", id)));
+        if(product.getImagePaths().isEmpty()) {
+            throw new ImageNotFoundException("Image not found");
+        }
+        return product.getImagePaths().get(0);
+    }
+
     public byte[] getImage(Long productId, ImagePath path) {
         String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");
         try {

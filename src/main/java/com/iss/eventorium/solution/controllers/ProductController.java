@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
@@ -10,6 +11,7 @@ import com.iss.eventorium.shared.utils.ProductFilter;
 import com.iss.eventorium.solution.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
@@ -86,6 +88,15 @@ public class ProductController {
             @RequestParam("price") Double price
     ) {
         return ResponseEntity.ok(service.getBudgetSuggestions(categoryId, price));
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id){
+        ImagePath path = service.getImagePath(id);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(path.getContentType()))
+                .body(service.getImage(id, path));
     }
 
 }

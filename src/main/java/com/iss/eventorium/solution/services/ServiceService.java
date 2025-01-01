@@ -72,6 +72,11 @@ public class ServiceService {
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public List<ServiceSummaryResponseDto> getServices() {
+        List<Service> services =  serviceRepository.findAll();
+        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
         Page<Service> services = serviceRepository.findAll(pageable);
         return ServiceMapper.toPagedResponse(services);

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #center {
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            text-align: center;
+        }
+        p {
+            color: #555;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4fb87d;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Account Verification</h1>
+    <p>You have requested to create an account on the Eventorium platform. To complete your registration and be able to log in, please click the button below:</p>
+    <div id="center">
+        <a th:href="${LINK}" class="button">Verify My Account</a>
+    </div>
+    <p>If the verification link is still valid, you will be able to log in after clicking the link.</p>
+    <p>If more than 24 hours have passed since you submitted your request, you will need to resubmit your registration by filling out the registration form again.</p>
+
+    <div class="footer">
+        <p>Thank you for choosing Eventorium!</p>
+    </div>
+</div>
+
+</body>
+</html>

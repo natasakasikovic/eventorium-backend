@@ -1,6 +1,6 @@
 package com.iss.eventorium.event.mappers;
 
-import com.iss.eventorium.event.dtos.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.models.Activity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

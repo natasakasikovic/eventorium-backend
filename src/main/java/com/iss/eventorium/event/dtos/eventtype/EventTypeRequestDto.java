@@ -1,4 +1,4 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.eventtype;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import lombok.AllArgsConstructor;

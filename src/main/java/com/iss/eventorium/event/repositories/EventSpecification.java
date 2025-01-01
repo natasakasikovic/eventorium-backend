@@ -2,7 +2,7 @@ package com.iss.eventorium.event.repositories;
 
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
-import com.iss.eventorium.event.dtos.EventFilterDto;
+import com.iss.eventorium.event.dtos.event.EventFilterDto;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
