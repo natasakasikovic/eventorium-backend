@@ -43,8 +43,7 @@ public class CompanyService {
         User provider = userService.findById(companyRequestDto.getProviderId());
         company.setProvider(provider);
         accountActivationService.sendActivationEmail(provider);
-        repository.save(company);
-        return CompanyMapper.toResponse(company);
+        return CompanyMapper.toResponse(repository.save(company));
     }
 
     public void uploadImages(Long id, List<MultipartFile> images) {

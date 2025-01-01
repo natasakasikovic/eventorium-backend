@@ -42,7 +42,7 @@ public class Company {
     @Column(nullable = false)
     private String email;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ImagePath> photos;
 
     @Column(nullable = false)
