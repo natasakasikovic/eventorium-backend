@@ -3,6 +3,7 @@ package com.iss.eventorium.company.controllers;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.services.CompanyService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ public class CompanyController {
     private final CompanyService service;
 
     @PostMapping
-    public ResponseEntity<CompanyResponseDto> createCompany(@RequestBody CompanyRequestDto companyDto) {
+    public ResponseEntity<CompanyResponseDto> createCompany(@Valid @RequestBody CompanyRequestDto companyDto) {
         return ResponseEntity.ok(service.createCompany(companyDto));
     }
 

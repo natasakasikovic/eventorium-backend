@@ -2,15 +2,13 @@ package com.iss.eventorium.company.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iss.eventorium.shared.models.City;
-import com.iss.eventorium.user.models.User;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Time;
 import java.time.LocalTime;
 
 @Getter
@@ -19,30 +17,36 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class CompanyRequestDto {
 
-    @NotBlank(message = "Name is required.")
+    @NotNull(message = "Name is required.")
+    @NotEmpty(message = "Name is required")
     private String name;
 
-    @NotBlank(message = "Address is required.")
+    @NotNull(message = "Address is required.")
+    @NotEmpty(message = "Address is required")
     private String address;
 
-    @NotBlank(message = "City is required.")
+    @NotNull(message = "City is required.")
     private City city;
 
-    @NotBlank(message = "Phone number is required.")
+    @NotNull(message = "Phone number is required.")
+    @NotEmpty(message = "Phone number is required")
     private String phoneNumber;
 
-    @NotBlank(message = "Description is required.")
+    @NotNull(message = "Description is required.")
+    @NotEmpty(message = "Description is required")
     private String description;
 
-    @NotBlank(message = "Email is required.")
+    @NotNull(message = "Email is required.")
+    @NotEmpty(message = "Email is required")
     private String email;
 
+    @NotNull(message = "Opening hours field is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime openingHours;
 
+    @NotNull(message = "Closing hours field is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime closingHours;
 
-    @NotBlank
     private Long providerId;
 }
