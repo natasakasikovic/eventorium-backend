@@ -37,8 +37,8 @@ public class UserService {
     @Value("${image-path}")
     private String imagePath;
 
-    public User findByEmail(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public boolean existsByEmail(String email){
@@ -82,13 +82,18 @@ public class UserService {
         User created = UserMapper.fromRequest(authRequestDto);
         created.setHash(HashUtils.generateHash());
         created.setPassword(encodePassword(authRequestDto.getPassword()));
-        accountActivationService.sendActivationEmail(created);
+        sendActivationEmail(created);
         return userRepository.save(created);
     }
 
     private String encodePassword(String password){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.encode(password);
+    }
+
+    private void sendActivationEmail(User user) {
+        if (user.getRoles().stream().noneMatch(role -> "PROVIDER".equals(role.getName())))
+            accountActivationService.sendActivationEmail(user);
     }
 
     private void checkRequestExpired(User existingUser) throws IllegalStateException {
