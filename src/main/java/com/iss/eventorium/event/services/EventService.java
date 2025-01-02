@@ -49,10 +49,18 @@ public class EventService {
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEvents (String keyword, Pageable pageable) {
-        if (keyword.isBlank()) {
+        if (keyword.isBlank())
             return EventMapper.toPagedResponse(repository.findAll(pageable));
-        }
+
         return EventMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
+    }
+
+    public List<EventSummaryResponseDto> searchEvents (String keyword) {
+        List<Event> events = keyword.isBlank()
+                ? repository.findAll()
+                : repository.findByNameContainingAllIgnoreCase(keyword);
+
+        return events.stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged (Pageable pageable) {

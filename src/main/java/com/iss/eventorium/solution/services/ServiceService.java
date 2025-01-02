@@ -188,4 +188,13 @@ public class ServiceService {
         service.setIsDeleted(true);
         serviceRepository.save(service);
     }
+
+    public List<ServiceSummaryResponseDto> searchServices(String keyword) {
+        List<Service> services = keyword.isBlank()
+                ? serviceRepository.findAll()
+                : serviceRepository.findByNameContainingAllIgnoreCase(keyword);
+
+        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
 }
