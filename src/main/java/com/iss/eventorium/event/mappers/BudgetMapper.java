@@ -1,9 +1,7 @@
 package com.iss.eventorium.event.mappers;
 
 import com.iss.eventorium.event.dtos.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.BudgetItem;
-import com.iss.eventorium.event.models.Event;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

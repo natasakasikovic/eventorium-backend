@@ -1,7 +1,7 @@
 package com.iss.eventorium.event.mappers;
 
-import com.iss.eventorium.event.dtos.InvitationRequestDto;
-import com.iss.eventorium.event.dtos.InvitationResponseDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
+import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.models.Invitation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

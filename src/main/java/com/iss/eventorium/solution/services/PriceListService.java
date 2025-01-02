@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.services;
 
 
+import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
@@ -12,8 +13,11 @@ import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +27,7 @@ public class PriceListService {
 
     private final HistoryService historyService;
     private final AuthService authService;
+    private final PdfService pdfService;
 
     private final ServiceRepository serviceRepository;
     private final ProductRepository productRepository;
@@ -83,5 +88,12 @@ public class PriceListService {
         historyService.addProductMemento(product);
 
         return PriceListMapper.toResponse(productRepository.save(product));
+    }
+
+    public byte[] generatePdf() throws JRException {
+        List<PriceListResponseDto> data = new ArrayList<>(getPriceListProducts());
+        data.addAll(getPriceListServices());
+
+        return pdfService.generate("/templates/price-list-pdf.jrxml", data, new HashMap<>());
     }
 }

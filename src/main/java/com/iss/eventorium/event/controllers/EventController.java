@@ -1,6 +1,10 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.*;
+import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.event.EventFilterDto;
+import com.iss.eventorium.event.dtos.event.EventRequestDto;
+import com.iss.eventorium.event.dtos.event.EventResponseDto;
+import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.validation.Valid;
@@ -45,6 +49,11 @@ public class EventController {
     @GetMapping("/search")
     public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword, Pageable pageable){
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
+    }
+
+    @GetMapping("/search/all")
+    public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
+        return  ResponseEntity.ok(service.searchEvents(keyword));
     }
 
     @PostMapping()

@@ -72,6 +72,11 @@ public class ServiceService {
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public List<ServiceSummaryResponseDto> getServices() {
+        List<Service> services =  serviceRepository.findAll();
+        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
         Page<Service> services = serviceRepository.findAll(pageable);
         return ServiceMapper.toPagedResponse(services);
@@ -193,7 +198,7 @@ public class ServiceService {
         service.setIsDeleted(true);
         serviceRepository.save(service);
     }
-
+    
     private void sendNotification(Category category) {
         Notification notification = new Notification(
                 "Category proposal",
@@ -206,4 +211,13 @@ public class ServiceService {
         );
         notificationService.sendNotificationToAdmin(notification);
     }
+    
+    public List<ServiceSummaryResponseDto> searchServices(String keyword) {
+        List<Service> services = keyword.isBlank()
+                ? serviceRepository.findAll()
+                : serviceRepository.findByNameContainingAllIgnoreCase(keyword);
+
+        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
 }

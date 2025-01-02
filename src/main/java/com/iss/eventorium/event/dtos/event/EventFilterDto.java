@@ -1,4 +1,4 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.event;
 
 import com.iss.eventorium.event.models.Privacy;
 import lombok.*;

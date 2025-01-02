@@ -20,6 +20,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
     List<Service> getBudgetSuggestions(Long categoryId, Double price);
 
     Page<Service> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
+    List<Service> findByNameContainingAllIgnoreCase(String keyword);
     List<Service> findByProvider_Id(Long id);
     Page<Service> findByProvider_Id(Long id, Pageable pageable);
 

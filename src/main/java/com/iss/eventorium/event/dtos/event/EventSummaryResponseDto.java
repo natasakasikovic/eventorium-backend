@@ -1,6 +1,5 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.event;
 
-import com.iss.eventorium.shared.models.Location;
 import lombok.*;
 
 @Getter
