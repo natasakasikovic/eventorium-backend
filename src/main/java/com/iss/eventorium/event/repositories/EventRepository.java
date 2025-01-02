@@ -18,4 +18,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     List<Event> findTopFiveUpcomingEvents(@Param("city") String city, Pageable pageable);
 
     Page<Event> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
+
+    List<Event> findByNameContainingAllIgnoreCase(String keyword);
 }
