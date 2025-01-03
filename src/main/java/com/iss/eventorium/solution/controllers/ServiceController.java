@@ -46,8 +46,8 @@ public class ServiceController {
     }
 
     @GetMapping("/search/all")
-    public ResponseEntity<List<ServiceResponseDto>> searchServices(@RequestParam("keyword") String keyword) {
-        return null;
+    public ResponseEntity<List<ServiceSummaryResponseDto>> searchServices(@RequestParam("keyword") String keyword) {
+        return ResponseEntity.ok(service.searchServices(keyword));
     }
 
     @GetMapping("/search")

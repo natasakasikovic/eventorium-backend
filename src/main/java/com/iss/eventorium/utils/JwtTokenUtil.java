@@ -23,7 +23,7 @@ public class JwtTokenUtil {
     @Value("${jwt_secret}")
     public String SECRET;
 
-    @Value("1800000")
+    @Value("259200000")
     private Long EXPIRES_IN;
 
     @Value("Authorization")
