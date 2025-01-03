@@ -30,7 +30,7 @@ INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
  ('Catering', 'Food and beverages arrangements',   false, false),
- ('Venue Booking', 'Booking venues for events',   true, false),
+ ('Venue Booking', 'Booking venues for events',   false, false),
  ('Photography', 'Photography and videography services',   false, false),
  ('Entertainment', 'Music, shows, and performances',   false, false),
  ('Logistics', 'Transport and materials management',   false, false),
