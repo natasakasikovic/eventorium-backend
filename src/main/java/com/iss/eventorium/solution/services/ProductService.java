@@ -86,6 +86,14 @@ public class ProductService {
         return product.getImagePaths().get(0);
     }
 
+    public List<ProductSummaryResponseDto> search(String keyword) {
+        List<Product> products = keyword.isBlank()
+                ? repository.findAll()
+                : repository.findByNameContainingAllIgnoreCase(keyword);
+
+        return products.stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
     public byte[] getImage(Long productId, ImagePath path) {
         String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");
         try {

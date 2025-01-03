@@ -82,6 +82,11 @@ public class ProductController {
         return ResponseEntity.ok(service.search(keyword, pageable));
     }
 
+    @GetMapping("/search/all")
+    public ResponseEntity<List<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword){
+        return ResponseEntity.ok(service.search(keyword));
+    }
+
     @GetMapping("/suggestions")
     public ResponseEntity<List<ProductSummaryResponseDto>> getBudgetSuggestions(
             @RequestParam("categoryId") Long categoryId,
