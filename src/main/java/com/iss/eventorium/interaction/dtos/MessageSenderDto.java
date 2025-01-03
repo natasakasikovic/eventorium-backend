@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatMessageRequestDto {
-    private Long senderId;
-    private Long recipientId;
-    private String message;
+public class MessageSenderDto {
+    private Long id;
+    private String name;
+    private String lastname;
 }

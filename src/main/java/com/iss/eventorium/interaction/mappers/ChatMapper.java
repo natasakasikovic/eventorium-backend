@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.mappers;
 import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
 import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.models.ChatMessage;
+import com.iss.eventorium.interaction.dtos.MessageSenderDto;
 import com.iss.eventorium.user.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,13 @@ public class ChatMapper {
         ChatMessageResponseDto dto = modelMapper.map(chatMessage, ChatMessageResponseDto.class);
         dto.setSenderId(chatMessage.getSender().getId());
         dto.setRecipientId(chatMessage.getRecipient().getId());
+        dto.setSender(
+                MessageSenderDto.builder()
+                        .id(chatMessage.getSender().getId())
+                        .name(chatMessage.getSender().getPerson().getName())
+                        .lastname(chatMessage.getSender().getPerson().getLastname())
+                        .build()
+        );
         return dto;
     }
 
@@ -31,7 +39,6 @@ public class ChatMapper {
                 .timestamp(LocalDateTime.now())
                 .sender(sender)
                 .recipient(recipient)
-                .chatName(dto.getChatName())
                 .message(dto.getMessage())
                 .build();
     }

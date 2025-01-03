@@ -51,8 +51,8 @@ public class ChatService {
 
     public List<ChatMessageResponseDto> getMessages(Long senderId, Long recipientId) {
         return Stream.concat(
-                        chatMessageRepository.findByChatName(senderId + "_" + recipientId).stream(),
-                        chatMessageRepository.findByChatName(recipientId + "_" + senderId).stream()
+                        chatMessageRepository.findBySender_IdAndRecipient_Id(senderId, recipientId).stream(),
+                        chatMessageRepository.findBySender_IdAndRecipient_Id(recipientId, senderId).stream()
                 )
                 .map(ChatMapper::toResponse)
                 .sorted(Comparator.comparing(ChatMessageResponseDto::getTimestamp))

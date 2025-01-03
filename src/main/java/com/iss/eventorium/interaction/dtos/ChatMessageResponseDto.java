@@ -14,4 +14,5 @@ public class ChatMessageResponseDto {
     private Long recipientId;
     private String message;
     private LocalDateTime timestamp;
+    private MessageSenderDto sender;
 }
