@@ -1,7 +1,9 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
-import com.iss.eventorium.user.controllers.ReportController;
+import com.iss.eventorium.user.dtos.AccountDetailsDto;
 import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.dtos.AuthRequestDto;
@@ -13,13 +15,15 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -33,6 +37,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final AccountActivationService accountActivationService;
+    private final AuthService authService;
 
     @Value("${image-path}")
     private String imagePath;
@@ -126,12 +131,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not fount."));
 
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
+        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
+        String fileName = Instant.now().toEpochMilli() + "_" + originalFileName;
         String uploadDir = StringUtils.cleanPath(imagePath + "profilePhotos/");
 
         try {
             ImageUpload.saveImage(uploadDir, fileName, photo);
-            user.getPerson().setProfilePhoto(fileName);
+            String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+            user.getPerson().setProfilePhoto(ImagePath.builder().path(fileName).contentType(contentType).build());
             userRepository.save(user);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to save the photo.", e);
@@ -155,4 +162,34 @@ public class UserService {
         return (System.currentTimeMillis() - activationTimestamp.getTime()) / (1000 * 60 * 60) < 24;
     }
 
+    public AccountDetailsDto getCurrentUser() {
+        User current = authService.getCurrentUser();
+        return AccountDetailsDto.builder()
+                .id(current.getId())
+                .email(current.getEmail())
+                .fullName(current.getPerson().getName() + " " + current.getPerson().getLastname())
+                .city(current.getPerson().getCity().getName())
+                .address(current.getPerson().getAddress())
+                .phoneNumber(current.getPerson().getPhoneNumber())
+                .role(current.getRoles().get(0).getName().replace("_", " "))
+                .build();
+    }
+
+    public ImagePath getProfilePhotoPath(long id) {
+        User user = findById(id);
+        if (user.getPerson().getProfilePhoto() == null) {
+            throw new ImageNotFoundException("Profile photo not found.");
+        }
+        return user.getPerson().getProfilePhoto();
+    }
+
+    public byte[] getProfilePhoto(ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + "profilePhotos/");
+        try {
+            File file = new File(uploadDir + path.getPath());
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new ImageNotFoundException("Fail to read image");
+        }
+    }
 }
