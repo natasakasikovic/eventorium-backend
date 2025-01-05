@@ -3,15 +3,16 @@ package com.iss.eventorium.user.controllers;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.user.dtos.AccountDetailsDto;
 import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
-import com.iss.eventorium.user.dtos.UpdateAccountDto;
-import com.iss.eventorium.user.dtos.UpdatedAccountDto;
+import com.iss.eventorium.user.dtos.UpdateRequestDto;
 import com.iss.eventorium.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -24,9 +25,10 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdatedAccountDto> updateAccount(@PathVariable Long id, @RequestBody UpdateAccountDto account) throws Exception {
-        return null;
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> update(@RequestBody UpdateRequestDto person) {
+        userService.update(person);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{id}")
@@ -45,5 +47,15 @@ public class UserController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(path.getContentType()))
                 .body(userService.getProfilePhoto(path));
+    }
+
+    @PutMapping(value = "/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> uploadProfilePhoto(@RequestParam("profilePhoto") MultipartFile file) {
+        try {
+            userService.updateProfilePhoto(file);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

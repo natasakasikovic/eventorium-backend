@@ -3,12 +3,11 @@ package com.iss.eventorium.user.services;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
-import com.iss.eventorium.user.dtos.AccountDetailsDto;
-import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
+import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.shared.utils.ImageUpload;
-import com.iss.eventorium.user.dtos.AuthRequestDto;
-import com.iss.eventorium.user.dtos.AuthResponseDto;
+import com.iss.eventorium.user.mappers.PersonMapper;
 import com.iss.eventorium.user.mappers.UserMapper;
+import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,6 +37,7 @@ public class UserService {
     private final RoleService roleService;
     private final AccountActivationService accountActivationService;
     private final AuthService authService;
+    private final PersonMapper personMapper;
 
     @Value("${image-path}")
     private String imagePath;
@@ -145,6 +145,10 @@ public class UserService {
         }
     }
 
+    public void updateProfilePhoto(MultipartFile photo) {
+        uploadProfilePhoto(this.getCurrentUser().getId(), photo);
+    }
+
     private User findByHash(String hash) {
         return userRepository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("User not fount."));
     }
@@ -164,15 +168,7 @@ public class UserService {
 
     public AccountDetailsDto getCurrentUser() {
         User current = authService.getCurrentUser();
-        return AccountDetailsDto.builder()
-                .id(current.getId())
-                .email(current.getEmail())
-                .fullName(current.getPerson().getName() + " " + current.getPerson().getLastname())
-                .city(current.getPerson().getCity().getName())
-                .address(current.getPerson().getAddress())
-                .phoneNumber(current.getPerson().getPhoneNumber())
-                .role(current.getRoles().get(0).getName().replace("_", " "))
-                .build();
+        return UserMapper.toAccountDetailsDto(current);
     }
 
     public ImagePath getProfilePhotoPath(long id) {
@@ -191,5 +187,13 @@ public class UserService {
         } catch (IOException e) {
             throw new ImageNotFoundException("Fail to read image");
         }
+    }
+
+    public void update(UpdateRequestDto person) {
+        User user = authService.getCurrentUser();
+        Person updated = personMapper.fromRequest(person);
+        updated.setProfilePhoto(user.getPerson().getProfilePhoto());
+        user.setPerson(updated);
+        userRepository.save(user);
     }
 }

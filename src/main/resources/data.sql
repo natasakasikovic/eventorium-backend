@@ -14,15 +14,30 @@ INSERT INTO cities (name) VALUES
 ('Kragujevac');
 
 INSERT INTO images (content_type, path) VALUES
-                    ('image/jpg', 'photo1.jpg'),
-                    ('image/jpg', 'photo2.jpg');
+                                            ('image/jpeg', 'custom_invitations.jpg'),
+                                            ('image/jpeg', 'event_banner.jpg'),
+                                            ('image/jpeg', 'party_favors.jpg'),
+                                            ('image/jpeg', 'decorative_balloons.jpg'),
+                                            ('image/jpeg', 'event_t-shirts.jpg'),
+                                            ('image/jpeg', 'party_hats.jpg'),
+                                            ('image/jpeg', 'event_mugs.jpg'),
+                                            ('image/jpeg', 'photo_frames.jpg'),
+                                            ('image/jpeg', 'event_photography.jpg'),
+                                            ('image/jpeg', 'catering_service.jpg'),
+                                            ('image/jpeg', 'event_planning.jpg'),
+                                            ('image/png', 'sound_system_setup.png'),
+                                            ('image/jpeg', 'decorative_lighting.jpg'),
+                                            ('image/jpeg', 'venue_booking.jpg'),
+                                            ('image/jpeg', 'transportation_service.jpg'),
+                                            ('image/jpg', 'photo1.jpg'),
+                                            ('image/jpg', 'photo2.jpg');
 
 INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id) VALUES
-                                (true, 6,  false, '2024-12-07 12:00:00', '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', '2017-10-01 21:58:58.508-07', '1', 1),
-                                (true, 2,  false, '2024-12-06 12:00:00', '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', '2017-10-01 21:58:58.508-07', '2', null),
-                                (true, 2,  false, '2024-12-06 12:00:00', '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', '2017-10-01 21:58:58.508-07', '3', null),
-                                (true, 6,  false, '2024-12-05 12:00:00', '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', '2017-10-01 21:58:58.508-07', '4', null),
-                                (true, 1,  false, '2024-12-06 12:00:00', '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', '2017-10-01 21:58:58.508-07', '5', 2);
+                                (true, 6,  false, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16),
+                                (true, 2,  false, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null),
+                                (true, 2,  false, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null),
+                                (true, 6,  false, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null),
+                                (true, 1,  false, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17);
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
@@ -136,22 +151,22 @@ INSERT INTO solution_event_types (solution_id, event_type_id) VALUES
 (14, 3), (15, 1);
 
 
-INSERT INTO images (content_type, path) VALUES
-('image/jpeg', 'custom_invitations.jpg'),
-('image/jpeg', 'event_banner.jpg'),
-('image/jpeg', 'party_favors.jpg'),
-('image/jpeg', 'decorative_balloons.jpg'),
-('image/jpeg', 'event_t-shirts.jpg'),
-('image/jpeg', 'party_hats.jpg'),
-('image/jpeg', 'event_mugs.jpg'),
-('image/jpeg', 'photo_frames.jpg'),
-('image/jpeg', 'event_photography.jpg'),
-('image/jpeg', 'catering_service.jpg'),
-('image/jpeg', 'event_planning.jpg'),
-('image/png', 'sound_system_setup.png'),
-('image/jpeg', 'decorative_lighting.jpg'),
-('image/jpeg', 'venue_booking.jpg'),
-('image/jpeg', 'transportation_service.jpg');
+-- INSERT INTO images (content_type, path) VALUES
+-- ('image/jpeg', 'custom_invitations.jpg'),
+-- ('image/jpeg', 'event_banner.jpg'),
+-- ('image/jpeg', 'party_favors.jpg'),
+-- ('image/jpeg', 'decorative_balloons.jpg'),
+-- ('image/jpeg', 'event_t-shirts.jpg'),
+-- ('image/jpeg', 'party_hats.jpg'),
+-- ('image/jpeg', 'event_mugs.jpg'),
+-- ('image/jpeg', 'photo_frames.jpg'),
+-- ('image/jpeg', 'event_photography.jpg'),
+-- ('image/jpeg', 'catering_service.jpg'),
+-- ('image/jpeg', 'event_planning.jpg'),
+-- ('image/png', 'sound_system_setup.png'),
+-- ('image/jpeg', 'decorative_lighting.jpg'),
+-- ('image/jpeg', 'venue_booking.jpg'),
+-- ('image/jpeg', 'transportation_service.jpg');
 
 
 INSERT INTO solutions_history VALUES (1);

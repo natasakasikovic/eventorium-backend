@@ -13,8 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonRequestDto {
-
+public class UpdateRequestDto {
     @NotBlank(message = "First name is required")
     private String name;
 
@@ -30,6 +29,4 @@ public class PersonRequestDto {
 
     @NotNull(message = "City is required")
     private City city;
-
-    private String profilePhoto;
 }
