@@ -7,7 +7,7 @@ import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.shared.utils.ProductFilter;
+import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -70,11 +70,8 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> filterProducts(
-            ProductFilter filter,
-            Pageable pageable
-    ) {
-        return null;
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> filterProducts(@ModelAttribute ProductFilterDto filter, Pageable pageable) {
+        return  ResponseEntity.ok(service.filter(filter, pageable));
     }
 
     @GetMapping("/search")

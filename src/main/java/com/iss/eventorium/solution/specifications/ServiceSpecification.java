@@ -1,4 +1,4 @@
-package com.iss.eventorium.solution.repositories;
+package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.models.Service;

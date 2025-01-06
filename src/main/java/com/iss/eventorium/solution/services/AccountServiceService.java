@@ -9,7 +9,7 @@ import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
-import com.iss.eventorium.solution.repositories.ServiceSpecification;
+import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toPagedResponse;
-import static com.iss.eventorium.solution.mappers.ServiceMapper.toSummaryResponse;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
