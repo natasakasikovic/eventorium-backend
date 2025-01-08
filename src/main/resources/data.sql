@@ -151,24 +151,6 @@ INSERT INTO solution_event_types (solution_id, event_type_id) VALUES
 (14, 3), (15, 1);
 
 
--- INSERT INTO images (content_type, path) VALUES
--- ('image/jpeg', 'custom_invitations.jpg'),
--- ('image/jpeg', 'event_banner.jpg'),
--- ('image/jpeg', 'party_favors.jpg'),
--- ('image/jpeg', 'decorative_balloons.jpg'),
--- ('image/jpeg', 'event_t-shirts.jpg'),
--- ('image/jpeg', 'party_hats.jpg'),
--- ('image/jpeg', 'event_mugs.jpg'),
--- ('image/jpeg', 'photo_frames.jpg'),
--- ('image/jpeg', 'event_photography.jpg'),
--- ('image/jpeg', 'catering_service.jpg'),
--- ('image/jpeg', 'event_planning.jpg'),
--- ('image/png', 'sound_system_setup.png'),
--- ('image/jpeg', 'decorative_lighting.jpg'),
--- ('image/jpeg', 'venue_booking.jpg'),
--- ('image/jpeg', 'transportation_service.jpg');
-
-
 INSERT INTO solutions_history VALUES (1);
 
 
