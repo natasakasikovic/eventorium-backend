@@ -75,6 +75,11 @@ public class ProductController {
         return  ResponseEntity.ok(service.filter(filter, pageable));
     }
 
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<ProductSummaryResponseDto>> filterProducts(@Valid @ModelAttribute ProductFilterDto filter) {
+        return  ResponseEntity.ok(service.filter(filter));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword, Pageable pageable){
         return ResponseEntity.ok(service.search(keyword, pageable));

@@ -107,4 +107,9 @@ public class ProductService {
         Specification<Product> specification = ProductSpecification.filterBy(filter);
         return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
+
+    public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
+        List<Product> products = repository.findAll(ProductSpecification.filterBy(filter));
+        return products.stream().map(ProductMapper::toSummaryResponse).toList();
+    }
 }
