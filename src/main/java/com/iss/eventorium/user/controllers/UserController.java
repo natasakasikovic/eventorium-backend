@@ -2,9 +2,11 @@ package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.user.dtos.AccountDetailsDto;
-import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
+import com.iss.eventorium.user.dtos.ChangePasswordRequestDto;
 import com.iss.eventorium.user.dtos.UpdateRequestDto;
+import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import com.iss.eventorium.user.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,9 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/reset-password/{id}")
-    public ResponseEntity<Void> resetPassword(@PathVariable Long id,
-                                              @RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) throws InvalidOldPasswordException {
+        userService.changePassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

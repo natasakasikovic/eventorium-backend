@@ -5,6 +5,7 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import com.iss.eventorium.user.mappers.PersonMapper;
 import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.Person;
@@ -38,6 +39,7 @@ public class UserService {
     private final AccountActivationService accountActivationService;
     private final AuthService authService;
     private final PersonMapper personMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${image-path}")
     private String imagePath;
@@ -91,9 +93,8 @@ public class UserService {
         return userRepository.save(created);
     }
 
-    private String encodePassword(String password){
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(password);
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     private void sendActivationEmail(User user) {
@@ -194,6 +195,16 @@ public class UserService {
         Person updated = personMapper.fromRequest(person);
         updated.setProfilePhoto(user.getPerson().getProfilePhoto());
         user.setPerson(updated);
+        userRepository.save(user);
+    }
+
+    public void changePassword(ChangePasswordRequestDto request) throws InvalidOldPasswordException {
+        User user = authService.getCurrentUser();
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidOldPasswordException("Old password does not match.");
+        }
+        user.setPassword(encodePassword(request.getPassword()));
+        user.setLastPasswordReset(new Date());
         userRepository.save(user);
     }
 }

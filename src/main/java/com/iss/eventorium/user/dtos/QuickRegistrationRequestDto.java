@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.shared.validators.password.PasswordsMatch;
+import com.iss.eventorium.user.validators.password.PasswordsMatch;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-@PasswordsMatch(message = "Passwords do not match")
+@PasswordsMatch
 public class QuickRegistrationRequestDto {
 
     @NotBlank(message = "Email is required")
