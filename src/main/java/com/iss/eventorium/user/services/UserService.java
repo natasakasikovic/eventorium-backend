@@ -65,7 +65,7 @@ public class UserService {
     private void setUserDetails(User user) {
         user.setRoles(roleService.findByName("USER"));
         user.setActivated(true);
-        user.setPassword(encodePassword(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
     public void delete(Long id) {
@@ -88,13 +88,9 @@ public class UserService {
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
         User created = UserMapper.fromRequest(authRequestDto);
         created.setHash(HashUtils.generateHash());
-        created.setPassword(encodePassword(authRequestDto.getPassword()));
+        created.setPassword(passwordEncoder.encode(authRequestDto.getPassword()));
         sendActivationEmail(created);
         return userRepository.save(created);
-    }
-
-    private String encodePassword(String password) {
-        return passwordEncoder.encode(password);
     }
 
     private void sendActivationEmail(User user) {
@@ -203,7 +199,7 @@ public class UserService {
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new InvalidOldPasswordException("Old password does not match.");
         }
-        user.setPassword(encodePassword(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setLastPasswordReset(new Date());
         userRepository.save(user);
     }
