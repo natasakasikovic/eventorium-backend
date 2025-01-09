@@ -5,10 +5,9 @@ import com.iss.eventorium.solution.models.Service;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
-
 import jakarta.persistence.criteria.Root;
-import org.springframework.data.jpa.domain.Specification;
 
+import org.springframework.data.jpa.domain.Specification;
 
 public class ServiceSpecification {
 
@@ -98,5 +97,4 @@ public class ServiceSpecification {
         Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
         return cb.prod(root.get("price"), discount);
     }
-
 }
