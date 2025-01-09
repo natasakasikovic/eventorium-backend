@@ -43,7 +43,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getCurrentUser());
     }
 
-    @GetMapping("/{id}/profilePhoto")
+    @GetMapping("/{id}/profile-photo")
     public ResponseEntity<byte[]> getProfilePhoto(@PathVariable("id") Long id) {
         ImagePath path = userService.getProfilePhotoPath(id);
         return ResponseEntity.ok()
