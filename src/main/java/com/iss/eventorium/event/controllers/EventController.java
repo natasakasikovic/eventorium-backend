@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilterDto filter, Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(@Valid @ModelAttribute EventFilterDto filter, Pageable pageable) {
         return ResponseEntity.ok(service.filterEvents(filter, pageable));
     }
 

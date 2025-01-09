@@ -42,7 +42,7 @@ public class Event {
     private Integer maxParticipants;
 
     @ManyToOne
-    private EventType type; // NOTE: If eventType is null, it indicates that the user selected "all"
+    private EventType eventType; // NOTE: If eventType is null, it indicates that the user selected "all"
 
     @ManyToOne
     private City city;
