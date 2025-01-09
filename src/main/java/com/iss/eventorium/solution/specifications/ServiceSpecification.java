@@ -2,6 +2,11 @@ package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.models.Service;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
+
 import org.springframework.data.jpa.domain.Specification;
 
 public class ServiceSpecification {
@@ -10,7 +15,18 @@ public class ServiceSpecification {
         return Specification
                 .where(hasCategory(filter.getCategory()))
                 .and(hasProvider(providerId))
-                .and(hasEventType(filter.getEventType()))
+                .and(hasEventType(filter.getType()))
+                .and(hasMinPrice(filter.getMinPrice()))
+                .and(hasMaxPrice(filter.getMaxPrice()))
+                .and(hasAvailability(filter.getAvailability()));
+    }
+
+    public static Specification<Service> filterBy(ServiceFilterDto filter) {
+        return Specification
+                .where(hasName(filter.getName()))
+                .and(hasDescription(filter.getDescription()))
+                .and(hasCategory(filter.getCategory()))
+                .and(hasEventType(filter.getType()))
                 .and(hasMinPrice(filter.getMinPrice()))
                 .and(hasMaxPrice(filter.getMaxPrice()))
                 .and(hasAvailability(filter.getAvailability()));
@@ -34,6 +50,13 @@ public class ServiceSpecification {
                  : cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
     }
 
+    private static Specification<Service> hasDescription(String description) {
+        return (root, query, cb) ->
+                description == null || description.isEmpty()
+                ? cb.conjunction()
+                : cb.equal(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%");
+    }
+
     private static Specification<Service> hasAvailability(Boolean available) {
         return (root, query, cb) ->
                 available == null || !available
@@ -41,18 +64,10 @@ public class ServiceSpecification {
                         : cb.equal(root.get("isAvailable"), true);
     }
 
-    private static Specification<Service> hasEventType(String eventType) {
+    private static Specification<Service> hasEventType(String type) {
         return (root, query, cb) ->
-                eventType == null || eventType.isEmpty()
-                        ? cb.conjunction()
-                        : cb.isTrue(
-                                cb.literal(eventType).in(
-                                    root.join("eventTypes")
-                                        .get("name")
-                                        .as(String.class)
-                                        .alias("eventTypeLower")
-                                )
-                );
+                type == null ? cb.conjunction()
+                        : cb.equal(root.join("eventTypes").get("name"), type);
     }
 
     private static Specification<Service> hasCategory(String category) {
@@ -62,18 +77,24 @@ public class ServiceSpecification {
                         : cb.equal(cb.lower(root.get("category").get("name")), category.toLowerCase());
     }
 
-    public static Specification<Service> hasMinPrice(Double minPrice) {
-        return (root, query, cb) ->
-                minPrice == null
-                        ? cb.conjunction()
-                        : cb.greaterThanOrEqualTo(root.get("price"), minPrice);
+    private static Specification<Service> hasMinPrice(Double minPrice) {
+        return (root, query, cb) -> {
+            if (minPrice == null) return cb.conjunction();
+            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            return cb.greaterThanOrEqualTo(discountedPrice, minPrice);
+        };
     }
 
-    public static Specification<Service> hasMaxPrice(Double maxPrice) {
-        return (root, query, cb) ->
-                maxPrice == null
-                        ? cb.conjunction()
-                        : cb.lessThanOrEqualTo(root.get("price"), maxPrice);
+    private static Specification<Service> hasMaxPrice(Double maxPrice) {
+        return (root, query, cb) -> {
+            if (maxPrice == null) return cb.conjunction();
+            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
+        };
     }
 
+    private static Expression<Double> calculateDiscountedPrice(Root<Service> root, CriteriaBuilder cb) {
+        Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
+        return cb.prod(root.get("price"), discount);
+    }
 }

@@ -36,13 +36,13 @@ public class ServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilterDto filter) {
-        return null;
+    public ResponseEntity<List<ServiceSummaryResponseDto>> filterServices(@Valid @ModelAttribute ServiceFilterDto filter) {
+        return ResponseEntity.ok(service.filter(filter));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilterDto filter, Pageable pageable) {
-        return null;
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filterServices(@Valid @ModelAttribute ServiceFilterDto filter, Pageable pageable) {
+        return ResponseEntity.ok(service.filter(filter, pageable));
     }
 
     @GetMapping("/search/all")
