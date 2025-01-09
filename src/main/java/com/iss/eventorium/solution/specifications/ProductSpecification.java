@@ -2,7 +2,11 @@ package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.models.Product;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Expression;
 
 public class ProductSpecification {
 
@@ -41,23 +45,35 @@ public class ProductSpecification {
     }
 
     public static Specification<Product> hasMinPrice(Double minPrice) {
-        return (root, query, cb) ->
-                minPrice == null
-                        ? cb.conjunction()
-                        : cb.greaterThanOrEqualTo(root.get("price"), minPrice);
+        return (root, query, cb) -> {
+            if (minPrice == null) return cb.conjunction();
+
+            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+
+            return cb.greaterThanOrEqualTo(discountedPrice, minPrice);
+        };
     }
 
     public static Specification<Product> hasMaxPrice(Double maxPrice) {
-        return (root, query, cb) ->
-                maxPrice == null
-                        ? cb.conjunction()
-                        : cb.lessThanOrEqualTo(root.get("price"), maxPrice);
+        return (root, query, cb) -> {
+            if (maxPrice == null) return cb.conjunction();
+
+            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+
+            return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
+        };
     }
 
     public static Specification<Product> hasAvailability(Boolean availability) {
         return (root, query, cb) ->
                 availability == null
-                ? cb.conjunction()
+                        ? cb.conjunction()
                         : cb.equal(root.get("isAvailable"), availability);
     }
+
+    private static Expression<Double> calculateDiscountedPrice(Root<Product> root, CriteriaBuilder cb) {
+        Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
+        return cb.prod(root.get("price"), discount);
+    }
+
 }
