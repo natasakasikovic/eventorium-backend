@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/change-password")
+    @PostMapping("/password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) throws InvalidOldPasswordException {
         userService.changePassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
