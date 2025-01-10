@@ -3,18 +3,16 @@ package com.iss.eventorium.interaction.controllers;
 import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
 import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
-import com.iss.eventorium.interaction.dtos.UpdatedReviewDto;
-import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.services.ReviewService;
 import com.iss.eventorium.shared.utils.PagedResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -52,7 +50,7 @@ public class ReviewController {
 
     @PostMapping("/services/{service-id}/reviews")
     public ResponseEntity<ReviewResponseDto> createServiceReview(
-            @RequestBody CreateReviewRequestDto createReviewRequestDto,
+            @RequestBody @Valid CreateReviewRequestDto createReviewRequestDto,
             @PathVariable("service-id") Long serviceId
     ) {
         return new ResponseEntity<>(reviewService.createServiceReview(serviceId, createReviewRequestDto), HttpStatus.CREATED);
@@ -60,30 +58,26 @@ public class ReviewController {
 
     @PostMapping("/products/{product-id}/reviews")
     public ResponseEntity<ReviewResponseDto> createProductReview(
-            @RequestBody CreateReviewRequestDto createReviewRequestDto,
+            @RequestBody @Valid CreateReviewRequestDto createReviewRequestDto,
             @PathVariable("product-id") Long productId
     ) {
         return new ResponseEntity<>(reviewService.createProductReview(productId, createReviewRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/products/{product-id}/reviews/{review-id}")
-    public ResponseEntity<UpdatedReviewDto> updateProductReview(
+    public ResponseEntity<ReviewResponseDto> updateProductReview(
             @PathVariable("product-id") Long productId,
             @PathVariable("review-id") Long reviewId,
-            @RequestBody UpdateReviewDto review) throws Exception {
-        // TODO: Call -> reviewService.updateReview(productId, reviewId, review);
-        UpdatedReviewDto updatedReview = new UpdatedReviewDto();
-        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
+            @RequestBody @Valid UpdateReviewDto review) throws Exception {
+        return null;
     }
 
     @PutMapping("/services/{service-id}/reviews/{review-id}")
-    public ResponseEntity<UpdatedReviewDto> updateServiceReview(
+    public ResponseEntity<ReviewResponseDto> updateServiceReview(
             @PathVariable("service-id") Long serviceId,
             @PathVariable("review-id") Long reviewId,
-            @RequestBody UpdateReviewDto review) throws Exception {
-        // TODO: Call -> reviewService.updateReview(serviceId, reviewId, review);
-        UpdatedReviewDto updatedReview = new UpdatedReviewDto();
-        return new ResponseEntity<>(updatedReview, HttpStatus.OK);
+            @RequestBody @Valid UpdateReviewDto review) throws Exception {
+        return null;
     }
 
 
