@@ -12,13 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class ServiceSpecification {
 
     public static Specification<Service> filterBy(ServiceFilterDto filter, Long providerId) {
-        return Specification
-                .where(hasCategory(filter.getCategory()))
-                .and(hasProvider(providerId))
-                .and(hasEventType(filter.getType()))
-                .and(hasMinPrice(filter.getMinPrice()))
-                .and(hasMaxPrice(filter.getMaxPrice()))
-                .and(hasAvailability(filter.getAvailability()));
+        return filterBy(filter).and(hasProvider(providerId));
     }
 
     public static Specification<Service> filterBy(ServiceFilterDto filter) {
@@ -54,7 +48,7 @@ public class ServiceSpecification {
         return (root, query, cb) ->
                 description == null || description.isEmpty()
                 ? cb.conjunction()
-                : cb.equal(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%");
+                : cb.like(cb.lower(root.get("description")), "%" + description.toLowerCase() + "%");
     }
 
     private static Specification<Service> hasAvailability(Boolean available) {
