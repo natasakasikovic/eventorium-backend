@@ -168,6 +168,11 @@ public class UserService {
         return UserMapper.toAccountDetailsDto(current);
     }
 
+    public AccountDetailsDto getUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not fount."));
+        return UserMapper.toAccountDetailsDto(user);
+    }
+
     public ImagePath getProfilePhotoPath(long id) {
         User user = findById(id);
         if (user.getPerson().getProfilePhoto() == null) {
