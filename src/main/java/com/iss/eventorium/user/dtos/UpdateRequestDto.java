@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -28,5 +28,5 @@ public class UpdateRequestDto {
     private String phoneNumber;
 
     @NotNull(message = "City is required")
-    private City city;
+    private CityDto city;
 }

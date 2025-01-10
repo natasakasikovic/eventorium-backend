@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.dtos.CityDto;
 import lombok.*;
 
 @Getter
@@ -15,6 +15,6 @@ public class AccountDetailsDto {
     private String lastname;
     private String phoneNumber;
     private String address;
-    private City city;
+    private CityDto city;
     private String role;
 }
