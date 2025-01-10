@@ -1,8 +1,7 @@
 package com.iss.eventorium.user.mappers;
 
-import com.iss.eventorium.user.dtos.QuickRegistrationRequestDto;
-import com.iss.eventorium.user.dtos.AuthRequestDto;
-import com.iss.eventorium.user.dtos.AuthResponseDto;
+import com.iss.eventorium.shared.mappers.CityMapper;
+import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +24,18 @@ public class UserMapper {
 
     public static AuthResponseDto toResponse(User user) {
         return modelMapper.map(user, AuthResponseDto.class);
+    }
+
+    public static AccountDetailsDto toAccountDetailsDto(User user) {
+        return AccountDetailsDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getPerson().getName())
+                .lastname(user.getPerson().getLastname())
+                .city(CityMapper.toResponse(user.getPerson().getCity()))
+                .address(user.getPerson().getAddress())
+                .phoneNumber(user.getPerson().getPhoneNumber())
+                .role(user.getRoles().get(0).getName().replace("_", " "))
+                .build();
     }
 }

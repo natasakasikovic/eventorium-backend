@@ -1,22 +1,20 @@
 package com.iss.eventorium.user.dtos;
 
-import com.iss.eventorium.user.models.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.iss.eventorium.shared.dtos.CityDto;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdatedAccountDto {
+@Builder
+public class AccountDetailsDto {
     private Long id;
     private String email;
     private String name;
     private String lastname;
     private String phoneNumber;
     private String address;
-    private String city;
-    private Role role;
+    private CityDto city;
+    private String role;
 }

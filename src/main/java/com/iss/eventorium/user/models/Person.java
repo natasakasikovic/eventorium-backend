@@ -1,6 +1,7 @@
 package com.iss.eventorium.user.models;
 
 import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Service;
 import jakarta.persistence.*;
@@ -31,8 +32,9 @@ public class Person {
     @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
 
-    @Column(name = "profile_photo")
-    private String profilePhoto;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_photo_id", referencedColumnName = "id")
+    private ImagePath profilePhoto;
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Product> favouriteProducts;

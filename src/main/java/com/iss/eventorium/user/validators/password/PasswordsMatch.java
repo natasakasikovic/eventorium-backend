@@ -1,4 +1,4 @@
-package com.iss.eventorium.shared.validators.password;
+package com.iss.eventorium.user.validators.password;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -13,6 +13,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PasswordsMatch {
 
+    String password() default "password";
+    String passwordConfirmation() default "passwordConfirmation";
     String message() default "Passwords must match";
 
     Class<?>[] groups() default {};
