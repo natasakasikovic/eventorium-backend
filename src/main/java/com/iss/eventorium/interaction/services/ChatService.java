@@ -29,7 +29,7 @@ public class ChatService {
     private final UserRepository userRepository;
 
     public void sendMessage(ChatMessageRequestDto chatMessage) {
-        if(chatMessage.getMessage().isEmpty()) {
+        if(chatMessage.getMessage().trim().isEmpty()) {
             return;
         }
         log.info("Sending message from {} to {}: {}",
