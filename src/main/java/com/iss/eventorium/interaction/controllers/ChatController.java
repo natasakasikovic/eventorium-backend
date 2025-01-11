@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.controllers;
 import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
 import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.services.ChatService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -22,7 +23,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("/chat")
-    public void sendMessage(@Payload ChatMessageRequestDto chatMessage){
+    public void sendMessage(@Payload @Valid ChatMessageRequestDto chatMessage){
         chatService.sendMessage(chatMessage);
     }
 

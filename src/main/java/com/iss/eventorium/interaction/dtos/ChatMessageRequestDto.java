@@ -1,6 +1,7 @@
 package com.iss.eventorium.interaction.dtos;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -11,5 +12,6 @@ import lombok.*;
 public class ChatMessageRequestDto {
     private Long senderId;
     private Long recipientId;
+    @NotBlank
     private String message;
 }
