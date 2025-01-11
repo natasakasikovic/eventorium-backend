@@ -18,6 +18,7 @@ import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +32,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -220,4 +222,13 @@ public class ServiceService {
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public PagedResponse<ServiceSummaryResponseDto> filter(ServiceFilterDto filter, Pageable pageable) {
+        Specification<Service> specification = ServiceSpecification.filterBy(filter);
+        return ServiceMapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
+    }
+
+    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter){
+        Specification<Service> specification = ServiceSpecification.filterBy(filter);
+        return serviceRepository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
 }

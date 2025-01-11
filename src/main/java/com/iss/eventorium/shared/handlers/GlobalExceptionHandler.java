@@ -6,6 +6,7 @@ import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
+import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
-
-import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,10 +29,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldError() != null
+                ? ex.getBindingResult().getFieldError().getDefaultMessage()
+                : ex.getBindingResult().getGlobalError() != null
+                ? ex.getBindingResult().getGlobalError().getDefaultMessage()
+                : "Validation error occurred";
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                        .message(Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage())
+                        .message(errorMessage)
                         .build());
     }
 
@@ -83,6 +88,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error("Category already exists!")
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleInvalidOldPasswordException(InvalidOldPasswordException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }
