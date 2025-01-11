@@ -1,9 +1,12 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.user.dtos.ReportRequestDto;
 import com.iss.eventorium.user.dtos.ReportResponseDto;
 import com.iss.eventorium.user.dtos.UpdateReportStatusDto;
+import com.iss.eventorium.user.dtos.UserReportRequestDto;
+import com.iss.eventorium.user.services.UserReportService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 
+@CrossOrigin
 @RestController
-@RequestMapping("/api/v1/reports")
-public class ReportController {
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/user-reports")
+public class UserReportController {
+
+    private final UserReportService service;
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ReportResponseDto>> getReports() {
@@ -31,11 +38,11 @@ public class ReportController {
         return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ReportResponseDto(1L, "Reason 3", 1L, 2L)), 1, 3));
     }
 
-    @PostMapping
-    public ResponseEntity<ReportResponseDto> createReport(@RequestBody ReportRequestDto report){
-        // TODO: call -> reportService.createReport(report); and delete line below
-        ReportResponseDto reportCreated = new ReportResponseDto();
-        return new ResponseEntity<>(reportCreated, HttpStatus.CREATED);
+
+    @PostMapping("/{offender-id}")
+    public ResponseEntity<Void> createReport(@Valid @RequestBody UserReportRequestDto report, @PathVariable("offender-id") Long id) {
+        service.createReport(report, id);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
