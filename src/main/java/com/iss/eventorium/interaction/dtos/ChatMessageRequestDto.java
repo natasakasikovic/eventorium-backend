@@ -12,6 +12,5 @@ import lombok.*;
 public class ChatMessageRequestDto {
     private Long senderId;
     private Long recipientId;
-    @NotBlank
     private String message;
 }

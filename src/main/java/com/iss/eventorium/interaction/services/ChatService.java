@@ -29,6 +29,9 @@ public class ChatService {
     private final UserRepository userRepository;
 
     public void sendMessage(ChatMessageRequestDto chatMessage) {
+        if(chatMessage.getMessage().isEmpty()) {
+            return;
+        }
         log.info("Sending message from {} to {}: {}",
             chatMessage.getSenderId(),
             chatMessage.getRecipientId(),

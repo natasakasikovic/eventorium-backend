@@ -23,7 +23,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("/chat")
-    public void sendMessage(@Payload @Valid ChatMessageRequestDto chatMessage){
+    public void sendMessage(@Payload ChatMessageRequestDto chatMessage){
         chatService.sendMessage(chatMessage);
     }
 
