@@ -20,11 +20,20 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public void sendNotification(Long userId, Notification notification) {
-        log.info("Sending WebSocket notification to {} with payload {}", userId, notification);
+        log.info("Sending notification to {}: {}", userId, notification.getMessage());
         messagingTemplate.convertAndSendToUser(
                 userId.toString(),
                 "/notifications",
                 toResponse(notification)
+        );
+        notificationRepository.save(notification);
+    }
+
+    public void sendNotificationToAdmin(Notification notification) {
+        log.info("Sending notification to admins: {}", notification.getMessage());
+        messagingTemplate.convertAndSend(
+          "/topic/admin",
+          toResponse(notification)
         );
         notificationRepository.save(notification);
     }

@@ -8,6 +8,7 @@ import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.models.Product;
 
+import com.iss.eventorium.user.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,6 +50,7 @@ public class ProductMapper {
         } catch (NullPointerException e) {
             dto.setRating(0.0d);
         }
+        dto.setProvider(UserMapper.toProviderResponse(product.getProvider()));
         return dto;
     }
 }
