@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.report;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

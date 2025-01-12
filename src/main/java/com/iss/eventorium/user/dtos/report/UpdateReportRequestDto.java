@@ -1,6 +1,7 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.report;
 
 import com.iss.eventorium.shared.models.Status;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateReportStatusDto {
-    private Long reportId;
+public class UpdateReportRequestDto {
+    @NotNull(message ="Status must not be null!")
     private Status status;
 }
