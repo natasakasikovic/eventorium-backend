@@ -2,6 +2,7 @@ package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.utils.JwtTokenUtil;
 import jakarta.validation.Valid;
@@ -31,6 +32,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
+    private final AuthService authService;
 
     @Value("${frontend.url}")
     private String FRONTEND_URL;
@@ -47,6 +49,8 @@ public class AuthController {
 
             User user = (User) authentication.getPrincipal();
             if (!user.isActivated()) return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+            authService.isSuspended(user); // TODO: When refactoring this, delegate the call to isSuspended to the service layer, along with the other business logic
 
             String jwt = jwtTokenUtil.generateToken(user);
             Long expiresIn = jwtTokenUtil.getExpiredIn();
