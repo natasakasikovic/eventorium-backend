@@ -30,20 +30,49 @@ INSERT INTO images (content_type, path) VALUES
                                             ('image/jpeg', 'venue_booking.jpg'),
                                             ('image/jpeg', 'transportation_service.jpg'),
                                             ('image/jpg', 'photo1.jpg'),
-                                            ('image/jpg', 'photo2.jpg');
+                                            ('image/jpg', 'photo2.jpg'),
+                                            ('image/png', 'logo.png'), --18
+                                            ('image/png', 'in_company.png'), --19
+                                            ('image/png', 'event_planned_by_us.png'), --20
+                                            ('image/png', 'logo.png'), --21
+                                            ('image/png', 'bday_decoration.png'), --22
+                                            ('image/png', 'decorated_by_us.png'); --23
+
 
 INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id) VALUES
-                                (true, 6,  false, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16),
-                                (true, 2,  false, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null),
-                                (true, 2,  false, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null),
-                                (true, 6,  false, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null),
-                                (true, 1,  false, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17);
+    (true, 6,  false, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16),
+    (true, 2,  false, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null),
+    (true, 2,  false, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null),
+    (true, 6,  false, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null),
+    (true, 1,  false, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17);
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (3, 4);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (4, 4);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
+
+INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
+VALUES
+    (3, '18:00:00', '09:00:00', 'Dositejeva, 6',
+     'Event Masters is your go-to partner for planning all types of events. ' ||
+     'From creating custom invitations and event banners to full-scale coordination, ' ||
+     'we bring your vision to life with precision and creativity. Contact us to make your event unforgettable.',
+     'info@eventmasters.com',
+     'Event Masters', '+1-555-123-4567', 3),
+    (4, '21:00:00', '08:00:00', 'Nemanjina, 15',
+     'Celebrate in style with Party Supplies Hub! Offering a wide range of balloons, party decorations, sound systems, and catering options. ' ||
+     'We are your one-stop shop for making every celebration unforgettable.',
+     'support@partysupplies.com',
+     'Party Supplies Hub', '+1-555-456-7890', 4);
+
+insert into companies_photos (company_id, photos_id) values
+ (1, 18),
+ (1, 19),
+ (1, 20),
+ (2, 21),
+ (2, 22),
+ (2, 23);
 
 
 INSERT INTO categories (name, description, deleted, suggested) VALUES
