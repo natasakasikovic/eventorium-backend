@@ -1,5 +1,6 @@
 package com.iss.eventorium.company.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iss.eventorium.shared.dtos.CityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class ProviderCompanyDto {
     private String email;
     private String address;
     private CityDto city;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime openingHours;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime closingHours;
 }

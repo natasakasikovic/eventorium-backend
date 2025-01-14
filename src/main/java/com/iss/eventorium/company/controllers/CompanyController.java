@@ -3,6 +3,7 @@ package com.iss.eventorium.company.controllers;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
+import com.iss.eventorium.company.dtos.UpdateRequestDto;
 import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import jakarta.validation.Valid;
@@ -46,5 +47,10 @@ public class CompanyController {
     @GetMapping("/{id}/images")
     public ResponseEntity<List<ImageResponseDto>> getImages(@PathVariable Long id) {
         return ResponseEntity.ok(service.getImages(id));
+    }
+
+    @PutMapping
+    public ResponseEntity<CompanyResponseDto> updateCompany(@Valid @RequestBody UpdateRequestDto request) {
+        return ResponseEntity.ok(service.updateCompany(request));
     }
 }

@@ -3,11 +3,13 @@ package com.iss.eventorium.company.services;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
+import com.iss.eventorium.company.dtos.UpdateRequestDto;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.models.User;
@@ -127,5 +129,17 @@ public class CompanyService {
         } catch (IOException e) {
             throw new ImageNotFoundException("Fail to read image" + path.getPath() + ": + e.getMessage()");
         }
+    }
+
+    public CompanyResponseDto updateCompany(UpdateRequestDto updateRequestDto) {
+        Company company = getCompanyById(updateRequestDto.getId());
+        company.setAddress(updateRequestDto.getAddress());
+        company.setCity(CityMapper.fromRequest(updateRequestDto.getCity()));
+        company.setPhoneNumber(updateRequestDto.getPhoneNumber());
+        company.setDescription(updateRequestDto.getDescription());
+        company.setOpeningHours(updateRequestDto.getOpeningHours());
+        company.setClosingHours(updateRequestDto.getClosingHours());
+        repository.save(company);
+        return CompanyMapper.toResponse(company);
     }
 }

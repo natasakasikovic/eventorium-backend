@@ -54,13 +54,13 @@ INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
 
 INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
 VALUES
-    (3, '18:00:00', '09:00:00', 'Dositejeva, 6',
+    (3, '9:00 pm', '9:00 am', 'Dositejeva, 6',
      'Event Masters is your go-to partner for planning all types of events. ' ||
      'From creating custom invitations and event banners to full-scale coordination, ' ||
      'we bring your vision to life with precision and creativity. Contact us to make your event unforgettable.',
      'info@eventmasters.com',
      'Event Masters', '+1-555-123-4567', 3),
-    (4, '21:00:00', '08:00:00', 'Nemanjina, 15',
+    (4, '5:00 pm', '7:00 am', 'Nemanjina, 15',
      'Celebrate in style with Party Supplies Hub! Offering a wide range of balloons, party decorations, sound systems, and catering options. ' ||
      'We are your one-stop shop for making every celebration unforgettable.',
      'support@partysupplies.com',
@@ -73,7 +73,7 @@ insert into companies_photos (company_id, photos_id) values
  (2, 21),
  (2, 22),
  (2, 23);
-
+    
 
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
