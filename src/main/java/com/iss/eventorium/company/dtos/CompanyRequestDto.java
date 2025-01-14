@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class CompanyRequestDto {
 
     @NotNull(message = "Description is required.")
     @NotEmpty(message = "Description is required")
+    @Size(max = 1024, message = "Description too long.")
     private String description;
 
     @NotNull(message = "Email is required.")

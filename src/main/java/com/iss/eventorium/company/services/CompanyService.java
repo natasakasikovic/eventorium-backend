@@ -2,9 +2,12 @@ package com.iss.eventorium.company.services;
 
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
+import com.iss.eventorium.company.dtos.ProviderCompanyDto;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageUpload;
 import com.iss.eventorium.user.models.User;
@@ -20,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +39,7 @@ public class CompanyService {
     private final CompanyRepository repository;
     private final AccountActivationService accountActivationService;
     private final UserService userService;
+    private final AuthService authService;
 
     @Value("${image-path}")
     private String imagePath;
@@ -96,4 +102,30 @@ public class CompanyService {
                 .build();
     }
 
+    public ProviderCompanyDto getCompany() {
+        User currentUser = authService.getCurrentUser();
+        Company company = repository.getCompanyByProviderId(currentUser.getId());
+        return CompanyMapper.toProviderCompanyResponse(company);
+    }
+
+    public List<ImageResponseDto> getImages(Long id) {
+        Company company = getCompanyById(id);
+        List<ImageResponseDto> images = new ArrayList<>();
+        for (ImagePath imagePath : company.getPhotos()) {
+            byte[] image = getImage(id, imagePath);
+            images.add(new ImageResponseDto(image, imagePath.getContentType()));
+        }
+        return images;
+    }
+
+    public byte[] getImage(Long id, ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + "companies/" + id + "/");
+        File file = new File(uploadDir, path.getPath());
+
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new ImageNotFoundException("Fail to read image" + path.getPath() + ": + e.getMessage()");
+        }
+    }
 }

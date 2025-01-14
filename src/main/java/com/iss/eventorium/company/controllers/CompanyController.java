@@ -2,10 +2,11 @@ package com.iss.eventorium.company.controllers;
 
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
+import com.iss.eventorium.company.dtos.ProviderCompanyDto;
 import com.iss.eventorium.company.services.CompanyService;
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,19 +33,18 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CompanyResponseDto> getCompany(@PathVariable Long id) {
-        return null;
-    }
-
-
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyResponseDto> updateCompany(@PathVariable Long id, @RequestBody CompanyResponseDto company) throws Exception {
         return null;
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteCompany(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @GetMapping("/my-company")
+    public ResponseEntity<ProviderCompanyDto> getCompany() {
+        return ResponseEntity.ok(service.getCompany());
+    }
+
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<ImageResponseDto>> getImages(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getImages(id));
     }
 }

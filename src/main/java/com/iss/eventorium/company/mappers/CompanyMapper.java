@@ -2,6 +2,7 @@ package com.iss.eventorium.company.mappers;
 
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
+import com.iss.eventorium.company.dtos.ProviderCompanyDto;
 import com.iss.eventorium.company.models.Company;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +22,9 @@ public class CompanyMapper {
 
     public static CompanyResponseDto toResponse(Company company) {
         return modelMapper.map(company, CompanyResponseDto.class);
+    }
+
+    public static ProviderCompanyDto toProviderCompanyResponse(Company company) {
+        return modelMapper.map(company, ProviderCompanyDto.class);
     }
 }

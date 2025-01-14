@@ -36,7 +36,7 @@ public class Company {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1024)
     private String description;
 
     @Column(nullable = false)
