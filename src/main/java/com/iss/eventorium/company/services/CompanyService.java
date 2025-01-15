@@ -8,6 +8,7 @@ import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -42,6 +43,7 @@ public class CompanyService {
     private final AccountActivationService accountActivationService;
     private final UserService userService;
     private final AuthService authService;
+    private final CompanyRepository companyRepository;
 
     @Value("${image-path}")
     private String imagePath;
@@ -115,7 +117,7 @@ public class CompanyService {
         List<ImageResponseDto> images = new ArrayList<>();
         for (ImagePath imagePath : company.getPhotos()) {
             byte[] image = getImage(id, imagePath);
-            images.add(new ImageResponseDto(image, imagePath.getContentType()));
+            images.add(new ImageResponseDto(imagePath.getId(), image, imagePath.getContentType()));
         }
         return images;
     }
@@ -141,5 +143,15 @@ public class CompanyService {
         company.setClosingHours(updateRequestDto.getClosingHours());
         repository.save(company);
         return CompanyMapper.toResponse(company);
+    }
+
+    public void updateImages(List<MultipartFile> newImages, List<RemoveImageRequestDto> removedImages) {
+        User provider = authService.getCurrentUser();
+        Company company = companyRepository.getCompanyByProviderId(provider.getId());
+        uploadImages(company.getId(), newImages);
+        company.getPhotos().removeIf(image ->
+                removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
+        );
+        repository.save(company);
     }
 }
