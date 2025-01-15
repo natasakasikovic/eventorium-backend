@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -45,8 +46,8 @@ public class User implements UserDetails {
     @Column(name = "last_password_reset", nullable = false)
     private Date lastPasswordReset = new Date();
 
-    @Column(name = "suspended", nullable = false)
-    private boolean suspended = false;
+    @Column(name = "suspended")
+    private LocalDateTime suspended = null;
 
     @Embedded
     private Person person;
