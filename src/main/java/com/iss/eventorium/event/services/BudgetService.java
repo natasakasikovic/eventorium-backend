@@ -37,27 +37,13 @@ public class BudgetService {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
         }
 
-        Event event = eventRepository.findById(eventId).orElseThrow(
-                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
-        );
+        Event event = getEvent(eventId);
         updateBudget(event, BudgetMapper.fromRequest(dto, product));
         return ProductMapper.toResponse(product);
     }
 
-    private void updateBudget(Event event, BudgetItem item) {
-        Budget budget = event.getBudget();
-        if(budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(item.getCategory())) {
-            throw new AlreadyPurchasedException("Product with the same category is already purchased!");
-        }
-        item.setPurchased(LocalDateTime.now());
-        budget.addItem(item);
-        eventRepository.save(event);
-    }
-
     public List<ProductSummaryResponseDto> getPurchasedProducts(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(
-                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
-        );
+        Event event = getEvent(eventId);
         Budget budget = event.getBudget();
         if(budget == null) {
             return new ArrayList<>();
@@ -70,9 +56,7 @@ public class BudgetService {
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(
-                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
-        );
+        Event event = getEvent(eventId);
         Budget budget = event.getBudget();
         if(budget == null) {
             budget = new Budget();
@@ -81,5 +65,21 @@ public class BudgetService {
         }
 
         return BudgetMapper.toResponse(budget);
+    }
+
+    private void updateBudget(Event event, BudgetItem item) {
+        Budget budget = event.getBudget();
+        if(budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(item.getCategory())) {
+            throw new AlreadyPurchasedException("Product with the same category is already purchased!");
+        }
+        item.setPurchased(LocalDateTime.now());
+        budget.addItem(item);
+        eventRepository.save(event);
+    }
+
+    private Event getEvent(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
+        );
     }
 }
