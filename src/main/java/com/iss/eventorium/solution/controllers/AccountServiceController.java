@@ -3,7 +3,7 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.AccountServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

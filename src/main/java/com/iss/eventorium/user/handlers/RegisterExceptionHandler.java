@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.handlers;
 
-import com.iss.eventorium.shared.utils.ExceptionResponse;
+import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.user.exceptions.ActivationTimeoutException;
 import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
 import com.iss.eventorium.user.exceptions.RegistrationRequestAlreadySentException;

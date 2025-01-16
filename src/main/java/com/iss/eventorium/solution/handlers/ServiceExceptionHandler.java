@@ -1,6 +1,6 @@
 package com.iss.eventorium.solution.handlers;
 
-import com.iss.eventorium.shared.utils.ExceptionResponse;
+import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,5 @@ public class ServiceExceptionHandler {
                         .message(ex.getMessage())
                         .build());
     }
-
 
 }

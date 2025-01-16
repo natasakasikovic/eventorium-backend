@@ -3,7 +3,7 @@ package com.iss.eventorium.solution.mappers;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.interaction.models.Review;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.models.Product;

@@ -2,7 +2,7 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
 import jakarta.validation.Valid;
