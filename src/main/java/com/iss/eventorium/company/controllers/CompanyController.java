@@ -23,13 +23,13 @@ public class CompanyController {
 
     @PostMapping
     public ResponseEntity<CompanyResponseDto> createCompany(@Valid @RequestBody CompanyRequestDto companyDto) {
-        return ResponseEntity.ok(service.createCompany(companyDto));
+        return new ResponseEntity<>(service.createCompany(companyDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}/images")
     public ResponseEntity<Void> uploadImages(@PathVariable Long id, @RequestParam("images") List<MultipartFile> images) {
         service.uploadImages(id, images);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{id}")

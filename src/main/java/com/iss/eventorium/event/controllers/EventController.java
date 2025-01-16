@@ -63,13 +63,13 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
-        return ResponseEntity.ok(service.createEvent(eventRequestDto));
+        return new ResponseEntity<>(service.createEvent(eventRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/agenda")
     public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
                                           @PathVariable Long id) {
         service.createAgenda(id, requestDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

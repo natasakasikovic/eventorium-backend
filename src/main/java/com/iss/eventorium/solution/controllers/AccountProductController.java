@@ -6,6 +6,7 @@ import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.AccountProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +64,7 @@ public class AccountProductController {
 
     @PostMapping("/favourites/{id}")
     public ResponseEntity<ProductResponseDto> addFavouriteProduct(@PathVariable Long id) {
-        return ResponseEntity.ok(accountProductService.addFavouriteProduct(id));
+        return new ResponseEntity<>(accountProductService.addFavouriteProduct(id), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/favourites/{id}")

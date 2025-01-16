@@ -7,6 +7,7 @@ import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.AccountServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,7 +70,7 @@ public class AccountServiceController {
 
     @PostMapping("/favourites/{id}")
     public ResponseEntity<ServiceResponseDto> addFavouriteService(@PathVariable Long id) {
-        return ResponseEntity.ok(accountService.addFavouriteService(id));
+        return new ResponseEntity<>(accountService.addFavouriteService(id), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/favourites/{id}")

@@ -86,7 +86,7 @@ public class ServiceController {
     public ResponseEntity<ServiceResponseDto> createService(
             @Valid @RequestBody CreateServiceRequestDto createServiceRequestDto
     ) {
-        return ResponseEntity.ok(service.createService(createServiceRequestDto));
+        return new ResponseEntity<>(service.createService(createServiceRequestDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}/images")
@@ -95,7 +95,7 @@ public class ServiceController {
             @RequestParam("images") List<MultipartFile> images
     ) {
         service.uploadImages(id, images);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")
