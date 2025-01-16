@@ -2,6 +2,8 @@ package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
+import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.event.exceptions.InsufficientFundsException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
@@ -79,6 +81,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error("Service Already Reserved")
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ExceptionResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(AlreadyPurchasedException.class)
+    public ResponseEntity<ExceptionResponse> handleAlreadyPurchasedException(AlreadyPurchasedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }

@@ -51,12 +51,17 @@ public class EventController {
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 
+    @GetMapping("/drafted")
+    public ResponseEntity<List<EventResponseDto>> draftedEvents() {
+        return ResponseEntity.ok(service.getDraftedEvents());
+    }
+  
     @GetMapping("/search/all")
     public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
         return  ResponseEntity.ok(service.searchEvents(keyword));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
         return ResponseEntity.ok(service.createEvent(eventRequestDto));
     }

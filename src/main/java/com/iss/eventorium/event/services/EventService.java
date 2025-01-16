@@ -107,4 +107,11 @@ public class EventService {
         else
             repository.save(event);
     }
+
+    public List<EventResponseDto> getDraftedEvents() {
+        return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
+                .stream()
+                .map(EventMapper::toResponse)
+                .toList();
+    }
 }

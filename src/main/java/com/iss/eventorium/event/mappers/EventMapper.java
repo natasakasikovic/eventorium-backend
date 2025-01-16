@@ -37,7 +37,12 @@ public class EventMapper {
     }
 
     public static EventResponseDto toResponse(Event event) {
-        return modelMapper.map(event, EventResponseDto.class);
+        EventResponseDto dto = modelMapper.map(event, EventResponseDto.class);
+        if(event.getBudget() != null)
+            dto.setBudget(BudgetMapper.toResponse(event.getBudget()));
+        if(event.getType() != null)
+            dto.setType(EventTypeMapper.toResponse(event.getType()));
+        return dto;
     }
 
 }

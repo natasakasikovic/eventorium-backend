@@ -1,7 +1,13 @@
-package com.iss.eventorium.event.dtos;
+package com.iss.eventorium.event.dtos.budget;
+
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BudgetRequestDto {
-    List<BudgetItemRequestDto> items;
+    private List<BudgetItemRequestDto> items;
 }
