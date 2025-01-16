@@ -1,11 +1,12 @@
 package com.iss.eventorium.user.services;
 
-import com.iss.eventorium.user.dtos.*;
+import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
+import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
-import com.iss.eventorium.utils.JwtTokenUtil;
+import com.iss.eventorium.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

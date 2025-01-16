@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

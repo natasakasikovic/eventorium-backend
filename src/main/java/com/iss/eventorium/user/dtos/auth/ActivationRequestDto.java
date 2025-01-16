@@ -1,15 +1,14 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-public class RoleDto {
-    private Long id;
-    private String name;
+@AllArgsConstructor
+public class ActivationRequestDto {
+    private String email;
 }

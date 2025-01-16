@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.details;
 
 import com.iss.eventorium.shared.dtos.CityDto;
 import lombok.*;

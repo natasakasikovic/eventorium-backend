@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.user.dtos.*;
+import com.iss.eventorium.user.dtos.auth.*;
 import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.validation.Valid;

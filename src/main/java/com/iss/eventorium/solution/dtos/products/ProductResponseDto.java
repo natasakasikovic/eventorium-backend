@@ -3,7 +3,7 @@ package com.iss.eventorium.solution.dtos.products;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.user.dtos.ProviderResponseDto;
+import com.iss.eventorium.user.dtos.details.ProviderResponseDto;
 import lombok.*;
 
 import java.util.List;

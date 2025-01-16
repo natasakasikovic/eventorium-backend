@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.auth;
 
 import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +13,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateRequestDto {
+public class PersonRequestDto {
+
     @NotBlank(message = "First name is required")
     private String name;
 
@@ -29,4 +30,6 @@ public class UpdateRequestDto {
 
     @NotNull(message = "City is required")
     private CityDto city;
+
+    private String profilePhoto;
 }

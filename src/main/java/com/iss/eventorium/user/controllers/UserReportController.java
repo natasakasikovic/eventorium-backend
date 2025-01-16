@@ -20,7 +20,7 @@ public class UserReportController {
 
     private final UserReportService service;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<Collection<UserReportResponseDto>> getPendingReports() {
         return ResponseEntity.ok(service.getPendingReports());
     }

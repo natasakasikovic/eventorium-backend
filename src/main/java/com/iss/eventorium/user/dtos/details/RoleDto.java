@@ -1,14 +1,15 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.details;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
-public class AuthResponseDto {
+@NoArgsConstructor
+public class RoleDto {
     private Long id;
+    private String name;
 }
