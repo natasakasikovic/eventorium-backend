@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 
 @ControllerAdvice
@@ -76,33 +77,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file upload: " + ex.getMessage());
     }
 
-    @ExceptionHandler(ServiceAlreadyReservedException.class)
-    public ResponseEntity<ExceptionResponse> handleServiceAlreadyReserved(ServiceAlreadyReservedException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ExceptionResponse.builder()
-                        .error("Service Already Reserved")
-                        .message(ex.getMessage())
-                        .build());
-    }
-
-
-    @ExceptionHandler(InsufficientFundsException.class)
-    public ResponseEntity<ExceptionResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ExceptionResponse.builder()
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                        .message(ex.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler(AlreadyPurchasedException.class)
-    public ResponseEntity<ExceptionResponse> handleAlreadyPurchasedException(AlreadyPurchasedException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ExceptionResponse.builder()
-                        .error(HttpStatus.CONFLICT.getReasonPhrase())
-                        .message(ex.getMessage())
-                        .build());
-    }
 
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ResponseEntity<ExceptionResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException ex) {
@@ -118,6 +92,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExceptionResponse.builder()
                         .error(ex.getMessage())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error("Max upload size exceeded")
                         .message(ex.getMessage())
                         .build());
     }
