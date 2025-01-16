@@ -1,33 +1,38 @@
-package com.iss.eventorium.user.dtos;
+package com.iss.eventorium.user.dtos.auth;
 
+import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.validators.password.PasswordsMatch;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @PasswordsMatch
-public class QuickRegistrationRequestDto {
+public class AuthRequestDto {
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
     private String email;
 
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
-    @NotBlank(message = "Confirm password is required")
+    @NotBlank(message = "Password confirmation is required")
     private String passwordConfirmation;
 
+    @NotEmpty(message = "Role is required")
+    private List<RoleDto> roles;
+
     @Valid
-    PersonQuickRegistrationDto person;
+    private PersonRequestDto person;
 }

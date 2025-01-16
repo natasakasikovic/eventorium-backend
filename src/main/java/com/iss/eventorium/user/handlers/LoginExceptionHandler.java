@@ -1,9 +1,12 @@
 package com.iss.eventorium.user.handlers;
 
 import com.iss.eventorium.shared.utils.ExceptionResponse;
+import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -15,6 +18,24 @@ public class LoginExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler({UsernameNotFoundException.class, BadCredentialsException.class})
+    public ResponseEntity<ExceptionResponse> handleAuthenticationExceptions(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .message("Invalid email or password.")
+                        .build());
+    }
+
+    @ExceptionHandler(AccountNotActivatedException.class)
+    public ResponseEntity<ExceptionResponse> handleAccountNotActivatedException(AccountNotActivatedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }

@@ -1,4 +1,4 @@
-package com.iss.eventorium.utils;
+package com.iss.eventorium.security.utils;
 
 import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.models.User;
