@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class CategoryExceptionHandler {
 
     @ExceptionHandler({ CategoryInUseException.class, CategoryAlreadyExistsException.class })
-    public ResponseEntity<ExceptionResponse> handleCategoryInUseException(RuntimeException ex) {
+    public ResponseEntity<ExceptionResponse> handleCategoryException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.CONFLICT.getReasonPhrase())
