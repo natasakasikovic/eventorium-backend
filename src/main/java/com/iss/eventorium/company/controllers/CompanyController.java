@@ -38,11 +38,6 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CompanyResponseDto> updateCompany(@PathVariable Long id, @RequestBody CompanyResponseDto company) throws Exception {
-        return null;
-    }
-
     @GetMapping("/my-company")
     public ResponseEntity<ProviderCompanyDto> getCompany() {
         return ResponseEntity.ok(service.getCompany());

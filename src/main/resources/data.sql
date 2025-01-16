@@ -59,12 +59,12 @@ VALUES
      'From creating custom invitations and event banners to full-scale coordination, ' ||
      'we bring your vision to life with precision and creativity. Contact us to make your event unforgettable.',
      'info@eventmasters.com',
-     'Event Masters', '+1-555-123-4567', 3),
+     'Event Masters', '+15551234567', 3),
     (4, '5:00 pm', '7:00 am', 'Nemanjina, 15',
      'Celebrate in style with Party Supplies Hub! Offering a wide range of balloons, party decorations, sound systems, and catering options. ' ||
      'We are your one-stop shop for making every celebration unforgettable.',
      'support@partysupplies.com',
-     'Party Supplies Hub', '+1-555-456-7890', 4);
+     'Party Supplies Hub', '+15554567890', 4);
 
 insert into companies_photos (company_id, photos_id) values
  (1, 18),
