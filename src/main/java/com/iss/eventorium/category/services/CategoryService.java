@@ -45,7 +45,9 @@ public class CategoryService {
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
-
+        if(categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
+        }
         Category created = CategoryMapper.fromRequest(category);
         created.setSuggested(false);
         return toResponse(categoryRepository.save(created));

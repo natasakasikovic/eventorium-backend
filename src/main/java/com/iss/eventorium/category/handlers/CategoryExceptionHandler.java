@@ -11,18 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CategoryExceptionHandler {
 
-    @ExceptionHandler(CategoryAlreadyExistsException.class)
-    public ResponseEntity<ExceptionResponse> handleCategoryAlreadyExistsException(CategoryAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ExceptionResponse.builder()
-                        .error("Category already exists!")
-                        .message(ex.getMessage())
-                        .build());
-    }
-
-
-    @ExceptionHandler(CategoryInUseException.class)
-    public ResponseEntity<ExceptionResponse> handleCategoryInUseException(CategoryInUseException ex) {
+    @ExceptionHandler({ CategoryInUseException.class, CategoryAlreadyExistsException.class })
+    public ResponseEntity<ExceptionResponse> handleCategoryInUseException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.CONFLICT.getReasonPhrase())
