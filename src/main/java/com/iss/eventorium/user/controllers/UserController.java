@@ -1,9 +1,9 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.user.dtos.details.AccountDetailsDto;
-import com.iss.eventorium.user.dtos.update.ChangePasswordRequestDto;
-import com.iss.eventorium.user.dtos.update.UpdateRequestDto;
+import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
+import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
+import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.validation.Valid;

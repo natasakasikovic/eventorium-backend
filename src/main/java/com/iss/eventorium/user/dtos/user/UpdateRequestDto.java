@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos.update;
+package com.iss.eventorium.user.dtos.user;
 
 import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotBlank;

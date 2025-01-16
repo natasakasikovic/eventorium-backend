@@ -1,4 +1,4 @@
-package com.iss.eventorium.user.dtos.update;
+package com.iss.eventorium.user.dtos.user;
 
 import com.iss.eventorium.user.validators.password.PasswordsMatch;
 import jakarta.validation.constraints.NotBlank;
