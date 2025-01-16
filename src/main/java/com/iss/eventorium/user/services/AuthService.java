@@ -1,9 +1,14 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.user.dtos.*;
+import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
+import com.iss.eventorium.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,10 +22,11 @@ import java.time.temporal.ChronoUnit;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
 
     public User getCurrentUser() {
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
@@ -30,6 +36,28 @@ public class AuthService {
             }
         }
         return null;
+    }
+
+    public UserTokenState login(LoginRequestDto request) {
+        Authentication authentication = authenticateUser(request.getEmail(), request.getPassword());
+        User user = (User) authentication.getPrincipal();
+        isActivated(user);
+        isSuspended(user);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtTokenUtil.generateToken(user);
+        Long expiresIn = jwtTokenUtil.getExpiredIn();
+        return new UserTokenState(jwt, expiresIn);
+    }
+
+    private Authentication authenticateUser(String email, String password) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
+        return authenticationManager.authenticate(token);
+    }
+
+    public void isActivated(User user) {
+        if (!user.isActivated())
+            throw new AccountNotActivatedException("Account is not verified. Check your email.");
     }
 
     public void isSuspended(User user) {
@@ -59,5 +87,4 @@ public class AuthService {
             message += String.format("It will be reactivated in %d hours and %d minutes.", remainingHours, remainingMinutesAfterHours);
         return message;
     }
-
 }

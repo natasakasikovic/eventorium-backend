@@ -4,9 +4,9 @@ import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.utils.ExceptionResponse;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
-import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,11 +92,11 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleInvalidOldPasswordException(InvalidOldPasswordException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ImageUploadException.class)
+    public ResponseEntity<ExceptionResponse> handleImageUploadException(ImageUploadException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExceptionResponse.builder()
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .error(ex.getMessage())
                         .message(ex.getMessage())
                         .build());
     }
