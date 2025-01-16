@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.handlers;
 
-import com.iss.eventorium.shared.utils.ExceptionResponse;
+import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import org.springframework.http.HttpStatus;

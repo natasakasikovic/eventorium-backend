@@ -6,7 +6,7 @@ import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
 import com.iss.eventorium.interaction.dtos.UpdatedReviewDto;
 import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

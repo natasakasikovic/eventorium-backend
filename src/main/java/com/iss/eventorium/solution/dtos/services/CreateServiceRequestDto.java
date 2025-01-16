@@ -4,7 +4,6 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.validators.DurationConstraint;
-import com.iss.eventorium.solution.validators.NotInPast;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -50,11 +49,11 @@ public class CreateServiceRequestDto {
     private ReservationType type;
 
     @NotNull(message = "Reservation deadline is mandatory")
-    @NotInPast(message = "Reservation deadline cannot be in the past")
+    @FutureOrPresent(message = "Reservation deadline cannot be in the past")
     private LocalDate reservationDeadline;
 
     @NotNull(message = "Cancellation deadline is mandatory")
-    @NotInPast(message = "Cancellation deadline cannot be in the past")
+    @FutureOrPresent(message = "Cancellation deadline cannot be in the past")
     private LocalDate cancellationDeadline;
 
     @NotNull(message = "Min duration is mandatory")

@@ -2,7 +2,7 @@ package com.iss.eventorium.solution.services;
 
 
 import com.iss.eventorium.shared.services.PdfService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
 import com.iss.eventorium.solution.mappers.PriceListMapper;

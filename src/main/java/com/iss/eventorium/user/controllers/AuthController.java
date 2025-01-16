@@ -37,7 +37,7 @@ public class AuthController {
     @PostMapping(value = "/{userId}/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("profilePhoto") MultipartFile file) {
         userService.uploadProfilePhoto(userId, file);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/quick-registration")

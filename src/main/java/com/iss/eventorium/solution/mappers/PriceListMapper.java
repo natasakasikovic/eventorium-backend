@@ -1,6 +1,6 @@
 package com.iss.eventorium.solution.mappers;
 
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import com.iss.eventorium.solution.models.Solution;
 import org.modelmapper.ModelMapper;

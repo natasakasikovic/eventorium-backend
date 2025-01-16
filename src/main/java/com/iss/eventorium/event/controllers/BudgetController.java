@@ -6,6 +6,7 @@ import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class BudgetController {
             @PathVariable("event-id") Long eventId,
             @RequestBody BudgetItemRequestDto budgetItemRequestDto
     ) {
-        return ResponseEntity.ok(budgetService.purchaseProduct(eventId, budgetItemRequestDto));
+        return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/purchased")

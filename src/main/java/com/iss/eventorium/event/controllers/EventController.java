@@ -6,7 +6,7 @@ import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,13 +63,13 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
-        return ResponseEntity.ok(service.createEvent(eventRequestDto));
+        return new ResponseEntity<>(service.createEvent(eventRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/agenda")
     public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
                                           @PathVariable Long id) {
         service.createAgenda(id, requestDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

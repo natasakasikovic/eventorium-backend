@@ -6,7 +6,7 @@ import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.services.ProductService;
 import jakarta.validation.Valid;
