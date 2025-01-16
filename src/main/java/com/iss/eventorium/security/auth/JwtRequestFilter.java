@@ -1,6 +1,6 @@
 package com.iss.eventorium.security.auth;
 
-import com.iss.eventorium.utils.JwtTokenUtil;
+import com.iss.eventorium.security.utils.JwtTokenUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

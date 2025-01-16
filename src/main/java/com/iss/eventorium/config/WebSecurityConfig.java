@@ -4,7 +4,7 @@ import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
 import com.iss.eventorium.user.services.UserService;
-import com.iss.eventorium.utils.JwtTokenUtil;
+import com.iss.eventorium.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -34,7 +33,6 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-    private UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @Bean

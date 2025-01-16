@@ -4,7 +4,7 @@ import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,7 +37,12 @@ public class EventMapper {
     }
 
     public static EventResponseDto toResponse(Event event) {
-        return modelMapper.map(event, EventResponseDto.class);
+        EventResponseDto dto = modelMapper.map(event, EventResponseDto.class);
+        if(event.getBudget() != null)
+            dto.setBudget(BudgetMapper.toResponse(event.getBudget()));
+        if(event.getType() != null)
+            dto.setType(EventTypeMapper.toResponse(event.getType()));
+        return dto;
     }
 
 }

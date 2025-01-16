@@ -7,7 +7,7 @@ import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 
@@ -45,7 +46,7 @@ public class CategoryService {
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
         if(categoryRepository.findByName(category.getName()).isPresent()) {
-            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
         Category created = CategoryMapper.fromRequest(category);
         created.setSuggested(false);
@@ -53,11 +54,14 @@ public class CategoryService {
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
-        if(categoryRepository.findByName(category.getName()).isPresent()) {
-            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
-        }
         Category toUpdate = categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+
+        if(!Objects.equals(toUpdate.getName(), category.getName())
+                && categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        }
+
         toUpdate.setName(category.getName());
         toUpdate.setDescription(category.getDescription());
         return toResponse(categoryRepository.save(toUpdate));

@@ -10,6 +10,7 @@ import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageUpload;
@@ -19,8 +20,6 @@ import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -38,7 +37,6 @@ import java.util.Objects;
 @Service
 public class CompanyService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CompanyService.class);
     private final CompanyRepository repository;
     private final AccountActivationService accountActivationService;
     private final UserService userService;
@@ -87,7 +85,7 @@ public class CompanyService {
                     paths.add(imagePath);
                 }
             } catch (IOException e) {
-                logger.error("Failed to upload image: {}", e.getMessage(), e);
+                throw new ImageUploadException("Error while uploading images");
             }
         }
         return paths;

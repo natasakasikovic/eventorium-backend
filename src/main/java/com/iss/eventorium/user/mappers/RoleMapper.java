@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.mappers;
 
-import com.iss.eventorium.user.dtos.RoleDto;
+import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.models.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

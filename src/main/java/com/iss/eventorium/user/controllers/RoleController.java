@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.user.dtos.RoleDto;
+import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.services.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

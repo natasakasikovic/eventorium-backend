@@ -1,11 +1,20 @@
 package com.iss.eventorium.user.services;
 
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
-import com.iss.eventorium.user.dtos.*;
 import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
+import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
+import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
+import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
+import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
+import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
+import com.iss.eventorium.user.exceptions.ActivationTimeoutException;
+import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
+import com.iss.eventorium.user.exceptions.RegistrationRequestAlreadySentException;
 import com.iss.eventorium.user.mappers.PersonMapper;
 import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.Person;
@@ -28,7 +37,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +65,7 @@ public class UserService {
         setUserDetails(user);
 
         if (userRepository.existsByEmail(user.getEmail()))
-            throw new DuplicateKeyException("Account with given email already exists.");
+            throw new EmailAlreadyTakenException("Account with given email already exists.");
 
         userRepository.save(user);
     }
@@ -107,12 +115,12 @@ public class UserService {
         LocalDateTime expiryTime = activationTime.plusHours(24);
         LocalDateTime now = LocalDateTime.now();
 
-        if (!now.isAfter(expiryTime)) throw new IllegalStateException("A registration request with the given email has already been sent.");
+        if (!now.isAfter(expiryTime)) throw new RegistrationRequestAlreadySentException("A registration request with the given email has already been sent.");
     }
 
     private void checkActivationStatus(User existingUser) throws DuplicateKeyException {
         if (existingUser.isActivated()) {
-            throw new DuplicateKeyException("Account with given email already exists.");
+            throw new EmailAlreadyTakenException("This email is already taken. Please log in or activate your account via the email we sent you.");
         }
     }
 
@@ -126,7 +134,7 @@ public class UserService {
         if (photo == null) return;
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not fount."));
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
         String fileName = Instant.now().toEpochMilli() + "_" + originalFileName;
@@ -138,7 +146,7 @@ public class UserService {
             user.getPerson().setProfilePhoto(ImagePath.builder().path(fileName).contentType(contentType).build());
             userRepository.save(user);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to save the photo.", e);
+            throw new ImageUploadException("Failed to save profile photo.");
         }
     }
 
@@ -147,16 +155,16 @@ public class UserService {
     }
 
     private User findByHash(String hash) {
-        return userRepository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("User not fount."));
+        return userRepository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("User not found."));
     }
 
-    public void activateAccount(String hash) throws TimeoutException {
+    public void activateAccount(String hash) {
         User user = findByHash(hash);
         if (isHashValid(user.getActivationTimestamp())) {
             user.setActivated(true);
             userRepository.save(user);
         }
-        else throw new TimeoutException("Activation time has expired.");
+        else throw new ActivationTimeoutException("Activation time has expired.");
     }
 
     private boolean isHashValid(Date activationTimestamp) {
@@ -169,7 +177,7 @@ public class UserService {
     }
 
     public AccountDetailsDto getUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not fount."));
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
         return UserMapper.toAccountDetailsDto(user);
     }
 

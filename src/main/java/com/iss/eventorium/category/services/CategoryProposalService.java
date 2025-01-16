@@ -2,6 +2,7 @@ package com.iss.eventorium.category.services;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
+import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.interaction.models.Notification;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
@@ -65,6 +67,12 @@ public class CategoryProposalService {
 
     public CategoryResponseDto updateCategoryProposal(Long categoryId, CategoryRequestDto dto) {
         Category category = getCategoryProposal(categoryId);
+
+        if(!Objects.equals(category.getName(), dto.getName())
+                && categoryRepository.findByName(dto.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        }
+
         Service service = getServiceProposal(category);
 
         category.setSuggested(false);

@@ -12,7 +12,7 @@ import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,13 +29,13 @@ public class CompanyController {
 
     @PostMapping
     public ResponseEntity<CompanyResponseDto> createCompany(@Valid @RequestBody CompanyRequestDto companyDto) {
-        return ResponseEntity.ok(service.createCompany(companyDto));
+        return new ResponseEntity<>(service.createCompany(companyDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}/images")
     public ResponseEntity<Void> uploadImages(@PathVariable Long id, @RequestParam("images") List<MultipartFile> images) {
         service.uploadImages(id, images);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/my-company")

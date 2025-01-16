@@ -1,9 +1,9 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.user.dtos.AccountDetailsDto;
-import com.iss.eventorium.user.dtos.ChangePasswordRequestDto;
-import com.iss.eventorium.user.dtos.UpdateRequestDto;
+import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
+import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
+import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.validation.Valid;
@@ -58,11 +58,7 @@ public class UserController {
 
     @PutMapping(value = "/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> uploadProfilePhoto(@RequestParam("profilePhoto") MultipartFile file) {
-        try {
-            userService.updateProfilePhoto(file);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        userService.updateProfilePhoto(file);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
