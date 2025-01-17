@@ -17,11 +17,9 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompanyRequestDto {
+public class UpdateCompanyRequestDto {
 
-    @NotNull(message = "Name is required.")
-    @NotEmpty(message = "Name is required")
-    private String name;
+    private Long id;
 
     @NotNull(message = "Address is required.")
     @NotEmpty(message = "Address is required")
@@ -32,17 +30,13 @@ public class CompanyRequestDto {
 
     @NotNull(message = "Phone number is required.")
     @NotEmpty(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "Phone number must be between 9 and 15 digits and may optionally start with a +.")
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Phone number must be between 9 and 15 digits and may optionally start with a +.")
     private String phoneNumber;
 
     @NotNull(message = "Description is required.")
     @NotEmpty(message = "Description is required")
     @Size(max = 1024, message = "Description too long.")
     private String description;
-
-    @NotNull(message = "Email is required.")
-    @NotEmpty(message = "Email is required")
-    private String email;
 
     @NotNull(message = "Opening hours field is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
@@ -51,6 +45,4 @@ public class CompanyRequestDto {
     @NotNull(message = "Closing hours field is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime closingHours;
-
-    private Long providerId;
 }
