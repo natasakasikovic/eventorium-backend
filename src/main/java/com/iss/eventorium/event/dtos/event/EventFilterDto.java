@@ -17,7 +17,7 @@ public class EventFilterDto {
     private String type;
     private String city;
 
-    @Positive(message = "The value of maximum participans must be greater than zero!")
+    @Positive(message = "The value of maximum participants must be greater than zero!")
     private Integer maxParticipants;
 
     @FutureOrPresent(message = "Event date must not be in the past!")
