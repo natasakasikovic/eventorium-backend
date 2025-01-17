@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateRequestDto {
+public class UpdateCompanyRequestDto {
 
     private Long id;
 

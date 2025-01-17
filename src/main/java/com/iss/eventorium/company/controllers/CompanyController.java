@@ -1,12 +1,9 @@
 package com.iss.eventorium.company.controllers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
-import com.iss.eventorium.company.dtos.UpdateRequestDto;
+import com.iss.eventorium.company.dtos.UpdateCompanyRequestDto;
 import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
@@ -49,17 +46,19 @@ public class CompanyController {
     }
 
     @PutMapping
-    public ResponseEntity<CompanyResponseDto> updateCompany(@Valid @RequestBody UpdateRequestDto request) {
+    public ResponseEntity<CompanyResponseDto> updateCompany(@Valid @RequestBody UpdateCompanyRequestDto request) {
         return ResponseEntity.ok(service.updateCompany(request));
     }
 
     @PutMapping("/images")
-    public ResponseEntity<Void> updateImages(@RequestParam(value="newImages", required = false) List<MultipartFile> newImages,
-                                             @RequestParam("removedImages") String removedImagesJson) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<RemoveImageRequestDto> removedImages = objectMapper.readValue(removedImagesJson, new TypeReference<>() {});
-        service.updateImages(newImages, removedImages);
+    public ResponseEntity<Void> uploadNewImages(@RequestParam(value="newImages") List<MultipartFile> newImages) {
+        service.uploadNewImages(newImages);
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/images")
+    public ResponseEntity<Void> removeImages(@RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.removeImages(removedImages);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

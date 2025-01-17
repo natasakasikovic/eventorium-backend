@@ -3,7 +3,7 @@ package com.iss.eventorium.company.services;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
-import com.iss.eventorium.company.dtos.UpdateRequestDto;
+import com.iss.eventorium.company.dtos.UpdateCompanyRequestDto;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
@@ -131,7 +131,7 @@ public class CompanyService {
         }
     }
 
-    public CompanyResponseDto updateCompany(UpdateRequestDto updateRequestDto) {
+    public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
         Company company = getCompanyById(updateRequestDto.getId());
         company.setAddress(updateRequestDto.getAddress());
         company.setCity(CityMapper.fromRequest(updateRequestDto.getCity()));
@@ -143,10 +143,16 @@ public class CompanyService {
         return CompanyMapper.toResponse(company);
     }
 
-    public void updateImages(List<MultipartFile> newImages, List<RemoveImageRequestDto> removedImages) {
+    public void uploadNewImages(List<MultipartFile> newImages) {
         User provider = authService.getCurrentUser();
         Company company = companyRepository.getCompanyByProviderId(provider.getId());
         uploadImages(company.getId(), newImages);
+        repository.save(company);
+    }
+
+    public void removeImages(List<RemoveImageRequestDto> removedImages) {
+        User provider = authService.getCurrentUser();
+        Company company = companyRepository.getCompanyByProviderId(provider.getId());
         company.getPhotos().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
