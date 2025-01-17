@@ -1,6 +1,6 @@
 package com.iss.eventorium.shared.controllers;
 
-import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.dtos.CityDto;
 import com.iss.eventorium.shared.services.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class CityController {
     private final CityService cityService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<City>> getAllCities() {
+    public ResponseEntity<List<CityDto>> getAllCities() {
         return ResponseEntity.ok(cityService.getAll());
     }
 }

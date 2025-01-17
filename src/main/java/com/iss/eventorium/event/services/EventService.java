@@ -12,7 +12,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -106,5 +106,12 @@ public class EventService {
             setIsDraftFalse(event);
         else
             repository.save(event);
+    }
+
+    public List<EventResponseDto> getDraftedEvents() {
+        return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
+                .stream()
+                .map(EventMapper::toResponse)
+                .toList();
     }
 }

@@ -3,29 +3,34 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.interaction.models.Notification;
+import com.iss.eventorium.interaction.models.NotificationType;
+import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageUpload;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,16 +40,20 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceService.class);
     private final AuthService authService;
+    private final NotificationService notificationService;
+
+    private final MessageSource messageSource;
 
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
@@ -78,6 +87,7 @@ public class ServiceService {
         if(service.getCategory().getId() == null) {
             service.setStatus(Status.PENDING);
             service.getCategory().setSuggested(true);
+            sendNotification(service.getCategory());
         } else {
             service.setStatus(Status.ACCEPTED);
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
@@ -108,7 +118,7 @@ public class ServiceService {
                 String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
                 paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
             } catch (IOException e) {
-                logger.error("Failed to upload image {}: {}", fileName, e.getMessage(), e);
+                log.error("Failed to upload image {}: {}", fileName, e.getMessage(), e);
             }
         }
         service.getImagePaths().addAll(paths);
@@ -188,7 +198,20 @@ public class ServiceService {
         service.setIsDeleted(true);
         serviceRepository.save(service);
     }
-
+    
+    private void sendNotification(Category category) {
+        Notification notification = new Notification(
+                "Category proposal",
+                messageSource.getMessage(
+                        "notification.category.proposal",
+                        new Object[] { category.getName() },
+                        Locale.getDefault()
+                ),
+                NotificationType.INFO
+        );
+        notificationService.sendNotificationToAdmin(notification);
+    }
+    
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {
         List<Service> services = keyword.isBlank()
                 ? serviceRepository.findAll()
@@ -197,4 +220,13 @@ public class ServiceService {
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public PagedResponse<ServiceSummaryResponseDto> filter(ServiceFilterDto filter, Pageable pageable) {
+        Specification<Service> specification = ServiceSpecification.filterBy(filter);
+        return ServiceMapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
+    }
+
+    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter){
+        Specification<Service> specification = ServiceSpecification.filterBy(filter);
+        return serviceRepository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
 }

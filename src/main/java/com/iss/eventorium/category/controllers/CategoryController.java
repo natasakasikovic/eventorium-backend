@@ -3,10 +3,11 @@ package com.iss.eventorium.category.controllers;
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.services.CategoryService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class CategoryController {
 
     @GetMapping("/all")
     public ResponseEntity<List<CategoryResponseDto>> getCategories() {
-        return  ResponseEntity.ok(categoryService.getCategories());
+        return ResponseEntity.ok(categoryService.getCategories());
     }
 
     @GetMapping
@@ -37,7 +38,7 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CategoryRequestDto requestDto) {
-        return ResponseEntity.ok(categoryService.createCategory(requestDto));
+        return new ResponseEntity<>(categoryService.createCategory(requestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

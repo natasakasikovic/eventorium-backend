@@ -57,7 +57,7 @@ public class Event {
     @ManyToOne
     private User organizer;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Budget budget;
 
     @Column(name = "is_draft")

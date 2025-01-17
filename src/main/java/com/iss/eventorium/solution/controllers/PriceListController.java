@@ -1,6 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import jakarta.validation.Valid;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;

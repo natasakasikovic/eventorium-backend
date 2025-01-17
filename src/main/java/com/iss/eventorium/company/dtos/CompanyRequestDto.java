@@ -1,7 +1,7 @@
 package com.iss.eventorium.company.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class CompanyRequestDto {
     private String address;
 
     @NotNull(message = "City is required.")
-    private City city;
+    private CityDto city;
 
     @NotNull(message = "Phone number is required.")
     @NotEmpty(message = "Phone number is required")

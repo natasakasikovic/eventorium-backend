@@ -9,10 +9,8 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
-import com.iss.eventorium.shared.utils.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,10 +26,6 @@ public class EventTypeService {
         return eventTypeRepository.findByDeletedFalse().stream()
                 .map(EventTypeMapper::toResponse)
                 .toList();
-    }
-
-    public PagedResponse<EventTypeResponseDto> getEventTypesPaged(Pageable pageable) {
-        return EventTypeMapper.toPagedResponse(eventTypeRepository.findByDeletedFalse(pageable));
     }
 
     public EventTypeResponseDto getEventType(Long id) {
@@ -51,7 +45,6 @@ public class EventTypeService {
 
         eventType.setDescription(eventTypeRequestDto.getDescription());
 
-        // NOTE: Not sure if it's best practice to call CategoryRepository directly here for conversion
         List<Category> categories = eventTypeRequestDto.getSuggestedCategories().stream()
                 .map(categoryResponseDto -> categoryRepository.findById(categoryResponseDto.getId())
                         .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryResponseDto.getId() + " not found")))

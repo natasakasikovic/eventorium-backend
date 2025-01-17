@@ -11,5 +11,4 @@ import java.util.Optional;
 public interface EventTypeRepository extends JpaRepository<EventType, Long> {
     Optional<EventType> findByIdAndDeletedFalse(Long id);
     List<EventType> findByDeletedFalse();
-    Page<EventType> findByDeletedFalse(Pageable pageable);
 }
