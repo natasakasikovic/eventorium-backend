@@ -1,7 +1,6 @@
-package com.iss.eventorium.event.repositories;
+package com.iss.eventorium.event.specifications;
 
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -13,12 +12,11 @@ public class EventSpecification {
         return Specification
                 .where(hasName(filter.getName()))
                 .and(hasDescription(filter.getDescription()))
-                .and(hasEventType(filter.getEventType()))
-                .and(hasLocationCity(filter.getLocation()))
+                .and(hasEventType(filter.getType()))
+                .and(hasCity(filter.getCity()))
                 .and(hasMaxParticipants(filter.getMaxParticipants()))
                 .and(hasDateAfter(filter.getFrom()))
-                .and(hasDateBefore(filter.getTo()))
-                .and(hasPrivacy(filter.getPrivacy()));
+                .and(hasDateBefore(filter.getTo()));
     }
 
     private static Specification<Event> hasName(String name) {
@@ -39,15 +37,14 @@ public class EventSpecification {
         return (root, query, cb) ->
                 eventType == null || eventType.isEmpty()
                         ? cb.conjunction()
-                        : cb.equal(cb.lower(root.get("eventType").get("name")), eventType.toLowerCase());
+                        : cb.equal(cb.lower(root.get("type").get("name")), eventType.toLowerCase());
     }
 
-    private static Specification<Event> hasLocationCity(String city) {
+    private static Specification<Event> hasCity(String city) {
         return (root, query, cb) -> {
-            if (city == null || city.isEmpty()) {
+            if (city == null || city.isEmpty())
                 return cb.conjunction();
-            }
-            return cb.like(cb.lower(root.get("location").get("city")), "%" + city.toLowerCase() + "%");
+            return cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%");
         };
     }
 
@@ -71,13 +68,6 @@ public class EventSpecification {
                 to == null
                         ? cb.conjunction()
                         : cb.lessThanOrEqualTo(root.get("date"), to);
-    }
-
-    private static Specification<Event> hasPrivacy(Privacy privacy) {
-        return (root, query, cb) ->
-                privacy == null
-                        ? cb.conjunction()
-                        : cb.equal(root.get("privacy"), privacy);
     }
 
 }
