@@ -3,12 +3,14 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
+import com.iss.eventorium.solution.specifications.ProductSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -106,5 +109,15 @@ public class ProductService {
 
     public Collection<ProductSummaryResponseDto> getProducts() {
         return repository.findAll().stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> filter(ProductFilterDto filter, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.filterBy(filter);
+        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
+        List<Product> products = repository.findAll(ProductSpecification.filterBy(filter));
+        return products.stream().map(ProductMapper::toSummaryResponse).toList();
     }
 }

@@ -5,7 +5,7 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.dtos.UpdateStatusRequestDto;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.category.services.CategoryService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

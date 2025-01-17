@@ -32,6 +32,6 @@ public class InvitationController {
     @PostMapping("/{event-id}")
     public ResponseEntity<Void> sendInvitations(@RequestBody List<InvitationRequestDto> invitations, @PathVariable("event-id") Long id){
         service.sendInvitations(invitations, id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -2,7 +2,7 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.services.ServiceService;
 import jakarta.validation.Valid;
@@ -36,13 +36,13 @@ public class ServiceController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ServiceResponseDto>> filterServices(ServiceFilterDto filter) {
-        return null;
+    public ResponseEntity<List<ServiceSummaryResponseDto>> filterServices(@Valid @ModelAttribute ServiceFilterDto filter) {
+        return ResponseEntity.ok(service.filter(filter));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filteredServicesPaged(ServiceFilterDto filter, Pageable pageable) {
-        return null;
+    public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filterServices(@Valid @ModelAttribute ServiceFilterDto filter, Pageable pageable) {
+        return ResponseEntity.ok(service.filter(filter, pageable));
     }
 
     @GetMapping("/search/all")
@@ -95,7 +95,7 @@ public class ServiceController {
             @RequestParam("images") List<MultipartFile> images
     ) {
         service.uploadImages(id, images);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")

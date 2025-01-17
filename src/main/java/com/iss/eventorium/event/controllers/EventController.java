@@ -6,7 +6,7 @@ import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilterDto filter, Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(@Valid @ModelAttribute EventFilterDto filter, Pageable pageable) {
         return ResponseEntity.ok(service.filterEvents(filter, pageable));
     }
 
@@ -51,20 +51,25 @@ public class EventController {
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 
+    @GetMapping("/drafted")
+    public ResponseEntity<List<EventResponseDto>> draftedEvents() {
+        return ResponseEntity.ok(service.getDraftedEvents());
+    }
+  
     @GetMapping("/search/all")
     public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
         return  ResponseEntity.ok(service.searchEvents(keyword));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<EventResponseDto> createEvent(@Valid @RequestBody EventRequestDto eventRequestDto) {
-        return ResponseEntity.ok(service.createEvent(eventRequestDto));
+        return new ResponseEntity<>(service.createEvent(eventRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}/agenda")
     public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
                                           @PathVariable Long id) {
         service.createAgenda(id, requestDto);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

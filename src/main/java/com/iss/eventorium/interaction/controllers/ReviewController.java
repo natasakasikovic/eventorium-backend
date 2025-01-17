@@ -5,7 +5,7 @@ import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.services.ReviewService;
-import com.iss.eventorium.shared.utils.PagedResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

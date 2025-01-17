@@ -13,12 +13,39 @@ INSERT INTO cities (name) VALUES
 ('Sombor'),
 ('Kragujevac');
 
-INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, profile_photo, last_password_reset, hash) VALUES
-                                (true, 6,  false, '2024-12-07 12:00:00', '123 Main St', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123-456-7890', null, '2017-10-01 21:58:58.508-07', '1'),
-                                (true, 2,  false, '2024-12-06 12:00:00', '456 Elm St', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '987-654-3210', null, '2017-10-01 21:58:58.508-07', '2'),
-                                (true, 2,  false, '2024-12-06 12:00:00', '789 Oak St', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '555-123-4567', null, '2017-10-01 21:58:58.508-07', '3'),
-                                (true, 6,  false, '2024-12-05 12:00:00', '101 Pine St', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '111-222-3333', null, '2017-10-01 21:58:58.508-07', '4'),
-                                (true, 1,  false, '2024-12-06 12:00:00', '202 Maple St', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '444-555-6666', null, '2017-10-01 21:58:58.508-07', '5');
+INSERT INTO images (content_type, path) VALUES
+                                            ('image/jpeg', 'custom_invitations.jpg'),
+                                            ('image/jpeg', 'event_banner.jpg'),
+                                            ('image/jpeg', 'party_favors.jpg'),
+                                            ('image/jpeg', 'decorative_balloons.jpg'),
+                                            ('image/jpeg', 'event_t-shirts.jpg'),
+                                            ('image/jpeg', 'party_hats.jpg'),
+                                            ('image/jpeg', 'event_mugs.jpg'),
+                                            ('image/jpeg', 'photo_frames.jpg'),
+                                            ('image/jpeg', 'event_photography.jpg'),
+                                            ('image/jpeg', 'catering_service.jpg'),
+                                            ('image/jpeg', 'event_planning.jpg'),
+                                            ('image/png', 'sound_system_setup.png'),
+                                            ('image/jpeg', 'decorative_lighting.jpg'),
+                                            ('image/jpeg', 'venue_booking.jpg'),
+                                            ('image/jpeg', 'transportation_service.jpg'),
+                                            ('image/jpg', 'photo1.jpg'),
+                                            ('image/jpg', 'photo2.jpg'),
+                                            ('image/png', 'logo.png'), --18
+                                            ('image/png', 'in_company.png'), --19
+                                            ('image/png', 'event_planned_by_us.png'), --20
+                                            ('image/png', 'logo.png'), --21
+                                            ('image/png', 'bday_decoration.png'), --22
+                                            ('image/png', 'decorated_by_us.png'); --23
+
+
+INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id) VALUES
+    (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16),
+    (true, 2,  null, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null),
+    (true, 2,  null, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null),
+    (true, 6,  null, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null),
+    (true, 1,  null, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17);
+
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
@@ -26,6 +53,28 @@ INSERT INTO USER_ROLE (user_id, role_id) VALUES (3, 4);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (4, 4);
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
 
+INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
+VALUES
+    (3, '9:00 pm', '9:00 am', 'Dositejeva, 6',
+     'Event Masters is your go-to partner for planning all types of events. ' ||
+     'From creating custom invitations and event banners to full-scale coordination, ' ||
+     'we bring your vision to life with precision and creativity. Contact us to make your event unforgettable.',
+     'info@eventmasters.com',
+     'Event Masters', '+15551234567', 3),
+    (4, '5:00 pm', '7:00 am', 'Nemanjina, 15',
+     'Celebrate in style with Party Supplies Hub! Offering a wide range of balloons, party decorations, sound systems, and catering options. ' ||
+     'We are your one-stop shop for making every celebration unforgettable.',
+     'support@partysupplies.com',
+     'Party Supplies Hub', '+15554567890', 4);
+
+insert into companies_photos (company_id, photos_id) values
+ (1, 18),
+ (1, 19),
+ (1, 20),
+ (2, 21),
+ (2, 22),
+ (2, 23);
+    
 
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
@@ -132,24 +181,6 @@ INSERT INTO solution_event_types (solution_id, event_type_id) VALUES
 (14, 3), (15, 1);
 
 
-INSERT INTO images (content_type, path) VALUES
-('image/jpeg', 'custom_invitations.jpg'),
-('image/jpeg', 'event_banner.jpg'),
-('image/jpeg', 'party_favors.jpg'),
-('image/jpeg', 'decorative_balloons.jpg'),
-('image/jpeg', 'event_t-shirts.jpg'),
-('image/jpeg', 'party_hats.jpg'),
-('image/jpeg', 'event_mugs.jpg'),
-('image/jpeg', 'photo_frames.jpg'),
-('image/jpeg', 'event_photography.jpg'),
-('image/jpeg', 'catering_service.jpg'),
-('image/jpeg', 'event_planning.jpg'),
-('image/png', 'sound_system_setup.png'),
-('image/jpeg', 'decorative_lighting.jpg'),
-('image/jpeg', 'venue_booking.jpg'),
-('image/jpeg', 'transportation_service.jpg');
-
-
 INSERT INTO solutions_history VALUES (1);
 
 
@@ -159,3 +190,25 @@ INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (7, 7), (8, 8), (9, 9),
 (10, 10), (11, 11), (12, 12),
 (13, 13), (14, 14), (15, 15);
+
+INSERT INTO reports (id, reason, timestamp, offender_id, reporter_id, status) VALUES
+    (1, 'Inappropriate behavior', '2025-01-12T10:15:30', 1, 2, 'PENDING'),
+    (2, 'Spam content', '2025-01-11T14:20:00', 3, 4, 'PENDING'),
+    (3, 'Violation of privacy', '2025-01-10T18:45:00', 1, 3, 'PENDING'),
+    (4, 'Abusive language', '2025-01-09T09:00:00', 2, 5, 'PENDING'),
+    (5, 'Fake account creation', '2025-01-08T16:30:00', 4, 5, 'PENDING'),
+    (6, 'Offensive content in posts', '2025-01-07T12:10:00', 4, 1, 'PENDING'),
+    (7, 'Threatening behavior', '2025-01-06T14:50:00', 2, 3, 'PENDING'),
+    (8, 'Hate speech', '2025-01-05T17:25:00', 3, 2, 'PENDING'),
+    (9, 'Impersonation of another user', '2025-01-04T08:15:00', 4, 1, 'PENDING'),
+    (10, 'Scamming attempt', '2025-01-03T19:05:00', 5, 1, 'PENDING'),
+    (11, 'Malicious links in messages', '2025-01-02T22:40:00', 1, 2, 'PENDING'),
+    (12, 'Inappropriate content in profile', '2025-01-01T10:30:00', 1, 3, 'PENDING'),
+    (13, 'Sharing unauthorized materials', '2024-12-31T16:55:00', 2, 4, 'PENDING'),
+    (14, 'Manipulating users', '2024-12-30T20:25:00', 3, 5, 'PENDING'),
+    (15, 'Posting illegal content', '2024-12-29T18:10:00', 4, 1, 'PENDING'),
+    (16, 'Soliciting personal information', '2024-12-28T21:00:00', 5, 3, 'PENDING'),
+    (17, 'Misleading advertisements', '2024-12-27T15:50:00', 1, 5, 'PENDING'),
+    (18, 'Spreading misinformation', '2024-12-26T11:35:00', 4, 3, 'PENDING'),
+    (19, 'Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
+    (20, 'Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');

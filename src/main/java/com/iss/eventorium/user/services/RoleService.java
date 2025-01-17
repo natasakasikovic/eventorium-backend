@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.services;
 
-import com.iss.eventorium.user.dtos.RoleDto;
+import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.mappers.RoleMapper;
 import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.repositories.RoleRepository;
