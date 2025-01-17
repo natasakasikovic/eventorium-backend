@@ -44,7 +44,7 @@ public class EventSpecification {
         return (root, query, cb) -> {
             if (city == null || city.isEmpty())
                 return cb.conjunction();
-            return cb.like(cb.lower(root.get("location").get("city")), "%" + city.toLowerCase() + "%");
+            return cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%");
         };
     }
 
