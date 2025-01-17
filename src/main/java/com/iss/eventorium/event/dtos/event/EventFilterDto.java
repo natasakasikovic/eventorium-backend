@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class EventFilterDto {
     private String name;
     private String description;
-    private String eventType;
+    private String type;
     private String city;
 
     @Positive(message = "The value of maximum participans must be greater than zero!")

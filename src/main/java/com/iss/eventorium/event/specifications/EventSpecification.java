@@ -12,7 +12,7 @@ public class EventSpecification {
         return Specification
                 .where(hasName(filter.getName()))
                 .and(hasDescription(filter.getDescription()))
-                .and(hasEventType(filter.getEventType()))
+                .and(hasEventType(filter.getType()))
                 .and(hasCity(filter.getCity()))
                 .and(hasMaxParticipants(filter.getMaxParticipants()))
                 .and(hasDateAfter(filter.getFrom()))
@@ -37,7 +37,7 @@ public class EventSpecification {
         return (root, query, cb) ->
                 eventType == null || eventType.isEmpty()
                         ? cb.conjunction()
-                        : cb.equal(cb.lower(root.get("eventType").get("name")), eventType.toLowerCase());
+                        : cb.equal(cb.lower(root.get("type").get("name")), eventType.toLowerCase());
     }
 
     private static Specification<Event> hasCity(String city) {

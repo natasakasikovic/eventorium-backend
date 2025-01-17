@@ -42,7 +42,7 @@ public class Event {
     private Integer maxParticipants;
 
     @ManyToOne
-    private EventType eventType; // NOTE: If eventType is null, it indicates that the user selected "all"
+    private EventType type; // NOTE: If type is null, it indicates that the user selected "all"
 
     @ManyToOne
     private City city;
@@ -52,7 +52,7 @@ public class Event {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
-    private List<Activity> activities = new ArrayList<>();;
+    private List<Activity> activities = new ArrayList<>();
 
     @ManyToOne
     private User organizer;
