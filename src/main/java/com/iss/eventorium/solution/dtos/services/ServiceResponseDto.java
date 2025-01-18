@@ -26,8 +26,8 @@ public class ServiceResponseDto {
     private Double rating;
     private CategoryResponseDto category;
     private ReservationType type;
-    private LocalDate reservationDeadline;
-    private LocalDate cancellationDeadline;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
     private Integer minDuration;
     private Integer maxDuration;
     private Boolean available;

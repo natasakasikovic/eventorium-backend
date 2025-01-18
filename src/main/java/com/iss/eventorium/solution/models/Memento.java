@@ -36,8 +36,8 @@ public class Memento {
     private LocalDateTime validTo;
     @Enumerated(EnumType.STRING)
     private ReservationType type;
-    private LocalDate reservationDeadline;
-    private LocalDate cancellationDeadline;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
     private Integer minDuration;
     private Integer maxDuration;
 }
