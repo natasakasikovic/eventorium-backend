@@ -51,9 +51,6 @@ public abstract class Solution {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name="valid_from")
-    private LocalDateTime validFrom;
-
     @Column(name="is_available")
     private Boolean isAvailable;
 

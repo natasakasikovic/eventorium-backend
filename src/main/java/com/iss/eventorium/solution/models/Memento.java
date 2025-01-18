@@ -25,6 +25,7 @@ public class Memento {
     private String description;
     private double price;
     private double discount;
+    @Enumerated(EnumType.STRING)
     private Status status;
     private boolean isAvailable;
     private boolean isVisible;
@@ -36,8 +37,8 @@ public class Memento {
     private LocalDateTime validTo;
     @Enumerated(EnumType.STRING)
     private ReservationType type;
-    private LocalDate reservationDeadline;
-    private LocalDate cancellationDeadline;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
     private Integer minDuration;
     private Integer maxDuration;
 }

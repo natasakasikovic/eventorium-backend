@@ -24,10 +24,10 @@ public class Service extends Solution {
     private ReservationType type;
 
     @Column(name="reservation_deadline", nullable = false)
-    private LocalDate reservationDeadline;
+    private Integer reservationDeadline;
 
     @Column(name="cancellation_deadline", nullable = false)
-    private LocalDate cancellationDeadline;
+    private Integer cancellationDeadline;
 
     @Column(name="min_duration", nullable = false)
     private Integer minDuration;
