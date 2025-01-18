@@ -79,7 +79,7 @@ insert into companies_photos (company_id, photos_id) values
 INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Event Planning', 'Category for organizing event-related tasks',  false, false),
  ('Catering', 'Food and beverages arrangements',   false, false),
- ('Venue Booking', 'Booking venues for events',   true, false),
+ ('Venue Booking', 'Booking venues for events',   false, false),
  ('Photography', 'Photography and videography services',   false, false),
  ('Entertainment', 'Music, shows, and performances',   false, false),
  ('Logistics', 'Transport and materials management',   false, false),
