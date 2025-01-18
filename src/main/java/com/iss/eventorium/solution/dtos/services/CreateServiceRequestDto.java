@@ -49,9 +49,11 @@ public class CreateServiceRequestDto {
     private ReservationType type;
 
     @NotNull(message = "Reservation deadline is mandatory")
+    @Positive(message = "Reservation deadline must be a positive number greater than zero")
     private Integer reservationDeadline;
 
     @NotNull(message = "Cancellation deadline is mandatory")
+    @Positive(message = "Cancellation deadline must be a positive number greater than zero")
     private Integer cancellationDeadline;
 
     @NotNull(message = "Min duration is mandatory")

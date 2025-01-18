@@ -41,11 +41,11 @@ public class UpdateServiceRequestDto {
     private ReservationType type;
 
     @NotNull(message = "Reservation deadline is mandatory")
-    @FutureOrPresent(message = "Reservation deadline cannot be in the past")
+    @Positive(message = "Cancellation deadline must be a positive number greater than zero")
     private Integer reservationDeadline;
 
     @NotNull(message = "Cancellation deadline is mandatory")
-    @FutureOrPresent(message = "Cancellation deadline cannot be in the past")
+    @Positive(message = "Cancellation deadline must be a positive number greater than zero")
     private Integer cancellationDeadline;
 
     @NotNull(message = "Min duration is mandatory")

@@ -25,6 +25,7 @@ public class Memento {
     private String description;
     private double price;
     private double discount;
+    @Enumerated(EnumType.STRING)
     private Status status;
     private boolean isAvailable;
     private boolean isVisible;
