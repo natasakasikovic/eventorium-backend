@@ -1,10 +1,7 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
-import com.iss.eventorium.event.dtos.event.EventFilterDto;
-import com.iss.eventorium.event.dtos.event.EventRequestDto;
-import com.iss.eventorium.event.dtos.event.EventResponseDto;
-import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Activity;
@@ -30,6 +27,11 @@ public class EventService {
 
     private final EventRepository repository;
     private final AuthService authService;
+
+    public EventDetailsDto getEventDetails(Long id) {
+        Event event = find(id);
+        return EventMapper.toEventDetailsDto(event);
+    }
 
     public List<EventSummaryResponseDto> getTopEvents() {
         Pageable pageable = PageRequest.of(0, 5);
@@ -72,7 +74,7 @@ public class EventService {
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public Event find (Long id) {
+    public Event find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + id));
     }
 

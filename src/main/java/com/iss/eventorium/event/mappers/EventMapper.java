@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.mappers;
 
+import com.iss.eventorium.event.dtos.event.EventDetailsDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
@@ -9,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class EventMapper {
@@ -42,6 +45,16 @@ public class EventMapper {
             dto.setBudget(BudgetMapper.toResponse(event.getBudget()));
         if(event.getType() != null)
             dto.setType(EventTypeMapper.toResponse(event.getType()));
+        return dto;
+    }
+
+    public static EventDetailsDto toEventDetailsDto(Event event) {
+        EventDetailsDto dto = modelMapper.map(event, EventDetailsDto.class);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yy");
+        dto.setDate(event.getDate().format(formatter));
+        dto.setPrivacy(event.getPrivacy().toString().toLowerCase());
+        if (event.getType() == null)
+            dto.setEventType("All");
         return dto;
     }
 
