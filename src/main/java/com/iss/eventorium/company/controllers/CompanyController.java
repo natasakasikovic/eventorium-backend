@@ -1,9 +1,6 @@
 package com.iss.eventorium.company.controllers;
 
-import com.iss.eventorium.company.dtos.CompanyRequestDto;
-import com.iss.eventorium.company.dtos.CompanyResponseDto;
-import com.iss.eventorium.company.dtos.ProviderCompanyDto;
-import com.iss.eventorium.company.dtos.UpdateCompanyRequestDto;
+import com.iss.eventorium.company.dtos.*;
 import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
@@ -38,6 +35,11 @@ public class CompanyController {
     @GetMapping("/my-company")
     public ResponseEntity<ProviderCompanyDto> getCompany() {
         return ResponseEntity.ok(service.getCompany());
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<CompanyDetailsDto> getCompany(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getCompany(id));
     }
 
     @GetMapping("/{id}/images")

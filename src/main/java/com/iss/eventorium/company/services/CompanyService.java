@@ -1,9 +1,6 @@
 package com.iss.eventorium.company.services;
 
-import com.iss.eventorium.company.dtos.CompanyRequestDto;
-import com.iss.eventorium.company.dtos.CompanyResponseDto;
-import com.iss.eventorium.company.dtos.ProviderCompanyDto;
-import com.iss.eventorium.company.dtos.UpdateCompanyRequestDto;
+import com.iss.eventorium.company.dtos.*;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
@@ -108,6 +105,11 @@ public class CompanyService {
         User currentUser = authService.getCurrentUser();
         Company company = repository.getCompanyByProviderId(currentUser.getId());
         return CompanyMapper.toProviderCompanyResponse(company);
+    }
+
+    public CompanyDetailsDto getCompany(Long id) {
+        Company company = getCompanyById(id);
+        return CompanyMapper.toCompanyDetailsResponse(company);
     }
 
     public List<ImageResponseDto> getImages(Long id) {

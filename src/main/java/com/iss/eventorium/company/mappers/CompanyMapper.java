@@ -1,5 +1,6 @@
 package com.iss.eventorium.company.mappers;
 
+import com.iss.eventorium.company.dtos.CompanyDetailsDto;
 import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
@@ -26,5 +27,9 @@ public class CompanyMapper {
 
     public static ProviderCompanyDto toProviderCompanyResponse(Company company) {
         return modelMapper.map(company, ProviderCompanyDto.class);
+    }
+
+    public static CompanyDetailsDto toCompanyDetailsResponse(Company company) {
+        return modelMapper.map(company, CompanyDetailsDto.class);
     }
 }
