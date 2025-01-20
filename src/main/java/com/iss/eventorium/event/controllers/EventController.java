@@ -1,10 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
-import com.iss.eventorium.event.dtos.event.EventFilterDto;
-import com.iss.eventorium.event.dtos.event.EventRequestDto;
-import com.iss.eventorium.event.dtos.event.EventResponseDto;
-import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
@@ -25,6 +22,11 @@ import java.util.List;
 public class EventController {
 
     private final EventService service;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDetailsDto> getEvent(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.getEventDetails(id));
+    }
 
     @GetMapping("/top-five-events")
     public ResponseEntity<List<EventSummaryResponseDto>> getTopEvents() {

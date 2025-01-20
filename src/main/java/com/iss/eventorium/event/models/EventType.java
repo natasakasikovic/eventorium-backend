@@ -31,4 +31,9 @@ public class EventType {
 
     @ManyToMany
     private List<Category> suggestedCategories;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
