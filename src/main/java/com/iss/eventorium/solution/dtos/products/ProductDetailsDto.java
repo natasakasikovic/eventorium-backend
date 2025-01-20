@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
+public class ProductDetailsDto {
     private Long id;
     private String name;
     private String description;
@@ -28,4 +28,5 @@ public class ProductResponseDto {
     private CategoryResponseDto category;
     private Double rating;
     private ChatUserResponseDto provider;
+    private CompanyResponseDto company;
 }

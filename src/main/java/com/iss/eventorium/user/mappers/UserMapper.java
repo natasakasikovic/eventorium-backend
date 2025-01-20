@@ -1,6 +1,6 @@
 package com.iss.eventorium.user.mappers;
 
-import com.iss.eventorium.user.dtos.user.ProviderResponseDto;
+import com.iss.eventorium.user.dtos.user.ChatUserResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
@@ -30,8 +30,8 @@ public class UserMapper {
         return modelMapper.map(user, AuthResponseDto.class);
     }
 
-    public static ProviderResponseDto toProviderResponse(User user) {
-        return ProviderResponseDto.builder()
+    public static ChatUserResponseDto toProviderResponse(User user) {
+        return ChatUserResponseDto.builder()
                 .id(user.getId())
                 .name(user.getPerson().getName())
                 .lastname(user.getPerson().getLastname())

@@ -1,11 +1,12 @@
 package com.iss.eventorium.solution.services;
 
+import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -13,8 +14,6 @@ import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.specifications.ProductSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +33,8 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository repository;
+    private final CompanyRepository companyRepository;
 
     @Value("${image-path}")
     private String imagePath;
@@ -51,10 +50,11 @@ public class ProductService {
         return ProductMapper.toPagedResponse(products);
     }
 
-    public ProductResponseDto getProduct(Long id) {
-        return ProductMapper.toResponse(repository.findById(id).orElseThrow(
+    public ProductDetailsDto getProduct(Long id) {
+        Product product = repository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Product with id " + id + " not found")
-        ));
+        );
+        return ProductMapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
     public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
