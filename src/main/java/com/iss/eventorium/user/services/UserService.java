@@ -173,12 +173,12 @@ public class UserService {
 
     public AccountDetailsDto getCurrentUser() {
         User current = authService.getCurrentUser();
-        return UserMapper.toAccountDetailsDto(current);
+        return UserMapper.toAccountDetails(current);
     }
 
     public AccountDetailsDto getUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
-        return UserMapper.toAccountDetailsDto(user);
+        return UserMapper.toAccountDetails(user);
     }
 
     public ImagePath getProfilePhotoPath(long id) {

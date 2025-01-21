@@ -2,12 +2,8 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +25,7 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping("/{id}")
-    public  ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long id) {
+    public  ResponseEntity<ProductDetailsDto> getProduct(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.getProduct(id));
     }
 

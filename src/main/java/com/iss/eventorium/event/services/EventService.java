@@ -50,14 +50,14 @@ public class EventService {
         return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
     }
 
-    public PagedResponse<EventSummaryResponseDto> searchEvents (String keyword, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         if (keyword.isBlank())
             return EventMapper.toPagedResponse(repository.findAll(pageable));
 
         return EventMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 
-    public List<EventSummaryResponseDto> searchEvents (String keyword) {
+    public List<EventSummaryResponseDto> searchEvents(String keyword) {
         List<Event> events = keyword.isBlank()
                 ? repository.findAll()
                 : repository.findByNameContainingAllIgnoreCase(keyword);
@@ -65,11 +65,11 @@ public class EventService {
         return events.stream().map(EventMapper::toSummaryResponse).toList();
     }
 
-    public PagedResponse<EventSummaryResponseDto> getEventsPaged (Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
         return EventMapper.toPagedResponse(repository.findAll(pageable));
     }
 
-    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilterDto filter, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterBy(filter);
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }

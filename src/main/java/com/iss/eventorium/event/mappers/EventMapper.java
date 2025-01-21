@@ -6,6 +6,7 @@ import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.user.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,6 +56,7 @@ public class EventMapper {
         dto.setPrivacy(event.getPrivacy().toString().toLowerCase());
         if (event.getType() == null)
             dto.setEventType("All");
+        dto.setOrganizer(UserMapper.toChatUserDetails(event.getOrganizer()));
         return dto;
     }
 

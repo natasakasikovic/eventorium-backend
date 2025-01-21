@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.dtos.products;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
+import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.dtos.user.ChatUserDetailsDto;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
+public class ProductDetailsDto {
     private Long id;
     private String name;
     private String description;
@@ -27,4 +28,5 @@ public class ProductResponseDto {
     private CategoryResponseDto category;
     private Double rating;
     private ChatUserDetailsDto provider;
+    private CompanyResponseDto company;
 }

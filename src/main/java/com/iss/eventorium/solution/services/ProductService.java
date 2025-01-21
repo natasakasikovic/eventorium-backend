@@ -1,11 +1,12 @@
 package com.iss.eventorium.solution.services;
 
+import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -13,8 +14,6 @@ import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.specifications.ProductSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,14 +33,14 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository repository;
+    private final CompanyRepository companyRepository;
 
     @Value("${image-path}")
     private String imagePath;
 
     public List<ProductSummaryResponseDto> getTopProducts(){
-        Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
+        Pageable pageable = PageRequest.of(0, 5);
         List<Product> products = repository.findTopFiveProducts(pageable);
         return products.stream().map(ProductMapper::toSummaryResponse).toList();
     }
@@ -51,10 +50,9 @@ public class ProductService {
         return ProductMapper.toPagedResponse(products);
     }
 
-    public ProductResponseDto getProduct(Long id) {
-        return ProductMapper.toResponse(repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + id + " not found")
-        ));
+    public ProductDetailsDto getProduct(Long id) {
+        Product product = find(id);
+        return ProductMapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
     public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
@@ -69,8 +67,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Product product = repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Product with id %s not found", id)));
+        Product product = find(id);
 
         List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : product.getImagePaths()) {
@@ -81,8 +78,7 @@ public class ProductService {
     }
 
     public ImagePath getImagePath(Long id) {
-        Product product = repository.findById(id)
-                .orElseThrow( () -> new EntityNotFoundException(String.format("Product with id %s not found", id)));
+        Product product = find(id);
         if(product.getImagePaths().isEmpty()) {
             throw new ImageNotFoundException("Image not found");
         }
@@ -119,5 +115,11 @@ public class ProductService {
     public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
         List<Product> products = repository.findAll(ProductSpecification.filterBy(filter));
         return products.stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    private Product find(Long id) {
+        return repository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Product with id " + id + " not found")
+        );
     }
 }
