@@ -8,30 +8,24 @@ import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
-import com.iss.eventorium.solution.exceptions.InvalidServiceDurationException;
-import com.iss.eventorium.solution.exceptions.ReservationConflictException;
-import com.iss.eventorium.solution.exceptions.ReservationDeadlineExceededException;
-import com.iss.eventorium.solution.exceptions.ReservationOutsideWorkingHoursException;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
-import com.iss.eventorium.solution.specifications.ServiceReservationSpecification;
+import com.iss.eventorium.solution.validators.reservation.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import lombok.RequiredArgsConstructor;
+
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
-import java.time.Duration;
-import java.time.LocalDate;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static java.time.temporal.ChronoUnit.DAYS;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -50,53 +44,23 @@ public class ReservationService {
         Service service = serviceService.find(serviceId);
         Reservation reservation = ReservationMapper.fromRequest(request, event, service);
 
-        validateReservation(reservation, service, event);
-        saveEntity(reservation, service);
+        validateReservation(reservation);
+        saveEntity(reservation);
 
-        sendConfirmationMails(reservation, service);
+        sendConfirmationMails(reservation);
     }
 
-    private void validateReservation(Reservation reservation, Service service, Event event) {
-        checkWorkingHours(reservation, getCompany(service));
-        checkReservationDurationValidity(reservation, service);
-        checkReservationConflicts(reservation, service, event);
-        checkReservationDeadline(service, event);
+    private void validateReservation(Reservation reservation) {
+        List<ReservationValidator> validators = List.of(new WorkingHoursValidator(getCompany(reservation.getService())),
+                                                        new ServiceDurationValidator(),
+                                                        new ReservationConflictValidator(repository),
+                                                        new ReservationDeadlineValidator());
+        for (ReservationValidator validator : validators)
+            validator.validate(reservation);
     }
 
-    private void checkReservationDeadline(Service service, Event event) {
-        long daysUntilEvent = DAYS.between(LocalDate.now(), event.getDate());
-        if (daysUntilEvent < service.getReservationDeadline())
-            throw new ReservationDeadlineExceededException("Reservation deadline has passed for this service!");
-    }
-
-    private void checkWorkingHours(Reservation reservation, Company company) {
-        boolean isBeforeOpeningTime = reservation.getStartingTime().isBefore(company.getOpeningHours());
-        boolean isAfterOpeningTime = reservation.getEndingTime().isAfter(company.getClosingHours());
-
-        if (isBeforeOpeningTime || isAfterOpeningTime)
-            throw new ReservationOutsideWorkingHoursException(String.format(String.format("Reservations can only be made between %s and %s", company.getOpeningHours(), company.getClosingHours())));
-    }
-
-    private void checkReservationConflicts(Reservation reservation, Service service, Event event) {
-        Specification<Reservation> specification = ServiceReservationSpecification.checkForOverlappingReservations(event, service, reservation);
-        if (repository.exists(specification))
-            throw new ReservationConflictException("The selected time slot for this service is already occupied. Please choose a different time.");
-    }
-
-    private void checkReservationDurationValidity(Reservation reservation, Service service) {
-        long hours = Duration.between(reservation.getStartingTime(), reservation.getEndingTime()).toHours();
-        int minDuration = service.getMinDuration();
-        int maxDuration = service.getMaxDuration();
-
-        if (minDuration == maxDuration && hours != minDuration)
-                throw new InvalidServiceDurationException(String.format("The service duration must be exactly %d hours.", minDuration));
-
-        if (minDuration != maxDuration && ( hours < minDuration || hours > maxDuration))
-            throw new InvalidServiceDurationException(String.format("The service duration must be between %d and %d hours.", minDuration, maxDuration));
-    }
-
-    private void saveEntity(Reservation reservation, Service service) {
-        if (service.getType() == ReservationType.AUTOMATIC)
+    private void saveEntity(Reservation reservation) {
+        if (reservation.getService().getType() == ReservationType.AUTOMATIC)
             reservation.setStatus(Status.ACCEPTED);
         repository.save(reservation);
     }
@@ -106,8 +70,8 @@ public class ReservationService {
         return companyRepository.getCompanyByProviderId(provider.getId());
     }
 
-    private void sendConfirmationMails(Reservation reservation, Service service) {
-        sendConfirmation(reservation, service.getProvider().getEmail()); // to provider
+    private void sendConfirmationMails(Reservation reservation) {
+        sendConfirmation(reservation, reservation.getService().getProvider().getEmail()); // to provider
         sendConfirmation(reservation, authService.getCurrentUser().getEmail()); // to organizer
     }
 

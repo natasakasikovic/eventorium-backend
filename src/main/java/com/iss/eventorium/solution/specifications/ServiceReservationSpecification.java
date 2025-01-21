@@ -1,8 +1,6 @@
 package com.iss.eventorium.solution.specifications;
 
-import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.solution.models.Reservation;
-import com.iss.eventorium.solution.models.Service;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -10,13 +8,13 @@ import java.time.LocalTime;
 
 public class ServiceReservationSpecification {
 
-    public static Specification<Reservation> checkForOverlappingReservations(Event event, Service service, Reservation reservation) {
+    public static Specification<Reservation> checkForOverlappingReservations(Reservation reservation) {
         return Specification
-                .where(hasEventId(event.getId()))
-                .and(hasServiceId(service.getId()))
+                .where(hasEventId(reservation.getEvent().getId()))
+                .and(hasServiceId(reservation.getService().getId()))
                 .and(hasStartTime(reservation.getEndingTime()))
                 .and(hasEndTime(reservation.getStartingTime()))
-                .and(hasDate(event.getDate()));
+                .and(hasDate(reservation.getEvent().getDate()));
     }
 
     private static Specification<Reservation> hasEventId(Long eventId) {
