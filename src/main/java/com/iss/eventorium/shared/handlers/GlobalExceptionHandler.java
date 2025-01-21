@@ -1,8 +1,7 @@
 package com.iss.eventorium.shared.handlers;
 
-import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
-import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
+import com.iss.eventorium.shared.exceptions.EmailSendingException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ExceptionResponse;
@@ -81,5 +80,13 @@ public class GlobalExceptionHandler {
                         .error("Max upload size exceeded")
                         .message(ex.getMessage())
                         .build());
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ExceptionResponse> handleEmailSendingException(EmailSendingException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ExceptionResponse.builder()
+                .message(ex.getMessage())
+                .build());
     }
 }
