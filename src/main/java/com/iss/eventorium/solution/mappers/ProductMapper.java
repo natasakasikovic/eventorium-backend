@@ -48,12 +48,12 @@ public class ProductMapper {
         ProductResponseDto dto = modelMapper.map(product, ProductResponseDto.class);
         dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
         dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
-        try {
+        if(product.getReviews() != null) {
             dto.setRating(product.getReviews().stream().mapToInt(Review::getRating).average().orElse(0.0));
-        } catch (NullPointerException e) {
+        } else {
             dto.setRating(0.0d);
         }
-        dto.setProvider(UserMapper.toProviderResponse(product.getProvider()));
+        dto.setProvider(UserMapper.toChatUserDetails(product.getProvider()));
         return dto;
     }
 
@@ -61,12 +61,12 @@ public class ProductMapper {
         ProductDetailsDto dto = modelMapper.map(product, ProductDetailsDto.class);
         dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
         dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
-        try {
+        if(product.getReviews() != null) {
             dto.setRating(product.getReviews().stream().mapToInt(Review::getRating).average().orElse(0.0));
-        } catch (NullPointerException e) {
+        } else {
             dto.setRating(0.0d);
         }
-        dto.setProvider(UserMapper.toProviderResponse(product.getProvider()));
+        dto.setProvider(UserMapper.toChatUserDetails(product.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
         return dto;
     }

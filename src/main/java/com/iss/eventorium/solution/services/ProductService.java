@@ -40,7 +40,7 @@ public class ProductService {
     private String imagePath;
 
     public List<ProductSummaryResponseDto> getTopProducts(){
-        Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
+        Pageable pageable = PageRequest.of(0, 5);
         List<Product> products = repository.findTopFiveProducts(pageable);
         return products.stream().map(ProductMapper::toSummaryResponse).toList();
     }
@@ -51,9 +51,7 @@ public class ProductService {
     }
 
     public ProductDetailsDto getProduct(Long id) {
-        Product product = repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + id + " not found")
-        );
+        Product product = find(id);
         return ProductMapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
@@ -69,8 +67,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Product product = repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Product with id %s not found", id)));
+        Product product = find(id);
 
         List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : product.getImagePaths()) {
@@ -81,8 +78,7 @@ public class ProductService {
     }
 
     public ImagePath getImagePath(Long id) {
-        Product product = repository.findById(id)
-                .orElseThrow( () -> new EntityNotFoundException(String.format("Product with id %s not found", id)));
+        Product product = find(id);
         if(product.getImagePaths().isEmpty()) {
             throw new ImageNotFoundException("Image not found");
         }
@@ -119,5 +115,11 @@ public class ProductService {
     public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
         List<Product> products = repository.findAll(ProductSpecification.filterBy(filter));
         return products.stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    private Product find(Long id) {
+        return repository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Product with id " + id + " not found")
+        );
     }
 }
