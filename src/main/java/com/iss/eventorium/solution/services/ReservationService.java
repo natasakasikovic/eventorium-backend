@@ -13,12 +13,14 @@ import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
+import com.iss.eventorium.solution.specifications.ServiceReservationSpecification;
 import com.iss.eventorium.solution.validators.reservation.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -47,7 +49,7 @@ public class ReservationService {
         validateReservation(reservation);
         saveEntity(reservation);
 
-        sendConfirmationMails(reservation);
+        sendEmails(reservation, false);
     }
 
     private void validateReservation(Reservation reservation) {
@@ -70,37 +72,48 @@ public class ReservationService {
         return companyRepository.getCompanyByProviderId(provider.getId());
     }
 
-    private void sendConfirmationMails(Reservation reservation) {
-        sendConfirmation(reservation, reservation.getService().getProvider().getEmail()); // to provider
-        sendConfirmation(reservation, authService.getCurrentUser().getEmail()); // to organizer
+    @Scheduled(fixedRate = 60000)
+    public void checkReservations() {
+        List<Reservation> reservations = repository.findAll(ServiceReservationSpecification.checkForReservationsInOneHour());
+        for (Reservation reservation: reservations)
+            sendEmails(reservation, true);
     }
 
-    private void sendConfirmation(Reservation reservation, String recipient) {
-        EmailDetails emailDetails = createEmailDetails(reservation, recipient);
+    private void sendEmails(Reservation reservation, boolean isReminder) {
+        if (!isReminder)
+            sendEmailToRecipient(reservation, authService.getCurrentUser().getEmail(), false); // to organizer
+
+        sendEmailToRecipient(reservation, reservation.getService().getProvider().getEmail(), isReminder); // to provider
+    }
+
+    private void sendEmailToRecipient(Reservation reservation, String recipient, boolean isReminder) {
+        EmailDetails emailDetails = createEmailDetails(reservation, recipient, isReminder);
         emailService.sendSimpleMail(emailDetails);
     }
 
-    private EmailDetails createEmailDetails(Reservation reservation, String recipient) {
+    private EmailDetails createEmailDetails(Reservation reservation, String recipient, boolean isReminder) {
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setRecipient(recipient);
-        emailDetails.setSubject("Notification about new reservation!");
-        emailDetails.setMsgBody(generateEmailContent(reservation, recipient));
+        emailDetails.setSubject(isReminder ? "Reminder about reservation" : "Notification about new reservation!");
+        emailDetails.setMsgBody(generateEmailContent(reservation, recipient, isReminder));
         return emailDetails;
     }
 
-    public String generateEmailContent(Reservation reservation, String recipient) {
+    public String generateEmailContent(Reservation reservation, String recipient, boolean isReminder) {
         Context context = new Context();
         context.setVariables(getContextVariables(reservation));
 
-        String emailTemplate = determineEmailTemplate(reservation, recipient);
-        return templateEngine.process(emailTemplate, context);
-    }
+        String emailTemplate;
 
-    private String determineEmailTemplate(Reservation reservation, String recipient) {
-        if (Objects.equals(authService.getCurrentUser().getEmail(), recipient))
-            return reservation.getStatus() == Status.ACCEPTED ? "reservation-accepted-organizer" : "reservation-pending-organizer";
+        if (isReminder)
+            emailTemplate = "reservation-reminder-provider";
+        else if (Objects.equals(authService.getCurrentUser().getEmail(), recipient))
+            emailTemplate = reservation.getStatus() == Status.ACCEPTED ? "reservation-accepted-organizer" : "reservation-pending-organizer";
         else
-            return reservation.getStatus() == Status.ACCEPTED ? "reservation-accepted-provider" : "reservation-pending-provider";
+            emailTemplate = reservation.getStatus() == Status.ACCEPTED ? "reservation-accepted-provider" : "reservation-pending-provider";
+
+
+        return templateEngine.process(emailTemplate, context);
     }
 
     private Map<String, Object> getContextVariables(Reservation reservation) {

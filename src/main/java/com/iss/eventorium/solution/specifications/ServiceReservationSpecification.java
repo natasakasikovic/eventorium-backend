@@ -1,10 +1,15 @@
 package com.iss.eventorium.solution.specifications;
 
+import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Reservation;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class ServiceReservationSpecification {
 
@@ -15,6 +20,29 @@ public class ServiceReservationSpecification {
                 .and(hasStartTime(reservation.getEndingTime()))
                 .and(hasEndTime(reservation.getStartingTime()))
                 .and(hasDate(reservation.getEvent().getDate()));
+    }
+
+    public static Specification<Reservation> checkForReservationsInOneHour() {
+        return Specification
+                .where(hasStatusAccepted())
+                .and(hasEventDateToday())
+                .and(hasStartTimeInNextHour());
+    }
+
+    private static Specification<Reservation> hasStartTimeInNextHour() {
+        return (root, query, cb) -> {
+            LocalTime nextHour = LocalDateTime.now().plusHours(1).toLocalTime().withSecond(0).withNano(0);
+            Expression<LocalTime> startingTime = root.get("startingTime").as(LocalTime.class);
+            return cb.equal(startingTime, nextHour);
+        };
+    }
+
+    private static Specification<Reservation> hasEventDateToday() {
+        return (root, query, cb) -> cb.equal(root.get("event").get("date"), LocalDate.now());
+    }
+
+    private static Specification<Reservation> hasStatusAccepted() {
+        return (root, query, cb) -> cb.equal(root.get("status"), Status.ACCEPTED);
     }
 
     private static Specification<Reservation> hasEventId(Long eventId) {
