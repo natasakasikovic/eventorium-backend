@@ -53,10 +53,10 @@ public class ReservationService {
     }
 
     private void validateReservation(Reservation reservation) {
-        List<ReservationValidator> validators = List.of(new WorkingHoursValidator(getCompany(reservation.getService())),
+        List<ReservationValidator> validators = List.of(new ReservationDeadlineValidator(),
                                                         new ServiceDurationValidator(),
-                                                        new ReservationConflictValidator(repository),
-                                                        new ReservationDeadlineValidator());
+                                                        new WorkingHoursValidator(getCompany(reservation.getService())),
+                                                        new ReservationConflictValidator(repository));
         for (ReservationValidator validator : validators)
             validator.validate(reservation);
     }
