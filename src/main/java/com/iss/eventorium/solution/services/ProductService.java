@@ -1,18 +1,22 @@
 package com.iss.eventorium.solution.services;
 
+import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
-import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
+import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.specifications.ProductSpecification;
+import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -35,6 +39,11 @@ public class ProductService {
 
     private final ProductRepository repository;
     private final CompanyRepository companyRepository;
+    private final AuthService authService;
+    private final CategoryProposalService categoryProposalService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${image-path}")
     private String imagePath;
@@ -119,7 +128,27 @@ public class ProductService {
 
     private Product find(Long id) {
         return repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + id + " not found")
+                () -> new EntityNotFoundException("Product not found")
         );
+    }
+
+    public ProductResponseDto createProduct(CreateProductRequestDto request) {
+        Product product = ProductMapper.fromCreateRequest(request);
+        handleCategoryAndStatus(product);
+        product.setProvider(authService.getCurrentUser());
+
+        repository.save(product);
+        return ProductMapper.toResponse(product);
+    }
+
+    private void handleCategoryAndStatus(Product product) {
+        if (product.getCategory().getId() == null) {
+            product.setStatus(Status.PENDING);
+            categoryProposalService.handleCategoryProposal(product.getCategory());
+        } else {
+            product.setStatus(Status.ACCEPTED);
+            Category category = entityManager.getReference(Category.class, product.getCategory().getId());
+            product.setCategory(category);
+        }
     }
 }

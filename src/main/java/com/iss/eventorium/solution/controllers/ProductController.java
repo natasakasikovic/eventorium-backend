@@ -30,10 +30,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody CreateProductRequestDto createProductRequestDto) {
-        ProductResponseDto responseDto = new ProductResponseDto();
-        // TODO: call service and map
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductRequestDto createProductRequestDto) {
+        return new ResponseEntity<>(service.createProduct(createProductRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

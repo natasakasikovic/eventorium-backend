@@ -6,6 +6,7 @@ import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
@@ -16,6 +17,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 @Component
 public class ProductMapper {
@@ -69,5 +72,20 @@ public class ProductMapper {
         dto.setProvider(UserMapper.toChatUserDetails(product.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
         return dto;
+    }
+
+    public static Product fromCreateRequest(CreateProductRequestDto request) {
+        return Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .discount(request.getDiscount())
+                .isVisible(true)
+                .isDeleted(false)
+                .isAvailable(true)
+                .reviews(new ArrayList<>())
+                .category(CategoryMapper.fromResponse(request.getCategory()))
+                .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
+                .build();
     }
 }

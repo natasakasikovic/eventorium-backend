@@ -1,10 +1,10 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.services.CategoryProposalService;
+import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
-import com.iss.eventorium.interaction.models.Notification;
-import com.iss.eventorium.interaction.models.NotificationType;
 import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -59,6 +59,7 @@ public class ServiceService {
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
+    private final CategoryProposalService categoryProposalService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -86,8 +87,7 @@ public class ServiceService {
         Service service = ServiceMapper.fromCreateRequest(createServiceRequestDto);
         if(service.getCategory().getId() == null) {
             service.setStatus(Status.PENDING);
-            service.getCategory().setSuggested(true);
-            sendNotification(service.getCategory());
+            categoryProposalService.handleCategoryProposal(service.getCategory());
         } else {
             service.setStatus(Status.ACCEPTED);
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
@@ -197,19 +197,6 @@ public class ServiceService {
         }
         service.setIsDeleted(true);
         serviceRepository.save(service);
-    }
-    
-    private void sendNotification(Category category) {
-        Notification notification = new Notification(
-                "Category proposal",
-                messageSource.getMessage(
-                        "notification.category.proposal",
-                        new Object[] { category.getName() },
-                        Locale.getDefault()
-                ),
-                NotificationType.INFO
-        );
-        notificationService.sendNotificationToAdmin(notification);
     }
     
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {

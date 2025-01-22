@@ -23,6 +23,7 @@ public class Memento {
     private Long solutionId;
     private String name;
     private String description;
+    private String specialties;
     private double price;
     private double discount;
     @Enumerated(EnumType.STRING)
