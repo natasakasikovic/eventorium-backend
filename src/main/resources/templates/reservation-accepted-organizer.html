@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        .details {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            text-align: center;
+            color: #888888;
+        }
+        p {
+            font-size: 1.1em;
+        }
+        strong {
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Reservation Successfully Confirmed!</h1>
+    <p>Dear organizer</p>
+    <p>We are thrilled to confirm that your reservation has been successfully completed. Your chosen service has been reserved, and we can't wait to provide you with an exceptional experience.</p>
+
+    <div class="details">
+        <p><strong>Service Name:</strong> <span th:text="${serviceName}"></span></p>
+        <p><strong>Location:</strong> <span th:text="${location}"></span></p>
+        <p><strong>Event Date:</strong> <span th:text="${eventDate}"></span></p>
+        <p><strong>Event Time:</strong> <span th:text="${startTime}"></span> - <span th:text="${endTime}"></span></p>
+    </div>
+
+    <p>We truly appreciate your trust in Eventorium, and we are excited to help make your upcoming event a memorable one. If you have any questions or need further assistance, our team is here for you.</p>
+
+    <p>Looking forward to seeing you soon!</p>
+
+    <p>Best regards,</p>
+    <p>The Eventorium Team</p>
+
+    <div class="footer">
+        <p>&copy; 2024 Eventorium. All Rights Reserved.</p>
+    </div>
+</div>
+</body>
+</html>

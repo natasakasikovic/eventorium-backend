@@ -1,5 +1,7 @@
-package com.iss.eventorium.shared.email;
+package com.iss.eventorium.shared.services;
 
+import com.iss.eventorium.shared.exceptions.EmailSendingException;
+import com.iss.eventorium.shared.models.EmailDetails;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +28,7 @@ public class EmailService {
 
             javaMailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();  // TODO: Consider to handle and display error messages to the user if email sending fails
+            throw new EmailSendingException(String.format("Failed to send email to %s", emailDetails.getRecipient()));
         }
     }
 

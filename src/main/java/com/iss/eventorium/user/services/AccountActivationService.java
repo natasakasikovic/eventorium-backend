@@ -1,7 +1,7 @@
 package com.iss.eventorium.user.services;
 
-import com.iss.eventorium.shared.email.EmailDetails;
-import com.iss.eventorium.shared.email.EmailService;
+import com.iss.eventorium.shared.models.EmailDetails;
+import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

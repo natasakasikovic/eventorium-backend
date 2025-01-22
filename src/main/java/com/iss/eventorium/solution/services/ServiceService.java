@@ -104,8 +104,7 @@ public class ServiceService {
         if(images == null || images.isEmpty()) {
             return;
         }
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
         List<ImagePath> paths = new ArrayList<>();
 
         for (MultipartFile image : images) {
@@ -126,8 +125,7 @@ public class ServiceService {
     }
 
     public List<ImageResponseDto> getImages(Long serviceId) {
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
 
         List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : service.getImagePaths()) {
@@ -142,9 +140,12 @@ public class ServiceService {
         return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public Service find(Long id) {
+        return serviceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+    }
+
     public ImagePath getImagePath(Long serviceId) {
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
         if(service.getImagePaths().isEmpty()) {
             throw new ImageNotFoundException("Image not found");
         }
@@ -173,8 +174,7 @@ public class ServiceService {
     }
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
-        Service toUpdate = serviceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        Service toUpdate = find(id);
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
         if (eventTypes.size() != serviceDto.getEventTypesIds().size()) {
@@ -190,8 +190,8 @@ public class ServiceService {
     }
 
     public void deleteService(Long id) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        Service service = find(id);
+
         if(reservationRepository.existsByServiceId(id)) {
             throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
         }
