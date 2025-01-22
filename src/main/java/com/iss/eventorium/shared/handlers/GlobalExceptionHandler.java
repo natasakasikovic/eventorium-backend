@@ -1,7 +1,5 @@
 package com.iss.eventorium.shared.handlers;
 
-import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
-import com.iss.eventorium.category.exceptions.CategoryInUseException;
 import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;

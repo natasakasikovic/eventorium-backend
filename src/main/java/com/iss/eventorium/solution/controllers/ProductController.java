@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -101,5 +102,10 @@ public class ProductController {
                 .body(service.getImage(id, path));
     }
 
+    @PostMapping("/{id}/images")
+    public ResponseEntity<Void> uploadImages(@PathVariable Long id, @RequestParam("images") List<MultipartFile> images) {
+        service.uploadImages(id, images);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
 
