@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.solution.models.Solution;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDateTime;
 
@@ -23,10 +24,10 @@ public class BudgetItem {
     @Column(nullable = false, name = "planned_amount")
     private Double plannedAmount;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Solution solution;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Category category;
 
     private LocalDateTime purchased;
