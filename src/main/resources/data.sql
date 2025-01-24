@@ -98,15 +98,15 @@ INSERT INTO event_types (name, description, deleted) VALUES
 INSERT INTO event_types_suggested_categories VALUES (1, 2),(1, 4),(1,9),(1,7),(2,1),(3,2),(3,4),(3, 7);
 
 
-INSERT INTO products (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
-(nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 'Invitations, Customizable', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
-(nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 'Banners, Event', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
-(nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 'Party, Favors', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
-(nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 'Balloons, Decorative', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
-(nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 'T-Shirts, Customizable', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
-(nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 'Party, Hats', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
-(nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 'Mugs, Personalized', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
-(nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 'Frames, Customizable', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3);
+INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
+(nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
+(nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
+(nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
+(nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
+(nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
+(nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3);
 
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
