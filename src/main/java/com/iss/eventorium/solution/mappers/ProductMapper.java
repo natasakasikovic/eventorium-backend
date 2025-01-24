@@ -10,6 +10,7 @@ import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
+import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Product;
 
 import com.iss.eventorium.user.mappers.UserMapper;
@@ -87,5 +88,9 @@ public class ProductMapper {
                 .category(CategoryMapper.fromResponse(request.getCategory()))
                 .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
                 .build();
+    }
+
+    public static Memento toMemento(Product product) {
+        return modelMapper.map(product, Memento.class);
     }
 }

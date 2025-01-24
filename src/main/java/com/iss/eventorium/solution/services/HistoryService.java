@@ -42,6 +42,17 @@ public class HistoryService {
         return findValidSolution(givenTime, mementos);
     }
 
+    public void addProductMemento(Product product) {
+        Memento memento = ProductMapper.toMemento(product);
+        memento.setId(null);
+        memento.setSolutionId(product.getId());
+        memento.setValidFrom(LocalDateTime.now());
+        SolutionHistory solutionHistory = getSolutionHistory();
+
+        solutionHistory.addProductMemento(memento);
+        historyRepository.save(solutionHistory);
+    }
+
 
     private Memento findValidSolution(LocalDateTime givenTime, List<Memento> mementos) {
         if(mementos.size() == 1) {
