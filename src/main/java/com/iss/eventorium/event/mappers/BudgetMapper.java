@@ -31,8 +31,7 @@ public class BudgetMapper {
     public static BudgetItemResponseDto toResponse(BudgetItem item) {
         BudgetItemResponseDto dto = modelMapper.map(item, BudgetItemResponseDto.class);
         dto.setCategory(CategoryMapper.toResponse(item.getCategory()));
-        //TODO: history!
-        dto.setSpentAmount(item.getSolution().getPrice());
+        dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
         return dto;
     }
 
