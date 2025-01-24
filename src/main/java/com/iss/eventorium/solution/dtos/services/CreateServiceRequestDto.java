@@ -65,4 +65,10 @@ public class CreateServiceRequestDto {
     @Min(value = 1, message = "Max duration must be at least 1")
     @Max(value = 24, message = "Max duration cannot exceed 100")
     private Integer maxDuration;
+
+    @NotNull(message = "Availability is mandatory")
+    private Boolean isAvailable;
+
+    @NotNull(message = "Visibility is mandatory")
+    private Boolean isVisible;
 }
