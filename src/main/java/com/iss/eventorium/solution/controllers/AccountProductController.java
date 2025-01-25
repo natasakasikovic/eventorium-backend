@@ -54,7 +54,7 @@ public class AccountProductController {
 
     @GetMapping("/favourites")
     public ResponseEntity<List<ProductSummaryResponseDto>> getFavouriteProducts() {
-        return ResponseEntity.ok().body(List.of(new ProductSummaryResponseDto()));
+        return ResponseEntity.ok(accountProductService.getFavouriteProducts());
     }
 
     @GetMapping("/favourites/{id}")

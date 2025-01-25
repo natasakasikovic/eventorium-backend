@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.models;
 
+import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.solution.models.Product;
@@ -41,4 +42,7 @@ public class Person {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Service> favouriteServices;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Event> favouriteEvents;
 }
