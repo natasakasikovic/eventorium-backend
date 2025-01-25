@@ -63,7 +63,7 @@ public abstract class Solution {
     @Column(name="is_visible")
     private Boolean isVisible;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn (name = "solution_id")
     private List<Review> reviews;
 
