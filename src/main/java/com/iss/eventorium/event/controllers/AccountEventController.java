@@ -16,7 +16,7 @@ public class AccountEventController {
     private final AccountEventService service;
 
     @GetMapping("/favourites")
-    public ResponseEntity<List<EventSummaryResponseDto>> getFavouriteProducts() {
+    public ResponseEntity<List<EventSummaryResponseDto>> getFavouriteEvents() {
         return ResponseEntity.ok(service.getFavouriteEvents());
     }
 
