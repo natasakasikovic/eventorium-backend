@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.controllers;
 import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
 import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
+import com.iss.eventorium.interaction.dtos.UpdateReviewRequestDto;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.services.ReviewService;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -48,6 +49,11 @@ public class ReviewController {
         return ResponseEntity.ok(new PagedResponse<>(List.of(new Review()), 2, 100));
     }
 
+    @GetMapping("/reviews/pending/all")
+    public ResponseEntity<List<ReviewResponseDto>> getPendingReviews() {
+        return ResponseEntity.ok(reviewService.getPendingReviews());
+    }
+
     @PostMapping("/services/{service-id}/reviews")
     public ResponseEntity<ReviewResponseDto> createServiceReview(
             @RequestBody @Valid CreateReviewRequestDto createReviewRequestDto,
@@ -80,6 +86,10 @@ public class ReviewController {
         return null;
     }
 
+    @PatchMapping("/reviews/{id}")
+    public ResponseEntity<ReviewResponseDto> updateReview(@RequestBody @Valid UpdateReviewRequestDto status, @PathVariable Long id) {
+        return ResponseEntity.ok(reviewService.updateReview(id, status.getStatus()));
+    }
 
     @DeleteMapping("/products/{product-id}/reviews/{review-id}")
     public ResponseEntity<?> deleteProductReview(

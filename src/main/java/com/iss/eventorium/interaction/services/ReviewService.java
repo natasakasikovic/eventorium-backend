@@ -4,18 +4,25 @@ import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
 import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
 import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
+import com.iss.eventorium.interaction.repositories.ReviewRepository;
+import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ReviewService {
 
+    private final ReviewRepository reviewRepository;
     private final ServiceRepository serviceRepository;
     private final ProductRepository productRepository;
     private final AuthService authService;
@@ -42,4 +49,16 @@ public class ReviewService {
         return ReviewMapper.toResponse(review);
     }
 
+    public List<ReviewResponseDto> getPendingReviews() {
+        return reviewRepository.findByStatus(Status.PENDING).stream().map(ReviewMapper::toResponse).toList();
+    }
+
+    public ReviewResponseDto updateReview(Long id, Status status) {
+        Review review = reviewRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Review not found")
+        );
+        review.setStatus(status);
+        reviewRepository.save(review);
+        return ReviewMapper.toResponse(review);
+    }
 }

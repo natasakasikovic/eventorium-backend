@@ -14,4 +14,5 @@ public class ReviewResponseDto {
     private LocalDateTime creationDate;
     private Integer rating;
     private String feedback;
+    private String user;
 }

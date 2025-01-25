@@ -22,7 +22,9 @@ public class ReviewMapper {
     }
 
     public static ReviewResponseDto toResponse(Review review) {
-        return modelMapper.map(review, ReviewResponseDto.class);
+        ReviewResponseDto dto = modelMapper.map(review, ReviewResponseDto.class);
+        dto.setUser(review.getUser().getPerson().getName() + " " + review.getUser().getPerson().getLastname());
+        return dto;
     }
 
     public static Review fromCreateRequest(CreateReviewRequestDto createReviewRequestDto) {
