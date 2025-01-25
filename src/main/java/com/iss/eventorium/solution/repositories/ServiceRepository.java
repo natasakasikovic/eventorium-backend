@@ -16,8 +16,6 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
     List<Service> findTopFiveServices(Pageable pageable);
     Optional<Service> findByCategoryId(Long categoryId);
 
-    @Query("SELECT s FROM Service s JOIN s.category c WHERE c.id = :categoryId AND s.price <= :price ORDER BY s.price DESC")
-    List<Service> getBudgetSuggestions(Long categoryId, Double price);
 
     Page<Service> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
     List<Service> findByNameContainingAllIgnoreCase(String keyword);
