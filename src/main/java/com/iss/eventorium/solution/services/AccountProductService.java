@@ -1,17 +1,22 @@
 package com.iss.eventorium.solution.services;
 
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.iss.eventorium.solution.mappers.ProductMapper.toPagedResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +27,8 @@ public class AccountProductService {
     private final UserRepository userRepository;
 
     public List<ProductSummaryResponseDto> getFavouriteProducts() {
-        return authService.getCurrentUser()
-                .getPerson()
-                .getFavouriteProducts()
-                .stream()
-                .map(ProductMapper::toSummaryResponse)
-                .toList();
+        return authService.getCurrentUser().getPerson().getFavouriteProducts()
+                .stream().map(ProductMapper::toSummaryResponse).toList();
     }
 
     public ProductResponseDto addFavouriteProduct(Long id) {
@@ -60,5 +61,16 @@ public class AccountProductService {
                 () -> new EntityNotFoundException("Product with id " + id + " not found")
         );
         return authService.getCurrentUser().getPerson().getFavouriteProducts().contains(product);
+    }
+
+    public List<ProductSummaryResponseDto> getAll() {
+        User provider = authService.getCurrentUser();
+        return productRepository.findByProvider_Id(provider.getId()).stream()
+                .map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> getProductsPaged(Pageable pageable) {
+        User provider = authService.getCurrentUser();
+        return toPagedResponse(productRepository.findByProvider_Id(provider.getId(), pageable));
     }
 }

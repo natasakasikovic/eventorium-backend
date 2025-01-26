@@ -17,16 +17,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountProductController {
 
-    private final AccountProductService accountProductService;
+    private final AccountProductService service;
 
     @GetMapping("/all")
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
-        return ResponseEntity.ok(List.of(new ProductResponseDto()));
+    public ResponseEntity<List<ProductSummaryResponseDto>> getAllProducts() {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping
-    public ResponseEntity<PagedResponse<ProductResponseDto>> getAllProductsPaged() {
-        return ResponseEntity.ok(new PagedResponse<>(List.of(new ProductResponseDto()), 1, 100));
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> getProductsPaged(Pageable pageable) {
+        return ResponseEntity.ok(service.getProductsPaged(pageable));
     }
 
     @GetMapping("/filter/all")
@@ -54,22 +54,22 @@ public class AccountProductController {
 
     @GetMapping("/favourites")
     public ResponseEntity<List<ProductSummaryResponseDto>> getFavouriteProducts() {
-        return ResponseEntity.ok(accountProductService.getFavouriteProducts());
+        return ResponseEntity.ok(service.getFavouriteProducts());
     }
 
     @GetMapping("/favourites/{id}")
     public ResponseEntity<Boolean> isFavouriteProduct(@PathVariable Long id) {
-        return ResponseEntity.ok(accountProductService.isFavouriteProduct(id));
+        return ResponseEntity.ok(service.isFavouriteProduct(id));
     }
 
     @PostMapping("/favourites/{id}")
     public ResponseEntity<ProductResponseDto> addFavouriteProduct(@PathVariable Long id) {
-        return new ResponseEntity<>(accountProductService.addFavouriteProduct(id), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.addFavouriteProduct(id), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/favourites/{id}")
     public ResponseEntity<Void> removeFavouriteProduct(@PathVariable Long id) {
-        accountProductService.removeFavouriteProduct(id);
+        service.removeFavouriteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
