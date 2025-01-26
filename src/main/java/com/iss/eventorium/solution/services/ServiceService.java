@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -144,8 +145,10 @@ public class ServiceService {
                 () -> new EntityNotFoundException("Event not found")
         );
         return serviceRepository
-                .findAll(ServiceSpecification.filterReservable(event.getDate(), entityManager.getReference(Category.class, id), price))
-                .stream().map(ServiceMapper::toSummaryResponse)
+                .getSuggestedServices(id, price)
+                .stream()
+                .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
+                .map(ServiceMapper::toSummaryResponse)
                 .toList();
     }
 

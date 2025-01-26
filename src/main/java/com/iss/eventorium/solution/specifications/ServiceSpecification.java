@@ -14,13 +14,6 @@ import java.time.LocalDate;
 
 public class ServiceSpecification {
 
-    public static Specification<Service> filterReservable(LocalDate date, Category category, Double price) {
-        return Specification.where(isReservable(date))
-                .and(hasCategory(category.getName()))
-                .and(hasMinPrice(price))
-                .and(hasAvailability(true));
-    }
-
     public static Specification<Service> filterBy(ServiceFilterDto filter, Long providerId) {
         return filterBy(filter).and(hasProvider(providerId));
     }
@@ -94,16 +87,6 @@ public class ServiceSpecification {
             if (maxPrice == null) return cb.conjunction();
             Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
             return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
-        };
-    }
-
-    private static Specification<Service> isReservable(LocalDate givenDate) {
-        return (root, query, cb) -> {
-            Expression<Long> dateDifference = cb.diff(
-                    cb.function("DATEDIFF", Long.class, cb.literal(givenDate), root.get("reservationDeadline")),
-                    0L
-            );
-            return cb.greaterThan(dateDifference, LocalDate.now().toEpochDay());
         };
     }
 
