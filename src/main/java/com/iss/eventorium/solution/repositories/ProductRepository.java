@@ -14,7 +14,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p FROM Product p JOIN p.reviews r WHERE p.status = 'ACCEPTED' GROUP BY p.id ORDER BY AVG(r.rating) DESC")
     List<Product> findTopFiveProducts(Pageable pageable);
 
-    @Query("SELECT p FROM Product p JOIN p.category c WHERE c.id = :categoryId AND p.price <= :price ORDER BY p.price DESC")
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "JOIN p.category c " +
+            "WHERE c.id = :categoryId AND p.price <= :price AND p.status = 'ACCPETED' " +
+            "ORDER BY p.price DESC")
     List<Product> getBudgetSuggestions(Long categoryId, Double price);
 
     Page<Product> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);

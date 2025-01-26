@@ -23,6 +23,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
             "WHERE c.id = :categoryId " +
             "AND s.price * (1 - s.discount / 100) <= :price " +
             "AND s.isAvailable = true " +
+            "AND s.status = 'ACCEPTED'" +
             "ORDER BY s.price DESC")
     List<Service> getSuggestedServices(Long categoryId, Double price);
 
