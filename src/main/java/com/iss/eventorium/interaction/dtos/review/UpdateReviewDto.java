@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.review;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

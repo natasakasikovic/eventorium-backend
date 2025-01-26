@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.review;
 
 import com.iss.eventorium.shared.models.Status;
 import jakarta.validation.constraints.NotNull;

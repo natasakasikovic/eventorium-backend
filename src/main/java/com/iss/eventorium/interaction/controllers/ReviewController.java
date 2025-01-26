@@ -1,9 +1,9 @@
 package com.iss.eventorium.interaction.controllers;
 
-import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
-import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
-import com.iss.eventorium.interaction.dtos.UpdateReviewDto;
-import com.iss.eventorium.interaction.dtos.UpdateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
+import com.iss.eventorium.interaction.dtos.review.UpdateReviewDto;
+import com.iss.eventorium.interaction.dtos.review.UpdateReviewRequestDto;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.services.ReviewService;
 import com.iss.eventorium.shared.models.PagedResponse;

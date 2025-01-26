@@ -1,10 +1,10 @@
 package com.iss.eventorium.interaction.mappers;
 
-import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
-import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
+import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class ReviewMapper {
 
     public static ReviewResponseDto toResponse(Review review) {
         ReviewResponseDto dto = modelMapper.map(review, ReviewResponseDto.class);
-        dto.setUser(review.getUser().getPerson().getName() + " " + review.getUser().getPerson().getLastname());
+        dto.setUser(UserMapper.toUserDetails(review.getUser()));
         return dto;
     }
 

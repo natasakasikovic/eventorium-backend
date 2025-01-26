@@ -1,7 +1,7 @@
 package com.iss.eventorium.interaction.services;
 
-import com.iss.eventorium.interaction.dtos.CreateReviewRequestDto;
-import com.iss.eventorium.interaction.dtos.ReviewResponseDto;
+import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
 import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.repositories.ReviewRepository;
@@ -12,9 +12,7 @@ import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.review;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -13,10 +13,10 @@ import lombok.*;
 @Builder
 public class CreateReviewRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "Feedback is mandatory")
     private String feedback;
 
-    @NotNull
+    @NotNull(message = "Rating is mandatory")
     @Min(value = 1)
     @Max(value = 5)
     private Integer rating;
