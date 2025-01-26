@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,11 +35,8 @@ public abstract class Solution {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String description;
-
-    @Column(nullable = false)
-    private String specialties;
 
     @Column(nullable = false)
     private Double price;
@@ -50,9 +46,6 @@ public abstract class Solution {
 
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    @Column(name="valid_from")
-    private LocalDateTime validFrom;
 
     @Column(name="is_available")
     private Boolean isAvailable;

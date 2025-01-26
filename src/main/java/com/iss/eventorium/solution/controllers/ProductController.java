@@ -2,12 +2,8 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,15 +26,13 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping("/{id}")
-    public  ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long id) {
+    public  ResponseEntity<ProductDetailsDto> getProduct(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.getProduct(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody CreateProductRequestDto createProductRequestDto) {
-        ProductResponseDto responseDto = new ProductResponseDto();
-        // TODO: call service and map
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductRequestDto createProductRequestDto) {
+        return new ResponseEntity<>(service.createProduct(createProductRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -107,5 +102,10 @@ public class ProductController {
                 .body(service.getImage(id, path));
     }
 
+    @PostMapping("/{id}/images")
+    public ResponseEntity<Void> uploadImages(@PathVariable Long id, @RequestParam("images") List<MultipartFile> images) {
+        service.uploadImages(id, images);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
 

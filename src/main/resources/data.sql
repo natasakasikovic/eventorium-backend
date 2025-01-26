@@ -98,25 +98,25 @@ INSERT INTO event_types (name, description, deleted) VALUES
 INSERT INTO event_types_suggested_categories VALUES (1, 2),(1, 4),(1,9),(1,7),(2,1),(3,2),(3,4),(3, 7);
 
 
-INSERT INTO products (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
-(nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 'Invitations, Customizable', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
-(nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 'Banners, Event', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
-(nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 'Party, Favors', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
-(nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 'Balloons, Decorative', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
-(nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 'T-Shirts, Customizable', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
-(nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 'Party, Hats', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
-(nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 'Mugs, Personalized', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
-(nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 'Frames, Customizable', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 5);
+INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
+(nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
+(nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 1.50, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
+(nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 0.80, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
+(nextval('solution_sequence'), 'Event T-Shirts', 'Customizable t-shirts for event attendees', 15.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
+(nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
+(nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 5.00, 20.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 4),
+(nextval('solution_sequence'), 'Photo Frames', 'Customizable photo frames for event photos', 8.00, 15.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3);
 
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
-(nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 2, 6, 4, 3),
-(nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 3, 8, 2, 3),
-(nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 4, 10, 1, 3),
-(nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 1, 5, 5, 3),
-(nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 2, 4, 7, 3),
-(nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 6, 12, 3, 3),
-(nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', NOW() + INTERVAL '1 day' * (RANDOM() * 30), NOW() + INTERVAL '1 day' * (RANDOM() * 30), 3, 7, 8, 3);
+(nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 3),
+(nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 3),
+(nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3),
+(nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 250.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 1, 5, 5, 3),
+(nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 4, 2, 4, 7, 3),
+(nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 7, 6, 12, 3, 3),
+(nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', 14, 5, 3, 7, 8, 3);
 
 
 INSERT INTO reviews (creation_date, rating, feedback, status, solution_id, user_id) VALUES
@@ -148,26 +148,26 @@ INSERT INTO reviews (creation_date, rating, feedback, status, solution_id, user_
 
 INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft)
 VALUES
-('Wedding in Novi Sad', 'A beautiful wedding ceremony with reception and dance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 100, 1, '123 Wedding St', 2, 2, false),
-('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 5, false),
-('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 4, false),
+('Wedding in Novi Sad', 'A beautiful wedding ceremony with reception and dance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 100, 1, '123 Wedding St', 2, 1, false),
+('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 2, false),
+('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 1, false),
 ('Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 2, '234 Business Rd', 6, 2, false),
 ('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 2, false),
-('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 4, false),
-('Corporate Seminar in Novi Sad', 'A corporate seminar about leadership and growth.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 70, 2, '999 Conference Blvd', 2, 5, false),
+('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 2, false),
+('Corporate Seminar in Novi Sad', 'A corporate seminar about leadership and growth.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 70, 2, '999 Conference Blvd', 2, 1, false),
 ('Trebinje Wedding Ceremony', 'A traditional wedding ceremony in Trebinje.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 120, 1, '555 Wedding Plaza', 3, 2, false),
-('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 50, 3, '888 Party St', 5, 4, false),
-('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 5, false),
+('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 50, 3, '888 Party St', 5, 1, false),
+('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 1, false),
 ('Team Building Event in Kragujevac', 'An outdoor team building event with games and activities.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 60, 2, '123 Team Rd', 7, 2, false),
 ('Wedding Gala in Novi Sad', 'An extravagant wedding gala with special guests and entertainment.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 1, '444 Gala St', 2, 2, false),
-('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 5, false),
-('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 4, false),
-('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 5, false),
-('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 4, false),
+('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 1, false),
+('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 1, false),
+('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 2, false),
+('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false),
 ('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false),
 ('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false),
-('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 50, 2, '234 Retreat Ave', 3, 5, false),
-('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 3, '111 Fest Rd', 1, 4, false),
+('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 50, 2, '234 Retreat Ave', 3, 1, false),
+('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 3, '111 Fest Rd', 1, 1, false),
 ('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 3, '444 Culture St', 6, 2, false);
 
 
@@ -205,24 +205,24 @@ INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (10, 10), (11, 11), (12, 12),
 (13, 13), (14, 14), (15, 15);
 
-INSERT INTO reports (id, reason, timestamp, offender_id, reporter_id, status) VALUES
-    (1, 'Inappropriate behavior', '2025-01-12T10:15:30', 1, 2, 'PENDING'),
-    (2, 'Spam content', '2025-01-11T14:20:00', 3, 4, 'PENDING'),
-    (3, 'Violation of privacy', '2025-01-10T18:45:00', 1, 3, 'PENDING'),
-    (4, 'Abusive language', '2025-01-09T09:00:00', 2, 5, 'PENDING'),
-    (5, 'Fake account creation', '2025-01-08T16:30:00', 4, 5, 'PENDING'),
-    (6, 'Offensive content in posts', '2025-01-07T12:10:00', 4, 1, 'PENDING'),
-    (7, 'Threatening behavior', '2025-01-06T14:50:00', 2, 3, 'PENDING'),
-    (8, 'Hate speech', '2025-01-05T17:25:00', 3, 2, 'PENDING'),
-    (9, 'Impersonation of another user', '2025-01-04T08:15:00', 4, 1, 'PENDING'),
-    (10, 'Scamming attempt', '2025-01-03T19:05:00', 5, 1, 'PENDING'),
-    (11, 'Malicious links in messages', '2025-01-02T22:40:00', 1, 2, 'PENDING'),
-    (12, 'Inappropriate content in profile', '2025-01-01T10:30:00', 1, 3, 'PENDING'),
-    (13, 'Sharing unauthorized materials', '2024-12-31T16:55:00', 2, 4, 'PENDING'),
-    (14, 'Manipulating users', '2024-12-30T20:25:00', 3, 5, 'PENDING'),
-    (15, 'Posting illegal content', '2024-12-29T18:10:00', 4, 1, 'PENDING'),
-    (16, 'Soliciting personal information', '2024-12-28T21:00:00', 5, 3, 'PENDING'),
-    (17, 'Misleading advertisements', '2024-12-27T15:50:00', 1, 5, 'PENDING'),
-    (18, 'Spreading misinformation', '2024-12-26T11:35:00', 4, 3, 'PENDING'),
-    (19, 'Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
-    (20, 'Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');
+INSERT INTO reports (reason, timestamp, offender_id, reporter_id, status) VALUES
+    ( 'Inappropriate behavior', '2025-01-12T10:15:30', 1, 2, 'PENDING'),
+    ('Spam content', '2025-01-11T14:20:00', 3, 4, 'PENDING'),
+    ('Violation of privacy', '2025-01-10T18:45:00', 1, 3, 'PENDING'),
+    ('Abusive language', '2025-01-09T09:00:00', 2, 5, 'PENDING'),
+    ('Fake account creation', '2025-01-08T16:30:00', 4, 5, 'PENDING'),
+    ('Offensive content in posts', '2025-01-07T12:10:00', 4, 1, 'PENDING'),
+    ('Threatening behavior', '2025-01-06T14:50:00', 2, 3, 'PENDING'),
+    ('Hate speech', '2025-01-05T17:25:00', 3, 2, 'PENDING'),
+    ('Impersonation of another user', '2025-01-04T08:15:00', 4, 1, 'PENDING'),
+    ('Scamming attempt', '2025-01-03T19:05:00', 5, 1, 'PENDING'),
+    ('Malicious links in messages', '2025-01-02T22:40:00', 1, 2, 'PENDING'),
+    ('Inappropriate content in profile', '2025-01-01T10:30:00', 1, 3, 'PENDING'),
+    ('Sharing unauthorized materials', '2024-12-31T16:55:00', 2, 4, 'PENDING'),
+    ('Manipulating users', '2024-12-30T20:25:00', 3, 5, 'PENDING'),
+    ('Posting illegal content', '2024-12-29T18:10:00', 4, 1, 'PENDING'),
+    ('Soliciting personal information', '2024-12-28T21:00:00', 5, 3, 'PENDING'),
+    ('Misleading advertisements', '2024-12-27T15:50:00', 1, 5, 'PENDING'),
+    ('Spreading misinformation', '2024-12-26T11:35:00', 4, 3, 'PENDING'),
+    ('Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
+    ('Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');

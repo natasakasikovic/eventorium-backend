@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProviderResponseDto {
+public class ChatUserDetailsDto {
     private Long id;
     private String name;
     private String lastname;

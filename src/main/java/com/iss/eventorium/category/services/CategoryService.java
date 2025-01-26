@@ -89,4 +89,10 @@ public class CategoryService {
     public PagedResponse<CategoryResponseDto> getPendingCategoriesPaged(Pageable pageable) {
         return toPagedResponse(categoryRepository.findBySuggestedTrue(pageable));
     }
+
+    public void ensureCategoryNameIsUnique(Category category) {
+        if (categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
+        }
+    }
 }

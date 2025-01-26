@@ -1,4 +1,4 @@
-package com.iss.eventorium.shared.email;
+package com.iss.eventorium.shared.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

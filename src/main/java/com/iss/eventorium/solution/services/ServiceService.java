@@ -1,10 +1,10 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.services.CategoryProposalService;
+import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
-import com.iss.eventorium.interaction.models.Notification;
-import com.iss.eventorium.interaction.models.NotificationType;
 import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -59,6 +59,7 @@ public class ServiceService {
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
+    private final CategoryProposalService categoryProposalService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -86,8 +87,7 @@ public class ServiceService {
         Service service = ServiceMapper.fromCreateRequest(createServiceRequestDto);
         if(service.getCategory().getId() == null) {
             service.setStatus(Status.PENDING);
-            service.getCategory().setSuggested(true);
-            sendNotification(service.getCategory());
+            categoryProposalService.handleCategoryProposal(service.getCategory());
         } else {
             service.setStatus(Status.ACCEPTED);
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
@@ -104,8 +104,7 @@ public class ServiceService {
         if(images == null || images.isEmpty()) {
             return;
         }
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
         List<ImagePath> paths = new ArrayList<>();
 
         for (MultipartFile image : images) {
@@ -126,8 +125,7 @@ public class ServiceService {
     }
 
     public List<ImageResponseDto> getImages(Long serviceId) {
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
 
         List<ImageResponseDto> images = new ArrayList<>();
         for(ImagePath imagePath : service.getImagePaths()) {
@@ -142,9 +140,12 @@ public class ServiceService {
         return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
+    public Service find(Long id) {
+        return serviceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+    }
+
     public ImagePath getImagePath(Long serviceId) {
-        Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", serviceId)));
+        Service service = find(serviceId);
         if(service.getImagePaths().isEmpty()) {
             throw new ImageNotFoundException("Image not found");
         }
@@ -173,8 +174,7 @@ public class ServiceService {
     }
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
-        Service toUpdate = serviceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        Service toUpdate = find(id);
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
         if (eventTypes.size() != serviceDto.getEventTypesIds().size()) {
@@ -190,26 +190,13 @@ public class ServiceService {
     }
 
     public void deleteService(Long id) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        Service service = find(id);
+
         if(reservationRepository.existsByServiceId(id)) {
             throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
         }
         service.setIsDeleted(true);
         serviceRepository.save(service);
-    }
-    
-    private void sendNotification(Category category) {
-        Notification notification = new Notification(
-                "Category proposal",
-                messageSource.getMessage(
-                        "notification.category.proposal",
-                        new Object[] { category.getName() },
-                        Locale.getDefault()
-                ),
-                NotificationType.INFO
-        );
-        notificationService.sendNotificationToAdmin(notification);
     }
     
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {

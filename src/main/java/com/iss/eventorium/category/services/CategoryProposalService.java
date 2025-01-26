@@ -30,7 +30,7 @@ public class CategoryProposalService {
     private final MessageSource messageSource;
 
     private final NotificationService notificationService;
-
+    private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
     private final ServiceRepository serviceRepository;
 
@@ -148,7 +148,22 @@ public class CategoryProposalService {
         );
     }
 
-    private void sendNotification() {
+    private void sendNotificationToAdmin(Category category) {
+        Notification notification = new Notification(
+                "Category proposal",
+                messageSource.getMessage(
+                        "notification.category.proposal",
+                        new Object[] { category.getName() },
+                        Locale.getDefault()
+                ),
+                NotificationType.INFO
+        );
+        notificationService.sendNotificationToAdmin(notification);
+    }
 
+    public void handleCategoryProposal(Category category) {
+        categoryService.ensureCategoryNameIsUnique(category);
+        category.setSuggested(true);
+        sendNotificationToAdmin(category);
     }
 }

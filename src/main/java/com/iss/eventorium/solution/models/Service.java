@@ -9,7 +9,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -24,11 +23,14 @@ public class Service extends Solution {
     @Enumerated(EnumType.STRING)
     private ReservationType type;
 
+    @Column(nullable = false)
+    private String specialties;
+
     @Column(name="reservation_deadline", nullable = false)
-    private LocalDate reservationDeadline;
+    private Integer reservationDeadline;
 
     @Column(name="cancellation_deadline", nullable = false)
-    private LocalDate cancellationDeadline;
+    private Integer cancellationDeadline;
 
     @Column(name="min_duration", nullable = false)
     private Integer minDuration;
@@ -41,6 +43,7 @@ public class Service extends Solution {
         setName(memento.getName());
         setPrice(memento.getPrice());
         setDescription(memento.getDescription());
+        setSpecialties(memento.getSpecialties());
         setDiscount(memento.getDiscount());
         setEventTypes(memento.getEventTypes());
         setIsVisible(memento.isVisible());

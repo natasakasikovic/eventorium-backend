@@ -1,10 +1,7 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
-import com.iss.eventorium.event.dtos.event.EventFilterDto;
-import com.iss.eventorium.event.dtos.event.EventRequestDto;
-import com.iss.eventorium.event.dtos.event.EventResponseDto;
-import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Activity;
@@ -31,6 +28,11 @@ public class EventService {
     private final EventRepository repository;
     private final AuthService authService;
 
+    public EventDetailsDto getEventDetails(Long id) {
+        Event event = find(id);
+        return EventMapper.toEventDetailsDto(event);
+    }
+
     public List<EventSummaryResponseDto> getTopEvents() {
         Pageable pageable = PageRequest.of(0, 5);
         List<Event> events = repository.findTopFiveUpcomingEvents(getUserCity(), pageable);
@@ -48,14 +50,14 @@ public class EventService {
         return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
     }
 
-    public PagedResponse<EventSummaryResponseDto> searchEvents (String keyword, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         if (keyword.isBlank())
             return EventMapper.toPagedResponse(repository.findAll(pageable));
 
         return EventMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 
-    public List<EventSummaryResponseDto> searchEvents (String keyword) {
+    public List<EventSummaryResponseDto> searchEvents(String keyword) {
         List<Event> events = keyword.isBlank()
                 ? repository.findAll()
                 : repository.findByNameContainingAllIgnoreCase(keyword);
@@ -63,16 +65,16 @@ public class EventService {
         return events.stream().map(EventMapper::toSummaryResponse).toList();
     }
 
-    public PagedResponse<EventSummaryResponseDto> getEventsPaged (Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
         return EventMapper.toPagedResponse(repository.findAll(pageable));
     }
 
-    public PagedResponse<EventSummaryResponseDto> filterEvents (EventFilterDto filter, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterBy(filter);
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public Event find (Long id) {
+    public Event find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + id));
     }
 

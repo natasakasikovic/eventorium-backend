@@ -11,4 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CompanyResponseDto {
     private Long id;
+    private String name;
 }
