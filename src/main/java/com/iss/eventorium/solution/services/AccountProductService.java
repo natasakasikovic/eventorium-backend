@@ -1,11 +1,13 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
+import com.iss.eventorium.solution.specifications.ProductSpecification;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
@@ -72,5 +74,31 @@ public class AccountProductService {
     public PagedResponse<ProductSummaryResponseDto> getProductsPaged(Pageable pageable) {
         User provider = authService.getCurrentUser();
         return toPagedResponse(productRepository.findByProvider_Id(provider.getId(), pageable));
+    }
+
+    public List<ProductSummaryResponseDto> searchProducts(String keyword) {
+        User provider = authService.getCurrentUser();
+        return productRepository.findAll(
+                ProductSpecification.search(keyword, provider.getId()))
+                .stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> searchProducts(String keyword, Pageable pageable) {
+        User provider = authService.getCurrentUser();
+        return toPagedResponse(productRepository.findAll(
+                ProductSpecification.search(keyword, provider.getId()), pageable));
+    }
+
+    public List<ProductSummaryResponseDto> filterProducts(ProductFilterDto filter) {
+        User provider = authService.getCurrentUser();
+        return productRepository.findAll(
+                ProductSpecification.filterBy(filter, provider.getId()))
+                .stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> filterProducts(ProductFilterDto filter, Pageable pageable) {
+        User provider = authService.getCurrentUser();
+        return toPagedResponse(productRepository.findAll(
+                ProductSpecification.filterBy(filter, provider.getId()), pageable));
     }
 }

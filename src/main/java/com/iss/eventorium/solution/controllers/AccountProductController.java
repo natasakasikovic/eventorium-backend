@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -30,26 +31,25 @@ public class AccountProductController {
     }
 
     @GetMapping("/filter/all")
-    public ResponseEntity<List<ProductSummaryResponseDto>> filterAccountProducts() {
-        return ResponseEntity.ok().body(List.of(new ProductSummaryResponseDto()));
+    public ResponseEntity<List<ProductSummaryResponseDto>> filterAccountProducts(@ModelAttribute ProductFilterDto filter) {
+        return ResponseEntity.ok().body(service.filterProducts(filter));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> filterAccountProductsPaged(Pageable pageable) {
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto()), 3, 100));
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> filterAccountProductsPaged(
+            @ModelAttribute ProductFilterDto filter, Pageable pageable) {
+        return ResponseEntity.ok().body(service.filterProducts(filter, pageable));
     }
 
     @GetMapping("/search/all")
     public ResponseEntity<List<ProductSummaryResponseDto>> searchAccountProducts(@RequestParam String keyword) {
-        return ResponseEntity.ok().body(List.of(new ProductSummaryResponseDto()));
+        return ResponseEntity.ok().body(service.searchProducts(keyword));
     }
 
     @GetMapping("/search")
     public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> searchAccountProductsPaged(
-            @RequestParam String keyword,
-            Pageable pageable
-    ) {
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto()), 3, 100));
+            @RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok().body(service.searchProducts(keyword, pageable));
     }
 
     @GetMapping("/favourites")
