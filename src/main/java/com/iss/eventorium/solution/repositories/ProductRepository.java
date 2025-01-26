@@ -17,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("SELECT p " +
             "FROM Product p " +
             "JOIN p.category c " +
-            "WHERE c.id = :categoryId AND p.price <= :price AND p.status = 'ACCPETED' " +
+            "WHERE c.id = :categoryId AND p.price <= :price AND p.status = 'ACCEPTED' " +
             "ORDER BY p.price DESC")
     List<Product> getBudgetSuggestions(Long categoryId, Double price);
 
