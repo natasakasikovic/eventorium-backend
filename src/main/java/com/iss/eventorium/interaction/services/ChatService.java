@@ -1,7 +1,7 @@
 package com.iss.eventorium.interaction.services;
 
-import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
-import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageRequestDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.mappers.ChatMapper;
 import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.repositories.ChatMessageRepository;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;

@@ -2,6 +2,7 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.mappers.EventMapper;
+import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
@@ -14,14 +15,21 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AccountEventService {
+
     private final AuthService authService;
+    private final EventRepository eventRepository;
     private final EventService eventService;
     private final UserRepository userRepository;
-    private final EventMapper eventMapper;
 
     public List<EventSummaryResponseDto> getFavouriteEvents() {
         return authService.getCurrentUser().getPerson().getFavouriteEvents()
-                .stream().map(event -> eventMapper.toSummaryResponse(event)).toList();
+                .stream().map(EventMapper::toSummaryResponse).toList();
+    }
+
+    public List<EventSummaryResponseDto> getEvents() {
+        return eventRepository.findByOrganizer_Id(authService.getCurrentUser().getId()).stream()
+                .map(EventMapper::toSummaryResponse)
+                .toList();
     }
 
     public void addFavouriteEvent(Long id) {

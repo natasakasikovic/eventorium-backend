@@ -1,9 +1,8 @@
 package com.iss.eventorium.interaction.controllers;
 
-import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
-import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageRequestDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.services.ChatService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;

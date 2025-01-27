@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.chat;
 
 
 import lombok.*;

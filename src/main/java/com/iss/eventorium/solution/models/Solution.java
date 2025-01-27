@@ -56,7 +56,7 @@ public abstract class Solution {
     @Column(name="is_visible")
     private Boolean isVisible;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn (name = "solution_id")
     private List<Review> reviews;
 
@@ -76,6 +76,10 @@ public abstract class Solution {
     private User provider;
 
     public abstract void restore(Memento memento);
+
+    public void addReview(Review review) {
+        getReviews().add(review);
+    }
 
     @Override
     public boolean equals(Object o) {

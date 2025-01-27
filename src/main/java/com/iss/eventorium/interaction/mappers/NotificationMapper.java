@@ -1,6 +1,6 @@
 package com.iss.eventorium.interaction.mappers;
 
-import com.iss.eventorium.interaction.dtos.NotificationResponseDto;
+import com.iss.eventorium.interaction.dtos.notification.NotificationResponseDto;
 import com.iss.eventorium.interaction.models.Notification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

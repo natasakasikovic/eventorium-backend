@@ -21,4 +21,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
 
     List<Event> findByIsDraftTrueAndOrganizer_Id(Long organizerId);
     List<Event> findByNameContainingAllIgnoreCase(String keyword);
+
+    List<Event> findByOrganizer_Id(Long id);
 }
