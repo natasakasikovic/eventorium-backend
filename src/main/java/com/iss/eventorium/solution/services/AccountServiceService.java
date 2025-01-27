@@ -1,10 +1,8 @@
 package com.iss.eventorium.solution.services;
 
 
-import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.models.Service;
