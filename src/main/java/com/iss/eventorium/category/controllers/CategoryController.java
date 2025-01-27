@@ -3,6 +3,7 @@ package com.iss.eventorium.category.controllers;
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.services.CategoryService;
+import com.iss.eventorium.solution.controllers.ServiceController;
 import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

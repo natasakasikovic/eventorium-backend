@@ -1,6 +1,6 @@
 package com.iss.eventorium.notifications.services;
 
-import com.iss.eventorium.category.repositories.NotificationRepository;
+import com.iss.eventorium.notifications.repositories.NotificationRepository;
 import com.iss.eventorium.notifications.dtos.NotificationResponseDto;
 import com.iss.eventorium.notifications.mappers.NotificationMapper;
 import com.iss.eventorium.notifications.models.Notification;

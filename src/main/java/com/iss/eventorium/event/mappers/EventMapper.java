@@ -56,7 +56,7 @@ public class EventMapper {
         dto.setPrivacy(event.getPrivacy().toString().toLowerCase());
         if (event.getType() == null)
             dto.setEventType("All");
-        dto.setOrganizer(UserMapper.toChatUserDetails(event.getOrganizer()));
+        dto.setOrganizer(UserMapper.toUserDetails(event.getOrganizer()));
         return dto;
     }
 

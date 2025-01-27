@@ -1,6 +1,6 @@
 package com.iss.eventorium.event.dtos.event;
 
-import com.iss.eventorium.user.dtos.user.ChatUserDetailsDto;
+import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +19,5 @@ public class EventDetailsDto {
     private String address;
     private String city;
     private String date;
-    private ChatUserDetailsDto organizer;
+    private UserDetailsDto organizer;
 }

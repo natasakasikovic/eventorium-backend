@@ -1,4 +1,4 @@
-package com.iss.eventorium.category.repositories;
+package com.iss.eventorium.notifications.repositories;
 
 import com.iss.eventorium.notifications.models.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;

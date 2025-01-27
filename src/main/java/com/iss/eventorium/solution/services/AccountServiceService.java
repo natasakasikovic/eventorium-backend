@@ -1,10 +1,8 @@
 package com.iss.eventorium.solution.services;
 
 
-import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.models.Service;
@@ -73,17 +71,15 @@ public class AccountServiceService {
                 .toList();
     }
 
-    public ServiceResponseDto addFavouriteService(Long id) {
+    public void addFavouriteService(Long id) {
         Service service = serviceRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Service with id " + id + " not found")
         );
         List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
-        if(favouriteService.contains(service)) {
-            throw new AlreadyInFavoritesException("This service is already in your favorites list!");
+        if(!favouriteService.contains(service)) {
+            favouriteService.add(service);
+            userRepository.save(authService.getCurrentUser());
         }
-        favouriteService.add(service);
-        userRepository.save(authService.getCurrentUser());
-        return ServiceMapper.toResponse(service);
     }
 
     public void removeFavouriteService(Long id) {
@@ -91,11 +87,10 @@ public class AccountServiceService {
                 () -> new EntityNotFoundException("Service with id " + id + " not found")
         );
         List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
-        if(!favouriteService.contains(service)) {
-            throw new EntityNotFoundException("Service with id " + id + " not found in list of favourite services");
+        if(favouriteService.contains(service)) {
+            favouriteService.remove(service);
+            userRepository.save(authService.getCurrentUser());
         }
-        favouriteService.remove(service);
-        userRepository.save(authService.getCurrentUser());
     }
 
     public Boolean isFavouriteService(Long id) {

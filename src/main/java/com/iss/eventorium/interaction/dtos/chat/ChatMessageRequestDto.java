@@ -1,7 +1,6 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.chat;
 
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
