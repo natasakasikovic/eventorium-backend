@@ -70,7 +70,6 @@ public class ServiceMapper {
         try {
             dto.setRating(service.getReviews().stream()
                     .filter(r -> r.getStatus().equals(Status.ACCEPTED))
-
                     .mapToInt(Review::getRating)
                     .average()
                     .orElse(0.0));

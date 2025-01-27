@@ -30,17 +30,15 @@ public class AccountProductService {
                 .toList();
     }
 
-    public ProductResponseDto addFavouriteProduct(Long id) {
+    public void addFavouriteProduct(Long id) {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Product with id " + id + " not found")
         );
         List<Product> favouriteProduct = authService.getCurrentUser().getPerson().getFavouriteProducts();
-        if(favouriteProduct.contains(product)) {
-            throw new RuntimeException("This product is already in your favorites list!");
+        if(!favouriteProduct.contains(product)) {
+            favouriteProduct.add(product);
+            userRepository.save(authService.getCurrentUser());
         }
-        favouriteProduct.add(product);
-        userRepository.save(authService.getCurrentUser());
-        return ProductMapper.toResponse(product);
     }
 
     public void removeFavouriteProduct(Long id) {
@@ -48,11 +46,10 @@ public class AccountProductService {
                 () -> new EntityNotFoundException("Product with id " + id + " not found")
         );
         List<Product> favouriteProduct = authService.getCurrentUser().getPerson().getFavouriteProducts();
-        if(!favouriteProduct.contains(product)) {
-            throw new EntityNotFoundException("Product with id " + id + " not found in list of favourite services");
+        if(favouriteProduct.contains(product)) {
+            favouriteProduct.remove(product);
+            userRepository.save(authService.getCurrentUser());
         }
-        favouriteProduct.remove(product);
-        userRepository.save(authService.getCurrentUser());
     }
 
     public Boolean isFavouriteProduct(Long id) {

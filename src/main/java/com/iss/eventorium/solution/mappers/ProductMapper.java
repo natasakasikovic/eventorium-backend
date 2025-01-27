@@ -81,7 +81,11 @@ public class ProductMapper {
         dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
         dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
         if(product.getReviews() != null) {
-            dto.setRating(product.getReviews().stream().mapToInt(Review::getRating).average().orElse(0.0));
+            dto.setRating(product.getReviews().stream()
+                    .filter(r -> r.getStatus().equals(Status.ACCEPTED))
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(0.0));
         } else {
             dto.setRating(0.0d);
         }

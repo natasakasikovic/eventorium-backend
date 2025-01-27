@@ -1,6 +1,6 @@
 package com.iss.eventorium.interaction.services;
 
-import com.iss.eventorium.category.repositories.NotificationRepository;
+import com.iss.eventorium.interaction.repositories.NotificationRepository;
 import com.iss.eventorium.interaction.models.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
