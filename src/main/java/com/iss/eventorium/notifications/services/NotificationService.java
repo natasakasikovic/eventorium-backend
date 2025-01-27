@@ -46,7 +46,11 @@ public class NotificationService {
         repository.save(notification);
     }
 
-    public List<NotificationResponseDto> getNotifications() {
+    public List<NotificationResponseDto> getAllNotifications() {
+        return getNotifications().stream().map(NotificationMapper::toResponse).toList();
+    }
+
+    private List<Notification> getNotifications() {
         User loggedIn = authService.getCurrentUser();
         List<Notification> notifications;
 
@@ -55,6 +59,14 @@ public class NotificationService {
         else
             notifications = repository.findByRecipient_Id(loggedIn.getId());
 
-        return notifications.stream().map(NotificationMapper::toResponse).toList();
+        return notifications;
+    }
+
+    public void markAsSeen() {
+        List<Notification> notifications = getNotifications();
+        notifications.stream().filter(notification -> !notification.getSeen()).forEach(notification -> {
+            notification.setSeen(true);
+            repository.save(notification);
+        });
     }
 }
