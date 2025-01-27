@@ -2,7 +2,6 @@ package com.iss.eventorium.interaction.controllers;
 
 import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
 import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
-import com.iss.eventorium.interaction.dtos.review.UpdateReviewDto;
 import com.iss.eventorium.interaction.dtos.review.UpdateReviewRequestDto;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.interaction.services.ReviewService;
@@ -70,41 +69,9 @@ public class ReviewController {
         return new ResponseEntity<>(reviewService.createProductReview(productId, createReviewRequestDto), HttpStatus.CREATED);
     }
 
-    @PutMapping("/products/{product-id}/reviews/{review-id}")
-    public ResponseEntity<ReviewResponseDto> updateProductReview(
-            @PathVariable("product-id") Long productId,
-            @PathVariable("review-id") Long reviewId,
-            @RequestBody @Valid UpdateReviewDto review) throws Exception {
-        return null;
-    }
-
-    @PutMapping("/services/{service-id}/reviews/{review-id}")
-    public ResponseEntity<ReviewResponseDto> updateServiceReview(
-            @PathVariable("service-id") Long serviceId,
-            @PathVariable("review-id") Long reviewId,
-            @RequestBody @Valid UpdateReviewDto review) throws Exception {
-        return null;
-    }
-
     @PatchMapping("/reviews/{id}")
     public ResponseEntity<ReviewResponseDto> updateReview(@RequestBody @Valid UpdateReviewRequestDto status, @PathVariable Long id) {
         return ResponseEntity.ok(reviewService.updateReview(id, status.getStatus()));
-    }
-
-    @DeleteMapping("/products/{product-id}/reviews/{review-id}")
-    public ResponseEntity<?> deleteProductReview(
-            @PathVariable("product-id") Long productId,
-            @PathVariable("review-id") Long reviewId) {
-        // TODO: call service -> reviewService.delete(productId, reviewId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @DeleteMapping("/services/{service-id}/reviews/{review-id}")
-    public ResponseEntity<?> deleteServiceReview(
-            @PathVariable("service-id") Long serviceId,
-            @PathVariable("review-id") Long reviewId) {
-        // TODO: call service -> reviewService.delete(serviceId, reviewId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

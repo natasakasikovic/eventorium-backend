@@ -29,7 +29,7 @@ public class ReviewService {
         Review review = ReviewMapper.fromCreateRequest(createReviewRequestDto);
         review.setUser(authService.getCurrentUser());
         Service service = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + serviceId + " not found")
+                () -> new EntityNotFoundException("Service not found")
         );
         service.addReview(review);
         serviceRepository.save(service);
@@ -40,7 +40,7 @@ public class ReviewService {
         Review review = ReviewMapper.fromCreateRequest(createReviewRequestDto);
         review.setUser(authService.getCurrentUser());
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + productId + " not found")
+                () -> new EntityNotFoundException("Product not found")
         );
         product.addReview(review);
         productRepository.save(product);

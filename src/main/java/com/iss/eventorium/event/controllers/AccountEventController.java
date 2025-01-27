@@ -19,7 +19,7 @@ public class AccountEventController {
 
     private final AccountEventService service;
 
-    @GetMapping("/all")
+    @GetMapping("/my-events")
     public ResponseEntity<List<EventSummaryResponseDto>> getAllEvents() {
         return ResponseEntity.ok(service.getEvents());
     }
