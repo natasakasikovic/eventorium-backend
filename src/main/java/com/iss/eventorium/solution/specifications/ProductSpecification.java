@@ -20,6 +20,19 @@ public class ProductSpecification {
                 .and(hasAvailability(filter.getAvailability()));
     }
 
+    public static Specification<Product> filterBy(ProductFilterDto filter, Long providerId) {
+        return filterBy(filter).and(hasProvider(providerId));
+    }
+
+    public static Specification<Product> search(String keyword, Long providerId) {
+        return Specification.where(hasName(keyword)).and(hasProvider(providerId));
+    }
+
+    private static Specification<Product> hasProvider(Long providerId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("provider").get("id"), providerId);
+    }
+
     public static Specification<Product> hasName(String name) {
         return (root, query, cb) ->
                 name == null ? cb.conjunction()
