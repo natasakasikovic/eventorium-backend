@@ -1,7 +1,7 @@
-package com.iss.eventorium.interaction.mappers;
+package com.iss.eventorium.notifications.mappers;
 
-import com.iss.eventorium.interaction.dtos.NotificationResponseDto;
-import com.iss.eventorium.interaction.models.Notification;
+import com.iss.eventorium.notifications.dtos.NotificationResponseDto;
+import com.iss.eventorium.notifications.models.Notification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,5 +18,4 @@ public class NotificationMapper {
     public static NotificationResponseDto toResponse(Notification notification) {
         return modelMapper.map(notification, NotificationResponseDto.class);
     }
-
 }

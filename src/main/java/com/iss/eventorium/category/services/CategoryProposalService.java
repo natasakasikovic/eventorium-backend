@@ -5,9 +5,9 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
-import com.iss.eventorium.interaction.models.Notification;
-import com.iss.eventorium.interaction.models.NotificationType;
-import com.iss.eventorium.interaction.services.NotificationService;
+import com.iss.eventorium.notifications.models.Notification;
+import com.iss.eventorium.notifications.models.NotificationType;
+import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
@@ -60,7 +60,7 @@ public class CategoryProposalService {
         service.setCategory(category);
         serviceRepository.save(service);
 
-        notificationService.sendNotification(service.getProvider().getId(), notification);
+        notificationService.sendNotification(service.getProvider(), notification);
 
         return toResponse(categoryRepository.save(category));
     }
@@ -87,7 +87,7 @@ public class CategoryProposalService {
                 getMessage(category, "notification.category.updated"),
                 NotificationType.SUCCESS
         );
-        notificationService.sendNotification(service.getProvider().getId(), notification);
+        notificationService.sendNotification(service.getProvider(), notification);
 
         return toResponse(response);
     }
@@ -107,7 +107,7 @@ public class CategoryProposalService {
                 getMessage(category, dto),
                 NotificationType.INFO
         );
-        notificationService.sendNotification(service.getProvider().getId(), notification);
+        notificationService.sendNotification(service.getProvider(), notification);
 
         categoryRepository.save(category);
         serviceRepository.save(service);

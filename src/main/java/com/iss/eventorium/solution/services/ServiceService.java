@@ -2,10 +2,9 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
-import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
-import com.iss.eventorium.interaction.services.NotificationService;
+import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -40,7 +39,6 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;

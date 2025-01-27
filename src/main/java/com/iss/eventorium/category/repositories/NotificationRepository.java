@@ -1,7 +1,12 @@
 package com.iss.eventorium.category.repositories;
 
-import com.iss.eventorium.interaction.models.Notification;
+import com.iss.eventorium.notifications.models.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
+
+    List<Notification> findAllByRecipientIsNull();
+    List<Notification> findByRecipient_Id(Long id);
 }
