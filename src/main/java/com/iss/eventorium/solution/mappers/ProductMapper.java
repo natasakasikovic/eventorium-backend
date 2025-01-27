@@ -71,7 +71,6 @@ public class ProductMapper {
     public static ProductReviewResponseDto toReviewResponse(Product product) {
         ProductReviewResponseDto dto = modelMapper.map(product, ProductReviewResponseDto.class);
         dto.setReviews(product.getReviews().stream()
-                .filter(review -> !review.getStatus().equals(Status.PENDING))
                 .map(ReviewMapper::toResponse)
                 .toList());
         return dto;
