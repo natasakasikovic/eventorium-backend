@@ -1,9 +1,9 @@
 package com.iss.eventorium.interaction.mappers;
 
-import com.iss.eventorium.interaction.dtos.ChatMessageRequestDto;
-import com.iss.eventorium.interaction.dtos.ChatMessageResponseDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageRequestDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatMessageResponseDto;
 import com.iss.eventorium.interaction.models.ChatMessage;
-import com.iss.eventorium.interaction.dtos.MessageSenderDto;
+import com.iss.eventorium.interaction.dtos.chat.MessageSenderDto;
 import com.iss.eventorium.user.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,6 +10,7 @@ import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
+import com.iss.eventorium.solution.dtos.products.ProductReviewResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -44,7 +45,7 @@ public class BudgetService {
         return ProductMapper.toResponse(product);
     }
 
-    public List<ProductSummaryResponseDto> getPurchasedProducts(Long eventId) {
+    public List<ProductReviewResponseDto> getPurchasedProducts(Long eventId) {
         Event event = getEvent(eventId);
         Budget budget = event.getBudget();
         if(budget == null) {
@@ -53,7 +54,7 @@ public class BudgetService {
 
         return budget.getItems().stream()
                 .filter(item -> item.getPurchased() != null)
-                .map(item -> ProductMapper.toSummaryResponse((Product) item.getSolution()))
+                .map(item -> ProductMapper.toReviewResponse((Product) item.getSolution()))
                 .toList();
     }
 

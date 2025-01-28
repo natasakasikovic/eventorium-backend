@@ -3,7 +3,7 @@ package com.iss.eventorium.solution.dtos.products;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.user.dtos.user.ChatUserDetailsDto;
+import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.*;
 
 import java.util.List;
@@ -26,5 +26,5 @@ public class ProductResponseDto {
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
     private Double rating;
-    private ChatUserDetailsDto provider;
+    private UserDetailsDto provider;
 }

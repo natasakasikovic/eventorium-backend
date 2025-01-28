@@ -1,5 +1,6 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.review;
 
+import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,4 +15,5 @@ public class ReviewResponseDto {
     private LocalDateTime creationDate;
     private Integer rating;
     private String feedback;
+    private UserDetailsDto user;
 }

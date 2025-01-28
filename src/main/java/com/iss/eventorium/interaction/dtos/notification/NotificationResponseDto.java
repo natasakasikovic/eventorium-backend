@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos;
+package com.iss.eventorium.interaction.dtos.notification;
 
 import com.iss.eventorium.interaction.models.NotificationType;
 import lombok.*;

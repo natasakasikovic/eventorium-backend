@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpecificationExecutor<Service> {
 
-    @Query("SELECT s FROM Service s JOIN s.reviews r WHERE s.status = 'ACCEPTED' GROUP BY s.id ORDER BY AVG(r.rating) DESC")
+    @Query("SELECT s FROM Service s JOIN s.reviews r WHERE s.status = 'ACCEPTED' AND r.status = 'ACCEPTED' GROUP BY s.id ORDER BY AVG(r.rating) DESC")
     List<Service> findTopFiveServices(Pageable pageable);
     Optional<Service> findByCategoryId(Long categoryId);
 

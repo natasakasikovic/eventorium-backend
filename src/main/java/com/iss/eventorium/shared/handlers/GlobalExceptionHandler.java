@@ -1,6 +1,5 @@
 package com.iss.eventorium.shared.handlers;
 
-import com.iss.eventorium.shared.exceptions.AlreadyInFavoritesException;
 import com.iss.eventorium.shared.exceptions.EmailSendingException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
@@ -46,15 +45,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                        .message(ex.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler(AlreadyInFavoritesException.class)
-    public ResponseEntity<ExceptionResponse> handleImageNotFoundException(AlreadyInFavoritesException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ExceptionResponse.builder()
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }

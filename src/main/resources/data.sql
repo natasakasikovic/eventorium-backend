@@ -14,29 +14,29 @@ INSERT INTO cities (name) VALUES
 ('Kragujevac');
 
 INSERT INTO images (content_type, path) VALUES
-                                            ('image/jpeg', 'custom_invitations.jpg'),
-                                            ('image/jpeg', 'event_banner.jpg'),
-                                            ('image/jpeg', 'party_favors.jpg'),
-                                            ('image/jpeg', 'decorative_balloons.jpg'),
-                                            ('image/jpeg', 'event_t-shirts.jpg'),
-                                            ('image/jpeg', 'party_hats.jpg'),
-                                            ('image/jpeg', 'event_mugs.jpg'),
-                                            ('image/jpeg', 'photo_frames.jpg'),
-                                            ('image/jpeg', 'event_photography.jpg'),
-                                            ('image/jpeg', 'catering_service.jpg'),
-                                            ('image/jpeg', 'event_planning.jpg'),
-                                            ('image/png', 'sound_system_setup.png'),
-                                            ('image/jpeg', 'decorative_lighting.jpg'),
-                                            ('image/jpeg', 'venue_booking.jpg'),
-                                            ('image/jpeg', 'transportation_service.jpg'),
-                                            ('image/jpg', 'photo1.jpg'),
-                                            ('image/jpg', 'photo2.jpg'),
-                                            ('image/png', 'logo.png'), --18
-                                            ('image/png', 'in_company.png'), --19
-                                            ('image/png', 'event_planned_by_us.png'), --20
-                                            ('image/png', 'logo.png'), --21
-                                            ('image/png', 'bday_decoration.png'), --22
-                                            ('image/png', 'decorated_by_us.png'); --23
+    ('image/jpeg', 'custom_invitations.jpg'),
+    ('image/jpeg', 'event_banner.jpg'),
+    ('image/jpeg', 'party_favors.jpg'),
+    ('image/jpeg', 'decorative_balloons.jpg'),
+    ('image/jpeg', 'event_t-shirts.jpg'),
+    ('image/jpeg', 'party_hats.jpg'),
+    ('image/jpeg', 'event_mugs.jpg'),
+    ('image/jpeg', 'photo_frames.jpg'),
+    ('image/jpeg', 'event_photography.jpg'),
+    ('image/jpeg', 'catering_service.jpg'),
+    ('image/jpeg', 'event_planning.jpg'),
+    ('image/png', 'sound_system_setup.png'),
+    ('image/jpeg', 'decorative_lighting.jpg'),
+    ('image/jpeg', 'venue_booking.jpg'),
+    ('image/jpeg', 'transportation_service.jpg'),
+    ('image/jpg', 'photo1.jpg'),
+    ('image/jpg', 'photo2.jpg'),
+    ('image/png', 'logo.png'), --18
+    ('image/png', 'in_company.png'), --19
+    ('image/png', 'event_planned_by_us.png'), --20
+    ('image/png', 'logo.png'), --21
+    ('image/png', 'bday_decoration.png'), --22
+    ('image/png', 'decorated_by_us.png'); --23
 
 
 INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id) VALUES
@@ -119,42 +119,66 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', 14, 5, 3, 7, 8, 3);
 
 
-INSERT INTO reviews (creation_date, rating, feedback, status, solution_id) VALUES
- ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1),
- ('2024-12-02 10:30:00', 4, 'The banners are great, but the print quality could be better.', 'ACCEPTED', 2),
- ('2024-12-03 11:45:00', 3, 'The party favors are cute, but the variety is limited.', 'PENDING', 3),
- ('2024-12-01 14:00:00', 5, 'These balloons added the perfect pop of color to our event. Highly recommend!', 'ACCEPTED', 4),
- ('2024-12-01 12:15:00', 5, 'Everything is great!', 'ACCEPTED', 2),
- ('2024-12-03 18:20:00', 4, 'Nice mugs but the customization options are a bit limited.', 'ACCEPTED', 7),
- ('2024-12-02 13:00:00', 5, 'These photo frames were the perfect souvenir for our event. Everyone loved them!', 'ACCEPTED', 8),
- ('2024-12-03 11:45:00', 3, 'The event planner was okay, but some details were overlooked during the event.', 'PENDING', 11),
- ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12),
- ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13);
+INSERT INTO reviews (creation_date, rating, feedback, status, solution_id, user_id) VALUES
+ ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1, 3),
+ ('2024-12-02 10:30:00', 4, 'The banners are great, but the print quality could be better.', 'ACCEPTED', 2, 2),
+ ('2024-12-03 11:45:00', 3, 'The party favors are cute, but the variety is limited.', 'PENDING', 3, 5),
+ ('2024-12-01 14:00:00', 5, 'These balloons added the perfect pop of color to our event. Highly recommend!', 'ACCEPTED', 4, 2),
+ ('2024-12-01 12:15:00', 5, 'Everything is great!', 'ACCEPTED', 2, 3),
+ ('2024-12-03 18:20:00', 4, 'Nice mugs but the customization options are a bit limited.', 'ACCEPTED', 7, 4),
+ ('2024-12-02 13:00:00', 5, 'These photo frames were the perfect souvenir for our event. Everyone loved them!', 'ACCEPTED', 8, 2),
+ ('2024-12-03 11:45:00', 3, 'The event planner was okay, but some details were overlooked during the event.', 'PENDING', 11, 2),
+ ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12, 5),
+ ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13, 3),
+ ('2025-01-25 10:30:00', 5, 'The custom invitations were exactly what I needed! They looked beautiful and really added a personal touch to the event.', 'ACCEPTED', 1, 3),
+ ('2025-01-24 11:00:00', 4, 'The event banner was high quality, but the colors did not match exactly what I expected from the design preview.', 'ACCEPTED', 2, 2),
+ ('2025-01-23 14:45:00', 3, 'The party favors were cute, but I was hoping for a bit more customization.', 'PENDING', 3, 3),
+ ('2025-01-22 16:00:00', 5, 'These balloons added so much life to our event! Vibrant colors and great quality.', 'ACCEPTED', 4, 5),
+ ('2025-01-21 12:30:00', 2, 'The event t-shirts arrived late and the print quality was not as good as expected.', 'DECLINED', 5, 4),
+ ('2025-01-20 18:00:00', 4, 'Party hats were a hit! The guests loved them. Only wish they were available in more colors.', 'PENDING', 6, 3),
+ ('2025-01-19 13:30:00', 5, 'The personalized mugs were a fantastic souvenir for the event. Everyone loved them!', 'PENDING', 7, 2),
+ ('2025-01-18 15:00:00', 3, 'The photo frames were nice, but the customization options were limited.', 'PENDING', 8, 5),
+ ('2025-01-25 10:00:00', 5, 'The event photography service was exceptional! The photos turned out amazing and captured every moment perfectly.', 'PENDING', 9, 4),
+ ('2025-01-24 12:00:00', 4, 'Catering was delicious, but some dishes arrived a bit cold. Overall, great service though.', 'PENDING', 10, 2),
+ ('2025-01-23 14:00:00', 5, 'The event planning service was incredible! They handled everything from start to finish, and it made my life so much easier.', 'PENDING', 11, 3),
+ ('2025-01-22 11:30:00', 3, 'Sound system setup was good, but the audio quality could have been better at times during the event.', 'PENDING', 12, 4),
+ ('2025-01-21 16:00:00', 5, 'The decorative lighting transformed our venue into something magical! Could not have been more pleased with how it looked.', 'ACCEPTED', 13, 3),
+ ('2025-01-20 17:00:00', 4, 'Venue booking was smooth and easy. However, the venue itself could use a bit of updating.', 'PENDING', 14, 2),
+ ('2025-01-18 09:00:00', 5, 'The event security team was fantastic. They ensured everything ran smoothly and kept everyone safe.', 'ACCEPTED', 15, 2);
+
+INSERT INTO budgets VALUES (62.0, 54.0);
+
+INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id) VALUES
+    (10,9,CURRENT_DATE, 8),
+    (50, 10, CURRENT_DATE, 2),
+    (2,7, CURRENT_DATE, 6);
+
+INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3);
 
 
-INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft)
+INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft, budget_id)
 VALUES
-('Wedding in Novi Sad', 'A beautiful wedding ceremony with reception and dance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 100, 1, '123 Wedding St', 2, 1, false),
-('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 2, false),
-('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 1, false),
-('Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 2, '234 Business Rd', 6, 2, false),
-('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 2, false),
-('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 2, false),
-('Corporate Seminar in Novi Sad', 'A corporate seminar about leadership and growth.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 70, 2, '999 Conference Blvd', 2, 1, false),
-('Trebinje Wedding Ceremony', 'A traditional wedding ceremony in Trebinje.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 120, 1, '555 Wedding Plaza', 3, 2, false),
-('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 50, 3, '888 Party St', 5, 1, false),
-('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 1, false),
-('Team Building Event in Kragujevac', 'An outdoor team building event with games and activities.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 60, 2, '123 Team Rd', 7, 2, false),
-('Wedding Gala in Novi Sad', 'An extravagant wedding gala with special guests and entertainment.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 1, '444 Gala St', 2, 2, false),
-('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 1, false),
-('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 1, false),
-('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 2, false),
-('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false),
-('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false),
-('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false),
-('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 50, 2, '234 Retreat Ave', 3, 1, false),
-('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 3, '111 Fest Rd', 1, 1, false),
-('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 3, '444 Culture St', 6, 2, false);
+('Wedding in Novi Sad', 'A beautiful wedding ceremony with reception and dance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 100, 1, '123 Wedding St', 2, 1, false, 1),
+('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 2, false, null),
+('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 1, false, null),
+('Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 2, '234 Business Rd', 6, 2, false, null),
+('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 2, false, null),
+('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 2, false, null),
+('Corporate Seminar in Novi Sad', 'A corporate seminar about leadership and growth.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 70, 2, '999 Conference Blvd', 2, 1, false, null),
+('Trebinje Wedding Ceremony', 'A traditional wedding ceremony in Trebinje.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 120, 1, '555 Wedding Plaza', 3, 2, false, null),
+('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 50, 3, '888 Party St', 5, 1, false, null),
+('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 1, false, null),
+('Team Building Event in Kragujevac', 'An outdoor team building event with games and activities.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 60, 2, '123 Team Rd', 7, 2, false, null),
+('Wedding Gala in Novi Sad', 'An extravagant wedding gala with special guests and entertainment.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 1, '444 Gala St', 2, 2, false, null),
+('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 1, false, null),
+('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 1, false, null),
+('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 2, false, null),
+('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false, null),
+('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false, null),
+('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, null),
+('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 50, 2, '234 Retreat Ave', 3, 1, false, null),
+('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 3, '111 Fest Rd', 1, 1, false, null),
+('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 3, '444 Culture St', 6, 2, false, null);
 
 
 INSERT INTO activities (name, description, start_time, end_time, location, event_id)
@@ -181,8 +205,8 @@ INSERT INTO solution_event_types (solution_id, event_type_id) VALUES
 (14, 3), (15, 1);
 
 
-INSERT INTO solutions_history VALUES (1);
 
+INSERT INTO solutions_history VALUES (1);
 
 INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (1, 1), (2, 2), (3, 3),
