@@ -56,7 +56,7 @@ public class ServiceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceResponseDto> getService(@PathVariable("id") Long id) {
+    public ResponseEntity<ServiceDetailsDto> getService(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.getService(id));
     }
 

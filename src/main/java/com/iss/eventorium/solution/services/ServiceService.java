@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.category.services.CategoryService;
+import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.interaction.services.NotificationService;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import static com.iss.eventorium.solution.mappers.ServiceMapper.toDetailsResponse;
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 
 @org.springframework.stereotype.Service
@@ -51,10 +53,8 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 public class ServiceService {
 
     private final AuthService authService;
-    private final NotificationService notificationService;
 
-    private final MessageSource messageSource;
-
+    private final CompanyRepository companyRepository;
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
@@ -135,13 +135,12 @@ public class ServiceService {
         return images;
     }
 
-
     public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
         return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public Service find(Long id) {
-        return serviceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        return serviceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found!"));
     }
 
     public ImagePath getImagePath(Long serviceId) {
@@ -162,9 +161,9 @@ public class ServiceService {
         }
     }
 
-    public ServiceResponseDto getService(Long id) {
-        return toResponse(serviceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id))));
+    public ServiceDetailsDto getService(Long id) {
+        Service service = find(id);
+        return toDetailsResponse(service, companyRepository.getCompanyByProviderId(service.getProvider().getId()));
     }
 
     public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
