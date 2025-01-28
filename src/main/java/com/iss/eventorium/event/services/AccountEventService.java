@@ -42,14 +42,13 @@ public class AccountEventService {
     public void markAttendance(Long eventId) {
         Event event = eventService.find(eventId);
         User user = authService.getCurrentUser();
-
-        if (!isEventAlreadyMarked(user, event)) {
-            addEventToUserAttendance(user, event);
-        }
+        markAttendance(event, user);
     }
 
-    private boolean isEventAlreadyMarked(User user, Event event) {
-        return user.getPerson().getAttendingEvents().contains(event);
+    public void markAttendance(Event event, User user) {
+        if (!user.getPerson().getAttendingEvents().contains(event)) {
+            addEventToUserAttendance(user, event);
+        }
     }
 
     private void addEventToUserAttendance(User user, Event event) {
