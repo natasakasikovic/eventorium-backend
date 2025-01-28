@@ -236,3 +236,19 @@ INSERT INTO reports (reason, timestamp, offender_id, reporter_id, status) VALUES
     ('Spreading misinformation', '2024-12-26T11:35:00', 4, 3, 'PENDING'),
     ('Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
     ('Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');
+
+INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
+VALUES
+    ('18:50:53', False, '17:50:53', 5, 9, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 1, 9, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 5, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 4, 10, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 5, 11, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 12, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 2, 13, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 3, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 2, 15, 'ACCEPTED'),
+    ('21:50:53', False, '17:50:53', 1, 15, 'ACCEPTED');
