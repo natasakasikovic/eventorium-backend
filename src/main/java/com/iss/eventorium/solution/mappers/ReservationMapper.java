@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.mappers;
 
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.Service;
@@ -25,5 +26,13 @@ public class ReservationMapper {
         reservation.setService(service);
 
         return reservation;
+    }
+
+    public static CalendarReservationDto toCalendarReservation(Reservation reservation) {
+        return CalendarReservationDto.builder()
+                .eventName(reservation.getEvent().getName())
+                .serviceName(reservation.getService().getName())
+                .date(reservation.getEvent().getDate())
+                .build();
     }
 }
