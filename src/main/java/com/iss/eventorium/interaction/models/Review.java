@@ -1,6 +1,7 @@
 package com.iss.eventorium.interaction.models;
 
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
@@ -39,4 +40,7 @@ public class Review {
 
     @ManyToOne
     private User user;
+
+    @ManyToOne
+    private Solution solution;
 }
