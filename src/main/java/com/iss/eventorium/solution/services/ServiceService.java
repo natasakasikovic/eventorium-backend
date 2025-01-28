@@ -7,6 +7,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -57,7 +58,7 @@ public class ServiceService {
 
     private final MessageSource messageSource;
 
-    private final EventRepository eventRepository;
+    private final EventService eventService;
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
@@ -141,9 +142,7 @@ public class ServiceService {
 
 
     public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Long eventId, Double price) {
-        Event event = eventRepository.findById(eventId).orElseThrow(
-                () -> new EntityNotFoundException("Event not found")
-        );
+        Event event = eventService.find(eventId);
         return serviceRepository
                 .getSuggestedServices(id, price)
                 .stream()
