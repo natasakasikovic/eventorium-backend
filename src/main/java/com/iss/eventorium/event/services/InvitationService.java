@@ -27,6 +27,7 @@ public class InvitationService {
 
     private final InvitationRepository repository;
     private final UserService userService;
+    private final AccountEventService accountEventService;
     private final EmailService emailService;
     private final EventService eventService;
     private final SpringTemplateEngine templateEngine;
@@ -76,13 +77,14 @@ public class InvitationService {
         variables.put("EVENT_NAME", invitation.getEvent().getName());
         variables.put("EVENT_DATE", invitation.getEvent().getDate());
         variables.put("EVENT_ADDRESS", invitation.getEvent().getAddress());
-        String link = (invitation.getHash() == null) ? BASE_URI + "login" : BASE_URI + "quick-registration/" + invitation.getHash();
+        String link = (invitation.getHash() == null) ? BASE_URI + "/login" : BASE_URI + "/quick-registration/" + invitation.getHash();
         variables.put("LINK", link);
         return variables;
     }
 
     public void verifyInvitation(String hash) {
-        findByHash(hash);
+        Invitation invitation = findByHash(hash);
+        accountEventService.markAttendance(invitation.getEvent(), userService.findByEmail(invitation.getEmail()));
     }
 
     public InvitationResponseDto getInvitation(String hash){
@@ -98,6 +100,6 @@ public class InvitationService {
     }
 
     private Invitation findByHash(String hash){
-        return repository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("Invitation with hash " + hash + " not found"));
+        return repository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("Invitation not found"));
     }
 }

@@ -17,10 +17,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecific
     @Query("SELECT e FROM Event e WHERE e.city.name = :city AND e.privacy = 'OPEN' AND e.date > CURRENT_DATE ORDER BY e.date DESC")
     List<Event> findTopFiveUpcomingEvents(@Param("city") String city, Pageable pageable);
 
-    Page<Event> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
-
     List<Event> findByIsDraftTrueAndOrganizer_Id(Long organizerId);
-    List<Event> findByNameContainingAllIgnoreCase(String keyword);
 
     List<Event> findByOrganizer_Id(Long id);
 }
