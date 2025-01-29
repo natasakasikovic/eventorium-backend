@@ -2,13 +2,10 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
-import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -29,7 +26,6 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,17 +50,12 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 public class ServiceService {
 
     private final AuthService authService;
-    private final NotificationService notificationService;
-
-    private final MessageSource messageSource;
-
     private final EventService eventService;
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
-    private final CategoryService categoryService;
 
     @PersistenceContext
     private EntityManager entityManager;

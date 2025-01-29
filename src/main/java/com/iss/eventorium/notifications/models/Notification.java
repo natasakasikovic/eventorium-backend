@@ -1,6 +1,6 @@
-package com.iss.eventorium.interaction.models;
+package com.iss.eventorium.notifications.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +31,11 @@ public class Notification {
     @Column(nullable = false)
     private Boolean seen = false;
 
+    @ManyToOne
+    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
+    private User recipient = null;
+
+    @Transient
     private NotificationType type;
 
     public Notification(String title, String message, NotificationType type) {
