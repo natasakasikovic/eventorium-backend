@@ -3,8 +3,11 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.category.services.CategoryService;
+import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.interaction.services.NotificationService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -38,9 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
@@ -55,11 +58,13 @@ public class ServiceService {
 
     private final MessageSource messageSource;
 
+    private final EventService eventService;
     private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
+    private final CategoryService categoryService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -136,8 +141,14 @@ public class ServiceService {
     }
 
 
-    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Double price) {
-        return serviceRepository.getBudgetSuggestions(id, price).stream().map(ServiceMapper::toSummaryResponse).toList();
+    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Long eventId, Double price) {
+        Event event = eventService.find(eventId);
+        return serviceRepository
+                .getSuggestedServices(id, price)
+                .stream()
+                .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
+                .map(ServiceMapper::toSummaryResponse)
+                .toList();
     }
 
     public Service find(Long id) {
