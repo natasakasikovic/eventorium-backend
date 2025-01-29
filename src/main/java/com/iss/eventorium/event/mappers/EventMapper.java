@@ -58,10 +58,6 @@ public class EventMapper {
     }
 
     public static CalendarEventDto toCalendarEvent(Event event) {
-        return CalendarEventDto.builder()
-                .id(event.getId())
-                .name(event.getName())
-                .date(event.getDate())
-                .build();
+        return  modelMapper.map(event, CalendarEventDto.class);
     }
 }

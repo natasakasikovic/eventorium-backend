@@ -40,7 +40,7 @@ public class ServiceReservationSpecification {
     }
 
     public static Specification<Reservation> getProviderReservations(User provider) {
-        return Specification.where(hasProviderId(provider.getId()));
+        return Specification.where(hasProviderId(provider.getId())).and(hasStatusAccepted());
     }
 
     private static Specification<Reservation> hasProviderId(Long providerId) {
