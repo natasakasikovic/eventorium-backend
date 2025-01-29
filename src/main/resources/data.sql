@@ -237,6 +237,22 @@ INSERT INTO reports (reason, timestamp, offender_id, reporter_id, status) VALUES
     ('Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
     ('Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');
 
+INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
+VALUES
+    ('18:50:53', False, '17:50:53', 5, 9, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 1, 9, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 5, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 4, 10, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 5, 11, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 12, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 2, 13, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 3, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 2, 15, 'ACCEPTED'),
+    ('21:50:53', False, '17:50:53', 1, 15, 'ACCEPTED');
+
 INSERT INTO notifications (seen, id, recipient_id, timestamp, message, title) VALUES
     (true, 1, null, '2025-01-26 16:41:51.040058', 'A new category proposal (Audio/Visual Equipment) has been created!', 'Category'),
     (true, 2, null, '2025-01-26 16:42:28.426459', 'A new category proposal (Audio/Visual Equipment) has been created!', 'Category'),

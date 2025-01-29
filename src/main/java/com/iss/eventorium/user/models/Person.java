@@ -45,4 +45,7 @@ public class Person {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Event> favouriteEvents;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Event> attendingEvents;
 }

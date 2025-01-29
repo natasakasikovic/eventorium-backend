@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.dtos.event.CalendarEventDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.AccountEventService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,19 @@ public class AccountEventController {
     private final AccountEventService service;
 
     @GetMapping("/my-events")
-    public ResponseEntity<List<EventSummaryResponseDto>> getAllEvents() {
-        return ResponseEntity.ok(service.getEvents());
+    public ResponseEntity<List<CalendarEventDto>> getOrganizerEvents() {
+        return ResponseEntity.ok(service.getOrganizerEvents());
+    }
+
+    @GetMapping("/my-attending-events")
+    public ResponseEntity<List<CalendarEventDto>> getAttendingEvents() {
+        return ResponseEntity.ok(service.getAttendingEvents());
+    }
+
+    @PostMapping("/{id}/attendance")
+    public ResponseEntity<Void> markAttendance(@PathVariable Long id) {
+        service.markAttendance(id);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/favourites")

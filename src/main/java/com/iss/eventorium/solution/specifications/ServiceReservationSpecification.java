@@ -2,14 +2,16 @@ package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Reservation;
+import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 public class ServiceReservationSpecification {
 
@@ -34,6 +36,17 @@ public class ServiceReservationSpecification {
             LocalTime nextHour = LocalDateTime.now().plusHours(1).toLocalTime().withSecond(0).withNano(0);
             Expression<LocalTime> startingTime = root.get("startingTime").as(LocalTime.class);
             return cb.equal(startingTime, nextHour);
+        };
+    }
+
+    public static Specification<Reservation> getProviderReservations(User provider) {
+        return Specification.where(hasProviderId(provider.getId())).and(hasStatusAccepted());
+    }
+
+    private static Specification<Reservation> hasProviderId(Long providerId) {
+        return (root, query, cb) -> {
+            Join<Reservation, Service> reservations = root.join("service", JoinType.INNER);
+            return cb.equal(reservations.get("provider").get("id"), providerId);
         };
     }
 

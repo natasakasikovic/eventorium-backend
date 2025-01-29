@@ -2,6 +2,7 @@ package com.iss.eventorium.event.specifications;
 
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
+import com.iss.eventorium.event.models.Privacy;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -16,7 +17,17 @@ public class EventSpecification {
                 .and(hasCity(filter.getCity()))
                 .and(hasMaxParticipants(filter.getMaxParticipants()))
                 .and(hasDateAfter(filter.getFrom()))
-                .and(hasDateBefore(filter.getTo()));
+                .and(hasDateBefore(filter.getTo()))
+                .and(hasPrivacy(Privacy.OPEN));
+    }
+
+    public static Specification<Event> filterByPrivacy(Privacy privacy) {
+        return Specification.where(hasPrivacy(privacy));
+    }
+
+    public static Specification<Event> filterByName(String keyword) {
+        return Specification.where(hasName(keyword))
+                            .and(hasPrivacy(Privacy.OPEN));
     }
 
     private static Specification<Event> hasName(String name) {
@@ -68,6 +79,11 @@ public class EventSpecification {
                 to == null
                         ? cb.conjunction()
                         : cb.lessThanOrEqualTo(root.get("date"), to);
+    }
+
+    private static Specification<Event> hasPrivacy(Privacy privacy) {
+        return (root, query, cb) ->
+                cb.equal(root.get("privacy"), privacy);
     }
 
 }

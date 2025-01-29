@@ -39,34 +39,30 @@ public class EventService {
         return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
     }
 
-    private String getUserCity(){  // If the user is logged in, it returns the city from the profile, otherwise defaults to "Novi Sad".
+    private String getUserCity() {  // If the user is logged in, it returns the city from the profile, otherwise defaults to "Novi Sad".
         if (authService.getCurrentUser() != null)
             return authService.getCurrentUser().getPerson().getCity().getName();
         return "Novi Sad";
     }
 
-    public List<EventSummaryResponseDto> getAll(){
-        List<Event> events = repository.findAll();
-        return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
+    public List<EventSummaryResponseDto> getAll() {
+        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN);
+        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
-        if (keyword.isBlank())
-            return EventMapper.toPagedResponse(repository.findAll(pageable));
-
-        return EventMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
+        Specification<Event> specification = EventSpecification.filterByName(keyword);
+        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
-        List<Event> events = keyword.isBlank()
-                ? repository.findAll()
-                : repository.findByNameContainingAllIgnoreCase(keyword);
-
-        return events.stream().map(EventMapper::toSummaryResponse).toList();
+        Specification<Event> specification = EventSpecification.filterByName(keyword);
+        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
-        return EventMapper.toPagedResponse(repository.findAll(pageable));
+        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN);
+        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
@@ -75,7 +71,7 @@ public class EventService {
     }
 
     public Event find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + id));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found."));
     }
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
