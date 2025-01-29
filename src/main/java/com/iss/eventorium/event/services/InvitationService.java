@@ -83,8 +83,7 @@ public class InvitationService {
     }
 
     public void verifyInvitation(String hash) {
-        Invitation invitation = findByHash(hash);
-        accountEventService.markAttendance(invitation.getEvent(), userService.findByEmail(invitation.getEmail()));
+        findByHash(hash);
     }
 
     public InvitationResponseDto getInvitation(String hash){
