@@ -56,7 +56,7 @@ public class EventService {
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
-        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN);
+        Specification<Event> specification = EventSpecification.filterByName(keyword);
         return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
     }
 
