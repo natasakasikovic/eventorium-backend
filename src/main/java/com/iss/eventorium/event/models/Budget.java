@@ -31,8 +31,7 @@ public class Budget {
     public void addItem(BudgetItem item) {
         this.items.add(item);
         if(item.getPurchased() != null) {
-            //TODO: discount
-            this.spentAmount += item.getSolution().getPrice();
+            this.spentAmount += item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100);
             this.plannedAmount += item.getPlannedAmount();
         }
     }

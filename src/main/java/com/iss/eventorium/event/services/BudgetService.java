@@ -15,6 +15,7 @@ import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
+import com.iss.eventorium.solution.services.HistoryService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,8 @@ public class BudgetService {
         Product product = productRepository.findById(dto.getItemId()).orElseThrow(
                 () -> new EntityNotFoundException("Product with id " + dto.getItemId() + " not found")
         );
-        if(product.getPrice() > dto.getPlannedAmount()) {
+        double netPrice = product.getPrice() * (1 - product.getDiscount() / 100);
+        if(netPrice > dto.getPlannedAmount()) {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
         }
 
