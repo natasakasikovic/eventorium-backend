@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findAllByRecipientIsNull();
-    List<Notification> findByRecipient_Id(Long id);
+    List<Notification> findAllByRecipientIsNullOrderByTimestampDesc();
+    List<Notification> findByRecipient_IdOrderByTimestampDesc(Long id);
 }

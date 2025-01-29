@@ -55,9 +55,9 @@ public class NotificationService {
         List<Notification> notifications;
 
         if (loggedIn.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName())))
-            notifications = repository.findAllByRecipientIsNull();
+            notifications = repository.findAllByRecipientIsNullOrderByTimestampDesc();
         else
-            notifications = repository.findByRecipient_Id(loggedIn.getId());
+            notifications = repository.findByRecipient_IdOrderByTimestampDesc(loggedIn.getId());
 
         return notifications;
     }
