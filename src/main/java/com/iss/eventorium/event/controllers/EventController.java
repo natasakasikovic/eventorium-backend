@@ -1,11 +1,14 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,9 +72,15 @@ public class EventController {
     }
 
     @PutMapping("/{id}/agenda")
-    public ResponseEntity<?> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
+    public ResponseEntity<Void> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
                                           @PathVariable Long id) {
         service.createAgenda(id, requestDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/agenda")
+    public ResponseEntity<List<ActivityResponseDto>> getAgenda(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getAgenda(id));
+    }
+
 }
