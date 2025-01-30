@@ -83,4 +83,12 @@ public class EventController {
         return ResponseEntity.ok(service.getAgenda(id));
     }
 
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> getPdf(@PathVariable Long id) throws JRException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=event_details.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+        return new ResponseEntity<>(service.generatePdf(id), headers, HttpStatus.OK);
+    }
 }

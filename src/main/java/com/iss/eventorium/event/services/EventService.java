@@ -124,4 +124,12 @@ public class EventService {
                 .toList();
     }
 
+    public byte[] generatePdf(Long id) throws JRException {
+        Event event = find(id);
+        Map<String, Object> params = new HashMap<>();
+        params.put("reportTitle", "EVENT: " + event.getName());
+        params.put("generatedDate", LocalDate.now());
+        List<Event> data = List.of(event);
+        return pdfService.generate("/templates/event-details.jrxml", data, params);
+    }
 }
