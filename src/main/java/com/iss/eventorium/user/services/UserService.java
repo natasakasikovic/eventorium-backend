@@ -130,11 +130,14 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+    public User findUser(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
+    }
+
     public void uploadProfilePhoto(Long userId, MultipartFile photo) {
         if (photo == null) return;
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+        User user = findUser(userId);
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
         String fileName = Instant.now().toEpochMilli() + "_" + originalFileName;

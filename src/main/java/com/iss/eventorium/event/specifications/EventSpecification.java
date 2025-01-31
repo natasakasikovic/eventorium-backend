@@ -3,13 +3,16 @@ package com.iss.eventorium.event.specifications;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
 import com.iss.eventorium.event.models.Privacy;
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.models.UserBlock;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 
 public class EventSpecification {
 
-    public static Specification<Event> filterBy(EventFilterDto filter) {
+    public static Specification<Event> filterBy(EventFilterDto filter, User user) {
         return Specification
                 .where(hasName(filter.getName()))
                 .and(hasDescription(filter.getDescription()))
@@ -18,16 +21,25 @@ public class EventSpecification {
                 .and(hasMaxParticipants(filter.getMaxParticipants()))
                 .and(hasDateAfter(filter.getFrom()))
                 .and(hasDateBefore(filter.getTo()))
-                .and(hasPrivacy(Privacy.OPEN));
+                .and(hasPrivacy(Privacy.OPEN))
+                .and(filterOutBlockedContent(user));
     }
 
-    public static Specification<Event> filterByPrivacy(Privacy privacy) {
-        return Specification.where(hasPrivacy(privacy));
+    public static Specification<Event> filterByPrivacy(Privacy privacy, User user) {
+        return Specification.where(hasPrivacy(privacy)
+                .and(filterOutBlockedContent(user)));
     }
 
-    public static Specification<Event> filterByName(String keyword) {
+    public static Specification<Event> filterByName(String keyword, User user) {
         return Specification.where(hasName(keyword))
-                            .and(hasPrivacy(Privacy.OPEN));
+                            .and(hasPrivacy(Privacy.OPEN)
+                            .and(filterOutBlockedContent(user)));
+    }
+
+    public static Specification<Event> filterTopEvents(String city){
+        return Specification.where(hasPrivacy(Privacy.OPEN)
+                            .and(hasCity(city))
+                            .and(hasDateAfter(LocalDate.now()))); // only events in future
     }
 
     private static Specification<Event> hasName(String name) {
@@ -86,4 +98,19 @@ public class EventSpecification {
                 cb.equal(root.get("privacy"), privacy);
     }
 
+    private static Specification<Event> filterOutBlockedContent(User blocker) {
+        return (root, query, cb) -> {
+            if (blocker == null) return cb.conjunction();
+
+            Long blockerId = blocker.getId();
+
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<UserBlock> userBlockRoot = subquery.from(UserBlock.class);
+
+            subquery.select(userBlockRoot.get("blocked").get("id"))
+                    .where(cb.equal(userBlockRoot.get("blocker").get("id"), blockerId));
+
+            return cb.not(root.get("organizer").get("id").in(subquery));
+        };
+    }
 }
