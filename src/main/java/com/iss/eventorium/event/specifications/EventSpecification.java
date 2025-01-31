@@ -42,6 +42,13 @@ public class EventSpecification {
                             .and(hasDateAfter(LocalDate.now()))); // only events in future
     }
 
+    public static Specification<Event> filterByOrganizer(User organizer) {
+        return (root, query, cb) ->
+                organizer == null
+                        ? cb.conjunction()
+                        : cb.equal(root.get("organizer"), organizer);
+    }
+
     private static Specification<Event> hasName(String name) {
         return (root, query, cb) ->
                 name == null || name.isEmpty()
@@ -70,7 +77,6 @@ public class EventSpecification {
             return cb.like(cb.lower(root.get("city").get("name")), "%" + city.toLowerCase() + "%");
         };
     }
-
 
     private static Specification<Event> hasMaxParticipants(Integer maxParticipants) {
         return (root, query, cb) ->

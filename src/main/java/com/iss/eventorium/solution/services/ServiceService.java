@@ -26,7 +26,6 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,9 +48,9 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 @Slf4j
 public class ServiceService {
 
+    private final ServiceRepository repository;
     private final AuthService authService;
     private final EventService eventService;
-    private final ServiceRepository serviceRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
@@ -63,20 +62,41 @@ public class ServiceService {
     @Value("${image-path}")
     private String imagePath;
 
+    // TODO: refactor method below to use specification
     public List<ServiceSummaryResponseDto> getTopServices(){
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
-        List<Service> services = serviceRepository.findTopFiveServices(pageable);
+        List<Service> services = repository.findTopFiveServices(pageable);
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public List<ServiceSummaryResponseDto> getServices() {
-        List<Service> services =  serviceRepository.findAll();
-        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+        Specification<Service> specification = ServiceSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
-        Page<Service> services = serviceRepository.findAll(pageable);
-        return ServiceMapper.toPagedResponse(services);
+        Specification<Service> specification = ServiceSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ServiceSummaryResponseDto> searchServices(String keyword) {
+        Specification<Service> specification = ServiceSpecification.filterByName(keyword, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
+        Specification<Service> specification = ServiceSpecification.filterByName(keyword, authService.getCurrentUser());
+        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter){
+        Specification<Service> specification = ServiceSpecification.filterBy(filter, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ServiceSummaryResponseDto> filter(ServiceFilterDto filter, Pageable pageable) {
+        Specification<Service> specification = ServiceSpecification.filterBy(filter, authService.getCurrentUser());
+        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public ServiceResponseDto createService(CreateServiceRequestDto createServiceRequestDto) {
@@ -92,14 +112,14 @@ public class ServiceService {
         service.setProvider(authService.getCurrentUser());
 
         historyService.addServiceMemento(service);
-        serviceRepository.save(service);
+        repository.save(service);
         return toResponse(service);
     }
 
     public void uploadImages(Long serviceId, List<MultipartFile> images) {
-        if(images == null || images.isEmpty()) {
+        if (images == null || images.isEmpty())
             return;
-        }
+
         Service service = find(serviceId);
         List<ImagePath> paths = new ArrayList<>();
 
@@ -117,7 +137,7 @@ public class ServiceService {
             }
         }
         service.getImagePaths().addAll(paths);
-        serviceRepository.save(service);
+        repository.save(service);
     }
 
     public List<ImageResponseDto> getImages(Long serviceId) {
@@ -131,10 +151,10 @@ public class ServiceService {
         return images;
     }
 
-
+    // TODO: refactor method below to use specification
     public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Long eventId, Double price) {
         Event event = eventService.find(eventId);
-        return serviceRepository
+        return repository
                 .getSuggestedServices(id, price)
                 .stream()
                 .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
@@ -143,14 +163,15 @@ public class ServiceService {
     }
 
     public Service find(Long id) {
-        return serviceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id)));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found."));
     }
 
     public ImagePath getImagePath(Long serviceId) {
         Service service = find(serviceId);
-        if(service.getImagePaths().isEmpty()) {
+
+        if (service.getImagePaths().isEmpty())
             throw new ImageNotFoundException("Image not found");
-        }
+
         return service.getImagePaths().get(0);
     }
 
@@ -160,62 +181,37 @@ public class ServiceService {
             File file = new File(uploadDir + path.getPath());
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to read image" + path.getPath() + ": + e.getMessage()");
+            throw new ImageNotFoundException("Fail to load image");
         }
     }
 
     public ServiceResponseDto getService(Long id) {
-        return toResponse(serviceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Service with id %s not found", id))));
-    }
-
-    public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
-        if (keyword.isBlank())
-            return ServiceMapper.toPagedResponse(serviceRepository.findAll(pageable));
-        return ServiceMapper.toPagedResponse(serviceRepository.findByNameContainingAllIgnoreCase(keyword, pageable));
+        return toResponse(find(id));
     }
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
         Service toUpdate = find(id);
 
         List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
-        if (eventTypes.size() != serviceDto.getEventTypesIds().size()) {
-            throw new EntityNotFoundException("One or more event type IDs are invalid.");
-        }
+
+        if (eventTypes.size() != serviceDto.getEventTypesIds().size())
+            throw new EntityNotFoundException("Event types not found.");
 
         Service service = ServiceMapper.fromUpdateRequest(serviceDto, toUpdate);
         service.setEventTypes(eventTypes);
 
         historyService.addServiceMemento(service);
-        serviceRepository.save(service);
+        repository.save(service);
         return toResponse(service);
     }
 
     public void deleteService(Long id) {
         Service service = find(id);
 
-        if(reservationRepository.existsByServiceId(id)) {
+        if (reservationRepository.existsByServiceId(id))
             throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
-        }
+
         service.setIsDeleted(true);
-        serviceRepository.save(service);
-    }
-    
-    public List<ServiceSummaryResponseDto> searchServices(String keyword) {
-        List<Service> services = keyword.isBlank()
-                ? serviceRepository.findAll()
-                : serviceRepository.findByNameContainingAllIgnoreCase(keyword);
-
-        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
-    }
-
-    public PagedResponse<ServiceSummaryResponseDto> filter(ServiceFilterDto filter, Pageable pageable) {
-        Specification<Service> specification = ServiceSpecification.filterBy(filter);
-        return ServiceMapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
-    }
-
-    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter){
-        Specification<Service> specification = ServiceSpecification.filterBy(filter);
-        return serviceRepository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        repository.save(service);
     }
 }

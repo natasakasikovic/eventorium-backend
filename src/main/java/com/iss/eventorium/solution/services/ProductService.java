@@ -21,7 +21,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,6 +51,7 @@ public class ProductService {
     @Value("${image-path}")
     private String imagePath;
 
+    // TODO: refactor method to use specification
     public List<ProductSummaryResponseDto> getTopProducts(){
         Pageable pageable = PageRequest.of(0, 5);
         List<Product> products = repository.findTopFiveProducts(pageable);
@@ -60,8 +59,33 @@ public class ProductService {
     }
 
     public PagedResponse<ProductSummaryResponseDto> getProducts(Pageable pageable) {
-        Page<Product> products = repository.findAll(pageable);
-        return ProductMapper.toPagedResponse(products);
+        Specification<Product> specification = ProductSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ProductSummaryResponseDto> getProducts() {
+        Specification<Product> specification = ProductSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> filter(ProductFilterDto filter, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.filterBy(filter, authService.getCurrentUser());
+        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
+        Specification<Product> specification = ProductSpecification.filterBy(filter, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<ProductSummaryResponseDto> search(String keyword, Pageable pageable) {
+        Specification<Product> specification = ProductSpecification.filterByName(keyword, authService.getCurrentUser());
+        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<ProductSummaryResponseDto> search(String keyword) {
+        Specification<Product> specification = ProductSpecification.filterByName(keyword, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
     }
 
     public ProductDetailsDto getProduct(Long id) {
@@ -69,15 +93,9 @@ public class ProductService {
         return ProductMapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
+    // TODO: method below needs to be refactored to use specification
     public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
         return repository.getBudgetSuggestions(categoryId, price).stream().map(ProductMapper::toSummaryResponse).toList();
-    }
-
-    public PagedResponse<ProductSummaryResponseDto> search(String keyword, Pageable pageable) {
-        if (keyword.isBlank()){
-            return ProductMapper.toPagedResponse(repository.findAll(pageable));
-        }
-        return  ProductMapper.toPagedResponse(repository.findByNameContainingAllIgnoreCase(keyword, pageable));
     }
 
     public List<ImageResponseDto> getImages(Long id) {
@@ -93,18 +111,11 @@ public class ProductService {
 
     public ImagePath getImagePath(Long id) {
         Product product = find(id);
-        if(product.getImagePaths().isEmpty()) {
+
+        if (product.getImagePaths().isEmpty())
             throw new ImageNotFoundException("Image not found");
-        }
+
         return product.getImagePaths().get(0);
-    }
-
-    public List<ProductSummaryResponseDto> search(String keyword) {
-        List<Product> products = keyword.isBlank()
-                ? repository.findAll()
-                : repository.findByNameContainingAllIgnoreCase(keyword);
-
-        return products.stream().map(ProductMapper::toSummaryResponse).toList();
     }
 
     public byte[] getImage(Long productId, ImagePath path) {
@@ -117,24 +128,8 @@ public class ProductService {
         }
     }
 
-    public Collection<ProductSummaryResponseDto> getProducts() {
-        return repository.findAll().stream().map(ProductMapper::toSummaryResponse).toList();
-    }
-
-    public PagedResponse<ProductSummaryResponseDto> filter(ProductFilterDto filter, Pageable pageable) {
-        Specification<Product> specification = ProductSpecification.filterBy(filter);
-        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
-    }
-
-    public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
-        List<Product> products = repository.findAll(ProductSpecification.filterBy(filter));
-        return products.stream().map(ProductMapper::toSummaryResponse).toList();
-    }
-
-    private Product find(Long id) {
-        return repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Product not found")
-        );
+    public Product find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
     public ProductResponseDto createProduct(CreateProductRequestDto request) {

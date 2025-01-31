@@ -107,6 +107,7 @@ public class EventService {
             repository.save(event);
     }
 
+    // TODO: this method needs to be replaces with method which will get my events in future
     public List<EventResponseDto> getDraftedEvents() {
         return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
                 .stream()

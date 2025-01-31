@@ -5,11 +5,13 @@ import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountEventService {
 
+    private final EventRepository repository;
     private final AuthService authService;
-    private final EventRepository eventRepository;
     private final EventService eventService;
     private final UserRepository userRepository;
 
@@ -29,9 +31,8 @@ public class AccountEventService {
     }
 
     public List<CalendarEventDto> getOrganizerEvents() {
-        return eventRepository.findByOrganizer_Id(authService.getCurrentUser().getId()).stream()
-                .map(EventMapper::toCalendarEvent)
-                .toList();
+        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(EventMapper::toCalendarEvent).toList();
     }
 
     public List<CalendarEventDto> getAttendingEvents() {
@@ -46,9 +47,8 @@ public class AccountEventService {
     }
 
     public void markAttendance(Event event, User user) {
-        if (!user.getPerson().getAttendingEvents().contains(event)) {
+        if (!user.getPerson().getAttendingEvents().contains(event))
             addEventToUserAttendance(user, event);
-        }
     }
 
     private void addEventToUserAttendance(User user, Event event) {
