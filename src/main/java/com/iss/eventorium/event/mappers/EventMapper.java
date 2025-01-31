@@ -1,9 +1,6 @@
 package com.iss.eventorium.event.mappers;
 
-import com.iss.eventorium.event.dtos.event.EventDetailsDto;
-import com.iss.eventorium.event.dtos.event.EventRequestDto;
-import com.iss.eventorium.event.dtos.event.EventResponseDto;
-import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
+import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.mappers.UserMapper;
@@ -60,4 +57,7 @@ public class EventMapper {
         return dto;
     }
 
+    public static CalendarEventDto toCalendarEvent(Event event) {
+        return  modelMapper.map(event, CalendarEventDto.class);
+    }
 }

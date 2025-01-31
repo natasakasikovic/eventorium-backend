@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.models;
+package com.iss.eventorium.notifications.models;
 
 public enum NotificationType {
     SUCCESS,

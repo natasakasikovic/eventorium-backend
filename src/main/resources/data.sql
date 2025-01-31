@@ -236,3 +236,34 @@ INSERT INTO reports (reason, timestamp, offender_id, reporter_id, status) VALUES
     ('Spreading misinformation', '2024-12-26T11:35:00', 4, 3, 'PENDING'),
     ('Disruptive behavior in public discussions', '2024-12-25T09:10:00', 5, 2, 'PENDING'),
     ('Violation of terms of service', '2024-12-24T14:00:00', 1, 3, 'PENDING');
+
+INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
+VALUES
+    ('18:50:53', False, '17:50:53', 5, 9, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 1, 9, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 5, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 4, 10, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 10, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 5, 11, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 12, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 2, 13, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 3, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 2, 14, 'ACCEPTED'),
+    ('18:50:53', False, '17:50:53', 2, 15, 'ACCEPTED'),
+    ('21:50:53', False, '17:50:53', 1, 15, 'ACCEPTED');
+
+INSERT INTO notifications (seen, id, recipient_id, timestamp, message, title) VALUES
+    (true, 1, null, '2025-01-26 16:41:51.040058', 'A new category proposal (Audio/Visual Equipment) has been created!', 'Category'),
+    (true, 2, null, '2025-01-26 16:42:28.426459', 'A new category proposal (Audio/Visual Equipment) has been created!', 'Category'),
+    (true, 3, null, '2025-01-26 16:43:05.987654', 'A new category proposal (Catering Equipment) has been created!', 'Category'),
+    (true, 4, null, '2025-01-26 16:44:12.123456', 'A new category proposal (Event Furniture) has been created!', 'Category'),
+    (false, 5, null, '2025-01-26 16:45:45.789123', 'A new category proposal (Lighting and Effects) has been created!', 'Category'),
+    (false, 6, null, '2025-01-26 16:46:59.654321', 'A new category proposal (Entertainment and Activities) has been created!', 'Category'),
+    (false, 7, null, '2025-01-26 16:47:33.999999', 'A new category proposal (Event Staffing and Security) has been created!', 'Category'),
+    (false, 8, null, '2025-01-28 00:24:06.023342', 'A new category proposal (Musical Instruments) has been created!', 'Category'),
+    (true, 9, 3, '2025-01-28 00:26:10.042144', 'Your category suggestion (Musical Instruments) has been accepted.', 'Category'),
+    (true, 10, 4, '2025-01-28 01:00:10.042144', 'Your category suggestion (Audio/Visual Equipment) has been accepted.', 'Category'),
+    (false, 11, null, '2025-01-28 01:10:15.112233', 'A new category proposal (Sports Equipment) has been created!', 'Category'),
+    (false, 12, null, '2025-01-28 01:20:25.223344', 'A new category proposal (Office Supplies) has been created!', 'Category'),
+    (true, 13, 3, '2025-01-28 01:30:30.334455', 'Your category suggestion (Catering Equipment) has been accepted.', 'Category');

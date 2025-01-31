@@ -216,4 +216,5 @@ public class UserService {
         user.setLastPasswordReset(new Date());
         userRepository.save(user);
     }
+
 }

@@ -7,6 +7,7 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
@@ -70,6 +71,11 @@ public class ReservationService {
     private Company getCompany(Service service) {
         User provider = service.getProvider();
         return companyRepository.getCompanyByProviderId(provider.getId());
+    }
+
+    public List<CalendarReservationDto> getProviderReservations() {
+        User provider = authService.getCurrentUser();
+        return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(ReservationMapper::toCalendarReservation).toList();
     }
 
     @Scheduled(fixedRate = 60000)
