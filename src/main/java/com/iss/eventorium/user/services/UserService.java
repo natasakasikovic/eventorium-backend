@@ -223,4 +223,16 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found."));
     }
+
+    public void cleanUserOfBlockedOrganizerContent(User user, User organizer) {
+        user.getPerson().getFavouriteEvents().removeIf(event -> event.getOrganizer().equals(organizer));
+        user.getPerson().getAttendingEvents().removeIf(event -> event.getOrganizer().equals(organizer));
+        userRepository.save(user);
+    }
+
+    public void cleanUserOfBlockedProviderContent(User user, User provider) {
+        user.getPerson().getFavouriteProducts().removeIf(product -> product.getProvider().equals(provider));
+        user.getPerson().getFavouriteServices().removeIf(service -> service.getProvider().equals(provider));
+        userRepository.save(user);
+    }
 }

@@ -21,9 +21,15 @@ public class UserBlockService {
         saveUserBlock(blocker, blocked);
         saveUserBlock(blocked, blocker);
 
-        // TODO: remove -> 1.) favourite events, 2.) attending events
-        // TODO: remove -> 1.) favourite products, 2.) favourite services
-        // TODO: cancel reservations, purchased products?
+        cleanUserOfBlockedContent(blocker, blocked);
+        cleanUserOfBlockedContent(blocked, blocker);
+    }
+
+    private void cleanUserOfBlockedContent(User blocker, User blocked ) {
+        if (blocked.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
+            userService.cleanUserOfBlockedOrganizerContent(blocker, blocked);
+        else if (blocked.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName())))
+            userService.cleanUserOfBlockedProviderContent(blocker, blocked);
     }
 
     private void saveUserBlock(User blocker, User blocked) {
