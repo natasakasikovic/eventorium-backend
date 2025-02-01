@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -10,15 +11,21 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +33,7 @@ public class EventService {
 
     private final EventRepository repository;
     private final AuthService authService;
+    private final PdfService pdfService;
 
     public EventDetailsDto getEventDetails(Long id) {
         Event event = find(id);
@@ -107,11 +115,24 @@ public class EventService {
             repository.save(event);
     }
 
+    public List<ActivityResponseDto> getAgenda(Long id) {
+        return find(id).getActivities().stream().map(ActivityMapper::toResponse).toList();
+    }
+
     // TODO: this method needs to be replaces with method which will get my events in future
     public List<EventResponseDto> getDraftedEvents() {
         return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
                 .stream()
                 .map(EventMapper::toResponse)
                 .toList();
+    }
+
+    public byte[] generatePdf(Long id) throws JRException {
+        Event event = find(id);
+        Map<String, Object> params = new HashMap<>();
+        params.put("reportTitle", "EVENT: " + event.getName());
+        params.put("generatedDate", LocalDate.now());
+        List<Event> data = List.of(event);
+        return pdfService.generate("/templates/event-details.jrxml", data, params);
     }
 }

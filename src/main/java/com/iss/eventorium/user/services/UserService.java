@@ -220,10 +220,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found."));
-    }
-
     public void cleanUserOfBlockedOrganizerContent(User user, User organizer) {
         user.getPerson().getFavouriteEvents().removeIf(event -> event.getOrganizer().equals(organizer));
         user.getPerson().getAttendingEvents().removeIf(event -> event.getOrganizer().equals(organizer));
