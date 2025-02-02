@@ -1,6 +1,7 @@
 package com.iss.eventorium.interaction.services;
 
 import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.ManageReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
 import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
@@ -32,6 +33,7 @@ public class ReviewService {
                 () -> new EntityNotFoundException("Service not found")
         );
         service.addReview(review);
+        review.setSolution(service);
         serviceRepository.save(service);
         return ReviewMapper.toResponse(review);
     }
@@ -43,12 +45,13 @@ public class ReviewService {
                 () -> new EntityNotFoundException("Product not found")
         );
         product.addReview(review);
+        review.setSolution(product);
         productRepository.save(product);
         return ReviewMapper.toResponse(review);
     }
 
-    public List<ReviewResponseDto> getPendingReviews() {
-        return reviewRepository.findByStatus(Status.PENDING).stream().map(ReviewMapper::toResponse).toList();
+    public List<ManageReviewResponseDto> getPendingReviews() {
+        return reviewRepository.findByStatus(Status.PENDING).stream().map(ReviewMapper::toManageResponse).toList();
     }
 
     public ReviewResponseDto updateReview(Long id, Status status) {

@@ -1,13 +1,17 @@
 package com.iss.eventorium.solution.mappers;
 
 import com.iss.eventorium.category.mappers.CategoryMapper;
+import com.iss.eventorium.company.mappers.CompanyMapper;
+import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
+import com.iss.eventorium.interaction.mappers.ReviewMapper;
 import com.iss.eventorium.interaction.models.Review;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Service;
+import com.iss.eventorium.user.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,25 @@ public class ServiceMapper {
     @Autowired
     public ServiceMapper(ModelMapper modelMapper) {
         ServiceMapper.modelMapper = modelMapper;
+    }
+
+    public static ServiceDetailsDto toDetailsResponse(Service service, Company company) {
+        ServiceDetailsDto dto = modelMapper.map(service, ServiceDetailsDto.class);
+        dto.setCategory(CategoryMapper.toResponse(service.getCategory()));
+        dto.setEventTypes(service.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
+        try {
+            dto.setRating(service.getReviews().stream()
+                    .filter(r -> r.getStatus().equals(Status.ACCEPTED))
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(0.0));
+        } catch (NullPointerException e) {
+            dto.setRating(0.0d);
+        }
+        dto.setProvider(UserMapper.toUserDetails(service.getProvider()));
+        dto.setCompany(CompanyMapper.toResponse(company));
+        dto.setReviews(service.getReviews().stream().map(ReviewMapper::toResponse).toList());
+        return dto;
     }
 
     public static Service fromCreateRequest(CreateServiceRequestDto request) {

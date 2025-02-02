@@ -1,6 +1,7 @@
 package com.iss.eventorium.interaction.controllers;
 
 import com.iss.eventorium.interaction.dtos.review.CreateReviewRequestDto;
+import com.iss.eventorium.interaction.dtos.review.ManageReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
 import com.iss.eventorium.interaction.dtos.review.UpdateReviewRequestDto;
 import com.iss.eventorium.interaction.models.Review;
@@ -49,7 +50,7 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews/pending/all")
-    public ResponseEntity<List<ReviewResponseDto>> getPendingReviews() {
+    public ResponseEntity<List<ManageReviewResponseDto>> getPendingReviews() {
         return ResponseEntity.ok(reviewService.getPendingReviews());
     }
 

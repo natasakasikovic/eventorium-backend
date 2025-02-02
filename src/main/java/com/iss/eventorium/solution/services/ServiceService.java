@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.event.services.EventService;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.iss.eventorium.solution.mappers.ServiceMapper.toDetailsResponse;
 import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
 
 @org.springframework.stereotype.Service
@@ -51,6 +53,7 @@ public class ServiceService {
     private final ServiceRepository repository;
     private final AuthService authService;
     private final EventService eventService;
+    private final CompanyRepository companyRepository;
     private final EventTypeRepository eventTypeRepository;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
@@ -67,6 +70,11 @@ public class ServiceService {
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
         List<Service> services = repository.findTopFiveServices(pageable);
         return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+    }
+
+    public ServiceDetailsDto getService(Long id) {
+        Service service = find(id);
+        return toDetailsResponse(service, companyRepository.getCompanyByProviderId(service.getProvider().getId()));
     }
 
     public List<ServiceSummaryResponseDto> getServices() {
@@ -163,7 +171,7 @@ public class ServiceService {
     }
 
     public Service find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found."));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found!"));
     }
 
     public ImagePath getImagePath(Long serviceId) {
@@ -185,19 +193,15 @@ public class ServiceService {
         }
     }
 
-    public ServiceResponseDto getService(Long id) {
-        return toResponse(find(id));
-    }
-
-    public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto serviceDto) {
+    public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto request) {
         Service toUpdate = find(id);
 
-        List<EventType> eventTypes = eventTypeRepository.findAllById(serviceDto.getEventTypesIds());
+        List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
 
-        if (eventTypes.size() != serviceDto.getEventTypesIds().size())
+        if (eventTypes.size() != request.getEventTypesIds().size())
             throw new EntityNotFoundException("Event types not found.");
 
-        Service service = ServiceMapper.fromUpdateRequest(serviceDto, toUpdate);
+        Service service = ServiceMapper.fromUpdateRequest(request, toUpdate);
         service.setEventTypes(eventTypes);
 
         historyService.addServiceMemento(service);
