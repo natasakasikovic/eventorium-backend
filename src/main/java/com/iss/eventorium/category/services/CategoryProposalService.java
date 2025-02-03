@@ -30,13 +30,13 @@ public class CategoryProposalService {
 
     private static final String NOTIFICATION_TITLE = "Category";
 
-    private final MessageSource messageSource;
-
     private final NotificationService notificationService;
     private final CategoryService categoryService;
-    private final CategoryRepository categoryRepository;
 
+    private final CategoryRepository categoryRepository;
     private final SolutionRepository solutionRepository;
+
+    private final MessageSource messageSource;
 
     public CategoryResponseDto updateCategoryStatus(Long categoryId, Status status) {
         Category category = getCategoryProposal(categoryId);
@@ -61,7 +61,7 @@ public class CategoryProposalService {
     public CategoryResponseDto updateCategoryProposal(Long categoryId, CategoryRequestDto request) {
         Category category = getCategoryProposal(categoryId);
 
-        if (checkCategoryExistence(category, request.getName()))
+        if (categoryService.checkCategoryExistence(category, request.getName()))
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
 
         Solution solution = getSolutionProposal(category);
@@ -134,11 +134,6 @@ public class CategoryProposalService {
         notificationService.sendNotification(provider, notification);
     }
 
-    private boolean checkCategoryExistence(Category category, String name) {
-        return !Objects.equals(category.getName(), name)
-                && categoryRepository.findByName(name).isPresent();
-    }
-
     private void changeProposal(Category category, Solution solution, String newCategoryName) {
         category.setDeleted(true);
         category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
@@ -149,8 +144,7 @@ public class CategoryProposalService {
     }
 
     private Category getCategoryProposal(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new EntityNotFoundException("Category not found"));
+        Category category = categoryService.find(categoryId);
         if(!category.isSuggested()) {
             throw new EntityNotFoundException("Category is not suggested");
         }

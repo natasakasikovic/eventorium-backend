@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface SolutionRepository extends JpaRepository<Solution, Long> {
     Optional<Solution> findByCategoryId(Long id);
+    boolean existsByCategory_Id(Long id);
 }

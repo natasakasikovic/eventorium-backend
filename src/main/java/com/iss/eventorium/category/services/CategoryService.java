@@ -10,6 +10,7 @@ import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
+import com.iss.eventorium.solution.repositories.SolutionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,7 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ServiceRepository serviceRepository;
-    private final ProductRepository productRepository;
+    private final SolutionRepository solutionRepository;
 
     public List<CategoryResponseDto> getCategories() {
         return categoryRepository.findBySuggestedFalse().stream()
@@ -40,9 +40,7 @@ public class CategoryService {
     }
 
     public CategoryResponseDto getCategory(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-        return toResponse(category);
+        return toResponse(find(id));
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
@@ -55,11 +53,9 @@ public class CategoryService {
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
-        Category toUpdate = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        Category toUpdate = find(id);
 
-        if(!Objects.equals(toUpdate.getName(), category.getName())
-                && categoryRepository.findByName(category.getName()).isPresent()) {
+        if(checkCategoryExistence(toUpdate, category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
         }
 
@@ -69,13 +65,10 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long id) {
-        Category toDelete = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-        if(serviceRepository.existsByCategory_Id(id)) {
-            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active service.");
-        }
-        if(productRepository.existsByCategory_Id(id)) {
-            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active product.");
+        Category toDelete = find(id);
+
+        if(solutionRepository.existsByCategory_Id(id)) {
+            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active solution.");
         }
         toDelete.setName(Instant.now().toEpochMilli() + "_" + toDelete.getName());
         toDelete.setDeleted(true);
@@ -96,5 +89,14 @@ public class CategoryService {
         if (categoryRepository.findByName(category.getName()).isPresent()) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
+    }
+
+    public Category find(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category not found"));
+    }
+
+    public boolean checkCategoryExistence(Category category, String name) {
+        return !Objects.equals(category.getName(), name)
+                && categoryRepository.findByName(name).isPresent();
     }
 }
