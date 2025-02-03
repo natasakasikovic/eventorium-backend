@@ -9,15 +9,13 @@ import com.iss.eventorium.notifications.models.Notification;
 import com.iss.eventorium.notifications.models.NotificationType;
 import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.Solution;
-import com.iss.eventorium.solution.repositories.ServiceRepository;
+import com.iss.eventorium.solution.repositories.SolutionRepository;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Objects;
@@ -36,25 +34,25 @@ public class CategoryProposalService {
     private final NotificationService notificationService;
     private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
-    private final ServiceRepository serviceRepository;
+    private final SolutionRepository solutionRepository;
 
     public CategoryResponseDto updateCategoryStatus(Long categoryId, Status status) {
         Category category = getCategoryProposal(categoryId);
-        Service service = getServiceProposal(category);
+        Solution solution = getSolutionProposal(category);
 
         if(status == Status.DECLINED) {
             category.setDeleted(true);
             category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
-            service.setIsDeleted(true);
+            solution.setIsDeleted(true);
         } else {
             category.setSuggested(false);
-            service.setCategory(category);
+            solution.setCategory(category);
         }
 
-        service.setStatus(status);
-        serviceRepository.save(service);
+        solution.setStatus(status);
+        solutionRepository.save(solution);
 
-        sendStatusUpdateNotification(category, status, service.getProvider());
+        sendStatusUpdateNotification(category, status, solution.getProvider());
         return toResponse(categoryRepository.save(category));
     }
 
@@ -64,27 +62,27 @@ public class CategoryProposalService {
         if (checkCategoryExistence(category, request.getName()))
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
 
-        Service service = getServiceProposal(category);
+        Solution solution = getSolutionProposal(category);
         updateCategoryProposal(category, request);
         Category response = categoryRepository.save(category);
 
-        service.setStatus(Status.ACCEPTED);
-        serviceRepository.save(service);
+        solution.setStatus(Status.ACCEPTED);
+        solutionRepository.save(solution);
 
-        sendUpdateNotification(category, service.getProvider());
+        sendUpdateNotification(category, solution.getProvider());
         return toResponse(response);
     }
 
     public CategoryResponseDto changeCategoryProposal(Long categoryId, CategoryRequestDto request) {
         Category category = getCategoryProposal(categoryId);
-        Service service = getServiceProposal(category);
+        Solution solution = getSolutionProposal(category);
 
-        changeProposal(category, service, request.getName());
+        changeProposal(category, solution, request.getName());
         categoryRepository.save(category);
-        serviceRepository.save(service);
+        solutionRepository.save(solution);
 
-        sendChangeNotification(category, service, request);
-        return toResponse(service.getCategory());
+        sendChangeNotification(category, solution, request);
+        return toResponse(solution.getCategory());
     }
 
     public void handleCategoryProposal(Category category) {
@@ -157,13 +155,13 @@ public class CategoryProposalService {
         return category;
     }
 
-    private Service getServiceProposal(Category category) {
-        Service service = serviceRepository.findByCategoryId(category.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Service with category '" + category.getName() + "' not found"));
-        if(!service.getStatus().equals(Status.PENDING)) {
-            throw new EntityNotFoundException("Service with category '" + category.getName() + "' is not pending");
+    private Solution getSolutionProposal(Category category) {
+        Solution solution = solutionRepository.findByCategoryId(category.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
+        if(!solution.getStatus().equals(Status.PENDING)) {
+            throw new EntityNotFoundException("Solution with category '" + category.getName() + "' is not pending");
         }
-        return service;
+        return solution;
     }
 
     private String getMessage(Category category, String code) {

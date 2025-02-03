@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class CategoryService {
 
     public CategoryResponseDto getCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         return toResponse(category);
     }
 
@@ -55,7 +56,7 @@ public class CategoryService {
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
         Category toUpdate = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
 
         if(!Objects.equals(toUpdate.getName(), category.getName())
                 && categoryRepository.findByName(category.getName()).isPresent()) {
@@ -69,13 +70,14 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category toDelete = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         if(serviceRepository.existsByCategory_Id(id)) {
             throw new CategoryInUseException("Unable to delete category because it is currently associated with an active service.");
         }
         if(productRepository.existsByCategory_Id(id)) {
             throw new CategoryInUseException("Unable to delete category because it is currently associated with an active product.");
         }
+        toDelete.setName(Instant.now().toEpochMilli() + "_" + toDelete.getName());
         toDelete.setDeleted(true);
         categoryRepository.save(toDelete);
     }
