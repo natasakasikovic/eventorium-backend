@@ -30,8 +30,7 @@ public class ProductSpecification {
 
     public static Specification<Product> filterByNameForProvider(String keyword, User user) {
         return Specification.where(hasName(keyword))
-                            .and(hasProvider(user.getId())
-                            .and(filterOutBlockedContent(user)));
+                            .and(hasProvider(user.getId()));
     }
 
     public static Specification<Product> filterByName(String keyword, User user) {

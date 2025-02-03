@@ -41,7 +41,7 @@ public class EventService {
     }
 
     public List<EventSummaryResponseDto> getTopEvents() {
-        Specification<Event> specification = EventSpecification.filterTopEvents(getUserCity());
+        Specification<Event> specification = EventSpecification.filterTopEvents(getUserCity(), authService.getCurrentUser());
         List<Event> events = repository.findAll(specification).stream()
                                         .sorted(Comparator.comparing(Event::getDate))
                                         .limit(5).toList();

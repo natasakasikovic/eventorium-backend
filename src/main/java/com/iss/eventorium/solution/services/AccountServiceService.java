@@ -38,12 +38,12 @@ public class AccountServiceService {
     }
 
     public List<ServiceSummaryResponseDto> filterServices(ServiceFilterDto filter) {
-        Specification<Service> specification = ServiceSpecification.filterByForProvider(filter, authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> filterServicesPaged(ServiceFilterDto filter, Pageable pageable) {
-        Specification<Service> specification = ServiceSpecification.filterByForProvider(filter, authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
         return toPagedResponse(repository.findAll(specification, pageable));
     }
 

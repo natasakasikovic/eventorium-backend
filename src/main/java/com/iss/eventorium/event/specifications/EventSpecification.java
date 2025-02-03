@@ -36,10 +36,11 @@ public class EventSpecification {
                             .and(filterOutBlockedContent(user)));
     }
 
-    public static Specification<Event> filterTopEvents(String city){
+    public static Specification<Event> filterTopEvents(String city, User user){
         return Specification.where(hasPrivacy(Privacy.OPEN)
                             .and(hasCity(city))
-                            .and(hasDateAfter(LocalDate.now()))); // only events in future
+                            .and(hasDateAfter(LocalDate.now())) // only events in future
+                            .and(filterOutBlockedContent(user)));
     }
 
     public static Specification<Event> filterByOrganizer(User organizer) {

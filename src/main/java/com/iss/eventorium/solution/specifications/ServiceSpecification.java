@@ -26,15 +26,14 @@ public class ServiceSpecification {
                 .and(filterOutBlockedContent(user)));
     }
 
-    public static Specification<Service> filterByForProvider(ServiceFilterDto filter, User user) {
+    public static Specification<Service> filterForProvider(ServiceFilterDto filter, User user) {
         return filterBy(filter, user).and(hasProvider(user.getId()));
     }
 
     public static Specification<Service> filterByNameForProvider(String keyword, User user) {
         return Specification
                 .where(hasName(keyword))
-                .and(hasProvider(user.getId())
-                .and(filterOutBlockedContent(user)));
+                .and(hasProvider(user.getId()));
     }
 
     public static Specification<Service> filterByName(String keyword, User user){
