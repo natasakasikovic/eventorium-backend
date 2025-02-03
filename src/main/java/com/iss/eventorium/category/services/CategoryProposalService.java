@@ -15,6 +15,7 @@ import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Locale;
@@ -24,7 +25,7 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
 
 @RequiredArgsConstructor
-@org.springframework.stereotype.Service
+@Service
 public class CategoryProposalService {
 
     private static final String NOTIFICATION_TITLE = "Category";
@@ -34,6 +35,7 @@ public class CategoryProposalService {
     private final NotificationService notificationService;
     private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
+
     private final SolutionRepository solutionRepository;
 
     public CategoryResponseDto updateCategoryStatus(Long categoryId, Status status) {
@@ -172,10 +174,10 @@ public class CategoryProposalService {
         );
     }
 
-    private String getMessage(Category category, CategoryRequestDto dto) {
+    private String getMessage(Category category, CategoryRequestDto request) {
         return messageSource.getMessage(
                 "notification.category.change",
-                new Object[] { category.getName(), dto.getName() },
+                new Object[] { category.getName(), request.getName() },
                 Locale.getDefault()
         );
     }
