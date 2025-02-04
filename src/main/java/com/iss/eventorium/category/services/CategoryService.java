@@ -8,6 +8,7 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.repositories.SolutionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,11 @@ public class CategoryService {
     public Category findByName(String name) {
         return categoryRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + name + " not found"));
+    }
+
+    public Solution findSolutionByCategoryId(Category category) {
+        return solutionRepository.findByCategoryId(category.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
     }
 
     public boolean checkCategoryExistence(Category category, String name) {
