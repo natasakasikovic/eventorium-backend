@@ -19,46 +19,47 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final UserService service;
 
     @PostMapping("/password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) throws InvalidOldPasswordException {
-        userService.changePassword(request);
+        service.changePassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> update(@RequestBody UpdateRequestDto person) {
-        userService.update(person);
+        service.update(person);
         return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deactivateAccount(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/me")
     public ResponseEntity<AccountDetailsDto> getCurrentUser() {
-        return ResponseEntity.ok(userService.getCurrentUser());
+        return ResponseEntity.ok(service.getCurrentUser());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDetailsDto> getUser(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(userService.getUser(id));
+        return ResponseEntity.ok(service.getUser(id));
     }
 
     @GetMapping("/{id}/profile-photo")
     public ResponseEntity<byte[]> getProfilePhoto(@PathVariable("id") Long id) {
-        ImagePath path = userService.getProfilePhotoPath(id);
+        ImagePath path = service.getProfilePhotoPath(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(path.getContentType()))
-                .body(userService.getProfilePhoto(path));
+                .body(service.getProfilePhoto(path));
     }
 
     @PutMapping(value = "/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> uploadProfilePhoto(@RequestParam("profilePhoto") MultipartFile file) {
-        userService.updateProfilePhoto(file);
+        service.updateProfilePhoto(file);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deactivateAccount() {
+        service.deactivateAccount();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -17,10 +17,10 @@ import java.util.Collection;
 @RequestMapping("/api/v1/roles")
 public class RoleController {
 
-    private final RoleService roleService;
+    private final RoleService service;
 
     @GetMapping("/registration-options")
     public ResponseEntity<Collection<RoleDto>> getRegistrationRoles() {
-        return ResponseEntity.ok(roleService.getRegistrationRoles());
+        return ResponseEntity.ok(service.getRegistrationRoles());
     }
 }

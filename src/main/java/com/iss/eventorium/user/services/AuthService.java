@@ -2,7 +2,7 @@ package com.iss.eventorium.user.services;
 
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.user.dtos.auth.UserTokenState;
-import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
+import com.iss.eventorium.user.exceptions.AccountAccessDeniedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
@@ -42,7 +42,8 @@ public class AuthService {
     public UserTokenState login(LoginRequestDto request) {
         Authentication authentication = authenticateUser(request.getEmail(), request.getPassword());
         User user = (User) authentication.getPrincipal();
-        isActivated(user);
+        isVerified(user);
+        isDeactivated(user);
         isSuspended(user);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -56,9 +57,14 @@ public class AuthService {
         return authenticationManager.authenticate(token);
     }
 
-    public void isActivated(User user) {
-        if (!user.isActivated())
-            throw new AccountNotActivatedException("Account is not verified. Check your email.");
+    public void isVerified(User user) {
+        if (!user.isVerified())
+            throw new AccountAccessDeniedException("Account is not verified. Check your email.");
+    }
+
+    public void isDeactivated(User user) {
+        if (user.isDeactivated())
+            throw new AccountAccessDeniedException("Account has been permanently deactivated and cannot be reactivated. Access is no longer available.");
     }
 
     public void isSuspended(User user) {

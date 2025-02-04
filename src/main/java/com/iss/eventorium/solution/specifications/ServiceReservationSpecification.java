@@ -39,6 +39,17 @@ public class ServiceReservationSpecification {
         };
     }
 
+    public static Specification<Reservation> checkForAcceptedFutureReservations(User provider) {
+        return Specification
+                .where(hasProviderId(provider.getId()))
+                .and(hasStatusAccepted())
+                .and(hasEventDateInFuture());
+    }
+
+    private static Specification<Reservation> hasEventDateInFuture() {
+        return (root, query, cb) -> cb.greaterThan(root.get("event").get("date"), LocalDate.now());
+    }
+
     public static Specification<Reservation> getProviderReservations(User provider) {
         return Specification.where(hasProviderId(provider.getId())).and(hasStatusAccepted());
     }

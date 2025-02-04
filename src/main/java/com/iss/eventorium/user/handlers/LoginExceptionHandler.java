@@ -1,7 +1,7 @@
 package com.iss.eventorium.user.handlers;
 
 import com.iss.eventorium.shared.models.ExceptionResponse;
-import com.iss.eventorium.user.exceptions.AccountNotActivatedException;
+import com.iss.eventorium.user.exceptions.AccountAccessDeniedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +31,8 @@ public class LoginExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(AccountNotActivatedException.class)
-    public ResponseEntity<ExceptionResponse> handleAccountNotActivatedException(AccountNotActivatedException ex) {
+    @ExceptionHandler(AccountAccessDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleAccountAccessDeniedException(AccountAccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
