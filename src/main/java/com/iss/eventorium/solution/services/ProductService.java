@@ -129,7 +129,8 @@ public class ProductService {
     }
 
     public Product find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser());
+        return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
     public ProductResponseDto createProduct(CreateProductRequestDto request) {

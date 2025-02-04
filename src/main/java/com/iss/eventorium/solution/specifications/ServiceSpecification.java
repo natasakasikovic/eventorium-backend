@@ -52,6 +52,15 @@ public class ServiceSpecification {
                             .and(applyUserRoleFilter(user)));
     }
 
+    public static Specification<Service> filterById(Long id, User user) {
+        return Specification.where(hasId(id)
+                .and(filterOutBlockedContent(user)));
+    }
+
+    private static Specification<Service> hasId(Long id){
+        return (root, query, cb) -> cb.equal(root.get("id"), id);
+    }
+
     private static Specification<Service> hasProvider(Long providerId) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("provider").get("id"), providerId);
@@ -116,7 +125,6 @@ public class ServiceSpecification {
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
-
 
             return cb.or(
                     cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),

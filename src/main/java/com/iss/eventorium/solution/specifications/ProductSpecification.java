@@ -49,6 +49,15 @@ public class ProductSpecification {
                 .and(applyUserRoleFilter(user)));
     }
 
+    public static Specification<Product> filterById(Long id, User user) {
+        return Specification.where(hasId(id)
+                .and(filterOutBlockedContent(user)));
+    }
+
+    private static Specification<Product> hasId(Long id){
+        return (root, query, cb) -> cb.equal(root.get("id"), id);
+    }
+
     private static Specification<Product> hasProvider(Long providerId) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("provider").get("id"), providerId);

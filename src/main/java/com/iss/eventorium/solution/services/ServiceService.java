@@ -171,7 +171,8 @@ public class ServiceService {
     }
 
     public Service find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found!"));
+        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser());
+        return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Service not found"));
     }
 
     public ImagePath getImagePath(Long serviceId) {
