@@ -3,7 +3,6 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;

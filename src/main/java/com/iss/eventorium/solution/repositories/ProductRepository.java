@@ -27,6 +27,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     List<Product> findByProvider_Id(Long providerId);
 
-    boolean existsByCategory_Id(Long id);
     Page<Product> findByProvider_Id(Long providerId, Pageable pageable);
 }
