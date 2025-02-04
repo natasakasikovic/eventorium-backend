@@ -7,13 +7,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpecificationExecutor<Service> {
 
     @Query("SELECT s FROM Service s JOIN s.reviews r WHERE s.status = 'ACCEPTED' AND r.status = 'ACCEPTED' GROUP BY s.id ORDER BY AVG(r.rating) DESC")
     List<Service> findTopFiveServices(Pageable pageable);
-    Optional<Service> findByCategoryId(Long categoryId);
 
     @Query("SELECT s " +
             "FROM Service s " +
@@ -25,5 +23,4 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
             "ORDER BY s.price DESC")
     List<Service> getSuggestedServices(Long categoryId, Double price);
 
-    boolean existsByCategory_Id(Long categoryId);
 }

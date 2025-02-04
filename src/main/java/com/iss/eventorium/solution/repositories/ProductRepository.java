@@ -19,5 +19,4 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "WHERE c.id = :categoryId AND p.price <= :price AND p.status = 'ACCEPTED' " +
             "ORDER BY p.price DESC")
     List<Product> getBudgetSuggestions(Long categoryId, Double price);
-    boolean existsByCategory_Id(Long id);
 }

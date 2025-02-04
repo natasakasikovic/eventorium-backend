@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findBySuggestedFalse();
     Page<Category> findBySuggestedFalse(Pageable pageable);
-    Optional<Category> findByName(String name);
+    Optional<Category> findByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
     List<Category> findBySuggestedTrue();
     Page<Category> findBySuggestedTrue(Pageable pageable);
 }

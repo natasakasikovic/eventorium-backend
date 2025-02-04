@@ -8,12 +8,13 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.repositories.ProductRepository;
-import com.iss.eventorium.solution.repositories.ServiceRepository;
+import com.iss.eventorium.solution.models.Solution;
+import com.iss.eventorium.solution.repositories.SolutionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,8 +25,7 @@ import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ServiceRepository serviceRepository;
-    private final ProductRepository productRepository;
+    private final SolutionRepository solutionRepository;
 
     public List<CategoryResponseDto> getCategories() {
         return categoryRepository.findBySuggestedFalse().stream()
@@ -39,13 +39,11 @@ public class CategoryService {
     }
 
     public CategoryResponseDto getCategory(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
-        return toResponse(category);
+        return toResponse(find(id));
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
-        if(categoryRepository.findByName(category.getName()).isPresent()) {
+        if(categoryRepository.existsByNameIgnoreCase(category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
         Category created = CategoryMapper.fromRequest(category);
@@ -54,11 +52,9 @@ public class CategoryService {
     }
 
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
-        Category toUpdate = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
+        Category toUpdate = find(id);
 
-        if(!Objects.equals(toUpdate.getName(), category.getName())
-                && categoryRepository.findByName(category.getName()).isPresent()) {
+        if(checkCategoryExistence(toUpdate, category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
         }
 
@@ -68,14 +64,12 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long id) {
-        Category toDelete = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id " + id + " not found"));
-        if(serviceRepository.existsByCategory_Id(id)) {
-            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active service.");
+        Category toDelete = find(id);
+
+        if(solutionRepository.existsByCategory_Id(id)) {
+            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active solution.");
         }
-        if(productRepository.existsByCategory_Id(id)) {
-            throw new CategoryInUseException("Unable to delete category because it is currently associated with an active product.");
-        }
+        toDelete.setName(Instant.now().toEpochMilli() + "_" + toDelete.getName());
         toDelete.setDeleted(true);
         categoryRepository.save(toDelete);
     }
@@ -91,8 +85,28 @@ public class CategoryService {
     }
 
     public void ensureCategoryNameIsUnique(Category category) {
-        if (categoryRepository.findByName(category.getName()).isPresent()) {
+        if (categoryRepository.existsByNameIgnoreCase(category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
     }
+
+    public Category find(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category not found"));
+    }
+
+    public Category findByName(String name) {
+        return categoryRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new EntityNotFoundException("Category with name " + name + " not found"));
+    }
+
+    public Solution findSolutionByCategoryId(Category category) {
+        return solutionRepository.findByCategoryId(category.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
+    }
+
+    public boolean checkCategoryExistence(Category category, String name) {
+        return !Objects.equals(category.getName(), name)
+                && categoryRepository.existsByNameIgnoreCase(name);
+    }
+
 }
