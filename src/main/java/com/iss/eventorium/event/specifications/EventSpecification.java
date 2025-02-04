@@ -50,6 +50,15 @@ public class EventSpecification {
                         : cb.equal(root.get("organizer"), organizer);
     }
 
+    public static Specification<Event> filterById(Long id, User user) {
+        return Specification.where(hasId(id)
+                .and(filterOutBlockedContent(user)));
+    }
+
+    private static Specification<Event> hasId(Long id){
+        return (root, query, cb) -> cb.equal(root.get("id"), id);
+    }
+
     private static Specification<Event> hasName(String name) {
         return (root, query, cb) ->
                 name == null || name.isEmpty()

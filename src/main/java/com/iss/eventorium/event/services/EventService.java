@@ -80,7 +80,8 @@ public class EventService {
     }
 
     public Event find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found."));
+        Specification<Event> specification = EventSpecification.filterById(id, authService.getCurrentUser());
+        return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Event not found"));
     }
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
