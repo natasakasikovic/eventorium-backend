@@ -21,7 +21,8 @@ public class ProductSpecification {
                 .and(hasMinPrice(filter.getMinPrice()))
                 .and(hasMaxPrice(filter.getMaxPrice()))
                 .and(hasAvailability(filter.getAvailability())
-                .and(filterOutBlockedContent(user)));
+                .and(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user)));
     }
 
     public static Specification<Product> filterForProvider(ProductFilterDto filter, User user) {
@@ -35,11 +36,17 @@ public class ProductSpecification {
 
     public static Specification<Product> filterByName(String keyword, User user) {
         return Specification.where(hasName(keyword))
-                            .and(filterOutBlockedContent(user));
+                            .and(filterOutBlockedContent(user)
+                            .and(applyUserRoleFilter(user)));
     }
 
     public static Specification<Product> filterForProvider(User provider) {
         return Specification.where(hasProvider(provider.getId()));
+    }
+
+    public static Specification<Product> filter(User user) {
+        return Specification.where(filterOutBlockedContent(user)
+                .and(applyUserRoleFilter(user)));
     }
 
     private static Specification<Product> hasProvider(Long providerId) {
@@ -98,7 +105,30 @@ public class ProductSpecification {
                         : cb.equal(root.get("isAvailable"), availability);
     }
 
-    public static Specification<Product> filterOutBlockedContent(User blocker) {
+    private static Specification<Product> applyUserRoleFilter(User user) {
+        return (root, query, cb) -> {
+            if (user == null) {
+                return cb.and(
+                        cb.isTrue(root.get("isVisible")),
+                        cb.equal(root.get("status"), "ACCEPTED")
+                );
+            }
+
+            if (user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()))) {
+                return cb.or(
+                        cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))), // If user is PROVIDER, filter by accepted and visible services
+                        cb.equal(root.get("provider").get("id"), user.getId())                 // or services that belong to the provider
+                );
+            } else {
+                return cb.and(
+                        cb.isTrue(root.get("isVisible")),
+                        cb.notEqual(root.get("status"), "ACCEPTED")
+                );
+            }
+        };
+    }
+
+    private static Specification<Product> filterOutBlockedContent(User blocker) {
         return (root, query, cb) -> {
             if (blocker == null) return cb.conjunction();
 

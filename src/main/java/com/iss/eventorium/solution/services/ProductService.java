@@ -59,12 +59,12 @@ public class ProductService {
     }
 
     public PagedResponse<ProductSummaryResponseDto> getProducts(Pageable pageable) {
-        Specification<Product> specification = ProductSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        Specification<Product> specification = ProductSpecification.filter(authService.getCurrentUser());
         return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> getProducts() {
-        Specification<Product> specification = ProductSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        Specification<Product> specification = ProductSpecification.filter(authService.getCurrentUser());
         return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
     }
 

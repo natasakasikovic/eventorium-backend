@@ -78,12 +78,12 @@ public class ServiceService {
     }
 
     public List<ServiceSummaryResponseDto> getServices() {
-        Specification<Service> specification = ServiceSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filter(authService.getCurrentUser());
         return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
-        Specification<Service> specification = ServiceSpecification.filterOutBlockedContent(authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filter(authService.getCurrentUser());
         return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
@@ -97,7 +97,7 @@ public class ServiceService {
         return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter){
+    public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter) {
         Specification<Service> specification = ServiceSpecification.filterBy(filter, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
