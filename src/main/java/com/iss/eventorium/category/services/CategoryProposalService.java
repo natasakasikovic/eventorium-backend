@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Locale;
-import java.util.Objects;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
 
@@ -138,8 +137,7 @@ public class CategoryProposalService {
         category.setDeleted(true);
         category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
         solution.setStatus(Status.ACCEPTED);
-        solution.setCategory(categoryRepository.findByName(newCategoryName)
-                .orElseThrow(() -> new EntityNotFoundException("Category with name " + newCategoryName + " not found")));
+        solution.setCategory(categoryService.findByName(newCategoryName));
 
     }
 

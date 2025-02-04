@@ -8,8 +8,6 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.repositories.ProductRepository;
-import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.repositories.SolutionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +42,7 @@ public class CategoryService {
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
-        if(categoryRepository.findByName(category.getName()).isPresent()) {
+        if(categoryRepository.existsByNameIgnoreCase(category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
         Category created = CategoryMapper.fromRequest(category);
@@ -86,7 +84,7 @@ public class CategoryService {
     }
 
     public void ensureCategoryNameIsUnique(Category category) {
-        if (categoryRepository.findByName(category.getName()).isPresent()) {
+        if (categoryRepository.existsByNameIgnoreCase(category.getName())) {
             throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists");
         }
     }
@@ -95,8 +93,14 @@ public class CategoryService {
         return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Category not found"));
     }
 
+    public Category findByName(String name) {
+        return categoryRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new EntityNotFoundException("Category with name " + name + " not found"));
+    }
+
     public boolean checkCategoryExistence(Category category, String name) {
         return !Objects.equals(category.getName(), name)
-                && categoryRepository.findByName(name).isPresent();
+                && categoryRepository.existsByNameIgnoreCase(name);
     }
+
 }
