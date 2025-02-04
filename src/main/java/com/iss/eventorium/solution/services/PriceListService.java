@@ -10,11 +10,13 @@ import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
+import com.iss.eventorium.solution.specifications.ProductSpecification;
+import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.services.AuthService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,26 +30,23 @@ public class PriceListService {
     private final HistoryService historyService;
     private final AuthService authService;
     private final PdfService pdfService;
-
+    private final ServiceService serviceService;
+    private final ProductService productService;
     private final ServiceRepository serviceRepository;
     private final ProductRepository productRepository;
 
     public List<PriceListResponseDto> getPriceListServices() {
-        return serviceRepository.findByProvider_Id(authService.getCurrentUser().getId()).stream()
-                .map(PriceListMapper::toResponse)
-                .toList();
+        Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
+        return serviceRepository.findAll(specification).stream().map(PriceListMapper::toResponse).toList();
     }
 
     public PagedResponse<PriceListResponseDto> getPriceListServicesPaged(Pageable pageable) {
-        return PriceListMapper.toPagedResponse(
-                serviceRepository.findByProvider_Id(authService.getCurrentUser().getId(), pageable)
-        );
+        Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
+        return PriceListMapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
     }
 
     public PriceListResponseDto updateService(Long id, UpdatePriceRequestDto updateRequestDto) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + id + " not found")
-        );
+        Service service = serviceService.find(id);
 
         if(Objects.equals(service.getPrice(), updateRequestDto.getPrice())
                 && Objects.equals(service.getDiscount(), updateRequestDto.getDiscount())) {
@@ -62,23 +61,20 @@ public class PriceListService {
     }
 
     public List<PriceListResponseDto> getPriceListProducts() {
-        return productRepository.findByProvider_Id(authService.getCurrentUser().getId()).stream()
-                .map(PriceListMapper::toResponse)
-                .toList();
+        Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
+        return productRepository.findAll(specification).stream().map(PriceListMapper::toResponse).toList();
     }
 
     public PagedResponse<PriceListResponseDto> getPriceListProductsPaged(Pageable pageable) {
-        return PriceListMapper.toPagedResponse(
-                productRepository.findByProvider_Id(authService.getCurrentUser().getId(), pageable)
+        Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
+        return PriceListMapper.toPagedResponse(productRepository.findAll(specification, pageable)
         );
     }
 
     public PriceListResponseDto updateProduct(Long id, UpdatePriceRequestDto updateRequestDto) {
-        Product product = productRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + id + " not found")
-        );
+        Product product = productService.find(id);
 
-        if(Objects.equals(product.getPrice(), updateRequestDto.getPrice())
+        if (Objects.equals(product.getPrice(), updateRequestDto.getPrice())
                 && Objects.equals(product.getDiscount(), updateRequestDto.getDiscount())) {
             return PriceListMapper.toResponse(product);
         }

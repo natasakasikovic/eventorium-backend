@@ -130,11 +130,14 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+    public User findUser(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
+    }
+
     public void uploadProfilePhoto(Long userId, MultipartFile photo) {
         if (photo == null) return;
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+        User user = findUser(userId);
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
         String fileName = Instant.now().toEpochMilli() + "_" + originalFileName;
@@ -217,4 +220,15 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void cleanUserOfBlockedOrganizerContent(User user, User organizer) {
+        user.getPerson().getFavouriteEvents().removeIf(event -> event.getOrganizer().equals(organizer));
+        user.getPerson().getAttendingEvents().removeIf(event -> event.getOrganizer().equals(organizer));
+        userRepository.save(user);
+    }
+
+    public void cleanUserOfBlockedProviderContent(User user, User provider) {
+        user.getPerson().getFavouriteProducts().removeIf(product -> product.getProvider().equals(provider));
+        user.getPerson().getFavouriteServices().removeIf(service -> service.getProvider().equals(provider));
+        userRepository.save(user);
+    }
 }

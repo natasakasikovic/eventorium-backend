@@ -1,15 +1,12 @@
 package com.iss.eventorium.solution.repositories;
 
 import com.iss.eventorium.solution.models.Service;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpecificationExecutor<Service> {
 
@@ -26,11 +23,4 @@ public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpec
             "ORDER BY s.price DESC")
     List<Service> getSuggestedServices(Long categoryId, Double price);
 
-    Page<Service> findByNameContainingAllIgnoreCase(String keyword, Pageable pageable);
-
-    List<Service> findByNameContainingAllIgnoreCase(String keyword);
-
-    List<Service> findByProvider_Id(Long id);
-
-    Page<Service> findByProvider_Id(Long id, Pageable pageable);
 }

@@ -16,16 +16,16 @@ import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JRException;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 @Service
@@ -41,9 +41,11 @@ public class EventService {
     }
 
     public List<EventSummaryResponseDto> getTopEvents() {
-        Pageable pageable = PageRequest.of(0, 5);
-        List<Event> events = repository.findTopFiveUpcomingEvents(getUserCity(), pageable);
-        return events.stream().map(EventMapper::toSummaryResponse).collect(Collectors.toList());
+        Specification<Event> specification = EventSpecification.filterTopEvents(getUserCity(), authService.getCurrentUser());
+        List<Event> events = repository.findAll(specification).stream()
+                                        .sorted(Comparator.comparing(Event::getDate))
+                                        .limit(5).toList();
+        return events.stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     private String getUserCity() {  // If the user is logged in, it returns the city from the profile, otherwise defaults to "Novi Sad".
@@ -53,32 +55,33 @@ public class EventService {
     }
 
     public List<EventSummaryResponseDto> getAll() {
-        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN);
+        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
-        Specification<Event> specification = EventSpecification.filterByName(keyword);
+        Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
-        Specification<Event> specification = EventSpecification.filterByName(keyword);
+        Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
-        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN);
+        Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
-        Specification<Event> specification = EventSpecification.filterBy(filter);
+        Specification<Event> specification = EventSpecification.filterBy(filter, authService.getCurrentUser());
         return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public Event find(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found."));
+        Specification<Event> specification = EventSpecification.filterById(id, authService.getCurrentUser());
+        return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Event not found"));
     }
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
@@ -117,6 +120,7 @@ public class EventService {
         return find(id).getActivities().stream().map(ActivityMapper::toResponse).toList();
     }
 
+    // TODO: this method needs to be replaces with method which will get my events in future
     public List<EventResponseDto> getDraftedEvents() {
         return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
                 .stream()

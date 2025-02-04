@@ -13,6 +13,7 @@ import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -22,44 +23,38 @@ import static com.iss.eventorium.solution.mappers.ServiceMapper.toPagedResponse;
 @RequiredArgsConstructor
 public class AccountServiceService {
 
+    private final ServiceRepository repository;
     private final AuthService authService;
-    private final ServiceRepository serviceRepository;
     private final UserRepository userRepository;
 
     public List<ServiceSummaryResponseDto> getServices() {
-        return serviceRepository.findByProvider_Id(authService.getCurrentUser().getId()).stream()
-                .map(ServiceMapper::toSummaryResponse)
-                .toList();
+        Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
-        return toPagedResponse(serviceRepository.findByProvider_Id(authService.getCurrentUser().getId(), pageable));
+        Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
+        return toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> filterServices(ServiceFilterDto filter) {
-        return serviceRepository.findAll(
-            ServiceSpecification.filterBy(filter, authService.getCurrentUser().getId())
-        ).stream().map(ServiceMapper::toSummaryResponse).toList();
+        Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> filterServicesPaged(ServiceFilterDto filter, Pageable pageable) {
-        return toPagedResponse(serviceRepository.findAll(
-            ServiceSpecification.filterBy(filter, authService.getCurrentUser().getId()),
-            pageable
-        ));
+        Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
+        return toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public PagedResponse<ServiceSummaryResponseDto> searchServicesPaged(String keyword, Pageable pageable) {
-        return toPagedResponse(serviceRepository.findAll(
-            ServiceSpecification.search(keyword, authService.getCurrentUser().getId()),
-            pageable
-        ));
+        Specification<Service> specification = ServiceSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
+        return toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {
-        return serviceRepository.findAll(
-                ServiceSpecification.search(keyword, authService.getCurrentUser().getId())
-        ).stream().map(ServiceMapper::toSummaryResponse).toList();
+        Specification<Service> specification = ServiceSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
     }
 
     public List<ServiceSummaryResponseDto> getFavouriteServices() {
@@ -72,9 +67,8 @@ public class AccountServiceService {
     }
 
     public void addFavouriteService(Long id) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + id + " not found")
-        );
+        Service service = find(id);
+
         List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
         if(!favouriteService.contains(service)) {
             favouriteService.add(service);
@@ -83,9 +77,9 @@ public class AccountServiceService {
     }
 
     public void removeFavouriteService(Long id) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + id + " not found")
-        );
+
+        Service service = find(id);
+
         List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
         if(favouriteService.contains(service)) {
             favouriteService.remove(service);
@@ -93,10 +87,12 @@ public class AccountServiceService {
         }
     }
 
+    public Service find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Service not found."));
+    }
+
     public Boolean isFavouriteService(Long id) {
-        Service service = serviceRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Service with id " + id + " not found")
-        );
+        Service service = find(id);
         return authService.getCurrentUser().getPerson().getFavouriteServices().contains(service);
     }
 }

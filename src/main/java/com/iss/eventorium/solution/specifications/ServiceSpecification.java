@@ -3,19 +3,18 @@ package com.iss.eventorium.solution.specifications;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.models.Service;
 
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ServiceSpecification {
 
-    public static Specification<Service> filterBy(ServiceFilterDto filter, Long providerId) {
-        return filterBy(filter).and(hasProvider(providerId));
-    }
-
-    public static Specification<Service> filterBy(ServiceFilterDto filter) {
+    public static Specification<Service> filterBy(ServiceFilterDto filter, User user) {
         return Specification
                 .where(hasName(filter.getName()))
                 .and(hasDescription(filter.getDescription()))
@@ -23,13 +22,43 @@ public class ServiceSpecification {
                 .and(hasEventType(filter.getType()))
                 .and(hasMinPrice(filter.getMinPrice()))
                 .and(hasMaxPrice(filter.getMaxPrice()))
-                .and(hasAvailability(filter.getAvailability()));
+                .and(hasAvailability(filter.getAvailability())
+                .and(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user)));
     }
 
-    public static Specification<Service> search(String keyword, Long providerId) {
+    public static Specification<Service> filterForProvider(ServiceFilterDto filter, User user) {
+        return filterBy(filter, user).and(hasProvider(user.getId()));
+    }
+
+    public static Specification<Service> filterByNameForProvider(String keyword, User user) {
         return Specification
                 .where(hasName(keyword))
-                .and(hasProvider(providerId));
+                .and(hasProvider(user.getId()));
+    }
+
+    public static Specification<Service> filterByName(String keyword, User user) {
+        return Specification.where(hasName(keyword)
+                .and(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user)));
+    }
+
+    public static Specification<Service> filterForProvider(User provider) {
+        return Specification.where(hasProvider(provider.getId()));
+    }
+
+    public static Specification<Service> filter(User user) {
+        return Specification.where(filterOutBlockedContent(user)
+                            .and(applyUserRoleFilter(user)));
+    }
+
+    public static Specification<Service> filterById(Long id, User user) {
+        return Specification.where(hasId(id)
+                .and(filterOutBlockedContent(user)));
+    }
+
+    private static Specification<Service> hasId(Long id){
+        return (root, query, cb) -> cb.equal(root.get("id"), id);
     }
 
     private static Specification<Service> hasProvider(Long providerId) {
@@ -84,6 +113,39 @@ public class ServiceSpecification {
             if (maxPrice == null) return cb.conjunction();
             Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
             return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
+        };
+    }
+
+    private static Specification<Service> applyUserRoleFilter(User user) {
+        return (root, query, cb) -> {
+            boolean isProvider = user != null && user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()));
+
+            if (user == null || !isProvider)
+                return cb.and(
+                        cb.isTrue(root.get("isVisible")),
+                        cb.equal(root.get("status"), "ACCEPTED")
+                );
+
+            return cb.or(
+                    cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),
+                    cb.equal(root.get("provider").get("id"), user.getId())
+            );
+        };
+    }
+
+    private static Specification<Service> filterOutBlockedContent(User blocker) {
+        return (root, query, cb) -> {
+            if (blocker == null) return cb.conjunction();
+
+            Long blockerId = blocker.getId();
+
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<UserBlock> userBlockRoot = subquery.from(UserBlock.class);
+
+            subquery.select(userBlockRoot.get("blocked").get("id"))
+                    .where(cb.equal(userBlockRoot.get("blocker").get("id"), blockerId));
+
+            return cb.not(root.get("provider").get("id").in(subquery));
         };
     }
 
