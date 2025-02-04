@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos.review;
+package com.iss.eventorium.interaction.dtos.ratings;
 
 import com.iss.eventorium.solution.models.SolutionType;
 import lombok.*;

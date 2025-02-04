@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpecificationExecutor<Service> {
 
-    @Query("SELECT s FROM Service s JOIN s.reviews r WHERE s.status = 'ACCEPTED' AND r.status = 'ACCEPTED' GROUP BY s.id ORDER BY AVG(r.rating) DESC")
+    @Query("SELECT s FROM Service s")
     List<Service> findTopFiveServices(Pageable pageable);
 
     @Query("SELECT s " +

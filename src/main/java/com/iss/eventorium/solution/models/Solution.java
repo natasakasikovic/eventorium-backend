@@ -2,7 +2,8 @@ package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.interaction.models.Review;
+import com.iss.eventorium.interaction.models.Comment;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
@@ -56,13 +57,17 @@ public abstract class Solution {
     @Column(name="is_visible")
     private Boolean isVisible;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn (name = "solution_id")
-    private List<Review> reviews;
+    @OneToMany
+    @JoinColumn(name = "solution_id", nullable = false)
+    private List<Rating> ratings;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name="category_id")
     private Category category;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "commentable_id")
+    private List<Comment> comments;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="solution_event_types", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
@@ -77,8 +82,8 @@ public abstract class Solution {
 
     public abstract void restore(Memento memento);
 
-    public void addReview(Review review) {
-        getReviews().add(review);
+    public void addRating(Rating rating) {
+        getRatings().add(rating);
     }
 
     @Override

@@ -118,34 +118,6 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 7, 6, 12, 3, 3),
 (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', 14, 5, 3, 7, 8, 3);
 
-
-INSERT INTO reviews (creation_date, rating, feedback, status, solution_id, user_id) VALUES
- ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1, 3),
- ('2024-12-02 10:30:00', 4, 'The banners are great, but the print quality could be better.', 'ACCEPTED', 2, 2),
- ('2024-12-03 11:45:00', 3, 'The party favors are cute, but the variety is limited.', 'PENDING', 3, 5),
- ('2024-12-01 14:00:00', 5, 'These balloons added the perfect pop of color to our event. Highly recommend!', 'ACCEPTED', 4, 2),
- ('2024-12-01 12:15:00', 5, 'Everything is great!', 'ACCEPTED', 2, 3),
- ('2024-12-03 18:20:00', 4, 'Nice mugs but the customization options are a bit limited.', 'ACCEPTED', 7, 4),
- ('2024-12-02 13:00:00', 5, 'These photo frames were the perfect souvenir for our event. Everyone loved them!', 'ACCEPTED', 8, 2),
- ('2024-12-03 11:45:00', 3, 'The event planner was okay, but some details were overlooked during the event.', 'PENDING', 11, 2),
- ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12, 5),
- ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13, 3),
- ('2025-01-25 10:30:00', 5, 'The custom invitations were exactly what I needed! They looked beautiful and really added a personal touch to the event.', 'ACCEPTED', 1, 3),
- ('2025-01-24 11:00:00', 4, 'The event banner was high quality, but the colors did not match exactly what I expected from the design preview.', 'ACCEPTED', 2, 2),
- ('2025-01-23 14:45:00', 3, 'The party favors were cute, but I was hoping for a bit more customization.', 'PENDING', 3, 3),
- ('2025-01-22 16:00:00', 5, 'These balloons added so much life to our event! Vibrant colors and great quality.', 'ACCEPTED', 4, 5),
- ('2025-01-21 12:30:00', 2, 'The event t-shirts arrived late and the print quality was not as good as expected.', 'DECLINED', 5, 4),
- ('2025-01-20 18:00:00', 4, 'Party hats were a hit! The guests loved them. Only wish they were available in more colors.', 'PENDING', 6, 3),
- ('2025-01-19 13:30:00', 5, 'The personalized mugs were a fantastic souvenir for the event. Everyone loved them!', 'PENDING', 7, 2),
- ('2025-01-18 15:00:00', 3, 'The photo frames were nice, but the customization options were limited.', 'PENDING', 8, 5),
- ('2025-01-25 10:00:00', 5, 'The event photography service was exceptional! The photos turned out amazing and captured every moment perfectly.', 'PENDING', 9, 4),
- ('2025-01-24 12:00:00', 4, 'Catering was delicious, but some dishes arrived a bit cold. Overall, great service though.', 'PENDING', 10, 2),
- ('2025-01-23 14:00:00', 5, 'The event planning service was incredible! They handled everything from start to finish, and it made my life so much easier.', 'PENDING', 11, 3),
- ('2025-01-22 11:30:00', 3, 'Sound system setup was good, but the audio quality could have been better at times during the event.', 'PENDING', 12, 4),
- ('2025-01-21 16:00:00', 5, 'The decorative lighting transformed our venue into something magical! Could not have been more pleased with how it looked.', 'ACCEPTED', 13, 3),
- ('2025-01-20 17:00:00', 4, 'Venue booking was smooth and easy. However, the venue itself could use a bit of updating.', 'PENDING', 14, 2),
- ('2025-01-18 09:00:00', 5, 'The event security team was fantastic. They ensured everything ran smoothly and kept everyone safe.', 'ACCEPTED', 15, 2);
-
 INSERT INTO budgets VALUES (62.0, 54.0);
 
 INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id) VALUES

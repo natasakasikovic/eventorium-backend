@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.models;
 
+import com.iss.eventorium.interaction.models.Comment;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
@@ -18,7 +20,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table (name = "events")
+@Table(name = "events")
 @Entity
 public class Event {
 
@@ -26,13 +28,13 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String description;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
@@ -42,7 +44,7 @@ public class Event {
     private Integer maxParticipants;
 
     @ManyToOne
-    private EventType type; // NOTE: If type is null, it indicates that the user selected "all"
+    private EventType type;
 
     @ManyToOne
     private City city;
@@ -54,6 +56,14 @@ public class Event {
     @JoinColumn(name = "event_id")
     private List<Activity> activities = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
+    private List<Rating> ratings;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "commentable_id")
+    private List<Comment> comments;
+
     @ManyToOne
     private User organizer;
 
@@ -62,4 +72,9 @@ public class Event {
 
     @Column(name = "is_draft")
     private boolean isDraft = true;
+
+    public void addRating(Rating rating) {
+        ratings.add(rating);
+    }
 }
+
