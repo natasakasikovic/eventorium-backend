@@ -1,6 +1,8 @@
 package com.iss.eventorium.user.dtos.auth;
 
+import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,4 +19,7 @@ public class PersonQuickRegistrationDto {
 
     @NotBlank(message = "Last name is required")
     private String lastname;
+
+    @NotNull(message = "City is required")
+    private CityDto city;
 }

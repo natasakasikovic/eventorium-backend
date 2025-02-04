@@ -65,7 +65,7 @@ public class UserService {
         setUserDetails(user);
 
         if (userRepository.existsByEmail(user.getEmail()))
-            throw new EmailAlreadyTakenException("Account with given email already exists.");
+            throw new EmailAlreadyTakenException("Registration with this email address has already been completed. Please log in to access the application.");
 
         userRepository.save(user);
     }

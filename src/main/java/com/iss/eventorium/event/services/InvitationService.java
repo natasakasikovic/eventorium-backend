@@ -9,6 +9,7 @@ import com.iss.eventorium.event.repositories.InvitationRepository;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.utils.HashUtils;
+import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,6 @@ public class InvitationService {
 
     private final InvitationRepository repository;
     private final UserService userService;
-    private final AccountEventService accountEventService;
     private final EmailService emailService;
     private final EventService eventService;
     private final SpringTemplateEngine templateEngine;
@@ -89,13 +89,11 @@ public class InvitationService {
     public InvitationResponseDto getInvitation(String hash){
         Invitation invitation = findByHash(hash);
         InvitationResponseDto response = InvitationMapper.toResponse(invitation);
-        setUpInvitationDto(response);
-        return response;
-    }
 
-    private void setUpInvitationDto(InvitationResponseDto invitation) {
-        boolean isEmailRegistered = userService.existsByEmail(invitation.getEmail());
-        invitation.setIsEmailRegistered(isEmailRegistered);
+        if (userService.existsByEmail(invitation.getEmail()))
+            throw new EmailAlreadyTakenException("An email you are trying to use within this invitation is already associated with an account. \nPlease log in to your account.");
+
+        return response;
     }
 
     private Invitation findByHash(String hash){
