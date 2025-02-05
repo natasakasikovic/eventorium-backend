@@ -1,8 +1,8 @@
 package com.iss.eventorium.event.models;
 
-import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "events")
 @Entity
-public class Event {
+public class Event extends CommentableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,10 +60,6 @@ public class Event {
     @JoinColumn(name = "event_id")
     private List<Rating> ratings;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "commentable_id")
-    private List<Comment> comments;
-
     @ManyToOne
     private User organizer;
 
@@ -75,6 +71,11 @@ public class Event {
 
     public void addRating(Rating rating) {
         ratings.add(rating);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name;
     }
 }
 

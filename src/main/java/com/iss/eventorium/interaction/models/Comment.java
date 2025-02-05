@@ -1,5 +1,6 @@
 package com.iss.eventorium.interaction.models;
 
+import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
@@ -35,4 +36,7 @@ public class Comment {
 
     @Enumerated(EnumType.STRING)
     private CommentType commentType;
+
+    @Column(nullable = false)
+    private Long commentable;
 }

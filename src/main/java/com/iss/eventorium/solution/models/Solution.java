@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
+import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
@@ -26,7 +27,7 @@ import java.util.Objects;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SQLRestriction("is_deleted = false")
-public abstract class Solution {
+public abstract class Solution extends CommentableEntity {
 
     @Id
     @SequenceGenerator(name = "solutionSeqGen", sequenceName = "solutionSequence", allocationSize = 1)
@@ -65,10 +66,6 @@ public abstract class Solution {
     @JoinColumn(name="category_id")
     private Category category;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "commentable_id")
-    private List<Comment> comments;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="solution_event_types", joinColumns = @JoinColumn(name = "solution_id"), inverseJoinColumns = @JoinColumn(name = "event_type_id"))
     private List<EventType> eventTypes;
@@ -91,6 +88,11 @@ public abstract class Solution {
         if (this == o) return true;
         if (!(o instanceof Solution solution)) return false;
         return Objects.equals(id, solution.id);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name;
     }
 
     @Override
