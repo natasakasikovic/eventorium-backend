@@ -1,7 +1,7 @@
 package com.iss.eventorium.interaction.mappers;
 
 import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
-import com.iss.eventorium.interaction.dtos.comment.CreateCommentDto;
+import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.shared.dtos.CommentableResponseDto;
 import com.iss.eventorium.shared.models.CommentableEntity;
@@ -20,7 +20,7 @@ public class CommentMapper {
         CommentMapper.modelMapper = modelMapper;
     }
 
-    public static Comment fromRequest(CreateCommentDto request) {
+    public static Comment fromRequest(CreateCommentRequestDto request) {
         return modelMapper.map(request, Comment.class);
     }
 

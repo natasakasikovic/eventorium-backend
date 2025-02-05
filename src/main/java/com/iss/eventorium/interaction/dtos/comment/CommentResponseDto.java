@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentResponseDto {
     private Long id;
+    private String comment;
     private LocalDateTime creationDate;
     private UserDetailsDto user;
     private CommentType type;

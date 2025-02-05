@@ -2,7 +2,7 @@ package com.iss.eventorium.interaction.services;
 
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
-import com.iss.eventorium.interaction.dtos.comment.CreateCommentDto;
+import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.mappers.CommentMapper;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.CommentType;
@@ -31,13 +31,13 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public CommentResponseDto createComment(Long id, CommentType type, CreateCommentDto request) {
+    public CommentResponseDto createComment(Long id, CommentType type, CreateCommentRequestDto request) {
         CommentableEntity entity = findCommentable(id, type);
 
         Comment comment = CommentMapper.fromRequest(request);
         comment.setUser(authService.getCurrentUser());
         comment.setCommentType(type);
-        comment.setCommentable(id);
+        comment.setCommentableId(id);
 
         entity.addComment(comment);
 
@@ -47,7 +47,7 @@ public class CommentService {
 
     public List<CommentResponseDto> getPendingComments() {
         return commentRepository.findByStatus(Status.PENDING).stream()
-                .map(c -> toResponse(c, findCommentable(c.getCommentable(), c.getCommentType())))
+                .map(c -> toResponse(c, findCommentable(c.getCommentableId(), c.getCommentType())))
                 .toList();
     }
 
@@ -61,5 +61,11 @@ public class CommentService {
 
     public Comment find(Long id) {
         return commentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Comment not found!"));
+    }
+
+    public CommentResponseDto updateCommentStatus(Long id, Status status) {
+        Comment comment = find(id);
+        comment.setStatus(status);
+        return toResponse(commentRepository.save(comment), findCommentable(comment.getCommentableId(), comment.getCommentType()));
     }
 }

@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateCommentDto {
+public class CreateCommentRequestDto {
     @NotBlank
     private String comment;
 }
