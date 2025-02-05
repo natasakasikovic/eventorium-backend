@@ -10,9 +10,11 @@ import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.repositories.SolutionRepository;
+import com.iss.eventorium.solution.services.SolutionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,12 +22,13 @@ import java.util.Objects;
 
 import static com.iss.eventorium.category.mappers.CategoryMapper.*;
 
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
 public class CategoryService {
 
+    private final SolutionService solutionService;
+
     private final CategoryRepository categoryRepository;
-    private final SolutionRepository solutionRepository;
 
     public List<CategoryResponseDto> getCategories() {
         return categoryRepository.findBySuggestedFalse().stream()
@@ -66,7 +69,7 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category toDelete = find(id);
 
-        if(solutionRepository.existsByCategory_Id(id)) {
+        if(solutionService.existsCategory(id)) {
             throw new CategoryInUseException("Unable to delete category because it is currently associated with an active solution.");
         }
         toDelete.setName(Instant.now().toEpochMilli() + "_" + toDelete.getName());
@@ -97,11 +100,6 @@ public class CategoryService {
     public Category findByName(String name) {
         return categoryRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new EntityNotFoundException("Category with name " + name + " not found"));
-    }
-
-    public Solution findSolutionByCategoryId(Category category) {
-        return solutionRepository.findByCategoryId(category.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
     }
 
     public boolean checkCategoryExistence(Category category, String name) {
