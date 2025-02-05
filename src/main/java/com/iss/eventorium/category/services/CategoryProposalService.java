@@ -10,6 +10,7 @@ import com.iss.eventorium.notifications.models.NotificationType;
 import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Solution;
+import com.iss.eventorium.solution.repositories.SolutionRepository;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -75,9 +76,9 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Solution solution = getSolutionProposal(category);
 
-        changeProposal(category, solution, request.getName());
+        changeProposal(category);
         categoryRepository.save(category);
-        solutionService.saveCategory(solution, category);
+        solutionService.setCategory(solution, categoryService.findByName(request.getName()));
 
         sendChangeNotification(category, solution, request);
         return toResponse(solution.getCategory());
@@ -130,7 +131,7 @@ public class CategoryProposalService {
         notificationService.sendNotification(provider, notification);
     }
 
-    private void changeProposal(Category category, Solution solution, String newCategoryName) {
+    private void changeProposal(Category category) {
         category.setDeleted(true);
         category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
     }

@@ -41,7 +41,7 @@ public class SolutionService {
         solutionRepository.save(solution);
     }
 
-    public void saveCategory(Solution solution, Category category) {
+    public void setCategory(Solution solution, Category category) {
         solution.setStatus(Status.ACCEPTED);
         solution.setCategory(category);
     }
