@@ -13,20 +13,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleService {
 
-    private final RoleRepository roleRepository;
+    private final RoleRepository repository;
 
     public Role findById(Long id) {
-        Role auth = this.roleRepository.getReferenceById(id);
-        return auth;
+        return this.repository.getReferenceById(id);
     }
 
     public List<Role> findByName(String name) {
-        List<Role> roles = this.roleRepository.findByName(name);
-        return roles;
+        return this.repository.findByName(name);
     }
 
     public List<RoleDto> getRegistrationRoles() {
-        List<Role> roles = roleRepository.findByNameIn(List.of("PROVIDER", "EVENT_ORGANIZER"));
+        List<Role> roles = repository.findByNameIn(List.of("PROVIDER", "EVENT_ORGANIZER"));
         return roles.stream()
                 .map(RoleMapper::toResponse)
                 .toList();

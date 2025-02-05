@@ -44,10 +44,15 @@ public class EventSpecification {
     }
 
     public static Specification<Event> filterByOrganizer(User organizer) {
-        return (root, query, cb) ->
-                organizer == null
-                        ? cb.conjunction()
-                        : cb.equal(root.get("organizer"), organizer);
+        return Specification.where(hasOrganizer(organizer));
+    }
+
+    public static Specification<Event> filterUpcomingEventsByOrganizer(User organizer) {
+        return Specification.where(hasOrganizer(organizer)).and(hasDateAfter(LocalDate.now()));
+    }
+
+    private static Specification<Event> hasOrganizer(User organizer) {
+        return (root, query, cb) -> cb.equal(root.get("organizer").get("id"), organizer.getId());
     }
 
     public static Specification<Event> filterById(Long id, User user) {

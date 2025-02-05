@@ -37,8 +37,8 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> roles;
 
-    @Column(name = "activated", nullable = false)
-    private boolean activated = false;
+    @Column(name = "verified", nullable = false)
+    private boolean verified = false;
 
     @Column(name = "activation_timestamp", nullable = false)
     private Date activationTimestamp = new Date();
@@ -48,6 +48,9 @@ public class User implements UserDetails {
 
     @Column(name = "suspended")
     private LocalDateTime suspended = null;
+
+    @Column(name = "deactivated")
+    private boolean deactivated = false;
 
     @Embedded
     private Person person;
