@@ -1,4 +1,4 @@
-package com.iss.eventorium.interaction.dtos.ratings;
+package com.iss.eventorium.interaction.dtos.comment;
 
 import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.*;

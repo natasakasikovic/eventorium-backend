@@ -23,7 +23,7 @@ public class Rating {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     @Column(nullable = false)
     @Min(value = 1)

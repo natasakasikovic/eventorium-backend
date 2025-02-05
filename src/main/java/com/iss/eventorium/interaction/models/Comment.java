@@ -5,6 +5,8 @@ import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,9 +23,12 @@ public class Comment {
     @Column(nullable = false)
     private String comment;
 
+    @Column(nullable = false)
+    private LocalDateTime creationDate = LocalDateTime.now();
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
+    private Status status = Status.PENDING;
 
     @ManyToOne
     private User user;
