@@ -83,6 +83,18 @@ public abstract class Solution extends CommentableEntity {
         getRatings().add(rating);
     }
 
+    public Double calculateAverageRating() {
+        try {
+            return getRatings()
+                    .stream()
+                    .mapToInt(Rating::getRating)
+                    .average()
+                    .orElse(0.0d);
+        } catch (NullPointerException e) {
+            return 0.0d;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

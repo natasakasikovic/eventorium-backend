@@ -34,14 +34,7 @@ public class ProductMapper {
 
     public static ProductSummaryResponseDto toSummaryResponse(Product product) {
         ProductSummaryResponseDto dto = modelMapper.map(product, ProductSummaryResponseDto.class);
-        try {
-            dto.setRating(product.getRatings().stream()
-                    .mapToInt(Rating::getRating)
-                    .average()
-                    .orElse(0.0));
-        } catch (NullPointerException e) {
-            dto.setRating(0.0d);
-        }
+        dto.setRating(product.calculateAverageRating());
         return dto;
     }
 
@@ -57,24 +50,8 @@ public class ProductMapper {
         ProductResponseDto dto = modelMapper.map(product, ProductResponseDto.class);
         dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
         dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
-        try {
-            dto.setRating(product.getRatings()
-                    .stream()
-                    .mapToInt(Rating::getRating)
-                    .average()
-                    .orElse(0.0));
-        } catch (NullPointerException e) {
-            dto.setRating(0.0);
-        }
+        dto.setRating(product.calculateAverageRating());
         dto.setProvider(UserMapper.toUserDetails(product.getProvider()));
-        return dto;
-    }
-
-    public static ProductReviewResponseDto toReviewResponse(Product product) {
-        ProductReviewResponseDto dto = modelMapper.map(product, ProductReviewResponseDto.class);
-        dto.setReviews(product.getRatings().stream()
-                .map(RatingMapper::toResponse)
-                .toList());
         return dto;
     }
 
@@ -82,14 +59,7 @@ public class ProductMapper {
         ProductDetailsDto dto = modelMapper.map(product, ProductDetailsDto.class);
         dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
         dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
-        if(product.getRatings() != null) {
-            dto.setRating(product.getRatings().stream()
-                    .mapToInt(Rating::getRating)
-                    .average()
-                    .orElse(0.0));
-        } else {
-            dto.setRating(0.0d);
-        }
+        dto.setRating(product.calculateAverageRating());
         dto.setProvider(UserMapper.toUserDetails(product.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
         dto.setReviews(product.getRatings().stream().map(RatingMapper::toResponse).toList());

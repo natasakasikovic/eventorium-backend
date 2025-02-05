@@ -1,8 +1,11 @@
 package com.iss.eventorium.event.specifications;
 
+import com.iss.eventorium.event.models.Budget;
+import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
 import com.iss.eventorium.event.models.Privacy;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.*;

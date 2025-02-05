@@ -19,8 +19,7 @@ import java.util.List;
 @MappedSuperclass
 public abstract class CommentableEntity implements Commentable {
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "commentable_id", referencedColumnName = "id")
+    @ManyToMany
     private List<Comment> comments = new ArrayList<>();
 
     @Override

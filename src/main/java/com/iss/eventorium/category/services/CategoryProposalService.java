@@ -10,7 +10,6 @@ import com.iss.eventorium.notifications.models.NotificationType;
 import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Solution;
-import com.iss.eventorium.solution.repositories.SolutionRepository;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;

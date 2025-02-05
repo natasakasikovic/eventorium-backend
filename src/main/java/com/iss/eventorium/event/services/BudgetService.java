@@ -8,21 +8,21 @@ import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
+import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductReviewResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
+import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
+import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.repositories.ProductRepository;
-import com.iss.eventorium.solution.services.HistoryService;
 import com.iss.eventorium.solution.services.ProductService;
-import jakarta.persistence.EntityNotFoundException;
+import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,8 +31,10 @@ public class BudgetService {
 
     private final ProductService productService;
     private final EventService eventService;
+    private final AuthService authService;
 
     private final EventRepository eventRepository;
+    private final BudgetItemRepository budgetItemRepository;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto dto) {
         Product product = productService.find(dto.getItemId());
@@ -44,19 +46,6 @@ public class BudgetService {
         Event event = eventService.find(eventId);
         updateBudget(event, BudgetMapper.fromRequest(dto, product));
         return ProductMapper.toResponse(product);
-    }
-
-    public List<ProductReviewResponseDto> getPurchasedProducts(Long eventId) {
-        Event event = eventService.find(eventId);
-        Budget budget = event.getBudget();
-        if(budget == null) {
-            return new ArrayList<>();
-        }
-
-        return budget.getItems().stream()
-                .filter(item -> item.getPurchased() != null)
-                .map(item -> ProductMapper.toReviewResponse((Product) item.getSolution()))
-                .toList();
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
@@ -79,5 +68,12 @@ public class BudgetService {
         item.setPurchased(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
+    }
+
+    public List<SolutionReviewResponseDto> getBudgetItems() {
+        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(authService.getCurrentUser().getId());
+        return budgetItemRepository.findAll(specification).stream()
+                .map(item -> SolutionMapper.toReviewResponse(item.getSolution(), item.getItemType()))
+                .toList();
     }
 }

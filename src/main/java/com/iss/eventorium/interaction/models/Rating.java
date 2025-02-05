@@ -1,6 +1,5 @@
 package com.iss.eventorium.interaction.models;
 
-import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
