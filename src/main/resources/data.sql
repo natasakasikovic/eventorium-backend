@@ -239,3 +239,75 @@ INSERT INTO notifications (seen, recipient_id, timestamp, message, title) VALUES
     (false,  null, '2025-01-28 01:10:15.112233', 'A new category proposal (Sports Equipment) has been created!', 'Category'),
     (false,  null, '2025-01-28 01:20:25.223344', 'A new category proposal (Office Supplies) has been created!', 'Category'),
     (true,  3, '2025-01-28 01:30:30.334455', 'Your category suggestion (Catering Equipment) has been accepted.', 'Category');
+
+-- Comments for events
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('What a beautiful wedding, I loved the decorations!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 1),
+    ('The reception was elegant, and the food was amazing. Would love to attend again!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 1),
+    ('The wedding in Novi Sad was magical, but it could have been a bit more organized.', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 1),
+    ('The corporate seminar was fantastic. I learned a lot!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 6),
+    ('Networking was great, but the venue felt a bit too small for such a large crowd.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 6),
+    ('The workshops were top-notch! I gained valuable insights on leadership.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 6),
+    ('The birthday bash was a blast! The music was amazing.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 2),
+    ('I had a fantastic time at the birthday party. The DJs were great!', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 2),
+    ('Everything was great, but the food could have been better.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 2),
+    ('Great business meetup, I made several new connections!', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 3),
+    ('The event was a bit too long, but the speakers were excellent.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 3),
+    ('I learned a lot about the local business scene in Sombor.', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 3),
+    ('Amazing wedding reception, everything was perfect!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 5),
+    ('The ambiance and the music were unforgettable. A truly special night.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 5),
+    ('The wedding reception could have used better coordination with the schedule.', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 5),
+    ('Fantastic birthday celebration, the band was amazing!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 7),
+    ('The location was great, but the crowd was a little too big for my liking.', CURRENT_TIMESTAMP, 'PENDING', 5, 'EVENT', 7),
+    ('I had so much fun, will definitely attend again next year!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 7),
+    ('Great seminar on leadership, very insightful!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 6),
+    ('The venue was nice, but the seating arrangements could have been better.', CURRENT_TIMESTAMP, 'PENDING', 5, 'EVENT', 6),
+    ('What a beautiful traditional wedding. It was so unique!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 4),
+    ('I loved the ceremony, but the reception area could have been a bit larger.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 4),
+    ('This birthday party was a great experience! The surprise guest was awesome.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'EVENT', 5),
+    ('The party could have used more food options, but the guest performance made up for it.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 5),
+    ('The corporate launch event was very professional and well-organized.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 8),
+    ('Great event but a bit too crowded. Could use more space next time.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 8),
+    ('The team-building activities were amazing, I had so much fun!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'EVENT', 10),
+    ('It was great, but the activities could have been better organized.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 10),
+    ('The wedding gala was stunning. The decorations were breathtaking!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 4),
+    ('Everything was perfect, but it could have been more interactive.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 4);
+
+-- Comments for products
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('These custom invitations are so beautiful. Exactly what I was looking for!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'PRODUCT', 1),
+    ('The quality of the invitations is outstanding! Highly recommend.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 1),
+    ('A bit too expensive for my taste, but the design is worth it.', CURRENT_TIMESTAMP, 'PENDING', 3, 'PRODUCT', 1),
+    ('The event banner was vibrant and eye-catching, exactly what we needed.', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 2),
+    ('This banner helped promote our event effectively. Great product.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'PRODUCT', 2),
+    ('I had to return it due to printing issues, but the customer service was great.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 2),
+    ('These party favors were a huge hit! All guests loved them.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'PRODUCT', 3),
+    ('Such a unique touch for any event! Will order again for my next party.', CURRENT_TIMESTAMP, 'PENDING', 5, 'PRODUCT', 3),
+    ('Some of the favors were damaged during shipping, but the quality is otherwise great.', CURRENT_TIMESTAMP, 'PENDING', 1, 'PRODUCT', 3),
+    ('These balloons made my event look festive and lively!', CURRENT_TIMESTAMP, 'PENDING', 4, 'PRODUCT', 4),
+    ('Great for any occasion! The colors were perfect for my party.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'PRODUCT', 4),
+    ('They deflated faster than expected, but still a great product overall.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 4),
+    ('The t-shirts were of great quality. Perfect for our event.', CURRENT_TIMESTAMP, 'PENDING', 5, 'PRODUCT', 5),
+    ('Loved the customization options. Everyone at the event was wearing them!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 5);
+
+-- Comments for services
+-- Corrected comments for services
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('The photographer was amazing! Caught all the special moments.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 9),
+    ('The photos were incredible. Worth every penny!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 9),
+    ('The photographer missed some key moments. Could be more attentive.', CURRENT_TIMESTAMP, 'PENDING', 5, 'SERVICE', 9),
+    ('The catering was fantastic! All my guests loved the food.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'SERVICE', 10),
+    ('Great service, but some food items were a bit too salty.', CURRENT_TIMESTAMP, 'PENDING', 1, 'SERVICE', 10),
+    ('They were very professional and the food was top-notch!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 10),
+    ('The event planning was flawless. Everything went according to schedule!', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'SERVICE', 11),
+    ('I was impressed with the attention to detail. Highly recommend for any event.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 11),
+    ('The planning could have been a little more organized. Some things were last minute.', CURRENT_TIMESTAMP, 'PENDING', 1, 'SERVICE', 11),
+    ('The sound system setup was fantastic. The quality was top-notch!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 12),
+    ('The sound was great, but the setup took longer than expected.', CURRENT_TIMESTAMP, 'PENDING', 5, 'SERVICE', 12),
+    ('Loved the setup, the sound quality was amazing for the event.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 12),
+    ('The lighting transformed the venue. Beautiful and vibrant colors.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'SERVICE', 13),
+    ('The lights were perfect for the atmosphere we wanted to create.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'SERVICE', 13),
+    ('The lighting setup was nice, but the bulbs burned out too soon.', CURRENT_TIMESTAMP, 'PENDING', 2, 'SERVICE', 13);
