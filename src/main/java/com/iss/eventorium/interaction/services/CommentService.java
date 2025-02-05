@@ -34,11 +34,8 @@ public class CommentService {
     public CommentResponseDto createComment(Long id, CommentType type, CreateCommentRequestDto request) {
         CommentableEntity entity = findCommentable(id, type);
 
-        Comment comment = CommentMapper.fromRequest(request);
+        Comment comment = CommentMapper.fromRequest(request, type, id);
         comment.setUser(authService.getCurrentUser());
-        comment.setCommentType(type);
-        comment.setCommentableId(id);
-
         entity.addComment(comment);
 
         commentRepository.save(comment);
