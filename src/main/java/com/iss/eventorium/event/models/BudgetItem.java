@@ -2,6 +2,7 @@ package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.solution.models.Solution;
+import com.iss.eventorium.solution.models.SolutionType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
@@ -26,6 +27,8 @@ public class BudgetItem {
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Solution solution;
+
+    private SolutionType itemType;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Category category;

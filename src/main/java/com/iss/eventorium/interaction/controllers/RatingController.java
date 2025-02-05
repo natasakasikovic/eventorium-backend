@@ -19,26 +19,26 @@ public class RatingController {
 
     @PostMapping("/services/{service-id}/ratings")
     public ResponseEntity<RatingResponseDto> createServiceRating(
-            @RequestBody @Valid CreateRatingRequestDto createRatingRequestDto,
+            @RequestBody @Valid CreateRatingRequestDto request,
             @PathVariable("service-id") Long serviceId
     ) {
-        return new ResponseEntity<>(ratingService.createRating(serviceId, createRatingRequestDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ratingService.createSolutionRating(serviceId, request), HttpStatus.CREATED);
     }
 
     @PostMapping("/products/{product-id}/ratings")
     public ResponseEntity<RatingResponseDto> createProductRating(
-            @RequestBody @Valid CreateRatingRequestDto createRatingRequestDto,
+            @RequestBody @Valid CreateRatingRequestDto request,
             @PathVariable("product-id") Long productId
     ) {
-        return new ResponseEntity<>(ratingService.createRating(productId, createRatingRequestDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ratingService.createSolutionRating(productId, request), HttpStatus.CREATED);
     }
 
     @PostMapping("/events/{event-id}/ratings")
     public ResponseEntity<RatingResponseDto> createEventRating(
-            @RequestBody @Valid CreateRatingRequestDto createRatingRequestDto,
+            @RequestBody @Valid CreateRatingRequestDto request,
             @PathVariable("event-id") Long eventId
     ) {
-        return new ResponseEntity<>(ratingService.createEventRating(eventId, createRatingRequestDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ratingService.createEventRating(eventId, request), HttpStatus.CREATED);
     }
 
 }

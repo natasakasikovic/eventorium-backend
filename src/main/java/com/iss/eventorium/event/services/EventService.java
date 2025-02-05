@@ -10,6 +10,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.services.AuthService;
@@ -135,5 +136,11 @@ public class EventService {
         params.put("generatedDate", LocalDate.now());
         List<Event> data = List.of(event);
         return pdfService.generate("/templates/event-details.jrxml", data, params);
+    }
+
+    public void addRating(Long id, Rating rating) {
+        Event event = find(id);
+        event.addRating(rating);
+        repository.save(event);
     }
 }

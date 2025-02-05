@@ -16,6 +16,7 @@ import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.services.HistoryService;
+import com.iss.eventorium.solution.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,25 +29,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BudgetService {
 
+    private final ProductService productService;
+    private final EventService eventService;
+
     private final EventRepository eventRepository;
-    private final ProductRepository productRepository;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto dto) {
-        Product product = productRepository.findById(dto.getItemId()).orElseThrow(
-                () -> new EntityNotFoundException("Product with id " + dto.getItemId() + " not found")
-        );
+        Product product = productService.find(dto.getItemId());
         double netPrice = product.getPrice() * (1 - product.getDiscount() / 100);
         if(netPrice > dto.getPlannedAmount()) {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
         }
 
-        Event event = getEvent(eventId);
+        Event event = eventService.find(eventId);
         updateBudget(event, BudgetMapper.fromRequest(dto, product));
         return ProductMapper.toResponse(product);
     }
 
     public List<ProductReviewResponseDto> getPurchasedProducts(Long eventId) {
-        Event event = getEvent(eventId);
+        Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
         if(budget == null) {
             return new ArrayList<>();
@@ -59,7 +60,7 @@ public class BudgetService {
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
-        Event event = getEvent(eventId);
+        Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
         if(budget == null) {
             budget = new Budget();
@@ -73,16 +74,10 @@ public class BudgetService {
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
         if(budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(item.getCategory())) {
-            throw new AlreadyPurchasedException("Product with the same category is already purchased!");
+            throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
         }
         item.setPurchased(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
-    }
-
-    private Event getEvent(Long eventId) {
-        return eventRepository.findById(eventId).orElseThrow(
-                () -> new EntityNotFoundException("Event with id " + eventId + " not found")
-        );
     }
 }
