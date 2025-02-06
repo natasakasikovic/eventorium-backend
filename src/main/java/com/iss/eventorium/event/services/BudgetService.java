@@ -74,7 +74,7 @@ public class BudgetService {
 
     public List<SolutionReviewResponseDto> getBudgetItems() {
         User user = authService.getCurrentUser();
-        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user.getId());
+        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user);
         return budgetItemRepository.findAll(specification).stream()
                 .map(item -> SolutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
