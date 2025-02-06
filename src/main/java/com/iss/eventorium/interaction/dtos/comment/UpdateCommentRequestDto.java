@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UpdateCommentRequestDto {
-    @NotNull
+
+    @NotNull(message = "Status is mandatory")
     private Status status;
 }

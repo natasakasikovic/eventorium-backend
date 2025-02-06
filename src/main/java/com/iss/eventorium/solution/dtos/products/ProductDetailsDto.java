@@ -28,7 +28,6 @@ public class ProductDetailsDto {
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
     private Double rating;
-    private List<RatingResponseDto> reviews;
     private UserDetailsDto provider;
     private CompanyResponseDto company;
 }

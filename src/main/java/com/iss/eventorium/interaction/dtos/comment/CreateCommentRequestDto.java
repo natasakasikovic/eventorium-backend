@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CreateCommentRequestDto {
-    @NotBlank
+
+    @NotBlank(message = "Comment is mandatory")
     private String comment;
 }

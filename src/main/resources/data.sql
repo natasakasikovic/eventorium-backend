@@ -118,12 +118,14 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 7, 6, 12, 3, 3),
 (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', 14, 5, 3, 7, 8, 3);
 
-INSERT INTO budgets VALUES (62.0, 54.0);
+INSERT INTO budgets VALUES (167.0, 159.0);
 
 INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
     (10,9,CURRENT_DATE, 8, 'PRODUCT'),
     (50, 10, CURRENT_DATE, 2, 'PRODUCT'),
-    (2,7, CURRENT_DATE, 6, 'PRODUCT');
+    (2,7, CURRENT_DATE, 6, 'PRODUCT'),
+    (105, 4, CURRENT_DATE, 9, 'SERVICE');
+
 
 INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3);
 

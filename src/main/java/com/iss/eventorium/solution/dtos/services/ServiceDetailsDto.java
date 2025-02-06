@@ -34,7 +34,6 @@ public class ServiceDetailsDto {
     private Integer maxDuration;
     private Boolean available;
     private Boolean visible;
-    private List<RatingResponseDto> reviews;
     private UserDetailsDto provider;
     private CompanyResponseDto company;
 }

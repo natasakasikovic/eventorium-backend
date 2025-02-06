@@ -34,7 +34,7 @@ public class BudgetController {
     }
 
     @GetMapping("/budget-items")
-    public ResponseEntity<List<SolutionReviewResponseDto>> getPurchasedItems() {
+    public ResponseEntity<List<SolutionReviewResponseDto>> getBudgetItems() {
         return ResponseEntity.ok(budgetService.getBudgetItems());
     }
 
