@@ -59,8 +59,8 @@ public abstract class Solution extends CommentableEntity {
     @Column(name="is_visible")
     private Boolean isVisible;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "solution_id", nullable = false)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "solution_id")
     private List<Rating> ratings;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

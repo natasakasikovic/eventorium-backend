@@ -311,3 +311,39 @@ VALUES
     ('The lighting transformed the venue. Beautiful and vibrant colors.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'SERVICE', 13),
     ('The lights were perfect for the atmosphere we wanted to create.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'SERVICE', 13),
     ('The lighting setup was nice, but the bulbs burned out too soon.', CURRENT_TIMESTAMP, 'PENDING', 2, 'SERVICE', 13);
+
+-- Ratings for solutions
+INSERT INTO ratings (rating, user_id, creation_date, solution_id)
+VALUES
+    (5, 1, CURRENT_TIMESTAMP, 1),
+    (4, 2, CURRENT_TIMESTAMP, 2),
+    (3, 3, CURRENT_TIMESTAMP, 3),
+    (4, 4, CURRENT_TIMESTAMP, 4),
+    (5, 5, CURRENT_TIMESTAMP, 5),
+    (2, 1, CURRENT_TIMESTAMP, 6),
+    (1, 2, CURRENT_TIMESTAMP, 7),
+    (4, 3, CURRENT_TIMESTAMP, 8),
+    (3, 4, CURRENT_TIMESTAMP, 9),
+    (5, 5, CURRENT_TIMESTAMP, 10),
+    (4, 2, CURRENT_TIMESTAMP, 1),
+    (3, 3, CURRENT_TIMESTAMP, 1),
+    (2, 4, CURRENT_TIMESTAMP, 1);
+
+-- Ratings for events
+INSERT INTO ratings (rating, user_id, creation_date, event_id)
+VALUES
+    (5, 1, CURRENT_TIMESTAMP, 1),
+    (4, 2, CURRENT_TIMESTAMP, 2),
+    (3, 3, CURRENT_TIMESTAMP, 3),
+    (5, 4, CURRENT_TIMESTAMP, 4),
+    (2, 5, CURRENT_TIMESTAMP, 5),
+    (4, 1, CURRENT_TIMESTAMP, 6),
+    (3, 2, CURRENT_TIMESTAMP, 7),
+    (1, 3, CURRENT_TIMESTAMP, 8),
+    (4, 4, CURRENT_TIMESTAMP, 9),
+    (5, 5, CURRENT_TIMESTAMP, 10),
+    (2, 1, CURRENT_TIMESTAMP, 11),
+    (5, 2, CURRENT_TIMESTAMP, 12),
+    (3, 3, CURRENT_TIMESTAMP, 13),
+    (4, 4, CURRENT_TIMESTAMP, 14),
+    (1, 5, CURRENT_TIMESTAMP, 15);
