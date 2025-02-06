@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.event.dtos.invitation.InvitationDetailsDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.mappers.InvitationMapper;
@@ -10,6 +11,8 @@ import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class InvitationService {
     private final UserService userService;
     private final EmailService emailService;
     private final EventService eventService;
+    private final AuthService authService;
     private final SpringTemplateEngine templateEngine;
 
     @Value("${frontend.url}")
@@ -98,5 +102,14 @@ public class InvitationService {
 
     private Invitation findByHash(String hash){
         return repository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("Invitation not found"));
+    }
+
+    private List<Invitation> findByEmail(String email) {
+        return repository.findByEmail(email);
+    }
+
+    public List<InvitationDetailsDto> getInvitations() {
+        User user = authService.getCurrentUser();
+        return findByEmail(user.getEmail()).stream().map(InvitationMapper::toInvitationDetails).toList();
     }
 }

@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.dtos.invitation.InvitationDetailsDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.services.InvitationService;
@@ -33,5 +34,10 @@ public class InvitationController {
     public ResponseEntity<Void> sendInvitations(@RequestBody List<InvitationRequestDto> invitations, @PathVariable("event-id") Long id){
         service.sendInvitations(invitations, id);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/my-invitations")
+    public ResponseEntity<List<InvitationDetailsDto>> getInvitations() {
+        return ResponseEntity.ok(service.getInvitations());
     }
 }
