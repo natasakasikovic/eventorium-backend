@@ -26,9 +26,4 @@ public abstract class CommentableEntity implements Commentable {
     public List<Comment> getComments() {
         return comments;
     }
-
-    @Override
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
 }

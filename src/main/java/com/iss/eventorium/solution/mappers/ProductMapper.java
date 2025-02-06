@@ -62,7 +62,6 @@ public class ProductMapper {
         dto.setRating(product.calculateAverageRating());
         dto.setProvider(UserMapper.toUserDetails(product.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
-        dto.setReviews(product.getRatings().stream().map(RatingMapper::toResponse).toList());
         return dto;
     }
 

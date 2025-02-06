@@ -43,6 +43,7 @@ public class Event extends CommentableEntity {
     @Column(name = "max_participants", nullable = false)
     private Integer maxParticipants;
 
+    // NOTE: If type is null, it indicates that the user selected "all"
     @ManyToOne
     private EventType type;
 
@@ -68,10 +69,6 @@ public class Event extends CommentableEntity {
 
     @Column(name = "is_draft")
     private boolean isDraft = true;
-
-    public void addRating(Rating rating) {
-        ratings.add(rating);
-    }
 
     @Override
     public String getDisplayName() {

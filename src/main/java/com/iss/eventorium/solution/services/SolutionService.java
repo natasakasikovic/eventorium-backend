@@ -25,7 +25,7 @@ public class SolutionService {
 
     public void addRating(Long id, Rating rating) {
         Solution solution = find(id);
-        solution.addRating(rating);
+        solution.getRatings().add(rating);
         solutionRepository.save(solution);
     }
 
@@ -49,7 +49,7 @@ public class SolutionService {
     }
 
     public void addComment(Solution solution, Comment comment) {
-        solution.addComment(comment);
+        solution.getComments().add(comment);
         solutionRepository.save(solution);
     }
 }

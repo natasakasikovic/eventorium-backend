@@ -30,9 +30,7 @@ public class RatingMapper {
     }
 
     public static Rating fromCreateRequest(CreateRatingRequestDto createRatingRequestDto) {
-        Rating rating = modelMapper.map(createRatingRequestDto, Rating.class);
-        rating.setCreationDate(LocalDateTime.now());
-        return rating;
+        return modelMapper.map(createRatingRequestDto, Rating.class);
     }
 
 }

@@ -8,5 +8,4 @@ public interface Commentable {
     List<Comment> getComments();
     String getDisplayName();
     Long getId();
-    void addComment(Comment comment);
 }

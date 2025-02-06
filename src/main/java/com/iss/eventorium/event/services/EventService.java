@@ -141,12 +141,12 @@ public class EventService {
 
     public void addRating(Long id, Rating rating) {
         Event event = find(id);
-        event.addRating(rating);
+        event.getRatings().add(rating);
         repository.save(event);
     }
 
     public void addComment(Event event, Comment comment) {
-        event.addComment(comment);
+        event.getComments().add(comment);
         repository.save(event);
     }
 }

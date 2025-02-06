@@ -41,7 +41,6 @@ public class ServiceMapper {
         }
         dto.setProvider(UserMapper.toUserDetails(service.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
-        dto.setReviews(service.getRatings().stream().map(RatingMapper::toResponse).toList());
         return dto;
     }
 
