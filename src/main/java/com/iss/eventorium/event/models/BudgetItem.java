@@ -28,6 +28,7 @@ public class BudgetItem {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Solution solution;
 
+    @Enumerated(EnumType.STRING)
     private SolutionType itemType;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

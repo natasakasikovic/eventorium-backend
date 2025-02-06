@@ -10,6 +10,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.services.PdfService;
@@ -141,6 +142,11 @@ public class EventService {
     public void addRating(Long id, Rating rating) {
         Event event = find(id);
         event.addRating(rating);
+        repository.save(event);
+    }
+
+    public void addComment(Event event, Comment comment) {
+        event.addComment(comment);
         repository.save(event);
     }
 }

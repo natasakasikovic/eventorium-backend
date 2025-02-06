@@ -16,6 +16,6 @@ public class SolutionReviewResponseDto {
     private String name;
     private Double price;
     private Double discount;
-    private List<RatingResponseDto> reviews;
+    private RatingResponseDto rating;
     private SolutionType type;
 }

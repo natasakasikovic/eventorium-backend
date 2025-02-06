@@ -21,6 +21,9 @@ public class RatingMapper {
     }
 
     public static RatingResponseDto toResponse(Rating rating) {
+        if(rating == null) {
+            return null;
+        }
         RatingResponseDto dto = modelMapper.map(rating, RatingResponseDto.class);
         dto.setUser(UserMapper.toUserDetails(rating.getUser()));
         return dto;

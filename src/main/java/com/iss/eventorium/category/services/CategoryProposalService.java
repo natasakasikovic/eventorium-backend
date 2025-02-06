@@ -144,7 +144,7 @@ public class CategoryProposalService {
     }
 
     private Solution getSolutionProposal(Category category) {
-        Solution solution = solutionService.findSolutionByCategoryId(category);
+        Solution solution = solutionService.findSolutionByCategory(category);
         if(!solution.getStatus().equals(Status.PENDING)) {
             throw new EntityNotFoundException("Solution with category '" + category.getName() + "' is not pending");
         }

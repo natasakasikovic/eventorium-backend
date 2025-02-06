@@ -16,7 +16,9 @@ import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.Product;
+import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.solution.services.ProductService;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,7 +46,7 @@ public class BudgetService {
         }
 
         Event event = eventService.find(eventId);
-        updateBudget(event, BudgetMapper.fromRequest(dto, product));
+        updateBudget(event, BudgetMapper.fromRequest(dto, product, SolutionType.PRODUCT));
         return ProductMapper.toResponse(product);
     }
 
@@ -71,9 +73,10 @@ public class BudgetService {
     }
 
     public List<SolutionReviewResponseDto> getBudgetItems() {
-        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(authService.getCurrentUser().getId());
+        User user = authService.getCurrentUser();
+        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user.getId());
         return budgetItemRepository.findAll(specification).stream()
-                .map(item -> SolutionMapper.toReviewResponse(item.getSolution(), item.getItemType()))
+                .map(item -> SolutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
 }

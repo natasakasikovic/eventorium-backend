@@ -19,7 +19,7 @@ import java.util.List;
 @MappedSuperclass
 public abstract class CommentableEntity implements Commentable {
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Comment> comments = new ArrayList<>();
 
     @Override

@@ -120,10 +120,10 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 
 INSERT INTO budgets VALUES (62.0, 54.0);
 
-INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id) VALUES
-    (10,9,CURRENT_DATE, 8),
-    (50, 10, CURRENT_DATE, 2),
-    (2,7, CURRENT_DATE, 6);
+INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
+    (10,9,CURRENT_DATE, 8, 'PRODUCT'),
+    (50, 10, CURRENT_DATE, 2, 'PRODUCT'),
+    (2,7, CURRENT_DATE, 6, 'PRODUCT');
 
 INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3);
 

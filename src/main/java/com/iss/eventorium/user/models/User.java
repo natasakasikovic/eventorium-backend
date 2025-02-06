@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -57,6 +58,18 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String hash;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 
     @JsonIgnore
     @Override

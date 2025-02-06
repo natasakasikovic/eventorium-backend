@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public abstract class Solution extends CommentableEntity {
     @Column(name="is_visible")
     private Boolean isVisible;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "solution_id", nullable = false)
     private List<Rating> ratings;
 
