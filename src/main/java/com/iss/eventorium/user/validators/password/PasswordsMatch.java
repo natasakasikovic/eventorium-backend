@@ -15,7 +15,7 @@ public @interface PasswordsMatch {
 
     String password() default "password";
     String passwordConfirmation() default "passwordConfirmation";
-    String message() default "Passwords must match";
+    String message() default "Passwords do not match!";
 
     Class<?>[] groups() default {};
 

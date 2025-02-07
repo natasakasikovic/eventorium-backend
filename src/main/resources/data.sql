@@ -1,8 +1,4 @@
-INSERT INTO roles (name) VALUES ('USER');
-INSERT INTO roles (name) VALUES ('UNAUTHENTICATED_USER');
-INSERT INTO roles (name) VALUES ('ADMIN');
-INSERT INTO roles (name) VALUES ('PROVIDER');
-INSERT INTO roles (name) VALUES ('EVENT_ORGANIZER');
+INSERT INTO roles (name) VALUES ('USER'), ('UNAUTHENTICATED_USER'), ('ADMIN'), ('PROVIDER'), ('EVENT_ORGANIZER');
 
 INSERT INTO cities (name) VALUES
 ('Beograd'),
@@ -39,19 +35,16 @@ INSERT INTO images (content_type, path) VALUES
     ('image/png', 'decorated_by_us.png'); --23
 
 
-INSERT INTO users (activated, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id) VALUES
-    (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16),
-    (true, 2,  null, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null),
-    (true, 2,  null, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null),
-    (true, 6,  null, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null),
-    (true, 1,  null, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17);
+INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id, deactivated) VALUES
+    (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '1', 16, false),
+    (true, 2,  null, '2024-12-06 12:00:00', 'Bulevar oslobodjenja, 20', 'jane.smith@example.com', 'Smith', 'Jane', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '9876543210', '2017-10-01 21:58:58.508-07', '2', null, false),
+    (true, 2,  null, '2024-12-06 12:00:00', 'Mise Dimitrijevica, 7', 'provider@gmail.com', 'Johnson', 'Emily', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '5551234567', '2017-10-01 21:58:58.508-07', '3', null, false),
+    (true, 6,  null, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '4', null, false),
+    (true, 1,  null, '2024-12-06 12:00:00', 'Njegoševa 12', 'admin@gmail.com', 'Davis', 'Sarah', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '4445556666', '2017-10-01 21:58:58.508-07', '5', 17, false),
+    (true, 3, null, '2024-12-06 12:00:00', 'Glavna', 'james@gmail.com', 'James', 'Bronny', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '123456789123', '2017-10-01 21:58:58.508-07', '6', null, false);
 
 
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5);
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (2, 5);
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (3, 4);
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (4, 4);
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (5, 3);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5), (2, 5), (3, 4), (4, 4), (5, 3), (6, 5);
 
 INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
 VALUES
@@ -150,9 +143,9 @@ VALUES
 ('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false, null),
 ('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false, null),
 ('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, null),
-('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 50, 2, '234 Retreat Ave', 3, 1, false, null),
-('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 3, '111 Fest Rd', 1, 1, false, null),
-('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 100, 3, '444 Culture St', 6, 2, false, null);
+('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'CLOSED', 50, 2, '234 Retreat Ave', 3, 1, false, null),
+('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'CLOSED', 200, 3, '111 Fest Rd', 1, 1, false, null),
+('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null);
 
 
 INSERT INTO activities (name, description, start_time, end_time, location, event_id)
@@ -242,6 +235,11 @@ INSERT INTO notifications (seen, recipient_id, timestamp, message, title) VALUES
     (false,  null, '2025-01-28 01:20:25.223344', 'A new category proposal (Office Supplies) has been created!', 'Category'),
     (true,  3, '2025-01-28 01:30:30.334455', 'Your category suggestion (Catering Equipment) has been accepted.', 'Category');
 
+INSERT INTO invitations (email, event_id, hash) VALUES
+('provider@gmail.com', 19, '1'),
+('provider@gmail.com', 20, '2'),
+('provider@gmail.com', 21, '3');
+
 -- Comments for events
 INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
 VALUES
@@ -295,7 +293,6 @@ VALUES
     ('Loved the customization options. Everyone at the event was wearing them!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 5);
 
 -- Comments for services
--- Corrected comments for services
 INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
 VALUES
     ('The photographer was amazing! Caught all the special moments.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 9),

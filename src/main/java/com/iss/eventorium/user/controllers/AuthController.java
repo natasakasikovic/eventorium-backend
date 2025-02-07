@@ -25,8 +25,8 @@ public class AuthController {
     private String FRONTEND_URL;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody LoginRequestDto authenticationRequest) {
-        return ResponseEntity.ok(authService.login(authenticationRequest));
+    public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

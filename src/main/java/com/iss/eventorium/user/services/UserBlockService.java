@@ -16,7 +16,7 @@ public class UserBlockService {
 
     public void blockUser(Long id) {
         User blocker = authService.getCurrentUser();
-        User blocked = userService.findUser(id);
+        User blocked = userService.find(id);
 
         saveUserBlock(blocker, blocked);
         saveUserBlock(blocked, blocker);

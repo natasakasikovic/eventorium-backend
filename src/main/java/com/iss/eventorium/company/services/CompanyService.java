@@ -38,14 +38,13 @@ public class CompanyService {
     private final AccountActivationService accountActivationService;
     private final UserService userService;
     private final AuthService authService;
-    private final CompanyRepository companyRepository;
 
     @Value("${image-path}")
     private String imagePath;
 
     public CompanyResponseDto createCompany(CompanyRequestDto companyRequestDto) {
         Company company = CompanyMapper.fromRequest(companyRequestDto);
-        User provider = userService.findById(companyRequestDto.getProviderId());
+        User provider = userService.find(companyRequestDto.getProviderId());
         company.setProvider(provider);
         accountActivationService.sendActivationEmail(provider);
         return CompanyMapper.toResponse(repository.save(company));
@@ -56,7 +55,7 @@ public class CompanyService {
             return;
         }
 
-        Company company = getCompanyById(id);
+        Company company = find(id);
         List<ImagePath> paths = processImages(id, images);
 
         if (!paths.isEmpty()) {
@@ -65,10 +64,8 @@ public class CompanyService {
         }
     }
 
-    private Company getCompanyById(Long id) {
-        return repository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Company with id %s not found", id))
-        );
+    private Company find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Company not found."));
     }
 
     private List<ImagePath> processImages(Long companyId, List<MultipartFile> images) {
@@ -95,10 +92,7 @@ public class CompanyService {
         ImageUpload.saveImage(uploadDir, fileName, image);
         String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
 
-        return ImagePath.builder()
-                .path(fileName)
-                .contentType(contentType)
-                .build();
+        return ImagePath.builder().path(fileName).contentType(contentType).build();
     }
 
     public ProviderCompanyDto getCompany() {
@@ -108,12 +102,12 @@ public class CompanyService {
     }
 
     public CompanyDetailsDto getCompany(Long id) {
-        Company company = getCompanyById(id);
+        Company company = find(id);
         return CompanyMapper.toCompanyDetailsResponse(company);
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Company company = getCompanyById(id);
+        Company company = find(id);
         List<ImageResponseDto> images = new ArrayList<>();
         for (ImagePath imagePath : company.getPhotos()) {
             byte[] image = getImage(id, imagePath);
@@ -129,12 +123,12 @@ public class CompanyService {
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to read image" + path.getPath() + ": + e.getMessage()");
+            throw new ImageNotFoundException("Fail to load image");
         }
     }
 
     public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
-        Company company = getCompanyById(updateRequestDto.getId());
+        Company company = find(updateRequestDto.getId());
         company.setAddress(updateRequestDto.getAddress());
         company.setCity(CityMapper.fromRequest(updateRequestDto.getCity()));
         company.setPhoneNumber(updateRequestDto.getPhoneNumber());
@@ -147,14 +141,14 @@ public class CompanyService {
 
     public void uploadNewImages(List<MultipartFile> newImages) {
         User provider = authService.getCurrentUser();
-        Company company = companyRepository.getCompanyByProviderId(provider.getId());
+        Company company = repository.getCompanyByProviderId(provider.getId());
         uploadImages(company.getId(), newImages);
         repository.save(company);
     }
 
     public void removeImages(List<RemoveImageRequestDto> removedImages) {
         User provider = authService.getCurrentUser();
-        Company company = companyRepository.getCompanyByProviderId(provider.getId());
+        Company company = repository.getCompanyByProviderId(provider.getId());
         company.getPhotos().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );

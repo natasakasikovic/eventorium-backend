@@ -2,6 +2,8 @@ package com.iss.eventorium.security.utils;
 
 import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.models.User;
+import lombok.Getter;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -23,6 +25,7 @@ public class JwtTokenUtil {
     @Value("${jwt_secret}")
     public String SECRET;
 
+    @Getter
     @Value("259200000")
     private Long EXPIRES_IN;
 
@@ -56,9 +59,8 @@ public class JwtTokenUtil {
 
     public String getToken(HttpServletRequest request) {
         String authHeader = getAuthHeaderFromHeader(request);
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer "))
             return authHeader.substring(7);
-        }
 
         return null;
     }
@@ -91,33 +93,6 @@ public class JwtTokenUtil {
         return issueAt;
     }
 
-    public String getAudienceFromToken(String token) {
-        String audience;
-        try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            audience = claims.getAudience();
-        } catch (ExpiredJwtException ex) {
-            throw ex;
-        } catch (Exception e) {
-            audience = null;
-        }
-        return audience;
-    }
-
-    public Date getExpirationDateFromToken(String token) {
-        Date expiration;
-        try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            expiration = claims.getExpiration();
-        } catch (ExpiredJwtException ex) {
-            throw ex;
-        } catch (Exception e) {
-            expiration = null;
-        }
-
-        return expiration;
-    }
-
     private Claims getAllClaimsFromToken(String token) {
         Claims claims;
         try {
@@ -138,17 +113,18 @@ public class JwtTokenUtil {
         final String username = getUsernameFromToken(token);
         final Date created = getIssuedAtDateFromToken(token);
 
+        if (user.isDeactivated())
+            throw new DisabledException("User is deactivated");
+
+
         return (username != null
                 && username.equals(userDetails.getUsername())
-                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordReset()));
+                && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordReset())
+                && !user.isDeactivated());
     }
 
     private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return (lastPasswordReset != null && created.before(lastPasswordReset));
-    }
-
-    public Long getExpiredIn() {
-        return EXPIRES_IN;
     }
 
     public String getAuthHeaderFromHeader(HttpServletRequest request) {

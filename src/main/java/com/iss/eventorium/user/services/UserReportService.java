@@ -29,7 +29,7 @@ public class UserReportService {
         UserReport report = UserReportMapper.fromRequest(request);
 
         report.setReporter(authService.getCurrentUser());
-        report.setOffender(userService.findById(offenderId));
+        report.setOffender(userService.find(offenderId));
 
         repository.save(report);
     }
@@ -40,7 +40,7 @@ public class UserReportService {
     }
 
     public void updateStatus(Long id, UpdateReportRequestDto request) {
-        UserReport report = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User report with ID " + id + " not found"));
+        UserReport report = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User report not found"));
         report.setStatus(request.getStatus());
 
         if (request.getStatus() == Status.ACCEPTED)
@@ -50,7 +50,7 @@ public class UserReportService {
     }
 
     private void suspendUser(UserReport report) {
-        User user = userService.findById(report.getOffender().getId());
+        User user = userService.find(report.getOffender().getId());
         user.setSuspended(LocalDateTime.now());
     }
 }
