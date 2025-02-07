@@ -1,19 +1,23 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.event.dtos.invitation.InvitationDetailsDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.mappers.InvitationMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Invitation;
 import com.iss.eventorium.event.repositories.InvitationRepository;
+import com.iss.eventorium.event.specifications.InvitationSpecification;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
+import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -30,6 +34,7 @@ public class InvitationService {
     private final UserService userService;
     private final EmailService emailService;
     private final EventService eventService;
+    private final AuthService authService;
     private final SpringTemplateEngine templateEngine;
 
     @Value("${frontend.url}")
@@ -98,5 +103,10 @@ public class InvitationService {
 
     private Invitation findByHash(String hash){
         return repository.findByHash(hash).orElseThrow(() -> new EntityNotFoundException("Invitation not found"));
+    }
+
+    public List<InvitationDetailsDto> getInvitations() {
+        Specification<Invitation> specification = InvitationSpecification.filterForInvitedUser(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(InvitationMapper::toInvitationDetails).toList();
     }
 }

@@ -2,6 +2,7 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.event.CalendarEventDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
+import com.iss.eventorium.event.exceptions.EventAlreadyPassedException;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -42,6 +44,7 @@ public class AccountEventService {
 
     public void markAttendance(Long eventId) {
         Event event = eventService.find(eventId);
+        if (event.getDate().isBefore(LocalDate.now())) throw new EventAlreadyPassedException("Event has already passed.");
         User user = authService.getCurrentUser();
         markAttendance(event, user);
     }

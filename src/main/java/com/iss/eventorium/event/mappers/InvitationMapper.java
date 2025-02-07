@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.mappers;
 
+import com.iss.eventorium.event.dtos.invitation.InvitationDetailsDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
 import com.iss.eventorium.event.models.Invitation;
@@ -23,5 +24,9 @@ public class InvitationMapper {
 
     public static InvitationResponseDto toResponse(Invitation invitation) {
         return modelMapper.map(invitation, InvitationResponseDto.class);
+    }
+
+    public static InvitationDetailsDto toInvitationDetails(Invitation invitation) {
+        return modelMapper.map(invitation, InvitationDetailsDto.class);
     }
 }
