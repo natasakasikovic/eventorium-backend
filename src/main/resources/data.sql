@@ -262,6 +262,6 @@ INSERT INTO notifications (seen, recipient_id, timestamp, message, title) VALUES
     (true,  3, '2025-01-28 01:30:30.334455', 'Your category suggestion (Catering Equipment) has been accepted.', 'Category');
 
 INSERT INTO invitations (email, event_id, hash) VALUES
-('provider@gmail.com', 18, '1'),
-('provider@gmail.com', 19, '2'),
-('provider@gmail.com', 20, '3');
+('provider@gmail.com', 19, '1'),
+('provider@gmail.com', 20, '2'),
+('provider@gmail.com', 21, '3');
