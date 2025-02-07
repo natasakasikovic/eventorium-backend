@@ -346,3 +346,6 @@ VALUES
     (3, 3, CURRENT_TIMESTAMP, 13),
     (4, 4, CURRENT_TIMESTAMP, 14),
     (1, 5, CURRENT_TIMESTAMP, 15);
+
+
+INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);

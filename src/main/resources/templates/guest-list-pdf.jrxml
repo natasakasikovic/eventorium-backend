@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="Guest list"
+              pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="ced95029-b569-4027-895c-af2843a4e088"
+              whenNoDataType="NoDataSection">
+
+    <style name="Detail" fontName="Arial" fontSize="12"/>
+    <style name="Row" mode="Transparent">
+        <conditionalStyle>
+            <conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+            <style backcolor="#E6DAC3"/>
+        </conditionalStyle>
+    </style>
+
+    <parameter name="eventName"/>
+    <field name="person.name"/>
+    <field name="person.lastname"/>
+    <field name="email"/>
+
+    <title>
+        <band height="90" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="70" backcolor="#F5E3C3"/>
+            </rectangle>
+            <textField>
+                <reportElement x="0" y="10" width="535" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="22" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{eventName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="45" width="535" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="12" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["GUEST LIST"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="20">
+            <frame>
+                <reportElement style="Row" mode="Opaque" x="0" y="0" width="50" height="20"/>
+                <textField>
+                    <reportElement x="0" y="0" width="50" height="20"/>
+                    <textElement verticalAlignment="Middle" textAlignment="Center"/>
+                    <textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+                </textField>
+            </frame>
+
+            <frame>
+                <reportElement style="Row" mode="Opaque" x="50" y="0" width="217" height="20"/>
+                <textField>
+                    <reportElement x="0" y="0" width="217" height="20"/>
+                    <textElement verticalAlignment="Middle" textAlignment="Center"/>
+                    <textFieldExpression><![CDATA[$F{person.name} + " " + $F{person.lastname}]]></textFieldExpression>
+                </textField>
+            </frame>
+
+            <frame>
+                <reportElement style="Row" mode="Opaque" x="267" y="0" width="267" height="20"/>
+                <textField>
+                    <reportElement x="0" y="0" width="267" height="20"/>
+                    <textElement verticalAlignment="Middle" textAlignment="Center"/>
+                    <textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
+                </textField>
+            </frame>
+        </band>
+    </detail>
+
+
+    <columnFooter>
+        <band height="45" splitType="Stretch">
+            <line>
+                <reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#999999"/>
+                </graphicElement>
+            </line>
+        </band>
+    </columnFooter>
+
+    <pageFooter>
+        <band height="30">
+            <textField>
+                <reportElement x="0" y="0" width="535" height="30"/>
+                <textElement verticalAlignment="Middle" textAlignment="Center"/>
+                <textFieldExpression><![CDATA["© Eventorium All Rights Reserved"]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <noData>
+        <band height="50">
+            <textField>
+                <reportElement x="0" y="0" width="535" height="50"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["No guests for event with name '" + $P{eventName} + "'"]]></textFieldExpression>
+            </textField>
+        </band>
+    </noData>
+
+</jasperReport>

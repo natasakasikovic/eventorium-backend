@@ -20,10 +20,12 @@ import com.iss.eventorium.user.mappers.UserMapper;
 import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
+import com.iss.eventorium.user.specifications.UserSpecification;
 import com.iss.eventorium.user.validators.deactivation.AccountDeactivationValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,6 +38,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -247,4 +250,8 @@ public class UserService {
         repository.save(user);
     }
 
+    public List<User> findByEventAttendance(Long eventId) {
+        Specification<User> specification = UserSpecification.filterByEventAttendance(eventId);
+        return repository.findAll(specification);
+    }
 }
