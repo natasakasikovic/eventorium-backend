@@ -10,10 +10,10 @@ import org.springframework.data.jpa.domain.Specification;
 public class InvitationSpecification {
 
     public static Specification<Invitation> filterForInvitedUser(User user) {
-        return Specification.where(filterByEmail(user.getEmail())).and(filterOutBlockedEvents(user));
+        return Specification.where(hasEmail(user.getEmail())).and(filterOutBlockedEvents(user));
     }
 
-    private static Specification<Invitation> filterByEmail(String email) {
+    private static Specification<Invitation> hasEmail(String email) {
         return (root, query, cb) -> cb.equal(root.get("email"), email);
     }
 
