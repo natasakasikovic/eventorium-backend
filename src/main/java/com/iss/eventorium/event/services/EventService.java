@@ -12,10 +12,11 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.services.PdfService;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
+import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class EventService {
     private final EventRepository repository;
     private final AuthService authService;
     private final PdfService pdfService;
+    private final UserService userService;
 
     public EventDetailsDto getEventDetails(Long id) {
         Event event = find(id);
@@ -128,12 +130,20 @@ public class EventService {
                 .toList();
     }
 
-    public byte[] generatePdf(Long id) throws JRException {
+    public byte[] generateEventDetailsPdf(Long id) {
         Event event = find(id);
+        return pdfService.generate("/templates/event-details.jrxml", List.of(event), generateParams(event));
+    }
+
+    public byte[] generateGuestListPdf(Long id) {
+        List<User> guests = userService.findByEventAttendance(id);
+        return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
+    }
+
+    private Map<String, Object> generateParams(Event event) {
         Map<String, Object> params = new HashMap<>();
-        params.put("reportTitle", "EVENT: " + event.getName());
+        params.put("eventName", event.getName());
         params.put("generatedDate", LocalDate.now());
-        List<Event> data = List.of(event);
-        return pdfService.generate("/templates/event-details.jrxml", data, params);
+        return params;
     }
 }

@@ -3,6 +3,7 @@ package com.iss.eventorium.shared.handlers;
 import com.iss.eventorium.shared.exceptions.EmailSendingException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
+import com.iss.eventorium.shared.exceptions.PdfGenerationException;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -78,5 +79,13 @@ public class GlobalExceptionHandler {
                 .body(ExceptionResponse.builder()
                 .message(ex.getMessage())
                 .build());
+    }
+
+    @ExceptionHandler(PdfGenerationException.class)
+    public ResponseEntity<ExceptionResponse> handlePdfGenerationException(PdfGenerationException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ExceptionResponse.builder()
+                        .message(e.getMessage())
+                        .build());
     }
 }
