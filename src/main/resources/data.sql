@@ -265,3 +265,5 @@ INSERT INTO invitations (email, event_id, hash) VALUES
 ('provider@gmail.com', 19, '1'),
 ('provider@gmail.com', 20, '2'),
 ('provider@gmail.com', 21, '3');
+
+INSERT INTO USERS_ATTENDING_EVENTS (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);

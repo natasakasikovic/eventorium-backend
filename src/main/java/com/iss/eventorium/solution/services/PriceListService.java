@@ -14,7 +14,6 @@ import com.iss.eventorium.solution.specifications.ProductSpecification;
 import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -86,7 +85,7 @@ public class PriceListService {
         return PriceListMapper.toResponse(productRepository.save(product));
     }
 
-    public byte[] generatePdf() throws JRException {
+    public byte[] generatePdf() {
         List<PriceListResponseDto> data = new ArrayList<>(getPriceListProducts());
         data.addAll(getPriceListServices());
 

@@ -1,12 +1,12 @@
 package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.utils.ResponseHeaderUtils;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import jakarta.validation.Valid;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
 import com.iss.eventorium.solution.services.PriceListService;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -59,11 +59,8 @@ public class PriceListController {
     }
 
     @GetMapping("/pdf")
-    public ResponseEntity<byte[]> getPdf() throws JRException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=price_list_report.pdf");
-        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
-
+    public ResponseEntity<byte[]> getPdf() {
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("price_list_report.pdf");
         return new ResponseEntity<>(priceListService.generatePdf(), headers, HttpStatus.OK);
     }
 }

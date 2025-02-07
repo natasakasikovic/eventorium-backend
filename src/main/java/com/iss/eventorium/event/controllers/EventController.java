@@ -5,9 +5,9 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.utils.ResponseHeaderUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.JRException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,11 +84,15 @@ public class EventController {
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<byte[]> getPdf(@PathVariable Long id) throws JRException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=event_details.pdf");
-        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
-
-        return new ResponseEntity<>(service.generatePdf(id), headers, HttpStatus.OK);
+    public ResponseEntity<byte[]> getEventDetailsPdf(@PathVariable Long id) {
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("event_details.pdf");
+        return new ResponseEntity<>(service.generateEventDetailsPdf(id), headers, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/guest-list-pdf")
+    public ResponseEntity<byte[]> getGuestListPdf(@PathVariable Long id) {
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("guest-list.pdf");
+        return new ResponseEntity<>(service.generateGuestListPdf(id), headers, HttpStatus.OK);
+    }
+
 }
