@@ -23,8 +23,7 @@ public class SolutionService {
         );
     }
 
-    public void addRating(Long id, Rating rating) {
-        Solution solution = find(id);
+    public void addRating(Solution solution, Rating rating) {
         solution.getRatings().add(rating);
         solutionRepository.save(solution);
     }

@@ -109,6 +109,11 @@ public abstract class Solution extends CommentableEntity {
     }
 
     @Override
+    public User getCreator() {
+        return provider;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hashCode(id);
     }

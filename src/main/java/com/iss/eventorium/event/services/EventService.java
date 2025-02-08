@@ -149,8 +149,7 @@ public class EventService {
         return params;
     }
 
-    public void addRating(Long id, Rating rating) {
-        Event event = find(id);
+    public void addRating(Event event, Rating rating) {
         event.getRatings().add(rating);
         repository.save(event);
     }

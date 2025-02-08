@@ -74,5 +74,10 @@ public class Event extends CommentableEntity {
     public String getDisplayName() {
         return name;
     }
+
+    @Override
+    public User getCreator() {
+        return organizer;
+    }
 }
 
