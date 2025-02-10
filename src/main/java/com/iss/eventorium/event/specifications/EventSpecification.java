@@ -51,6 +51,11 @@ public class EventSpecification {
         return Specification.where(hasOrganizer(organizer)).and(hasDateAfter(LocalDate.now()));
     }
 
+    public static Specification<Event> filterByNameForOrganizer(String keyword, User user) {
+        return Specification.where(hasName(keyword))
+                .and(hasOrganizer(user));
+    }
+
     private static Specification<Event> hasOrganizer(User organizer) {
         return (root, query, cb) -> cb.equal(root.get("organizer").get("id"), organizer.getId());
     }

@@ -3,7 +3,9 @@ package com.iss.eventorium.event.controllers;
 import com.iss.eventorium.event.dtos.event.CalendarEventDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.AccountEventService;
+import com.iss.eventorium.shared.models.PagedResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ public class AccountEventController {
 
     private final AccountEventService service;
 
-    @GetMapping("/my-events")
+    @GetMapping("/calendar")
     public ResponseEntity<List<CalendarEventDto>> getOrganizerEvents() {
         return ResponseEntity.ok(service.getOrganizerEvents());
     }
@@ -56,5 +58,26 @@ public class AccountEventController {
     @GetMapping("/favourites/{id}")
     public ResponseEntity<Boolean> isFavouriteEvent(@PathVariable Long id) {
         return ResponseEntity.ok(service.isFavouriteEvent(id));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<EventSummaryResponseDto>> getAllEvents() {
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> getEvents(Pageable pageable) {
+        return ResponseEntity.ok(service.getEventsPaged(pageable));
+    }
+
+    @GetMapping("search/all")
+    public ResponseEntity<List<EventSummaryResponseDto>> searchAccountEvents(@RequestParam String keyword) {
+        return ResponseEntity.ok().body(service.searchEvents(keyword));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchAccountEventsPaged(
+            @RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 }
