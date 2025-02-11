@@ -5,11 +5,13 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
+import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.models.Activity;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.models.User;
@@ -21,11 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -36,10 +35,14 @@ public class EventService {
     private final AuthService authService;
     private final PdfService pdfService;
     private final UserService userService;
+    private final EventRepository eventRepository;
+
+    public EditableEventDto getEvent(Long id) {
+        return EventMapper.toEditableEvent(find(id));
+    }
 
     public EventDetailsDto getEventDetails(Long id) {
-        Event event = find(id);
-        return EventMapper.toEventDetailsDto(event);
+        return EventMapper.toEventDetailsDto(find(id));
     }
 
     public List<EventSummaryResponseDto> getTopEvents() {
@@ -100,6 +103,31 @@ public class EventService {
     public void setIsDraftFalse(Event event) {
         event.setDraft(false);
         repository.save(event);
+    }
+
+    public void updateEvent(Long id, UpdateEventRequestDto request) {
+        Event event = find(id);
+        if (!hasChanges(event, request)) return;
+        // TODO: SEND EMAIL TO ATTENDEES INFORMING THEM ABOUT THE CHANGES
+        // TODO: CANCEL RESERVATIONS IF THE EVENT DATE HAS BEEN CHANGED
+        event.setName(request.getName());
+        event.setDescription(request.getDescription());
+        event.setDate(request.getDate());
+        event.setMaxParticipants(request.getMaxParticipants());
+        event.setType(EventTypeMapper.fromResponse(request.getEventType()));
+        event.setCity(CityMapper.fromRequest(request.getCity()));
+        event.setAddress(request.getAddress());
+        eventRepository.save(event);
+    }
+
+    private boolean hasChanges(Event event, UpdateEventRequestDto request) {
+        return !Objects.equals(event.getName(), request.getName()) ||
+                !Objects.equals(event.getDescription(), request.getDescription()) ||
+                !Objects.equals(event.getDate(), request.getDate()) ||
+                !Objects.equals(event.getMaxParticipants(), request.getMaxParticipants()) ||
+                !Objects.equals(event.getType().getId(), request.getEventType().getId()) ||
+                !Objects.equals(event.getCity().getId(), request.getCity().getId()) ||
+                !Objects.equals(event.getAddress(), request.getAddress());
     }
 
     public void createAgenda(Long id, List<ActivityRequestDto> request) {

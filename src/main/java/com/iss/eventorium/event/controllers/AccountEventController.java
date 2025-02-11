@@ -71,13 +71,13 @@ public class AccountEventController {
     }
 
     @GetMapping("search/all")
-    public ResponseEntity<List<EventSummaryResponseDto>> searchAccountEvents(@RequestParam String keyword) {
+    public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
         return ResponseEntity.ok().body(service.searchEvents(keyword));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchAccountEventsPaged(
-            @RequestParam String keyword, Pageable pageable) {
+    public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchEventsPaged(
+            @RequestParam (required = false) String keyword, Pageable pageable) {
         return ResponseEntity.ok(service.searchEvents(keyword, pageable));
     }
 }

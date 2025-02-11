@@ -1,7 +1,6 @@
 package com.iss.eventorium.event.dtos.event;
 
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
-import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.shared.dtos.CityDto;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -11,16 +10,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventRequestDto {
+public class UpdateEventRequestDto {
 
     @NotNull(message = "Event name is required")
     @NotBlank(message = "Event name cannot be blank")
@@ -34,14 +31,11 @@ public class EventRequestDto {
     @FutureOrPresent(message = "Event date must not be in the past")
     private LocalDate date;
 
-    @NotNull(message = "Privacy field is required")
-    private Privacy privacy;
-
     @NotNull(message = "Max participants field is required")
     @Positive(message = "Max participants must be a positive number greater than zero")
     private Integer maxParticipants;
 
-    private EventTypeResponseDto eventType = null;
+    private EventTypeResponseDto eventType;
 
     @NotNull(message = "City field is required")
     private CityDto city;

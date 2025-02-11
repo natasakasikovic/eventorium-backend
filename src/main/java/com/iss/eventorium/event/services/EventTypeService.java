@@ -1,9 +1,7 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
-import com.iss.eventorium.category.repositories.CategoryRepository;
+import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
@@ -14,59 +12,45 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EventTypeService {
-    private final EventTypeRepository eventTypeRepository;
-    private final CategoryRepository categoryRepository;
+    private final EventTypeRepository repository;
+    private final CategoryService categoryService;
+
+    public EventType find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event type not found"));
+    }
 
     public List<EventTypeResponseDto> getEventTypes() {
-        return eventTypeRepository.findByDeletedFalse().stream()
-                .map(EventTypeMapper::toResponse)
-                .toList();
+        return repository.findByDeletedFalse().stream().map(EventTypeMapper::toResponse).toList();
     }
 
     public EventTypeResponseDto getEventType(Long id) {
-        EventType eventType = eventTypeRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
-        return EventTypeMapper.toResponse(eventType);
+        return EventTypeMapper.toResponse(find(id));
     }
 
-    public EventTypeResponseDto createEventType(EventTypeRequestDto eventTypeRequestDto) {
-        EventType created = EventTypeMapper.fromRequest(eventTypeRequestDto);
-        return EventTypeMapper.toResponse(eventTypeRepository.save(created));
+    public EventTypeResponseDto createEventType(EventTypeRequestDto request) {
+        return EventTypeMapper.toResponse(repository.save(EventTypeMapper.fromRequest(request)));
     }
 
-    public EventTypeResponseDto updateEventType(Long id, EventTypeRequestDto eventTypeRequestDto) {
-        EventType eventType = eventTypeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
+    public EventTypeResponseDto updateEventType(Long id, EventTypeRequestDto request) {
+        EventType eventType = find(id);
 
-        eventType.setDescription(eventTypeRequestDto.getDescription());
-
-        List<Category> categories = eventTypeRequestDto.getSuggestedCategories().stream()
-                .map(categoryResponseDto -> categoryRepository.findById(categoryResponseDto.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryResponseDto.getId() + " not found")))
-                .collect(Collectors.toList());
-
+        eventType.setDescription(request.getDescription());
+        List<Category> categories = request.getSuggestedCategories()
+                                    .stream()
+                                    .map(category -> categoryService.find(category.getId()))
+                                    .toList();
         eventType.setSuggestedCategories(categories);
-        return EventTypeMapper.toResponse(eventTypeRepository.save(eventType));
+
+        return EventTypeMapper.toResponse(repository.save(eventType));
     }
 
     public void deleteEventType(Long id) {
-        EventType eventType = eventTypeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
-
+        EventType eventType = find(id);
         eventType.setDeleted(true);
-        eventTypeRepository.save(eventType);
+        repository.save(eventType);
     }
-
-    public List<CategoryResponseDto> getSuggestedCategories(Long id) {
-        EventType eventType = eventTypeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event type with id " + id + " not found"));
-
-        return eventType.getSuggestedCategories().stream().map(CategoryMapper::toResponse).toList();
-    }
-
 }
