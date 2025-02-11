@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
+import com.iss.eventorium.solution.dtos.services.UpdateReservationRequestDto;
 import com.iss.eventorium.solution.services.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,13 @@ public class ReservationController {
     @GetMapping("/reservations/pending")
     public ResponseEntity<List<ReservationResponseDto>> getPendingReservations() {
         return ResponseEntity.ok(service.getPendingReservations());
+    }
+
+    @PatchMapping("/reservations/{id}")
+    public ResponseEntity<ReservationResponseDto> updateReservation(
+        @PathVariable Long id,
+        @RequestBody UpdateReservationRequestDto request
+    ) {
+        return ResponseEntity.ok(service.updateReservation(id, request.getStatus()));
     }
 }
