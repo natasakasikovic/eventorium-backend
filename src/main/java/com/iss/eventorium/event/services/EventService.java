@@ -3,6 +3,7 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -19,6 +20,7 @@ import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class EventService {
     private final AuthService authService;
     private final PdfService pdfService;
     private final UserService userService;
-    private final EventRepository eventRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public EditableEventDto getEvent(Long id) {
         return EventMapper.toEditableEvent(find(id));
@@ -89,7 +91,7 @@ public class EventService {
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Event not found"));
     }
 
-    public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
+    public EventResponseDto createEvent(EventRequestDto eventRequestDto) {
         Event created = repository.save(prepareEvent(eventRequestDto));
         return EventMapper.toResponse(created);
     }
@@ -108,8 +110,9 @@ public class EventService {
     public void updateEvent(Long id, UpdateEventRequestDto request) {
         Event event = find(id);
         if (!hasChanges(event, request)) return;
-        // TODO: SEND EMAIL TO ATTENDEES INFORMING THEM ABOUT THE CHANGES
-        // TODO: CANCEL RESERVATIONS IF THE EVENT DATE HAS BEEN CHANGED
+        if (!Objects.equals(event.getDate(), request.getDate()))
+            eventPublisher.publishEvent(new EventDateChangedEvent(this, id));
+
         event.setName(request.getName());
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
@@ -117,7 +120,9 @@ public class EventService {
         event.setType(EventTypeMapper.fromResponse(request.getEventType()));
         event.setCity(CityMapper.fromRequest(request.getCity()));
         event.setAddress(request.getAddress());
-        eventRepository.save(event);
+
+        repository.save(event);
+        // TODO: SEND EMAIL TO ATTENDEES INFORMING THEM ABOUT THE CHANGES
     }
 
     private boolean hasChanges(Event event, UpdateEventRequestDto request) {
