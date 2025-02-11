@@ -9,6 +9,7 @@ import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
+import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
@@ -21,6 +22,7 @@ import com.iss.eventorium.user.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
@@ -41,6 +43,7 @@ public class ReservationService {
     private final EmailService emailService;
     private final AuthService authService;
     private final SpringTemplateEngine templateEngine;
+    private final ReservationMapper reservationMapper;
 
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
@@ -76,6 +79,13 @@ public class ReservationService {
     public List<CalendarReservationDto> getProviderReservations() {
         User provider = authService.getCurrentUser();
         return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(ReservationMapper::toCalendarReservation).toList();
+    }
+
+
+    public List<ReservationResponseDto> getPendingReservations() {
+        User user = authService.getCurrentUser();
+        Specification<Reservation> specification = ServiceReservationSpecification.getPendingReservations(user);
+        return repository.findAll(specification).stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Scheduled(fixedRate = 60000)

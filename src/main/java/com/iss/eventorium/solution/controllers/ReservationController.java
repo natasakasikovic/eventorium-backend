@@ -39,4 +39,9 @@ public class ReservationController {
     public ResponseEntity<List<CalendarReservationDto>> getProviderReservations() {
         return ResponseEntity.ok(service.getProviderReservations());
     }
+
+    @GetMapping("/reservations/pending")
+    public ResponseEntity<List<ReservationResponseDto>> getPendingReservations() {
+        return ResponseEntity.ok(service.getPendingReservations());
+    }
 }
