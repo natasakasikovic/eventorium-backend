@@ -13,7 +13,9 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.shared.mappers.CityMapper;
+import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
@@ -24,6 +26,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.*;
 import java.time.LocalDate;
@@ -37,7 +41,12 @@ public class EventService {
     private final AuthService authService;
     private final PdfService pdfService;
     private final UserService userService;
+    private final EmailService emailService;
     private final ApplicationEventPublisher eventPublisher;
+
+    public static final String EMAIL_SUBJECT = "Notification from Eventorium";
+    public static final String EVENT_UPDATE_NOTIFICATION_TEMPLATE = "event-update-notification";
+    private final SpringTemplateEngine templateEngine;
 
     public EditableEventDto getEvent(Long id) {
         return EventMapper.toEditableEvent(find(id));
@@ -122,7 +131,7 @@ public class EventService {
         event.setAddress(request.getAddress());
 
         repository.save(event);
-        // TODO: SEND EMAIL TO ATTENDEES INFORMING THEM ABOUT THE CHANGES
+        notifyGuestsAboutChanges(event);
     }
 
     private boolean hasChanges(Event event, UpdateEventRequestDto request) {
@@ -133,6 +142,38 @@ public class EventService {
                 !Objects.equals(event.getType().getId(), request.getEventType().getId()) ||
                 !Objects.equals(event.getCity().getId(), request.getCity().getId()) ||
                 !Objects.equals(event.getAddress(), request.getAddress());
+    }
+
+    private void notifyGuestsAboutChanges(Event event) {
+        List<User> guests = userService.findByEventAttendance(event.getId());
+        for (User guest: guests) {
+            EmailDetails emailDetails = createEmailDetails(event, guest);
+            emailService.sendSimpleMail(emailDetails);
+        }
+    }
+
+    private EmailDetails createEmailDetails(Event event, User recipient) {
+        EmailDetails emailDetails = new EmailDetails();
+        emailDetails.setRecipient(recipient.getEmail());
+        emailDetails.setSubject(EMAIL_SUBJECT);
+        emailDetails.setMsgBody(generateEmailContent(event));
+        return emailDetails;
+    }
+
+    public String generateEmailContent(Event event) {
+        Context context = new Context();
+        context.setVariables(getContextVariables(event));
+        return templateEngine.process(EVENT_UPDATE_NOTIFICATION_TEMPLATE, context);
+    }
+
+    private Map<String, Object> getContextVariables(Event event) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("eventName", event.getName());
+        variables.put("description", event.getDescription());
+        variables.put("eventDate", event.getDate());
+        variables.put("address", event.getAddress());
+        variables.put("city", event.getCity().getName());
+        return variables;
     }
 
     public void createAgenda(Long id, List<ActivityRequestDto> request) {
