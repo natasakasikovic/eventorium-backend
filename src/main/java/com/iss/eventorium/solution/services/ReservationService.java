@@ -2,6 +2,7 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
+import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.services.EmailService;
@@ -21,10 +22,13 @@ import com.iss.eventorium.user.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.context.event.EventListener;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,5 +135,27 @@ public class ReservationService {
         variables.put("startTime", reservation.getStartingTime());
         variables.put("endTime", reservation.getEndingTime());
         return variables;
+    }
+
+    private List<Reservation> getEventReservations(Event event) {
+        Specification<Reservation> specification = ServiceReservationSpecification.getEventReservations(event);
+        return repository.findAll(specification);
+    }
+
+    @EventListener
+    public void handleEventDateChanged(EventDateChangedEvent dateChangedEvent) {
+        Event event = eventService.find(dateChangedEvent.getEventId());
+        List<Reservation> reservations = getEventReservations(event);
+
+        reservations.stream()
+                .filter(reservation -> isCancellable(reservation, event.getDate()))
+                .forEach(reservation -> reservation.setIsCanceled(true));
+
+        repository.saveAll(reservations);
+    }
+
+    private boolean isCancellable(Reservation reservation, LocalDate date) {
+        int deadline = reservation.getService().getCancellationDeadline();
+        return !date.minusDays(deadline).isBefore(LocalDate.now());
     }
 }

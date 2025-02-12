@@ -7,16 +7,20 @@ import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.iss.eventorium.event.mappers.EventMapper.toPagedResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -80,5 +84,25 @@ public class AccountEventService {
     public boolean isFavouriteEvent(Long id) {
         Event event = eventService.find(id);
         return authService.getCurrentUser().getPerson().getFavouriteEvents().contains(event);
+    }
+
+    public List<EventSummaryResponseDto> getAll() {
+        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
+        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
+        return toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<EventSummaryResponseDto> searchEvents(String keyword) {
+        Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
+        Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
+        return toPagedResponse(repository.findAll(specification, pageable));
     }
 }

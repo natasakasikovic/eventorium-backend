@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Update Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #FF5722;
+            text-align: center;
+        }
+        .details {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            text-align: center;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Event Update Notification</h1>
+    <p>Dear guest,</p>
+    <p>We would like to inform you that there have been updates regarding the event you plan to attend. Please find the updated details of the event below:</p>
+
+    <div class="details">
+        <p><strong>Event Name:</strong> <span th:text="${eventName}"></span></p>
+        <p><strong>Date:</strong> <span th:text="${eventDate}"></span></p>
+        <p><strong>Description:</strong> <span th:text="${description}"></span></p>
+        <p><strong>Address:</strong> <span th:text="${address}"></span></p>
+        <p><strong>City:</strong> <span th:text="${city}"></span></p>
+    </div>
+
+    <p>We recommend checking the event details to stay informed about the latest updates. Thank you for your understanding and cooperation.</p>
+
+    <p>Best regards,</p>
+    <p>The Eventorium Team</p>
+
+    <div class="footer">
+        <p>&copy; 2025 Eventorium. All Rights Reserved.</p>
+    </div>
+</div>
+</body>
+</html>
