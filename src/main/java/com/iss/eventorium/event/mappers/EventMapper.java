@@ -46,6 +46,10 @@ public class EventMapper {
         return dto;
     }
 
+    public static EditableEventDto toEditableEvent(Event event) {
+        return modelMapper.map(event, EditableEventDto.class);
+    }
+
     public static EventDetailsDto toEventDetailsDto(Event event) {
         EventDetailsDto dto = modelMapper.map(event, EventDetailsDto.class);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yy");

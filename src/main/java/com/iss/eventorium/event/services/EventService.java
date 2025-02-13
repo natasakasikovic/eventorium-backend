@@ -3,8 +3,10 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
+import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.models.Activity;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
@@ -12,22 +14,25 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
+import com.iss.eventorium.shared.mappers.CityMapper;
+import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -38,10 +43,19 @@ public class EventService {
     private final AuthService authService;
     private final PdfService pdfService;
     private final UserService userService;
+    private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    public static final String EMAIL_SUBJECT = "Notification from Eventorium";
+    public static final String EVENT_UPDATE_NOTIFICATION_TEMPLATE = "event-update-notification";
+    private final SpringTemplateEngine templateEngine;
+
+    public EditableEventDto getEvent(Long id) {
+        return EventMapper.toEditableEvent(find(id));
+    }
 
     public EventDetailsDto getEventDetails(Long id) {
-        Event event = find(id);
-        return EventMapper.toEventDetailsDto(event);
+        return EventMapper.toEventDetailsDto(find(id));
     }
 
     public List<EventSummaryResponseDto> getTopEvents() {
@@ -88,7 +102,7 @@ public class EventService {
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Event not found"));
     }
 
-    public EventResponseDto createEvent(EventRequestDto eventRequestDto)  {
+    public EventResponseDto createEvent(EventRequestDto eventRequestDto) {
         Event created = repository.save(prepareEvent(eventRequestDto));
         return EventMapper.toResponse(created);
     }
@@ -102,6 +116,66 @@ public class EventService {
     public void setIsDraftFalse(Event event) {
         event.setDraft(false);
         repository.save(event);
+    }
+
+    public void updateEvent(Long id, UpdateEventRequestDto request) {
+        Event event = find(id);
+        if (!hasChanges(event, request)) return;
+        if (!Objects.equals(event.getDate(), request.getDate()))
+            eventPublisher.publishEvent(new EventDateChangedEvent(this, id));
+
+        event.setName(request.getName());
+        event.setDescription(request.getDescription());
+        event.setDate(request.getDate());
+        event.setMaxParticipants(request.getMaxParticipants());
+        event.setType(EventTypeMapper.fromResponse(request.getEventType()));
+        event.setCity(CityMapper.fromRequest(request.getCity()));
+        event.setAddress(request.getAddress());
+
+        repository.save(event);
+        notifyGuestsAboutChanges(event);
+    }
+
+    private boolean hasChanges(Event event, UpdateEventRequestDto request) {
+        return !Objects.equals(event.getName(), request.getName()) ||
+                !Objects.equals(event.getDescription(), request.getDescription()) ||
+                !Objects.equals(event.getDate(), request.getDate()) ||
+                !Objects.equals(event.getMaxParticipants(), request.getMaxParticipants()) ||
+                !Objects.equals(event.getType().getId(), request.getEventType().getId()) ||
+                !Objects.equals(event.getCity().getId(), request.getCity().getId()) ||
+                !Objects.equals(event.getAddress(), request.getAddress());
+    }
+
+    private void notifyGuestsAboutChanges(Event event) {
+        List<User> guests = userService.findByEventAttendance(event.getId());
+        for (User guest: guests) {
+            EmailDetails emailDetails = createEmailDetails(event, guest);
+            emailService.sendSimpleMail(emailDetails);
+        }
+    }
+
+    private EmailDetails createEmailDetails(Event event, User recipient) {
+        EmailDetails emailDetails = new EmailDetails();
+        emailDetails.setRecipient(recipient.getEmail());
+        emailDetails.setSubject(EMAIL_SUBJECT);
+        emailDetails.setMsgBody(generateEmailContent(event));
+        return emailDetails;
+    }
+
+    public String generateEmailContent(Event event) {
+        Context context = new Context();
+        context.setVariables(getContextVariables(event));
+        return templateEngine.process(EVENT_UPDATE_NOTIFICATION_TEMPLATE, context);
+    }
+
+    private Map<String, Object> getContextVariables(Event event) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("eventName", event.getName());
+        variables.put("description", event.getDescription());
+        variables.put("eventDate", event.getDate());
+        variables.put("address", event.getAddress());
+        variables.put("city", event.getCity().getName());
+        return variables;
     }
 
     public void createAgenda(Long id, List<ActivityRequestDto> request) {

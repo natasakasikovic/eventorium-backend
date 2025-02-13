@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collection;
 import java.util.List;
 
-
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -27,7 +26,12 @@ public class EventController {
     private final EventService service;
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventDetailsDto> getEvent(@PathVariable("id") Long id) {
+    public ResponseEntity<EditableEventDto> getEvent(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.getEvent(id));
+    }
+
+    @GetMapping("/{id}/details")
+    public ResponseEntity<EventDetailsDto> getEventDetails(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.getEventDetails(id));
     }
 
@@ -72,15 +76,20 @@ public class EventController {
     }
 
     @PutMapping("/{id}/agenda")
-    public ResponseEntity<Void> createAgenda(@Valid @RequestBody List<ActivityRequestDto> requestDto,
-                                          @PathVariable Long id) {
-        service.createAgenda(id, requestDto);
+    public ResponseEntity<Void> createAgenda(@Valid @RequestBody List<ActivityRequestDto> request, @PathVariable Long id) {
+        service.createAgenda(id, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}/agenda")
     public ResponseEntity<List<ActivityResponseDto>> getAgenda(@PathVariable Long id) {
         return ResponseEntity.ok(service.getAgenda(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateEvent(@PathVariable Long id, @Valid @RequestBody UpdateEventRequestDto request) {
+        this.service.updateEvent(id, request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/pdf")
@@ -91,7 +100,7 @@ public class EventController {
 
     @GetMapping("/{id}/guest-list-pdf")
     public ResponseEntity<byte[]> getGuestListPdf(@PathVariable Long id) {
-        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("guest-list.pdf");
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("guest_list.pdf");
         return new ResponseEntity<>(service.generateGuestListPdf(id), headers, HttpStatus.OK);
     }
 
