@@ -1,6 +1,5 @@
 package com.iss.eventorium.solution.models;
 
-import com.iss.eventorium.interaction.models.Review;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

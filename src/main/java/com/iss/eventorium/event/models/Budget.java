@@ -35,5 +35,4 @@ public class Budget {
             this.plannedAmount += item.getPlannedAmount();
         }
     }
-
 }

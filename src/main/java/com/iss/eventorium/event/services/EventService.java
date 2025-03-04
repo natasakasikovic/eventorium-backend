@@ -12,6 +12,8 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.interaction.models.Comment;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -219,5 +221,15 @@ public class EventService {
         params.put("eventName", event.getName());
         params.put("generatedDate", LocalDate.now());
         return params;
+    }
+
+    public void addRating(Event event, Rating rating) {
+        event.getRatings().add(rating);
+        repository.save(event);
+    }
+
+    public void addComment(Event event, Comment comment) {
+        event.getComments().add(comment);
+        repository.save(event);
     }
 }

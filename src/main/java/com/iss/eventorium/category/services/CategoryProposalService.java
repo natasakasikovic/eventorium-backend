@@ -10,7 +10,7 @@ import com.iss.eventorium.notifications.models.NotificationType;
 import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Solution;
-import com.iss.eventorium.solution.repositories.SolutionRepository;
+import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,9 @@ public class CategoryProposalService {
 
     private final NotificationService notificationService;
     private final CategoryService categoryService;
+    private final SolutionService solutionService;
 
     private final CategoryRepository categoryRepository;
-    private final SolutionRepository solutionRepository;
 
     private final MessageSource messageSource;
 
@@ -50,9 +50,7 @@ public class CategoryProposalService {
             solution.setCategory(category);
         }
 
-        solution.setStatus(status);
-        solutionRepository.save(solution);
-
+        solutionService.saveStatus(solution, status);
         sendStatusUpdateNotification(category, status, solution.getProvider());
         return toResponse(categoryRepository.save(category));
     }
@@ -67,8 +65,7 @@ public class CategoryProposalService {
         updateCategoryProposal(category, request);
         Category response = categoryRepository.save(category);
 
-        solution.setStatus(Status.ACCEPTED);
-        solutionRepository.save(solution);
+        solutionService.saveStatus(solution, Status.ACCEPTED);
 
         sendUpdateNotification(category, solution.getProvider());
         return toResponse(response);
@@ -78,9 +75,9 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Solution solution = getSolutionProposal(category);
 
-        changeProposal(category, solution, request.getName());
+        changeProposal(category);
         categoryRepository.save(category);
-        solutionRepository.save(solution);
+        solutionService.setCategory(solution, categoryService.findByName(request.getName()));
 
         sendChangeNotification(category, solution, request);
         return toResponse(solution.getCategory());
@@ -133,12 +130,9 @@ public class CategoryProposalService {
         notificationService.sendNotification(provider, notification);
     }
 
-    private void changeProposal(Category category, Solution solution, String newCategoryName) {
+    private void changeProposal(Category category) {
         category.setDeleted(true);
         category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
-        solution.setStatus(Status.ACCEPTED);
-        solution.setCategory(categoryService.findByName(newCategoryName));
-
     }
 
     private Category getCategoryProposal(Long categoryId) {
@@ -150,7 +144,7 @@ public class CategoryProposalService {
     }
 
     private Solution getSolutionProposal(Category category) {
-        Solution solution = categoryService.findSolutionByCategoryId(category);
+        Solution solution = solutionService.findSolutionByCategory(category);
         if(!solution.getStatus().equals(Status.PENDING)) {
             throw new EntityNotFoundException("Solution with category '" + category.getName() + "' is not pending");
         }

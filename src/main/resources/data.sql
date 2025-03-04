@@ -111,40 +111,14 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 1000.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 7, 6, 12, 3, 3),
 (nextval('solution_sequence'), 'Transportation Service', 'Event transportation services for guests and equipment', 'Transportation, Event', 350.00, 60.00, 'PENDING', TRUE, FALSE, TRUE, 'MANUAL', 14, 5, 3, 7, 8, 3);
 
+INSERT INTO budgets VALUES (167.0, 159.0);
 
-INSERT INTO reviews (creation_date, rating, feedback, status, solution_id, user_id) VALUES
- ('2024-12-01 09:00:00', 5, 'These invitations are beautifully designed and very easy to personalize! Perfect for our event.', 'ACCEPTED', 1, 3),
- ('2024-12-02 10:30:00', 4, 'The banners are great, but the print quality could be better.', 'ACCEPTED', 2, 2),
- ('2024-12-03 11:45:00', 3, 'The party favors are cute, but the variety is limited.', 'PENDING', 3, 5),
- ('2024-12-01 14:00:00', 5, 'These balloons added the perfect pop of color to our event. Highly recommend!', 'ACCEPTED', 4, 2),
- ('2024-12-01 12:15:00', 5, 'Everything is great!', 'ACCEPTED', 2, 3),
- ('2024-12-03 18:20:00', 4, 'Nice mugs but the customization options are a bit limited.', 'ACCEPTED', 7, 4),
- ('2024-12-02 13:00:00', 5, 'These photo frames were the perfect souvenir for our event. Everyone loved them!', 'ACCEPTED', 8, 2),
- ('2024-12-03 11:45:00', 3, 'The event planner was okay, but some details were overlooked during the event.', 'PENDING', 11, 2),
- ('2024-12-01 14:00:00', 5, 'Great sound system, the setup was flawless!', 'ACCEPTED', 12, 5),
- ('2024-12-02 16:00:00', 4, 'The lighting setup was beautiful, but could have been a bit brighter.', 'ACCEPTED', 13, 3),
- ('2025-01-25 10:30:00', 5, 'The custom invitations were exactly what I needed! They looked beautiful and really added a personal touch to the event.', 'ACCEPTED', 1, 3),
- ('2025-01-24 11:00:00', 4, 'The event banner was high quality, but the colors did not match exactly what I expected from the design preview.', 'ACCEPTED', 2, 2),
- ('2025-01-23 14:45:00', 3, 'The party favors were cute, but I was hoping for a bit more customization.', 'PENDING', 3, 3),
- ('2025-01-22 16:00:00', 5, 'These balloons added so much life to our event! Vibrant colors and great quality.', 'ACCEPTED', 4, 5),
- ('2025-01-21 12:30:00', 2, 'The event t-shirts arrived late and the print quality was not as good as expected.', 'DECLINED', 5, 4),
- ('2025-01-20 18:00:00', 4, 'Party hats were a hit! The guests loved them. Only wish they were available in more colors.', 'PENDING', 6, 3),
- ('2025-01-19 13:30:00', 5, 'The personalized mugs were a fantastic souvenir for the event. Everyone loved them!', 'PENDING', 7, 2),
- ('2025-01-18 15:00:00', 3, 'The photo frames were nice, but the customization options were limited.', 'PENDING', 8, 5),
- ('2025-01-25 10:00:00', 5, 'The event photography service was exceptional! The photos turned out amazing and captured every moment perfectly.', 'PENDING', 9, 4),
- ('2025-01-24 12:00:00', 4, 'Catering was delicious, but some dishes arrived a bit cold. Overall, great service though.', 'PENDING', 10, 2),
- ('2025-01-23 14:00:00', 5, 'The event planning service was incredible! They handled everything from start to finish, and it made my life so much easier.', 'PENDING', 11, 3),
- ('2025-01-22 11:30:00', 3, 'Sound system setup was good, but the audio quality could have been better at times during the event.', 'PENDING', 12, 4),
- ('2025-01-21 16:00:00', 5, 'The decorative lighting transformed our venue into something magical! Could not have been more pleased with how it looked.', 'ACCEPTED', 13, 3),
- ('2025-01-20 17:00:00', 4, 'Venue booking was smooth and easy. However, the venue itself could use a bit of updating.', 'PENDING', 14, 2),
- ('2025-01-18 09:00:00', 5, 'The event security team was fantastic. They ensured everything ran smoothly and kept everyone safe.', 'ACCEPTED', 15, 2);
+INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
+    (10,9,CURRENT_DATE, 8, 'PRODUCT'),
+    (50, 10, CURRENT_DATE, 2, 'PRODUCT'),
+    (2,7, CURRENT_DATE, 6, 'PRODUCT'),
+    (105, 4, CURRENT_DATE, 9, 'SERVICE');
 
-INSERT INTO budgets VALUES (62.0, 54.0);
-
-INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id) VALUES
-    (10,9,CURRENT_DATE, 8),
-    (50, 10, CURRENT_DATE, 2),
-    (2,7, CURRENT_DATE, 6);
 
 INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3);
 
@@ -266,4 +240,112 @@ INSERT INTO invitations (email, event_id, hash) VALUES
 ('provider@gmail.com', 20, '2'),
 ('provider@gmail.com', 21, '3');
 
-INSERT INTO USERS_ATTENDING_EVENTS (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);
+-- Comments for events
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('What a beautiful wedding, I loved the decorations!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 1),
+    ('The reception was elegant, and the food was amazing. Would love to attend again!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 1),
+    ('The wedding in Novi Sad was magical, but it could have been a bit more organized.', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 1),
+    ('The corporate seminar was fantastic. I learned a lot!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 6),
+    ('Networking was great, but the venue felt a bit too small for such a large crowd.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 6),
+    ('The workshops were top-notch! I gained valuable insights on leadership.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 6),
+    ('The birthday bash was a blast! The music was amazing.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 2),
+    ('I had a fantastic time at the birthday party. The DJs were great!', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 2),
+    ('Everything was great, but the food could have been better.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 2),
+    ('Great business meetup, I made several new connections!', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 3),
+    ('The event was a bit too long, but the speakers were excellent.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 3),
+    ('I learned a lot about the local business scene in Sombor.', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 3),
+    ('Amazing wedding reception, everything was perfect!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 5),
+    ('The ambiance and the music were unforgettable. A truly special night.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 5),
+    ('The wedding reception could have used better coordination with the schedule.', CURRENT_TIMESTAMP, 'PENDING', 4, 'EVENT', 5),
+    ('Fantastic birthday celebration, the band was amazing!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 7),
+    ('The location was great, but the crowd was a little too big for my liking.', CURRENT_TIMESTAMP, 'PENDING', 5, 'EVENT', 7),
+    ('I had so much fun, will definitely attend again next year!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 7),
+    ('Great seminar on leadership, very insightful!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 6),
+    ('The venue was nice, but the seating arrangements could have been better.', CURRENT_TIMESTAMP, 'PENDING', 5, 'EVENT', 6),
+    ('What a beautiful traditional wedding. It was so unique!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'EVENT', 4),
+    ('I loved the ceremony, but the reception area could have been a bit larger.', CURRENT_TIMESTAMP, 'PENDING', 3, 'EVENT', 4),
+    ('This birthday party was a great experience! The surprise guest was awesome.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'EVENT', 5),
+    ('The party could have used more food options, but the guest performance made up for it.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 5),
+    ('The corporate launch event was very professional and well-organized.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'EVENT', 8),
+    ('Great event but a bit too crowded. Could use more space next time.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 8),
+    ('The team-building activities were amazing, I had so much fun!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'EVENT', 10),
+    ('It was great, but the activities could have been better organized.', CURRENT_TIMESTAMP, 'PENDING', 1, 'EVENT', 10),
+    ('The wedding gala was stunning. The decorations were breathtaking!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 4),
+    ('Everything was perfect, but it could have been more interactive.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 4);
+
+-- Comments for products
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('These custom invitations are so beautiful. Exactly what I was looking for!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'PRODUCT', 1),
+    ('The quality of the invitations is outstanding! Highly recommend.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 1),
+    ('A bit too expensive for my taste, but the design is worth it.', CURRENT_TIMESTAMP, 'PENDING', 3, 'PRODUCT', 1),
+    ('The event banner was vibrant and eye-catching, exactly what we needed.', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 2),
+    ('This banner helped promote our event effectively. Great product.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'PRODUCT', 2),
+    ('I had to return it due to printing issues, but the customer service was great.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 2),
+    ('These party favors were a huge hit! All guests loved them.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'PRODUCT', 3),
+    ('Such a unique touch for any event! Will order again for my next party.', CURRENT_TIMESTAMP, 'PENDING', 5, 'PRODUCT', 3),
+    ('Some of the favors were damaged during shipping, but the quality is otherwise great.', CURRENT_TIMESTAMP, 'PENDING', 1, 'PRODUCT', 3),
+    ('These balloons made my event look festive and lively!', CURRENT_TIMESTAMP, 'PENDING', 4, 'PRODUCT', 4),
+    ('Great for any occasion! The colors were perfect for my party.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'PRODUCT', 4),
+    ('They deflated faster than expected, but still a great product overall.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 4),
+    ('The t-shirts were of great quality. Perfect for our event.', CURRENT_TIMESTAMP, 'PENDING', 5, 'PRODUCT', 5),
+    ('Loved the customization options. Everyone at the event was wearing them!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 5);
+
+-- Comments for services
+INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+VALUES
+    ('The photographer was amazing! Caught all the special moments.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 9),
+    ('The photos were incredible. Worth every penny!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 9),
+    ('The photographer missed some key moments. Could be more attentive.', CURRENT_TIMESTAMP, 'PENDING', 5, 'SERVICE', 9),
+    ('The catering was fantastic! All my guests loved the food.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'SERVICE', 10),
+    ('Great service, but some food items were a bit too salty.', CURRENT_TIMESTAMP, 'PENDING', 1, 'SERVICE', 10),
+    ('They were very professional and the food was top-notch!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 10),
+    ('The event planning was flawless. Everything went according to schedule!', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'SERVICE', 11),
+    ('I was impressed with the attention to detail. Highly recommend for any event.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 11),
+    ('The planning could have been a little more organized. Some things were last minute.', CURRENT_TIMESTAMP, 'PENDING', 1, 'SERVICE', 11),
+    ('The sound system setup was fantastic. The quality was top-notch!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 12),
+    ('The sound was great, but the setup took longer than expected.', CURRENT_TIMESTAMP, 'PENDING', 5, 'SERVICE', 12),
+    ('Loved the setup, the sound quality was amazing for the event.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 12),
+    ('The lighting transformed the venue. Beautiful and vibrant colors.', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'SERVICE', 13),
+    ('The lights were perfect for the atmosphere we wanted to create.', CURRENT_TIMESTAMP, 'ACCEPTED', 5, 'SERVICE', 13),
+    ('The lighting setup was nice, but the bulbs burned out too soon.', CURRENT_TIMESTAMP, 'PENDING', 2, 'SERVICE', 13);
+
+-- Ratings for solutions
+INSERT INTO ratings (rating, user_id, creation_date, solution_id)
+VALUES
+    (5, 1, CURRENT_TIMESTAMP, 1),
+    (4, 2, CURRENT_TIMESTAMP, 2),
+    (3, 3, CURRENT_TIMESTAMP, 3),
+    (4, 4, CURRENT_TIMESTAMP, 4),
+    (5, 5, CURRENT_TIMESTAMP, 5),
+    (2, 1, CURRENT_TIMESTAMP, 6),
+    (1, 2, CURRENT_TIMESTAMP, 7),
+    (4, 3, CURRENT_TIMESTAMP, 8),
+    (3, 4, CURRENT_TIMESTAMP, 9),
+    (5, 5, CURRENT_TIMESTAMP, 10),
+    (4, 2, CURRENT_TIMESTAMP, 1),
+    (3, 3, CURRENT_TIMESTAMP, 1),
+    (2, 4, CURRENT_TIMESTAMP, 1);
+
+-- Ratings for events
+INSERT INTO ratings (rating, user_id, creation_date, event_id)
+VALUES
+    (5, 1, CURRENT_TIMESTAMP, 1),
+    (4, 2, CURRENT_TIMESTAMP, 2),
+    (3, 3, CURRENT_TIMESTAMP, 3),
+    (5, 4, CURRENT_TIMESTAMP, 4),
+    (2, 5, CURRENT_TIMESTAMP, 5),
+    (4, 1, CURRENT_TIMESTAMP, 6),
+    (3, 2, CURRENT_TIMESTAMP, 7),
+    (1, 3, CURRENT_TIMESTAMP, 8),
+    (4, 4, CURRENT_TIMESTAMP, 9),
+    (5, 5, CURRENT_TIMESTAMP, 10),
+    (2, 1, CURRENT_TIMESTAMP, 11),
+    (5, 2, CURRENT_TIMESTAMP, 12),
+    (3, 3, CURRENT_TIMESTAMP, 13),
+    (4, 4, CURRENT_TIMESTAMP, 14),
+    (1, 5, CURRENT_TIMESTAMP, 15);
+
+
+INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);

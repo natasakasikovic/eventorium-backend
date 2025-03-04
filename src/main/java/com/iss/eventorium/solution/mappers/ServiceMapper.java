@@ -4,10 +4,9 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
-import com.iss.eventorium.interaction.mappers.ReviewMapper;
-import com.iss.eventorium.interaction.models.Review;
+import com.iss.eventorium.interaction.mappers.RatingMapper;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Service;
@@ -33,9 +32,8 @@ public class ServiceMapper {
         dto.setCategory(CategoryMapper.toResponse(service.getCategory()));
         dto.setEventTypes(service.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
         try {
-            dto.setRating(service.getReviews().stream()
-                    .filter(r -> r.getStatus().equals(Status.ACCEPTED))
-                    .mapToInt(Review::getRating)
+            dto.setRating(service.getRatings().stream()
+                    .mapToInt(Rating::getRating)
                     .average()
                     .orElse(0.0));
         } catch (NullPointerException e) {
@@ -43,7 +41,6 @@ public class ServiceMapper {
         }
         dto.setProvider(UserMapper.toUserDetails(service.getProvider()));
         dto.setCompany(CompanyMapper.toResponse(company));
-        dto.setReviews(service.getReviews().stream().map(ReviewMapper::toResponse).toList());
         return dto;
     }
 
@@ -60,7 +57,7 @@ public class ServiceMapper {
                 .isVisible(request.getIsVisible())
                 .isDeleted(false)
                 .isAvailable(request.getIsAvailable())
-                .reviews(new ArrayList<>())
+                .ratings(new ArrayList<>())
                 .specialties(request.getSpecialties())
                 .type(request.getType())
                 .category(CategoryMapper.fromResponse(request.getCategory()))
@@ -75,7 +72,7 @@ public class ServiceMapper {
         service.setId(toUpdate.getId());
         service.setStatus(toUpdate.getStatus());
         service.setCategory(toUpdate.getCategory());
-        service.setReviews(toUpdate.getReviews());
+        service.setRatings(toUpdate.getRatings());
         service.setImagePaths(toUpdate.getImagePaths());
         service.setIsDeleted(toUpdate.getIsDeleted());
         service.setProvider(toUpdate.getProvider());
@@ -91,9 +88,8 @@ public class ServiceMapper {
         dto.setCategory(CategoryMapper.toResponse(service.getCategory()));
         dto.setEventTypes(service.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
         try {
-            dto.setRating(service.getReviews().stream()
-                    .filter(r -> r.getStatus().equals(Status.ACCEPTED))
-                    .mapToInt(Review::getRating)
+            dto.setRating(service.getRatings().stream()
+                    .mapToInt(Rating::getRating)
                     .average()
                     .orElse(0.0));
         } catch (NullPointerException e) {
@@ -105,9 +101,8 @@ public class ServiceMapper {
     public static ServiceSummaryResponseDto toSummaryResponse(Service service) {
         ServiceSummaryResponseDto dto = modelMapper.map(service, ServiceSummaryResponseDto.class);
         try {
-            dto.setRating(service.getReviews().stream()
-                    .filter(r -> r.getStatus().equals(Status.ACCEPTED))
-                    .mapToInt(Review::getRating)
+            dto.setRating(service.getRatings().stream()
+                    .mapToInt(Rating::getRating)
                     .average()
                     .orElse(0.0));
         } catch (NullPointerException e) {

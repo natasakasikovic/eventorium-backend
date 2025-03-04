@@ -3,7 +3,7 @@ package com.iss.eventorium.solution.dtos.products;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
-import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
+import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.*;
@@ -28,7 +28,6 @@ public class ProductDetailsDto {
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
     private Double rating;
-    private List<ReviewResponseDto> reviews;
     private UserDetailsDto provider;
     private CompanyResponseDto company;
 }
