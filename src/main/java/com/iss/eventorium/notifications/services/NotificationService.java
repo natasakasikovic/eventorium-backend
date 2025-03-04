@@ -26,7 +26,7 @@ public class NotificationService {
     private final NotificationRepository repository;
 
     public void sendNotification(User user, Notification notification) {
-        log.info("Sending notification to {}: {}", user, notification.getMessage());
+        log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
         messagingTemplate.convertAndSendToUser(
                 user.getId().toString(),
                 "/notifications",

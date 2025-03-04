@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CityDto {
-    private int id;
+    private Long id;
     private String name;
 }

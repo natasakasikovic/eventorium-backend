@@ -1,17 +1,16 @@
-package com.iss.eventorium.interaction.dtos.review;
+package com.iss.eventorium.interaction.dtos.comment;
 
 import com.iss.eventorium.shared.models.Status;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateReviewRequestDto {
+@Builder
+public class UpdateCommentRequestDto {
+
     @NotNull(message = "Status is mandatory")
     private Status status;
 }

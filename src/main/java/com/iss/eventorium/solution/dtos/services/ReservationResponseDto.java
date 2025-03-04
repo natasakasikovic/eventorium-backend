@@ -1,9 +1,7 @@
 package com.iss.eventorium.solution.dtos.services;
 
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

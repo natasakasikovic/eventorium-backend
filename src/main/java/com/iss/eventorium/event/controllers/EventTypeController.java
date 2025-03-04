@@ -17,34 +17,31 @@ import java.util.List;
 @CrossOrigin
 public class EventTypeController {
 
-    private final EventTypeService eventTypeService;
+    private final EventTypeService service;
 
     @GetMapping("/all")
     public ResponseEntity<List<EventTypeResponseDto>> getEventTypes() {
-        return ResponseEntity.ok(eventTypeService.getEventTypes());
+        return ResponseEntity.ok(service.getEventTypes());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EventTypeResponseDto> getEventType(@PathVariable Long id) {
-        return ResponseEntity.ok(eventTypeService.getEventType(id));
+        return ResponseEntity.ok(service.getEventType(id));
     }
 
     @PostMapping
     public ResponseEntity<EventTypeResponseDto> createEventType(@Valid @RequestBody EventTypeRequestDto requestDto) {
-        return new ResponseEntity<>(eventTypeService.createEventType(requestDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createEventType(requestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventTypeResponseDto> updateEventType(
-            @Valid @RequestBody EventTypeRequestDto requestDto,
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(eventTypeService.updateEventType(id, requestDto));
+    public ResponseEntity<EventTypeResponseDto> updateEventType(@Valid @RequestBody EventTypeRequestDto requestDto, @PathVariable Long id) {
+        return ResponseEntity.ok(service.updateEventType(id, requestDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEventType(@PathVariable Long id) {
-        eventTypeService.deleteEventType(id);
+        service.deleteEventType(id);
         return ResponseEntity.noContent().build();
     }
 }

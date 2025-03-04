@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.dtos.products;
 
-import com.iss.eventorium.interaction.dtos.review.ReviewResponseDto;
+import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
+import com.iss.eventorium.solution.models.SolutionType;
 import lombok.*;
 
 import java.util.List;
@@ -10,10 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductReviewResponseDto {
+public class SolutionReviewResponseDto {
     private Long id;
     private String name;
     private Double price;
     private Double discount;
-    private List<ReviewResponseDto> reviews;
+    private RatingResponseDto rating;
+    private SolutionType type;
 }

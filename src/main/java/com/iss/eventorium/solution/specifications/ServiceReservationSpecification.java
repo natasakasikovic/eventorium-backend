@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.specifications;
 
+import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.Service;
@@ -46,16 +47,20 @@ public class ServiceReservationSpecification {
                 .and(hasEventDateInFuture());
     }
 
-    private static Specification<Reservation> hasEventDateInFuture() {
-        return (root, query, cb) -> cb.greaterThan(root.get("event").get("date"), LocalDate.now());
-    }
-
     public static Specification<Reservation> getProviderReservations(User provider) {
         return Specification.where(hasProviderId(provider.getId())).and(hasStatus(Status.ACCEPTED));
     }
 
     public static Specification<Reservation> getPendingReservations(User provider) {
         return Specification.where(hasProviderId(provider.getId())).and(hasStatus(Status.PENDING));
+    }
+
+    public static Specification<Reservation> getEventReservations(Event event) {
+        return Specification.where(hasEventId(event.getId()));
+    }
+
+    private static Specification<Reservation> hasEventDateInFuture() {
+        return (root, query, cb) -> cb.greaterThan(root.get("event").get("date"), LocalDate.now());
     }
 
     private static Specification<Reservation> hasProviderId(Long providerId) {

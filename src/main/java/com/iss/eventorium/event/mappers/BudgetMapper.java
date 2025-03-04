@@ -7,6 +7,7 @@ import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.solution.models.Solution;
+import com.iss.eventorium.solution.models.SolutionType;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,10 +22,11 @@ public class BudgetMapper {
     }
 
 
-    public static BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution) {
+    public static BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution, SolutionType itemType) {
         BudgetItem item = modelMapper.map(dto, BudgetItem.class);
         item.setCategory(solution.getCategory());
         item.setSolution(solution);
+        item.setItemType(itemType);
         return item;
     }
 
