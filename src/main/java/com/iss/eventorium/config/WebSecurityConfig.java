@@ -65,55 +65,96 @@ public class WebSecurityConfig {
         http.csrf((csrf) -> csrf.disable());
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("api/v1/ws/**").authenticated()
+                        .requestMatchers("/api/v1/ws/**").permitAll()
+                        .requestMatchers("/api/v1/ws").permitAll()
 
                         // Services
-                        .requestMatchers("api/v1/services/top-five-services").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/services/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/services").permitAll()
-                        .requestMatchers("api/v1/services/all").permitAll()
-                        .requestMatchers("api/v1/services/filter").permitAll()
-                        .requestMatchers("api/v1/services/search").permitAll()
-                        .requestMatchers("api/v1/services/{id}/*").permitAll()
+                        .requestMatchers("/api/v1/services/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/services/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/services").permitAll()
+                        .requestMatchers("/api/v1/services/all").permitAll()
+                        .requestMatchers("/api/v1/services/filter").permitAll()
+                        .requestMatchers("/api/v1/services/search").permitAll()
+                        .requestMatchers("/api/v1/services/filter/all").permitAll()
+                        .requestMatchers("/api/v1/services/search/all").permitAll()
+                        .requestMatchers("/api/v1/services/{id}/*").permitAll()
 
                         // Products
-                        .requestMatchers("api/v1/products/top-five-services").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/products/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/products").permitAll()
-                        .requestMatchers("api/v1/products/all").permitAll()
-                        .requestMatchers("api/v1/products/filter").permitAll()
-                        .requestMatchers("api/v1/products/search").permitAll()
-                        .requestMatchers("api/v1/products/{id}/*").permitAll()
+                        .requestMatchers("/api/v1/products/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
+                        .requestMatchers("/api/v1/products/all").permitAll()
+                        .requestMatchers("/api/v1/products/filter").permitAll()
+                        .requestMatchers("/api/v1/products/search").permitAll()
+                        .requestMatchers("/api/v1/products/filter/all").permitAll()
+                        .requestMatchers("/api/v1/products/search/all").permitAll()
+                        .requestMatchers("/api/v1/products/{id}/*").permitAll()
 
                         // Events
-                        .requestMatchers("api/v1/events/top-five-services").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/events/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/events").permitAll()
-                        .requestMatchers("api/v1/events/all").permitAll()
-                        .requestMatchers("api/v1/events/filter").permitAll()
-                        .requestMatchers("api/v1/events/search").permitAll()
-                        .requestMatchers("api/v1/events/{id}/*").permitAll()
+                        .requestMatchers("/api/v1/events/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/events/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/events").permitAll()
+                        .requestMatchers("/api/v1/events/all").permitAll()
+                        .requestMatchers("/api/v1/events/filter").permitAll()
+                        .requestMatchers("/api/v1/events/search").permitAll()
+                        .requestMatchers("/api/v1/events/filter/all").permitAll()
+                        .requestMatchers("/api/v1/events/search/all").permitAll()
+                        .requestMatchers("/api/v1/events/{id}/*").permitAll()
 
                         // Users
-                        .requestMatchers(HttpMethod.GET, "api/v1/users/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/users/{id}/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users").authenticated()
+                        .requestMatchers("/api/v1/users/password").authenticated()
+                        .requestMatchers("/api/v1/users/profile-photo").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
 
                         // Companies
-                        .requestMatchers(HttpMethod.GET, "api/v1/companies/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/companies/{id}/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}/*").permitAll()
                         .requestMatchers("/api/v1/companies/{id}/images").permitAll()
 
                         // Event types
-                        .requestMatchers("api/v1/event-types/all").permitAll()
+                        .requestMatchers("/api/v1/event-types/all").permitAll()
+
                         // Categories
-                        .requestMatchers("api/v1/categories/all").permitAll()
+                        .requestMatchers("/api/v1/categories/all").permitAll()
+
+                        // Notifications
+                        .requestMatchers("/api/v1/notifications").authenticated()
+                        .requestMatchers("/api/v1/notifications/seen").authenticated()
+
+                        // Account Events
+                        .requestMatchers("/api/v1/account/events").authenticated()
+                        .requestMatchers("/api/v1/account/events/{id}/attendance").authenticated()
+                        .requestMatchers("/api/v1/account/events/favourites").authenticated()
+                        .requestMatchers("/api/v1/account/events/favourites/{id}").authenticated()
+                        .requestMatchers("/api/v1/account/events/my-attending-events").authenticated()
+
+                        // Account Services
+                        .requestMatchers("/api/v1/account/services").authenticated()
+                        .requestMatchers("/api/v1/account/services/all").authenticated()
+                        .requestMatchers("/api/v1/account/services/favourites").authenticated()
+                        .requestMatchers("/api/v1/account/services/favourites/{id}").authenticated()
+
+                        // Account Products
+                        .requestMatchers("/api/v1/account/products").authenticated()
+                        .requestMatchers("/api/v1/account/products/all").authenticated()
+                        .requestMatchers("/api/v1/account/products/favourites").authenticated()
+                        .requestMatchers("/api/v1/account/products/favourites/{id}").authenticated()
+
 
                         // Others
-                        .requestMatchers("api/v1/roles/registration-options").permitAll()
-                        .requestMatchers("api/v1/cities/all").permitAll()
-                        .requestMatchers("api/v1/auth/activation/{hash}").permitAll()
-                        .requestMatchers("api/v1/auth/{id}/profile-photo").permitAll()
+                        .requestMatchers("/api/v1/roles/registration-options").permitAll()
+                        .requestMatchers("/api/v1//auth/quick-registration").permitAll()
+                        .requestMatchers("/api/v1/cities/all").permitAll()
+                        .requestMatchers("/api/v1/auth/activation/{hash}").permitAll()
+                        .requestMatchers("/api/v1/auth/{id}/profile-photo").permitAll()
+                        .requestMatchers("/api/v1/provider-reservations").hasAuthority("PROVIDER")
+
+                        // Invitations
+                        .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
 
 //                        .requestMatchers("**").permitAll()
                 // TODO: Add access rules for all API endpoints.
