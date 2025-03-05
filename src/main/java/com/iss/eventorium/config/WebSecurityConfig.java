@@ -71,6 +71,9 @@ public class WebSecurityConfig {
                         // Services
                         .requestMatchers("/api/v1/services/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/services/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/services").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/services/{id}").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/services/{id}").hasAuthority("PROVIDER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/services").permitAll()
                         .requestMatchers("/api/v1/services/all").permitAll()
                         .requestMatchers("/api/v1/services/filter").permitAll()
@@ -83,6 +86,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/products/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/{id}").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/{id}").hasAuthority("PROVIDER")
                         .requestMatchers("/api/v1/products/all").permitAll()
                         .requestMatchers("/api/v1/products/filter").permitAll()
                         .requestMatchers("/api/v1/products/search").permitAll()
@@ -112,8 +118,12 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/user-reports/{id}").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/user-reports").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/user-reports/{id}").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/user-blocking/*").authenticated()
 
                         // Companies
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/companies").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/companies/images").hasAuthority("PROVIDER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/companies/images").hasAuthority("PROVIDER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}/*").permitAll()
                         .requestMatchers("/api/v1/companies/{id}/images").permitAll()
@@ -133,21 +143,30 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/notifications/seen").authenticated()
 
                         // Account Events
-                        .requestMatchers("/api/v1/account/events").authenticated()
+                        .requestMatchers("/api/v1/account/events").hasAuthority("EVENT_ORGANIZER")
+                        .requestMatchers("/api/v1/account/events/all").hasAuthority("EVENT_ORGANIZER")
                         .requestMatchers("/api/v1/account/events/{id}/attendance").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites/{id}").authenticated()
                         .requestMatchers("/api/v1/account/events/my-attending-events").authenticated()
 
                         // Account Services
-                        .requestMatchers("/api/v1/account/services").authenticated()
-                        .requestMatchers("/api/v1/account/services/all").authenticated()
+                        .requestMatchers("/api/v1/account/services").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/services/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/services/search/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/services/search").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/services/filter/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/services/filter").hasAuthority("PROVIDER")
                         .requestMatchers("/api/v1/account/services/favourites").authenticated()
                         .requestMatchers("/api/v1/account/services/favourites/{id}").authenticated()
 
                         // Account Products
-                        .requestMatchers("/api/v1/account/products").authenticated()
-                        .requestMatchers("/api/v1/account/products/all").authenticated()
+                        .requestMatchers("/api/v1/account/products").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/products/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/products/search/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/products/search").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/products/filter/all").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/account/products/filter").hasAuthority("PROVIDER")
                         .requestMatchers("/api/v1/account/products/favourites").authenticated()
                         .requestMatchers("/api/v1/account/products/favourites/{id}").authenticated()
 
@@ -161,6 +180,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/activation/{hash}").permitAll()
                         .requestMatchers("/api/v1/auth/{id}/profile-photo").permitAll()
                         .requestMatchers("/api/v1/provider-reservations").hasAuthority("PROVIDER")
+                        .requestMatchers("/api/v1/price-list/**").hasAuthority("PROVIDER")
 
                         // Invitations
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
