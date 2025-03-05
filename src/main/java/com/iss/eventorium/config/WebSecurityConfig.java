@@ -109,6 +109,9 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user-reports/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user-reports").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/user-reports/{id}").hasAuthority("ADMIN")
 
                         // Companies
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}").permitAll()
@@ -117,9 +120,13 @@ public class WebSecurityConfig {
 
                         // Event types
                         .requestMatchers("/api/v1/event-types/all").permitAll()
+                        .requestMatchers("/api/v1/event-types").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/event-types/*").hasAuthority("ADMIN")
 
                         // Categories
                         .requestMatchers("/api/v1/categories/all").permitAll()
+                        .requestMatchers("/api/v1/categories").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/categories/**").hasAuthority("ADMIN")
 
                         // Notifications
                         .requestMatchers("/api/v1/notifications").authenticated()
@@ -144,6 +151,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/account/products/favourites").authenticated()
                         .requestMatchers("/api/v1/account/products/favourites/{id}").authenticated()
 
+                        // Interactions
+                        .requestMatchers("/api/v1/comments/**").hasAuthority("ADMIN")
 
                         // Others
                         .requestMatchers("/api/v1/roles/registration-options").permitAll()
