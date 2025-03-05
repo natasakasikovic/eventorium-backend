@@ -106,6 +106,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/events/filter/all").permitAll()
                         .requestMatchers("/api/v1/events/search/all").permitAll()
                         .requestMatchers("/api/v1/events/{id}/*").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority("EVENT_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority("EVENT_ORGANIZER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority("EVENT_ORGANIZER")
 
                         // Users
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
@@ -145,6 +148,8 @@ public class WebSecurityConfig {
                         // Account Events
                         .requestMatchers("/api/v1/account/events").hasAuthority("EVENT_ORGANIZER")
                         .requestMatchers("/api/v1/account/events/all").hasAuthority("EVENT_ORGANIZER")
+                        .requestMatchers("/api/v1/account/events/search/all").hasAuthority("EVENT_ORGANIZER")
+                        .requestMatchers("/api/v1/account/events/search").hasAuthority("EVENT_ORGANIZER")
                         .requestMatchers("/api/v1/account/events/{id}/attendance").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites/{id}").authenticated()
@@ -172,21 +177,23 @@ public class WebSecurityConfig {
 
                         // Interactions
                         .requestMatchers("/api/v1/comments/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/messages/**").authenticated()
 
                         // Others
                         .requestMatchers("/api/v1/roles/registration-options").permitAll()
-                        .requestMatchers("/api/v1//auth/quick-registration").permitAll()
+                        .requestMatchers("/api/v1/auth/quick-registration").permitAll()
                         .requestMatchers("/api/v1/cities/all").permitAll()
                         .requestMatchers("/api/v1/auth/activation/{hash}").permitAll()
                         .requestMatchers("/api/v1/auth/{id}/profile-photo").permitAll()
+                        .requestMatchers("/api/v1/budget-items").hasAuthority("EVENT_ORGANIZER")
                         .requestMatchers("/api/v1/provider-reservations").hasAuthority("PROVIDER")
                         .requestMatchers("/api/v1/price-list/**").hasAuthority("PROVIDER")
 
                         // Invitations
+                        .requestMatchers("/api/v1/invitations/verification/{hash}").permitAll()
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
+                        .requestMatchers("/api/v1/invitations/*").hasAuthority("EVENT_ORGANIZER")
 
-//                        .requestMatchers("**").permitAll()
-                // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
