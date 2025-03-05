@@ -65,8 +65,57 @@ public class WebSecurityConfig {
         http.csrf((csrf) -> csrf.disable());
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("**").permitAll()
+                        .requestMatchers("api/v1/ws/**").authenticated()
+
+                        // Services
+                        .requestMatchers("api/v1/services/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/services/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/services").permitAll()
+                        .requestMatchers("api/v1/services/all").permitAll()
+                        .requestMatchers("api/v1/services/filter").permitAll()
+                        .requestMatchers("api/v1/services/search").permitAll()
+                        .requestMatchers("api/v1/services/{id}/*").permitAll()
+
+                        // Products
+                        .requestMatchers("api/v1/products/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/products/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/products").permitAll()
+                        .requestMatchers("api/v1/products/all").permitAll()
+                        .requestMatchers("api/v1/products/filter").permitAll()
+                        .requestMatchers("api/v1/products/search").permitAll()
+                        .requestMatchers("api/v1/products/{id}/*").permitAll()
+
+                        // Events
+                        .requestMatchers("api/v1/events/top-five-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/events/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/events").permitAll()
+                        .requestMatchers("api/v1/events/all").permitAll()
+                        .requestMatchers("api/v1/events/filter").permitAll()
+                        .requestMatchers("api/v1/events/search").permitAll()
+                        .requestMatchers("api/v1/events/{id}/*").permitAll()
+
+                        // Users
+                        .requestMatchers(HttpMethod.GET, "api/v1/users/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/users/{id}/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/users/me").authenticated()
+
+                        // Companies
+                        .requestMatchers(HttpMethod.GET, "api/v1/companies/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/v1/companies/{id}/*").permitAll()
+                        .requestMatchers("/api/v1/companies/{id}/images").permitAll()
+
+                        // Event types
+                        .requestMatchers("api/v1/event-types/all").permitAll()
+                        // Categories
+                        .requestMatchers("api/v1/categories/all").permitAll()
+
+                        // Others
+                        .requestMatchers("api/v1/roles/registration-options").permitAll()
+                        .requestMatchers("api/v1/cities/all").permitAll()
+                        .requestMatchers("api/v1/auth/activation/{hash}").permitAll()
+                        .requestMatchers("api/v1/auth/{id}/profile-photo").permitAll()
+
+//                        .requestMatchers("**").permitAll()
                 // TODO: Add access rules for all API endpoints.
         )
         .sessionManagement(session -> {
@@ -81,7 +130,8 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
-                .requestMatchers(HttpMethod.POST, "/api/v1/auth/register")
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/registration")
+                .requestMatchers(HttpMethod.POST, "/api/v1/companies")
 
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/*", "/*.html", "favicon.ico",
                         "/*/*.html", "/*/*.css", "/*/*.js");

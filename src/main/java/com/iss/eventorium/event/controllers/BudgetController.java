@@ -17,17 +17,17 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
-@RequestMapping("api/v1/")
+@RequestMapping("api/v1")
 public class BudgetController {
 
     private final BudgetService budgetService;
 
-    @GetMapping("events/{event-id}/budget")
+    @GetMapping("/events/{event-id}/budget")
     public ResponseEntity<BudgetResponseDto> getBudget(@PathVariable("event-id") Long eventId) {
         return ResponseEntity.ok(budgetService.getBudget(eventId));
     }
 
-    @PostMapping("events/{event-id}/budget/purchase")
+    @PostMapping("/events/{event-id}/budget/purchase")
     public ResponseEntity<ProductResponseDto> purchaseProduct(
             @PathVariable("event-id") Long eventId,
             @RequestBody BudgetItemRequestDto budgetItemRequestDto
@@ -35,7 +35,7 @@ public class BudgetController {
         return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
     }
 
-    @PostMapping("events/{event-id}/budget/reserve")
+    @PostMapping("/events/{event-id}/budget/reserve")
     public ResponseEntity<ServiceResponseDto> reserveService(
             @PathVariable("event-id") Long eventId,
             @RequestBody BudgetItemRequestDto budgetItemRequestDto
