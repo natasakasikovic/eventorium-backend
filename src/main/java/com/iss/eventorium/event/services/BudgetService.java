@@ -15,30 +15,26 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
-import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
-import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.solution.services.ProductService;
-import com.iss.eventorium.solution.services.ServiceService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
 public class BudgetService {
 
     private final ProductService productService;
-    private final ServiceService serviceService;
     private final EventService eventService;
     private final AuthService authService;
 
@@ -75,18 +71,6 @@ public class BudgetService {
         return budgetItemRepository.findAll(specification).stream()
                 .map(item -> SolutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
-    }
-
-    public ServiceResponseDto reserveService(Long eventId, BudgetItemRequestDto request) {
-        Service service = serviceService.find(request.getItemId());
-        double netPrice = calculateNetPrice(service);
-        if(netPrice > request.getPlannedAmount()) {
-            throw new InsufficientFundsException("You do not have enough funds for this purchase!");
-        }
-
-        Event event = eventService.find(eventId);
-        updateBudget(event, BudgetMapper.fromRequest(request, service, SolutionType.SERVICE));
-        return ServiceMapper.toResponse(service);
     }
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {

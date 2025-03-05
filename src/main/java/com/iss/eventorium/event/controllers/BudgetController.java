@@ -35,14 +35,6 @@ public class BudgetController {
         return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
     }
 
-    @PostMapping("/events/{event-id}/budget/reserve")
-    public ResponseEntity<ServiceResponseDto> reserveService(
-            @PathVariable("event-id") Long eventId,
-            @RequestBody BudgetItemRequestDto budgetItemRequestDto
-    ) {
-        return new ResponseEntity<>(budgetService.reserveService(eventId, budgetItemRequestDto), HttpStatus.CREATED);
-    }
-
     @GetMapping("/events/{event-id}/budget/budget-items")
     public ResponseEntity<List<BudgetItemResponseDto>> getBudgetItems(@PathVariable("event-id") Long eventId) {
         return ResponseEntity.ok(budgetService.getBudgetItems(eventId));
