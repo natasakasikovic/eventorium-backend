@@ -2,11 +2,17 @@ package com.iss.eventorium.interaction.mappers;
 
 import com.iss.eventorium.interaction.dtos.chat.ChatMessageRequestDto;
 import com.iss.eventorium.interaction.dtos.chat.ChatMessageResponseDto;
+import com.iss.eventorium.interaction.dtos.chat.ChatRoomResponseDto;
 import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.dtos.chat.MessageSenderDto;
+import com.iss.eventorium.interaction.models.ChatRoom;
+import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.mappers.ServiceMapper;
+import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -42,4 +48,24 @@ public class ChatMapper {
                 .message(dto.getMessage())
                 .build();
     }
+
+    public static ChatRoomResponseDto toResponse(ChatRoom chatRoom) {
+        Person recipient = chatRoom.getLastMessage().getRecipient().getPerson();
+        ChatMessage lastMessage = chatRoom.getLastMessage();
+        return ChatRoomResponseDto.builder()
+                .displayName(recipient.getName() + " " + recipient.getLastname())
+                .lastMessage(lastMessage.getMessage())
+                .recipientId(lastMessage.getRecipient().getId())
+                .timestamp(lastMessage.getTimestamp())
+                .build();
+    }
+
+    public static PagedResponse<ChatRoomResponseDto> toPagedResponse(Page<ChatRoom> page) {
+        return new PagedResponse<>(
+                page.stream().map(ChatMapper::toResponse).toList(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+    }
+
 }
