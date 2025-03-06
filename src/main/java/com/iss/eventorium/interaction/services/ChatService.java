@@ -7,6 +7,7 @@ import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.repositories.ChatMessageRepository;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
+import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,25 +23,25 @@ import java.util.stream.Stream;
 @Slf4j
 public class ChatService {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final UserService userService;
+    private final ChatRoomService chatRoomService;
 
     private final ChatMessageRepository chatMessageRepository;
-    private final UserRepository userRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     public void sendMessage(ChatMessageRequestDto chatMessage) {
         if(chatMessage.getMessage().trim().isEmpty()) {
             return;
         }
+
+        User sender = userService.find(chatMessage.getSenderId());
+        User recipient = userService.find(chatMessage.getRecipientId());
+
         log.info("Sending message from {} to {}: {}",
             chatMessage.getSenderId(),
             chatMessage.getRecipientId(),
             chatMessage.getMessage()
-        );
-        User sender = userRepository.findById(chatMessage.getSenderId()).orElseThrow(
-                () -> new EntityNotFoundException("Sender not found")
-        );
-        User recipient = userRepository.findById(chatMessage.getRecipientId()).orElseThrow(
-                () -> new EntityNotFoundException("Recipient not found")
         );
 
         ChatMessage message = chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
@@ -49,6 +50,7 @@ public class ChatService {
                 "/queue/messages",
                 ChatMapper.toResponse(message)
         );
+        chatRoomService.createChatRoom(sender, recipient, message);
     }
 
     public List<ChatMessageResponseDto> getMessages(Long senderId, Long recipientId) {
