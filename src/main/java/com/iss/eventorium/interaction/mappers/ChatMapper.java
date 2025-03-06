@@ -53,6 +53,7 @@ public class ChatMapper {
         Person recipient = chatRoom.getLastMessage().getRecipient().getPerson();
         ChatMessage lastMessage = chatRoom.getLastMessage();
         return ChatRoomResponseDto.builder()
+                .id(chatRoom.getId())
                 .displayName(recipient.getName() + " " + recipient.getLastname())
                 .lastMessage(lastMessage.getMessage())
                 .recipientId(lastMessage.getRecipient().getId())

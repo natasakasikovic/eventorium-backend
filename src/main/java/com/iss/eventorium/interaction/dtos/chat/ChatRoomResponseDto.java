@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ChatRoomResponseDto {
+    private Long id;
     private String displayName;
     private LocalDateTime timestamp;
     private String lastMessage;
