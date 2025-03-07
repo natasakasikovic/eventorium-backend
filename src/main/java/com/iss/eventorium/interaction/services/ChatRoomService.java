@@ -40,13 +40,13 @@ public class ChatRoomService {
     }
 
     public List<ChatRoomResponseDto> getChatRooms() {
-        return repository.findChatRooms(authService.getCurrentUser().getId() + "%").stream()
+        return repository.findChatRooms(authService.getCurrentUser().getId() + "_%").stream()
                 .map(ChatMapper::toResponse)
                 .toList();
     }
 
     public PagedResponse<ChatRoomResponseDto> getChatRoomsPaged(Pageable pageable) {
-        return toPagedResponse(repository.findChatRooms(authService.getCurrentUser().getId() + "%", pageable));
+        return toPagedResponse(repository.findChatRooms(authService.getCurrentUser().getId() + "_%", pageable));
     }
 
     private void updateChatRoom(ChatRoom room, ChatMessage message) {
