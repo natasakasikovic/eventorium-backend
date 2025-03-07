@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.iss.eventorium.interaction.mappers.ChatMapper.toPagedResponse;
+import static com.iss.eventorium.interaction.mappers.ChatMapper.toResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +41,15 @@ public class ChatRoomService {
     }
 
     public List<ChatRoomResponseDto> getChatRooms() {
-        return repository.findChatRooms(authService.getCurrentUser().getId() + "_%").stream()
-                .map(ChatMapper::toResponse)
+        User currentUser = authService.getCurrentUser();
+        return repository.findChatRooms(currentUser.getId() + "_%").stream()
+                .map(room -> toResponse(room, currentUser))
                 .toList();
     }
 
     public PagedResponse<ChatRoomResponseDto> getChatRoomsPaged(Pageable pageable) {
-        return toPagedResponse(repository.findChatRooms(authService.getCurrentUser().getId() + "_%", pageable));
+        User currentUser = authService.getCurrentUser();
+        return toPagedResponse(repository.findChatRooms(currentUser.getId() + "_%", pageable), currentUser);
     }
 
     private void updateChatRoom(ChatRoom room, ChatMessage message) {

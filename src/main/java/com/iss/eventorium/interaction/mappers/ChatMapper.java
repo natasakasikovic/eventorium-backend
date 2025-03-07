@@ -49,21 +49,24 @@ public class ChatMapper {
                 .build();
     }
 
-    public static ChatRoomResponseDto toResponse(ChatRoom chatRoom) {
-        Person recipient = chatRoom.getLastMessage().getRecipient().getPerson();
+    public static ChatRoomResponseDto toResponse(ChatRoom chatRoom, User currentUser) {
+        User user = chatRoom.getLastMessage().getSender().equals(currentUser)
+                ? chatRoom.getLastMessage().getRecipient()
+                : chatRoom.getLastMessage().getSender();
+
         ChatMessage lastMessage = chatRoom.getLastMessage();
         return ChatRoomResponseDto.builder()
                 .id(chatRoom.getId())
-                .displayName(recipient.getName() + " " + recipient.getLastname())
+                .displayName(user.getPerson().getName() + " " + user.getPerson().getLastname())
                 .lastMessage(lastMessage.getMessage())
-                .recipientId(lastMessage.getRecipient().getId())
+                .recipientId(user.getId())
                 .timestamp(lastMessage.getTimestamp())
                 .build();
     }
 
-    public static PagedResponse<ChatRoomResponseDto> toPagedResponse(Page<ChatRoom> page) {
+    public static PagedResponse<ChatRoomResponseDto> toPagedResponse(Page<ChatRoom> page, User currentUser) {
         return new PagedResponse<>(
-                page.stream().map(ChatMapper::toResponse).toList(),
+                page.stream().map(room -> toResponse(room, currentUser)).toList(),
                 page.getTotalPages(),
                 page.getTotalElements()
         );
