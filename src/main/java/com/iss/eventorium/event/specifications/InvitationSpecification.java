@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class InvitationSpecification {
 
+    private InvitationSpecification() {}
+
     public static Specification<Invitation> filterForInvitedUser(User user) {
         return Specification.where(hasEmail(user.getEmail())).and(filterOutBlockedEvents(user));
     }

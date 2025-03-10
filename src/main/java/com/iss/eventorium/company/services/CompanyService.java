@@ -74,9 +74,9 @@ public class CompanyService {
 
         for (MultipartFile image : images) {
             try {
-                ImagePath imagePath = saveImage(uploadDir, image);
-                if (imagePath != null) {
-                    paths.add(imagePath);
+                ImagePath path = saveImage(uploadDir, image);
+                if (path != null) {
+                    paths.add(path);
                 }
             } catch (IOException e) {
                 throw new ImageUploadException("Error while uploading images");
@@ -109,9 +109,9 @@ public class CompanyService {
     public List<ImageResponseDto> getImages(Long id) {
         Company company = find(id);
         List<ImageResponseDto> images = new ArrayList<>();
-        for (ImagePath imagePath : company.getPhotos()) {
-            byte[] image = getImage(id, imagePath);
-            images.add(new ImageResponseDto(imagePath.getId(), image, imagePath.getContentType()));
+        for (ImagePath path : company.getPhotos()) {
+            byte[] image = getImage(id, path);
+            images.add(new ImageResponseDto(path.getId(), image, path.getContentType()));
         }
         return images;
     }

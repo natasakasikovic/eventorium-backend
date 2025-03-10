@@ -5,8 +5,11 @@ import lombok.Setter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+
 public class TokenBasedAuthentication extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Setter

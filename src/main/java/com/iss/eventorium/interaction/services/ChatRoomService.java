@@ -1,7 +1,6 @@
 package com.iss.eventorium.interaction.services;
 
 import com.iss.eventorium.interaction.dtos.chat.ChatRoomResponseDto;
-import com.iss.eventorium.interaction.mappers.ChatMapper;
 import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.models.ChatRoom;
 import com.iss.eventorium.interaction.repositories.ChatRoomRepository;
@@ -32,7 +31,7 @@ public class ChatRoomService {
         Optional<ChatRoom> senderRoom = repository.findByName(senderRoomName);
         if(senderRoom.isPresent()) {
             updateChatRoom(senderRoom.get(), message);
-            updateChatRoom(repository.findByName(recipientRoomName).get(), message);
+            repository.findByName(recipientRoomName).ifPresent(chatRoom -> updateChatRoom(chatRoom, message));
             return;
         }
 
