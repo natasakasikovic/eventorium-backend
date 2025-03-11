@@ -35,6 +35,7 @@ public class WebSecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService customUserDetailsService;
+
     private static final String PROVIDER = "PROVIDER";
     private static final String ORGANIZER = "EVENT_ORGANIZER";
     private static final String ADMIN = "ADMIN";
@@ -201,9 +202,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/invitations/*").hasAuthority(ORGANIZER)
 
         )
-        .sessionManagement(session -> {
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        })
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new JwtRequestFilter(jwtTokenUtil, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
         http.authenticationProvider(authenticationProvider());
         return http.build();
@@ -211,7 +210,7 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
+        return web -> web.ignoring()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login")
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/registration")
                 .requestMatchers(HttpMethod.POST, "/api/v1/companies")

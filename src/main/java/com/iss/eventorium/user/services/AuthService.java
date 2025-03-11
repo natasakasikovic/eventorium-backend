@@ -32,8 +32,8 @@ public class AuthService {
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
 
-            if (principal instanceof UserDetails) {
-                return userRepository.findByEmail(((UserDetails) principal).getUsername()).orElse(null);
+            if (principal instanceof UserDetails details) {
+                return userRepository.findByEmail(details.getUsername()).orElse(null);
             }
         }
         return null;
