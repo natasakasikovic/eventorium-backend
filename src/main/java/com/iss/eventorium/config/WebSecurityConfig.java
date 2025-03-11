@@ -68,7 +68,6 @@ public class WebSecurityConfig {
         http.csrf((csrf) -> csrf.disable());
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
-                        .requestMatchers("**").permitAll()
                         .requestMatchers("/api/v1/ws/**").permitAll()
                         .requestMatchers("/api/v1/ws").permitAll()
 
