@@ -45,6 +45,8 @@ public class ProductService {
     private final AuthService authService;
     private final CategoryProposalService categoryProposalService;
 
+    private final ProductMapper mapper;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -55,56 +57,56 @@ public class ProductService {
     public List<ProductSummaryResponseDto> getTopProducts(){
         Pageable pageable = PageRequest.of(0, 5);
         List<Product> products = repository.findTopFiveProducts(pageable);
-        return products.stream().map(ProductMapper::toSummaryResponse).toList();
+        return products.stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> getProducts(Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filter(authService.getCurrentUser());
-        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> getProducts() {
         Specification<Product> specification = ProductSpecification.filter(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> filter(ProductFilterDto filter, Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterBy(filter, authService.getCurrentUser());
-        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> filter(ProductFilterDto filter) {
         Specification<Product> specification = ProductSpecification.filterBy(filter, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> search(String keyword, Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterByName(keyword, authService.getCurrentUser());
-        return ProductMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> search(String keyword) {
         Specification<Product> specification = ProductSpecification.filterByName(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public ProductDetailsDto getProduct(Long id) {
         Product product = find(id);
-        return ProductMapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
+        return mapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
     // TODO: method below needs to be refactored to use specification
     public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
-        return repository.getBudgetSuggestions(categoryId, price).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.getBudgetSuggestions(categoryId, price).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public List<ImageResponseDto> getImages(Long id) {
         Product product = find(id);
 
         List<ImageResponseDto> images = new ArrayList<>();
-        for(ImagePath imagePath : product.getImagePaths()) {
-            byte[] image = getImage(id, imagePath);
-            images.add(new ImageResponseDto(image, imagePath.getContentType()));
+        for(ImagePath path : product.getImagePaths()) {
+            byte[] image = getImage(id, path);
+            images.add(new ImageResponseDto(image, path.getContentType()));
         }
         return images;
     }
@@ -134,12 +136,12 @@ public class ProductService {
     }
 
     public ProductResponseDto createProduct(CreateProductRequestDto request) {
-        Product product = ProductMapper.fromCreateRequest(request);
+        Product product = mapper.fromCreateRequest(request);
         handleCategoryAndStatus(product);
         product.setProvider(authService.getCurrentUser());
 
         repository.save(product);
-        return ProductMapper.toResponse(product);
+        return mapper.toResponse(product);
     }
 
     private void handleCategoryAndStatus(Product product) {

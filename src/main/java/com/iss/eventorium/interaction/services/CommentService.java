@@ -27,8 +27,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Locale;
 
-import static com.iss.eventorium.interaction.mappers.CommentMapper.toResponse;
-
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -42,21 +40,23 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
+    private final CommentMapper mapper;
+
     private final MessageSource messageSource;
 
     public CommentResponseDto createComment(Long id, CommentType type, CreateCommentRequestDto request) {
         CommentableEntity entity = findCommentable(id, type);
 
-        Comment comment = CommentMapper.fromRequest(request, type, id);
+        Comment comment = mapper.fromRequest(request, type, id);
         comment.setUser(authService.getCurrentUser());
         addComment(entity, comment, type);
 
-        return toResponse(comment, entity);
+        return mapper.toResponse(comment, entity);
     }
 
     public List<CommentResponseDto> getPendingComments() {
         return commentRepository.findByStatusOrderByCreationDateDesc(Status.PENDING).stream()
-                .map(c -> toResponse(c, findCommentable(c.getCommentableId(), c.getCommentType())))
+                .map(c -> mapper.toResponse(c, findCommentable(c.getCommentableId(), c.getCommentType())))
                 .toList();
     }
 
@@ -81,7 +81,7 @@ public class CommentService {
             sendNotification(comment.getUser(), commentable);
         }
 
-        return toResponse(commentRepository.save(comment), commentable);
+        return mapper.toResponse(commentRepository.save(comment), commentable);
     }
 
     private void addComment(CommentableEntity entity, Comment comment, CommentType type) {

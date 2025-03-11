@@ -23,7 +23,7 @@ public class AccountActivationService {
     public static final String EMAIL_TEMPLATE = "account-activation";
 
     @Value("${backend.url}")
-    public String BACKEND_URL;
+    public String backendUrl;
 
     public void sendActivationEmail(User user) {
         EmailDetails emailDetails = createEmailDetails(user);
@@ -46,7 +46,7 @@ public class AccountActivationService {
 
     private Map<String, Object> getContextVariables(User user) {
         Map<String, Object> variables = new HashMap<>();
-        String link = String.format("%s/api/v1/auth/activation/%s", BACKEND_URL, user.getHash());
+        String link = String.format("%s/api/v1/auth/activation/%s", backendUrl, user.getHash());
         variables.put("LINK", link);
         return variables;
     }

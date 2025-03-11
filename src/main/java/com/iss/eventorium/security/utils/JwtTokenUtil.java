@@ -65,31 +65,25 @@ public class JwtTokenUtil {
     }
 
     public String getUsernameFromToken(String token) {
-        String username;
-
         try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            username = claims.getSubject();
+            final Claims claims = getAllClaimsFromToken(token);
+            return (claims != null) ? claims.getSubject() : null;
         } catch (ExpiredJwtException ex) {
             throw ex;
         } catch (Exception e) {
-            username = null;
+            return null;
         }
-
-        return username;
     }
 
     public Date getIssuedAtDateFromToken(String token) {
-        Date issueAt;
         try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            issueAt = claims.getIssuedAt();
+            final Claims claims = getAllClaimsFromToken(token);
+            return (claims != null) ? claims.getIssuedAt() : null;
         } catch (ExpiredJwtException ex) {
             throw ex;
         } catch (Exception e) {
-            issueAt = null;
+            return null;
         }
-        return issueAt;
     }
 
     private Claims getAllClaimsFromToken(String token) {

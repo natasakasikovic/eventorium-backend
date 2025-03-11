@@ -25,8 +25,10 @@ public class UserReportService {
     private final AuthService authService;
     private final UserService userService;
 
+    private final UserReportMapper mapper;
+
     public void createReport(UserReportRequestDto request, Long offenderId) {
-        UserReport report = UserReportMapper.fromRequest(request);
+        UserReport report = mapper.fromRequest(request);
 
         report.setReporter(authService.getCurrentUser());
         report.setOffender(userService.find(offenderId));
@@ -36,7 +38,7 @@ public class UserReportService {
 
     public Collection<UserReportResponseDto> getPendingReports() {
         List<UserReport> reports = repository.findByStatusPending();
-        return reports.stream().map(UserReportMapper::toResponse).toList();
+        return reports.stream().map(mapper::toResponse).toList();
     }
 
     public void updateStatus(Long id, UpdateReportRequestDto request) {

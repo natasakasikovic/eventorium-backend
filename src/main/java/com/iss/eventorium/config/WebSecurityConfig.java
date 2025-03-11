@@ -3,7 +3,6 @@ package com.iss.eventorium.config;
 import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
-import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,15 +32,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final JwtTokenUtil jwtTokenUtil;
+    private final CustomUserDetailsService customUserDetailsService;
     private static final String PROVIDER = "PROVIDER";
     private static final String ORGANIZER = "EVENT_ORGANIZER";
     private static final String ADMIN = "ADMIN";
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
+        return customUserDetailsService;
     }
 
     @Bean
@@ -65,7 +66,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
-        http.csrf((csrf) -> csrf.disable());
+        http.csrf(AbstractHttpConfigurer::disable);
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/ws/**").permitAll()
@@ -73,7 +74,7 @@ public class WebSecurityConfig {
 
                         // Services
                         .requestMatchers("/api/v1/services/top-five-services").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/services/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/services").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/services/{id}").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/services/{id}").hasAuthority(PROVIDER)

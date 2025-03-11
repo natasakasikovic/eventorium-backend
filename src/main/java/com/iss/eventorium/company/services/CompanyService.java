@@ -39,15 +39,18 @@ public class CompanyService {
     private final UserService userService;
     private final AuthService authService;
 
+    private final CompanyMapper mapper;
+    private final CityMapper cityMapper;
+
     @Value("${image-path}")
     private String imagePath;
 
     public CompanyResponseDto createCompany(CompanyRequestDto companyRequestDto) {
-        Company company = CompanyMapper.fromRequest(companyRequestDto);
+        Company company = mapper.fromRequest(companyRequestDto);
         User provider = userService.find(companyRequestDto.getProviderId());
         company.setProvider(provider);
         accountActivationService.sendActivationEmail(provider);
-        return CompanyMapper.toResponse(repository.save(company));
+        return mapper.toResponse(repository.save(company));
     }
 
     public void uploadImages(Long id, List<MultipartFile> images) {
@@ -98,12 +101,12 @@ public class CompanyService {
     public ProviderCompanyDto getCompany() {
         User currentUser = authService.getCurrentUser();
         Company company = repository.getCompanyByProviderId(currentUser.getId());
-        return CompanyMapper.toProviderCompanyResponse(company);
+        return mapper.toProviderCompanyResponse(company);
     }
 
     public CompanyDetailsDto getCompany(Long id) {
         Company company = find(id);
-        return CompanyMapper.toCompanyDetailsResponse(company);
+        return mapper.toCompanyDetailsResponse(company);
     }
 
     public List<ImageResponseDto> getImages(Long id) {
@@ -130,13 +133,13 @@ public class CompanyService {
     public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
         Company company = find(updateRequestDto.getId());
         company.setAddress(updateRequestDto.getAddress());
-        company.setCity(CityMapper.fromRequest(updateRequestDto.getCity()));
+        company.setCity(cityMapper.fromRequest(updateRequestDto.getCity()));
         company.setPhoneNumber(updateRequestDto.getPhoneNumber());
         company.setDescription(updateRequestDto.getDescription());
         company.setOpeningHours(updateRequestDto.getOpeningHours());
         company.setClosingHours(updateRequestDto.getClosingHours());
         repository.save(company);
-        return CompanyMapper.toResponse(company);
+        return mapper.toResponse(company);
     }
 
     public void uploadNewImages(List<MultipartFile> newImages) {

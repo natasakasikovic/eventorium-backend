@@ -37,8 +37,10 @@ public class InvitationService {
     private final AuthService authService;
     private final SpringTemplateEngine templateEngine;
 
+    private final InvitationMapper mapper;
+
     @Value("${frontend.url}")
-    public String BASE_URI;
+    public String baseUri;
 
     public static final String EVENT_INVITATION_AUTHENTICATED_TEMPLATE = "event-invitation-authenticated";
     public static final String EVENT_INVITATION_UNAUTHENTICATED_TEMPLATE = "event-invitation-unauthenticated";
@@ -48,8 +50,11 @@ public class InvitationService {
         Event event = eventService.find(id);
 
         List<Invitation> invitations = invitationsDto.stream()
-                .map(InvitationMapper::fromRequest)
-                .peek(invitation -> invitation.setEvent(event)).toList();
+                .map(dto -> {
+                    Invitation invitation = mapper.fromRequest(dto);
+                    invitation.setEvent(event);
+                    return invitation;
+                }).toList();
 
         for (Invitation invitation : invitations) {
             if (!userService.existsByEmail(invitation.getEmail()))
@@ -82,7 +87,7 @@ public class InvitationService {
         variables.put("EVENT_NAME", invitation.getEvent().getName());
         variables.put("EVENT_DATE", invitation.getEvent().getDate());
         variables.put("EVENT_ADDRESS", invitation.getEvent().getAddress());
-        String link = (invitation.getHash() == null) ? BASE_URI + "/login" : BASE_URI + "/quick-registration/" + invitation.getHash();
+        String link = (invitation.getHash() == null) ? baseUri + "/login" : baseUri + "/quick-registration/" + invitation.getHash();
         variables.put("LINK", link);
         return variables;
     }
@@ -93,7 +98,7 @@ public class InvitationService {
 
     public InvitationResponseDto getInvitation(String hash){
         Invitation invitation = findByHash(hash);
-        InvitationResponseDto response = InvitationMapper.toResponse(invitation);
+        InvitationResponseDto response = mapper.toResponse(invitation);
 
         if (userService.existsByEmail(invitation.getEmail()))
             throw new EmailAlreadyTakenException("An email you are trying to use within this invitation is already associated with an account. \nPlease log in to your account.");
@@ -107,6 +112,6 @@ public class InvitationService {
 
     public List<InvitationDetailsDto> getInvitations() {
         Specification<Invitation> specification = InvitationSpecification.filterForInvitedUser(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(InvitationMapper::toInvitationDetails).toList();
+        return repository.findAll(specification).stream().map(mapper::toInvitationDetails).toList();
     }
 }

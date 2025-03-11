@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
+import java.util.Objects;
+
 
 @Getter
 @Setter
@@ -52,5 +54,15 @@ public class Service extends Solution {
         setCancellationDeadline(memento.getCancellationDeadline());
         setMinDuration(memento.getMinDuration());
         setMaxDuration(memento.getMaxDuration());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, specialties, reservationDeadline, cancellationDeadline, minDuration, maxDuration);
     }
 }
