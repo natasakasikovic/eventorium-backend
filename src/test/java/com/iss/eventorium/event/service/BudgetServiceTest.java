@@ -19,6 +19,7 @@ import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.services.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -89,8 +90,9 @@ class BudgetServiceTest {
             "200.0, 10.0, 180.0",
             "500.0, 20.0, 400.0",
             "1000.0, 0.0, 1000.0",
-            "100.0, 0.0, 100.0",
-            "50.0, 0.0, 50.0"
+            "100.0, 10.0, 100.0",
+            "50.0, 50.0, 25.0",
+            "0.0, 0.0, 100.0"
     })
     void purchaseProduct_shouldUpdateBudgetWhenSufficientFunds(double price, double discount, double plannedAmount) {
         Product product = mock(Product.class);
@@ -111,9 +113,10 @@ class BudgetServiceTest {
         when(mapper.fromRequest(any(), any(), any())).thenReturn(item);
         when(productMapper.toResponse(any())).thenReturn(dto);
 
-        BudgetItemRequestDto request = new BudgetItemRequestDto();
-        request.setItemId(1L);
-        request.setPlannedAmount(plannedAmount);
+        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
+                .itemId(1L)
+                .plannedAmount(plannedAmount)
+                .build();
 
         budgetService.purchaseProduct(1L, request);
 
@@ -121,28 +124,38 @@ class BudgetServiceTest {
     }
 
     @Test
-    void getBudget_shouldReturnExistingBudget() {
-        Event event = mock(Event.class);
-        Budget budget = new Budget();
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(budget);
-        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
+    void purchaseProduct_productNotFound_shouldThrowEntityNotFoundException() {
+        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
+                .itemId(1L)
+                .plannedAmount(100.00)
+                .build();
 
-        BudgetResponseDto response = budgetService.getBudget(1L);
-        assertNotNull(response);
+        when(productService.find(anyLong())).thenThrow(new EntityNotFoundException());
+
+        assertThrows(EntityNotFoundException.class, () -> budgetService.purchaseProduct(1L, request));
     }
 
     @Test
-    void getBudget_shouldCreateAndReturnNewBudgetIfNoneExists() {
-        Event event = mock(Event.class);
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(null);
-        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
+    void purchaseProduct_eventNotFound_shouldThrowEntityNotFoundException() {
+        Product product = mock(Product.class);
+        when(product.getPrice()).thenReturn(100.00);
+        when(product.getDiscount()).thenReturn(0.00);
+        when(productService.find(anyLong())).thenReturn(product);
 
-        BudgetResponseDto response = budgetService.getBudget(1L);
-        assertNotNull(response);
+        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
+                .itemId(1L)
+                .plannedAmount(100.00)
+                .build();
 
-        verify(eventRepository, times(1)).save(event);
+        when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException());
+
+        assertThrows(EntityNotFoundException.class, () -> budgetService.purchaseProduct(1L, request));
+    }
+
+    @Test
+    void getBudget_eventNotFound_shouldThrowEntityNotFoundException() {
+        when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException());
+        assertThrows(EntityNotFoundException.class, () -> budgetService.getBudget(1L));
     }
 
     @Test
@@ -168,6 +181,31 @@ class BudgetServiceTest {
         request.setPlannedAmount(180.0);
 
         assertThrows(AlreadyPurchasedException.class, () -> budgetService.purchaseProduct(1L, request));
+    }
+
+    @Test
+    void getBudget_shouldReturnExistingBudget() {
+        Event event = mock(Event.class);
+        Budget budget = new Budget();
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(event.getBudget()).thenReturn(budget);
+        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
+
+        BudgetResponseDto response = budgetService.getBudget(1L);
+        assertNotNull(response);
+    }
+
+    @Test
+    void getBudget_shouldCreateAndReturnNewBudgetIfNoneExists() {
+        Event event = mock(Event.class);
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(event.getBudget()).thenReturn(null);
+        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
+
+        BudgetResponseDto response = budgetService.getBudget(1L);
+        assertNotNull(response);
+
+        verify(eventRepository, times(1)).save(event);
     }
 
 }
