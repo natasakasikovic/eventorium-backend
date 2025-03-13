@@ -15,6 +15,8 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
+import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.services.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +48,8 @@ class BudgetServiceTest {
     private EventRepository eventRepository;
     @MockBean
     private BudgetMapper mapper;
+    @MockBean
+    private ProductMapper productMapper;
 
     @Autowired
     private BudgetService budgetService;
@@ -100,9 +104,12 @@ class BudgetServiceTest {
         BudgetItem item = mock(BudgetItem.class);
         item.setSolution(product);
 
+        ProductResponseDto dto = mock(ProductResponseDto.class);
+
         when(eventService.find(anyLong())).thenReturn(event);
         when(event.getBudget()).thenReturn(budget);
         when(mapper.fromRequest(any(), any(), any())).thenReturn(item);
+        when(productMapper.toResponse(any())).thenReturn(dto);
 
         BudgetItemRequestDto request = new BudgetItemRequestDto();
         request.setItemId(1L);

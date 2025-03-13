@@ -33,11 +33,24 @@ INSERT INTO categories (name, description, deleted, suggested) VALUES
     ('Guest Management', 'Handling guest invitations and RSVP',   false, false),
     ('Marketing', 'Promotions and event advertising',   false, false);
 
+INSERT INTO event_types (name, description, deleted) VALUES
+    ('Wedding', 'Event type for organizing weddings', false),
+    ('Corporate Event', 'Event type for organizing corporate events', false),
+    ('Birthday Party', 'Event type for organizing birthdays', false);
+
+INSERT INTO budgets VALUES (85.0, 80.0);
+
+INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
+    (20.0,9,CURRENT_DATE, 1, 'PRODUCT'),
+    (45.0, 10, CURRENT_DATE, 2, 'PRODUCT'),
+    (20.0,1, CURRENT_DATE, 3, 'PRODUCT');
+
+INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3);
 
 INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft, budget_id)
 VALUES
     ('Wedding in Novi Sad', 'A beautiful wedding ceremony with reception and dance.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 100, 1, '123 Wedding St', 2, 1, false, 1),
-    ('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 2, false, null),
+    ('Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 2, '456 Business Ave', 2, 1, false, null),
     ('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 1, false, null);
 
 INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
@@ -50,10 +63,3 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
     (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 3),
     (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 3),
     (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3);
-
-INSERT INTO budgets VALUES (85.0, 80.0);
-
-INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
-    (20.0,9,CURRENT_DATE, 1, 'PRODUCT'),
-    (45.0, 10, CURRENT_DATE, 2, 'PRODUCT'),
-    (20.0,1, CURRENT_DATE, 3, 'PRODUCT');
