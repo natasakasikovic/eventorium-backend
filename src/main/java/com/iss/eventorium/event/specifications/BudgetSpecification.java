@@ -21,11 +21,12 @@ public class BudgetSpecification {
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
         return (root, query, criteriaBuilder) -> {
             assert query != null;
-            query.distinct(true);
 
             Root<Event> eventRoot = query.from(Event.class);
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
             Join<Budget, BudgetItem> budgetItemJoin = budgetJoin.join("items");
+
+            query.select(budgetItemJoin.get("id")).distinct(true);
 
             query.where(
                     criteriaBuilder.and(

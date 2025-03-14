@@ -16,7 +16,7 @@ public class TestUtil {
     public static final Long EVENT_WITH_BUDGET = 1L;
     public static final Long EVENT_WITHOUT_BUDGET = 2L;
     public static final Long INVALID_EVENT = 500L;
-
+    public static final Long INVALID_PRODUCT = 500L;
 
     public static String login(MockMvc mockMvc, ObjectMapper objectMapper, LoginRequestDto request) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")

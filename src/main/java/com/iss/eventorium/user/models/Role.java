@@ -2,16 +2,19 @@ package com.iss.eventorium.user.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+
+import java.io.Serial;
 
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="roles")
 public class Role implements GrantedAuthority {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
