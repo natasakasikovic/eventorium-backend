@@ -1,17 +1,15 @@
 package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.TestUtil;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.solution.models.SolutionType;
-import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
-import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import jakarta.servlet.Filter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +20,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static com.iss.eventorium.TestUtil.*;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,12 +85,7 @@ class BudgetControllerIntegrationTest {
     @Transactional
     void testPurchaseProduct() throws Exception {
         String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .plannedAmount(10.0)
-                .itemId(4L)
-                .itemType(SolutionType.PRODUCT)
-                .category(CategoryResponseDto.builder().id(7L).build())
-                .build();
+        BudgetItemRequestDto request = createBudgetItemRequest(10.0);
 
         mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
                         .header("Authorization", "Bearer " + token)
@@ -106,12 +102,7 @@ class BudgetControllerIntegrationTest {
     @Transactional
     void testPurchaseProduct_insufficientFunds() throws Exception {
         String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .plannedAmount(9.0)
-                .itemId(4L)
-                .itemType(SolutionType.PRODUCT)
-                .category(CategoryResponseDto.builder().id(7L).build())
-                .build();
+        BudgetItemRequestDto request = createBudgetItemRequest(9.0);
 
         mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
                         .header("Authorization", "Bearer " + token)
@@ -141,6 +132,22 @@ class BudgetControllerIntegrationTest {
     }
 
     @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
+    @Transactional
+    void testPurchaseProduct_invalidRequest_shouldThrowValidationError(BudgetItemRequestDto request) throws Exception {
+        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
+        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", anyOf(
+                        matchesPattern(".* is mandatory"),
+                        is("Planned amount must be positive")
+                )));
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {
             "/api/v1/events/{event-id}/budget",
             "/api/v1/events/{event-id}/budget/purchase",
@@ -151,6 +158,15 @@ class BudgetControllerIntegrationTest {
         mockMvc.perform(get(urlTemplate, EVENT_WITH_BUDGET))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
+    }
+
+    private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount) {
+        return BudgetItemRequestDto.builder()
+                .plannedAmount(plannedAmount)
+                .itemId(4L)
+                .itemType(SolutionType.PRODUCT)
+                .category(CategoryResponseDto.builder().id(7L).build())
+                .build();
     }
 
 }

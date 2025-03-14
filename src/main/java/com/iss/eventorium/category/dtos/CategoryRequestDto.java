@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CategoryRequestDto {
+
     @NotBlank(message = "Name is mandatory")
     private String name;
 

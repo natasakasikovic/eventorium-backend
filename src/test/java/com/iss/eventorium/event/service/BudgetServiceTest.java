@@ -72,15 +72,8 @@ class BudgetServiceTest {
             "900, 99, 0"
     })
     void purchaseProduct_shouldThrowExceptionWhenInsufficientFunds(double price, double discount, double plannedAmount) {
-        Product product = mock(Product.class);
-
-        when(product.getPrice()).thenReturn(price);
-        when(product.getDiscount()).thenReturn(discount);
-        when(productService.find(anyLong())).thenReturn(product);
-
-        BudgetItemRequestDto request = new BudgetItemRequestDto();
-        request.setItemId(1L);
-        request.setPlannedAmount(plannedAmount);
+        mockProduct(price, discount);
+        BudgetItemRequestDto request = createRequest(plannedAmount);
 
         assertThrows(InsufficientFundsException.class, () -> budgetService.purchaseProduct(1L, request));
     }
@@ -95,28 +88,16 @@ class BudgetServiceTest {
             "0.0, 0.0, 100.0"
     })
     void purchaseProduct_shouldUpdateBudgetWhenSufficientFunds(double price, double discount, double plannedAmount) {
-        Product product = mock(Product.class);
-        when(product.getPrice()).thenReturn(price);
-        when(product.getDiscount()).thenReturn(discount);
-        when(productService.find(anyLong())).thenReturn(product);
-
-        Event event = mock(Event.class);
-        Budget budget = new Budget();
+        Product product = mockProduct(price, discount);
+        Event event = mockEvent(new Budget());
 
         BudgetItem item = mock(BudgetItem.class);
         item.setSolution(product);
+        when(mapper.fromRequest(any(), any(), any())).thenReturn(item);
 
         ProductResponseDto dto = mock(ProductResponseDto.class);
-
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(budget);
-        when(mapper.fromRequest(any(), any(), any())).thenReturn(item);
         when(productMapper.toResponse(any())).thenReturn(dto);
-
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .itemId(1L)
-                .plannedAmount(plannedAmount)
-                .build();
+        BudgetItemRequestDto request = createRequest(plannedAmount);
 
         budgetService.purchaseProduct(1L, request);
 
@@ -125,10 +106,7 @@ class BudgetServiceTest {
 
     @Test
     void purchaseProduct_productNotFound_shouldThrowEntityNotFoundException() {
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .itemId(1L)
-                .plannedAmount(100.00)
-                .build();
+        BudgetItemRequestDto request = createRequest(100.0);
 
         when(productService.find(anyLong())).thenThrow(new EntityNotFoundException());
 
@@ -137,15 +115,8 @@ class BudgetServiceTest {
 
     @Test
     void purchaseProduct_eventNotFound_shouldThrowEntityNotFoundException() {
-        Product product = mock(Product.class);
-        when(product.getPrice()).thenReturn(100.00);
-        when(product.getDiscount()).thenReturn(0.00);
-        when(productService.find(anyLong())).thenReturn(product);
-
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .itemId(1L)
-                .plannedAmount(100.00)
-                .build();
+        mockProduct(100.0, 0.0);
+        BudgetItemRequestDto request = createRequest(100.0);
 
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException());
 
@@ -160,15 +131,10 @@ class BudgetServiceTest {
 
     @Test
     void purchaseProduct_shouldThrowExceptionWhenCategoryAlreadyPurchased() {
-        Product product = mock(Product.class);
-        when(product.getPrice()).thenReturn(200.0);
-        when(product.getDiscount()).thenReturn(10.0);
-        when(productService.find(anyLong())).thenReturn(product);
+        mockProduct(200.0, 10.0);
 
-        Event event = mock(Event.class);
         Budget budget = mock(Budget.class);
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(budget);
+        mockEvent(budget);
 
         BudgetItem existingItem = mock(BudgetItem.class);
         Category existingCategory = mock(Category.class);
@@ -176,19 +142,15 @@ class BudgetServiceTest {
         when(existingItem.getCategory()).thenReturn(existingCategory);
         when(budget.getItems()).thenReturn(List.of(existingItem));
 
-        BudgetItemRequestDto request = new BudgetItemRequestDto();
-        request.setItemId(1L);
-        request.setPlannedAmount(180.0);
+        BudgetItemRequestDto request = createRequest(180.0);
 
         assertThrows(AlreadyPurchasedException.class, () -> budgetService.purchaseProduct(1L, request));
     }
 
     @Test
     void getBudget_shouldReturnExistingBudget() {
-        Event event = mock(Event.class);
-        Budget budget = new Budget();
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(budget);
+        mockEvent(new Budget());
+
         when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
 
         BudgetResponseDto response = budgetService.getBudget(1L);
@@ -197,15 +159,31 @@ class BudgetServiceTest {
 
     @Test
     void getBudget_shouldCreateAndReturnNewBudgetIfNoneExists() {
-        Event event = mock(Event.class);
-        when(eventService.find(anyLong())).thenReturn(event);
-        when(event.getBudget()).thenReturn(null);
+        Event event = mockEvent(null);
         when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
 
         BudgetResponseDto response = budgetService.getBudget(1L);
-        assertNotNull(response);
 
+        assertNotNull(response);
         verify(eventRepository, times(1)).save(event);
     }
 
+    private Product mockProduct(double price, double discount) {
+        Product product = mock(Product.class);
+        when(product.getPrice()).thenReturn(price);
+        when(product.getDiscount()).thenReturn(discount);
+        when(productService.find(anyLong())).thenReturn(product);
+        return product;
+    }
+
+    private BudgetItemRequestDto createRequest(double plannedAmount) {
+        return BudgetItemRequestDto.builder().itemId(1L).plannedAmount(plannedAmount).build();
+    }
+
+    private Event mockEvent(Budget budget) {
+        Event event = mock(Event.class);
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(event.getBudget()).thenReturn(budget);
+        return event;
+    }
 }

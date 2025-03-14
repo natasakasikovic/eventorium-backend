@@ -1,4 +1,4 @@
-package com.iss.eventorium.suits;
+package com.iss.eventorium.suit;
 
 import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
