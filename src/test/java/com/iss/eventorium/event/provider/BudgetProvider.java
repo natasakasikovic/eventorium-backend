@@ -8,7 +8,6 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
-import com.iss.eventorium.user.models.User;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Collections;

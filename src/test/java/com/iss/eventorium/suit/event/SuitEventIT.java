@@ -4,6 +4,6 @@ import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
-@SelectPackages({"com.iss.eventorium.event.service", "com.iss.eventorium.event.repository"})
-public class SuitEventUnitTest {
+@SelectPackages("com.iss.eventorium.event.controller")
+public class SuitEventIT {
 }
