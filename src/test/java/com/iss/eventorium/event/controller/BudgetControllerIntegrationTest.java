@@ -179,35 +179,15 @@ class BudgetControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Event not found"));
     }
 
-    @Test
-    void getAllBudgetItems_organizerWithOneEvent() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideBudgetItems")
+    void getAllBudgetItems(LoginRequestDto loginRequest, int expectedSize) throws Exception {
+        String token = login(mockMvc, objectMapper, loginRequest);
         mockMvc.perform(get("/api/v1/budget-items")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
-
-    }
-
-    @Test
-    void getAllBudgetItems_organizerWithMoreEvents() throws Exception {
-        String token = login(mockMvc, objectMapper, new LoginRequestDto("organizer2@gmail.com", "pera"));
-        mockMvc.perform(get("/api/v1/budget-items")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
-    }
-
-    @Test
-    void getAllBudgetItems_organizerWithDuplicatePurchases() throws Exception {
-        String token = login(mockMvc, objectMapper, new LoginRequestDto("organizer3@gmail.com", "pera"));
-        mockMvc.perform(get("/api/v1/budget-items")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.length()").value(expectedSize));
     }
 
     @ParameterizedTest
