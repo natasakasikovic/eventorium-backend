@@ -11,6 +11,4 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
     List<Event> findByIsDraftTrueAndOrganizer_Id(Long organizerId);
-
-    List<Event> findByOrganizer_Id(Long id);
 }

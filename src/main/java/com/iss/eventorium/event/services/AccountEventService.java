@@ -37,8 +37,7 @@ public class AccountEventService {
     }
 
     public List<CalendarEventDto> getOrganizerEvents() {
-        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(mapper::toCalendarEvent).toList();
+        return findOrganizerEvents(authService.getCurrentUser()).stream().map(mapper::toCalendarEvent).toList();
     }
 
     public List<CalendarEventDto> getAttendingEvents() {

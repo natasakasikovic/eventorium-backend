@@ -52,17 +52,20 @@ class BudgetServiceTest {
     @MockBean
     private EventService eventService;
     @MockBean
-    private EventRepository eventRepository;
-    @MockBean
     private AuthService authService;
     @MockBean
     private AccountEventService accountEventService;
+
+    @MockBean
+    private EventRepository eventRepository;
+
     @MockBean
     private BudgetMapper mapper;
     @MockBean
     private ProductMapper productMapper;
     @MockBean
     private SolutionMapper solutionMapper;
+
 
     @Autowired
     private BudgetService budgetService;
