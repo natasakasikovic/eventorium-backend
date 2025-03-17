@@ -10,12 +10,17 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class BudgetSpecification {
 
     private BudgetSpecification() {}
 
     public static Specification<BudgetItem> filterForOrganizer(User organizer) {
-        return filterBudgetItems(organizer.getId()).and(filterOutBlockedContent(organizer));
+        return filterBudgetItems(organizer.getId());
     }
 
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
@@ -25,8 +30,6 @@ public class BudgetSpecification {
             Root<Event> eventRoot = query.from(Event.class);
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
             Join<Budget, BudgetItem> budgetItemJoin = budgetJoin.join("items");
-
-            query.select(budgetItemJoin.get("id")).distinct(true);
 
             query.where(
                     criteriaBuilder.and(
@@ -53,5 +56,15 @@ public class BudgetSpecification {
 
             return cb.not(root.get("solution").get("provider").get("id").in(subquery));
         };
+    }
+
+    public static List<BudgetItem> ensureUniqueSolutions(List<BudgetItem> budgetItems) {
+        Map<Long, BudgetItem> uniqueSolutionMap = new HashMap<>();
+
+        for (BudgetItem item : budgetItems) {
+            uniqueSolutionMap.putIfAbsent(item.getSolution().getId(), item);
+        }
+
+        return new ArrayList<>(uniqueSolutionMap.values());
     }
 }

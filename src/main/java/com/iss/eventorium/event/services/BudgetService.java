@@ -10,9 +10,7 @@ import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
-import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
@@ -24,11 +22,12 @@ import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +35,10 @@ public class BudgetService {
 
     private final ProductService productService;
     private final EventService eventService;
+    private final AccountEventService accountEventService;
     private final AuthService authService;
 
     private final EventRepository eventRepository;
-    private final BudgetItemRepository budgetItemRepository;
 
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
@@ -71,8 +70,9 @@ public class BudgetService {
 
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
-        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user);
-        return budgetItemRepository.findAll(specification).stream()
+        List<Event> events = accountEventService.findOrganizerEvents(user);
+        return getUniqueBudgetItems(events)
+                .stream()
                 .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
@@ -98,5 +98,13 @@ public class BudgetService {
 
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
+    }
+
+    private List<BudgetItem> getUniqueBudgetItems(List<Event> events) {
+        Map<Long, BudgetItem> items = new HashMap<>();
+        events.stream().filter(event -> event.getBudget() != null)
+                .forEach(event -> event.getBudget().getItems()
+                        .forEach(item -> items.putIfAbsent(item.getSolution().getId(), item)));
+        return items.values().stream().toList();
     }
 }

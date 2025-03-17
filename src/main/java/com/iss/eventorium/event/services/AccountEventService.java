@@ -87,8 +87,7 @@ public class AccountEventService {
     }
 
     public List<EventSummaryResponseDto> getAll() {
-        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
+        return findOrganizerEvents(authService.getCurrentUser()).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
@@ -104,5 +103,10 @@ public class AccountEventService {
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
         return mapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    public List<Event> findOrganizerEvents(User organizer) {
+        Specification<Event> specification = EventSpecification.filterByOrganizer(organizer);
+        return repository.findAll(specification);
     }
 }

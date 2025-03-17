@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.solution.models.SolutionType;
+import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import jakarta.servlet.Filter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -176,6 +178,37 @@ class BudgetControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Event not found"));
+    }
+
+    @Test
+    void getAllBudgetItems_organizerWithOneEvent() throws Exception {
+        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
+        mockMvc.perform(get("/api/v1/budget-items")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
+
+    }
+
+    @Test
+    void getAllBudgetItems_organizerWithMoreEvents() throws Exception {
+        String token = login(mockMvc, objectMapper, new LoginRequestDto("organizer2@gmail.com", "pera"));
+        mockMvc.perform(get("/api/v1/budget-items")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void getAllBudgetItems_organizerWithDuplicatePurchases() throws Exception {
+        String token = login(mockMvc, objectMapper, new LoginRequestDto("organizer3@gmail.com", "pera"));
+        mockMvc.perform(get("/api/v1/budget-items")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
     }
 
     @ParameterizedTest

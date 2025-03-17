@@ -18,7 +18,6 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
