@@ -1,13 +1,10 @@
 package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.event.controllers.AccountEventController;
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.iss.eventorium.TestUtil.EVENT_WITH_BUDGET;
-import static com.iss.eventorium.TestUtil.login;
+import static com.iss.eventorium.util.TestUtil.login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

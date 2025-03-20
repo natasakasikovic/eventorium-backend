@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.iss.eventorium.TestUtil.*;
+import static com.iss.eventorium.util.TestUtil.*;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;

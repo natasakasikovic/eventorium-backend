@@ -1,9 +1,10 @@
-package com.iss.eventorium;
+package com.iss.eventorium.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -29,4 +30,18 @@ public class TestUtil {
         UserTokenState tokenState = objectMapper.readValue(responseContent, UserTokenState.class);
         return tokenState.getJwt();
     }
+
+    private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
+        jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));
+        jdbcTemplate.execute(String.format("ALTER TABLE %s ALTER COLUMN id RESTART WITH 1;", tableName));
+    }
+
+    public static void resetTables(JdbcTemplate jdbcTemplate) {
+        resetTable(jdbcTemplate, "roles");
+        resetTable(jdbcTemplate, "cities");
+        resetTable(jdbcTemplate, "users");
+        resetTable(jdbcTemplate, "event_types");
+        resetTable(jdbcTemplate, "events");
+    }
+
 }
