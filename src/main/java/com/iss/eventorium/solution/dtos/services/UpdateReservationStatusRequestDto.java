@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateReservationRequestDto {
+public class UpdateReservationStatusRequestDto {
 
     @NotNull(message = "Status is mandatory")
     private Status status;
