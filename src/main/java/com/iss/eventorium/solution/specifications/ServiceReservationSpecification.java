@@ -52,7 +52,9 @@ public class ServiceReservationSpecification {
     }
 
     public static Specification<Reservation> getPendingReservations(User provider) {
-        return Specification.where(hasProviderId(provider.getId())).and(hasStatus(Status.PENDING));
+        return Specification.where(hasProviderId(provider.getId()))
+                .and(hasStatus(Status.PENDING)
+                .and(hasEventDateInFuture()));
     }
 
     public static Specification<Reservation> getEventReservations(Event event) {
