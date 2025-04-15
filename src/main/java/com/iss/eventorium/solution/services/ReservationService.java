@@ -5,11 +5,13 @@ import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
+import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
@@ -20,6 +22,7 @@ import com.iss.eventorium.solution.validators.reservation.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.event.EventListener;
@@ -38,12 +41,14 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    private final ReservationRepository repository;
-    private final CompanyRepository companyRepository;
     private final EventService eventService;
     private final ServiceService serviceService;
     private final EmailService emailService;
     private final AuthService authService;
+
+    private final CompanyRepository companyRepository;
+    private final ReservationRepository repository;
+
     private final SpringTemplateEngine templateEngine;
 
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
@@ -80,6 +85,13 @@ public class ReservationService {
     public List<CalendarReservationDto> getProviderReservations() {
         User provider = authService.getCurrentUser();
         return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(ReservationMapper::toCalendarReservation).toList();
+    }
+
+
+    public List<ReservationResponseDto> getPendingReservations() {
+        User user = authService.getCurrentUser();
+        Specification<Reservation> specification = ServiceReservationSpecification.getPendingReservations(user);
+        return repository.findAll(specification).stream().map(ReservationMapper::toResponse).toList();
     }
 
     @Scheduled(fixedRate = 60000)
@@ -135,6 +147,16 @@ public class ReservationService {
         variables.put("startTime", reservation.getStartingTime());
         variables.put("endTime", reservation.getEndingTime());
         return variables;
+    }
+
+    public ReservationResponseDto updateReservation(Long id, Status status) {
+        Reservation reservation = find(id);
+        reservation.setStatus(status);
+        return ReservationMapper.toResponse(repository.save(reservation));
+    }
+
+    public Reservation find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
     }
 
     private List<Reservation> getEventReservations(Event event) {
