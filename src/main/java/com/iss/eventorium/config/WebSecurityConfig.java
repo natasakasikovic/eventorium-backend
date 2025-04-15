@@ -184,6 +184,8 @@ public class WebSecurityConfig {
                         // Interactions
                         .requestMatchers("/api/v1/comments/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/v1/messages/**").authenticated()
+                        .requestMatchers("/api/v1/chat-rooms").authenticated()
+                        .requestMatchers("/api/v1/chat-rooms/all").authenticated()
 
                         // Others
                         .requestMatchers("/api/v1/roles/registration-options").permitAll()
