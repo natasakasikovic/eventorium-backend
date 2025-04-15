@@ -5,11 +5,13 @@ import com.iss.eventorium.interaction.mappers.ChatMapper;
 import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.models.ChatRoom;
 import com.iss.eventorium.interaction.repositories.ChatRoomRepository;
+import com.iss.eventorium.interaction.specifications.ChatRoomSpecification;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,14 +44,16 @@ public class ChatRoomService {
 
     public List<ChatRoomResponseDto> getChatRooms() {
         User currentUser = authService.getCurrentUser();
-        return repository.findChatRooms(currentUser.getId() + "_%").stream()
+        Specification<ChatRoom> specification = ChatRoomSpecification.filterBy(currentUser);
+        return repository.findAll(specification).stream()
                 .map(room -> toResponse(room, currentUser))
                 .toList();
     }
 
     public PagedResponse<ChatRoomResponseDto> getChatRoomsPaged(Pageable pageable) {
         User currentUser = authService.getCurrentUser();
-        return toPagedResponse(repository.findChatRooms(currentUser.getId() + "_%", pageable), currentUser);
+        Specification<ChatRoom> specification = ChatRoomSpecification.filterBy(currentUser);
+        return toPagedResponse(repository.findAll(specification, pageable), currentUser);
     }
 
     private void updateChatRoom(ChatRoom room, ChatMessage message) {
