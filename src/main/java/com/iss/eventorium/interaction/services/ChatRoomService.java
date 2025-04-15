@@ -31,10 +31,12 @@ public class ChatRoomService {
         String senderRoomName = generateChatRoomName(sender, recipient);
         String recipientRoomName = generateChatRoomName(recipient, sender);
 
-        Optional<ChatRoom> senderRoom = repository.findByName(senderRoomName);
+        Specification<ChatRoom> senderRoomSpecification = ChatRoomSpecification.filterByName(senderRoomName);
+        Specification<ChatRoom> recipientRoomSpecification = ChatRoomSpecification.filterByName(recipientRoomName);
+        Optional<ChatRoom> senderRoom = repository.findOne(senderRoomSpecification);
         if(senderRoom.isPresent()) {
             updateChatRoom(senderRoom.get(), message);
-            updateChatRoom(repository.findByName(recipientRoomName).get(), message);
+            updateChatRoom(repository.findOne(recipientRoomSpecification).get(), message);
             return;
         }
 

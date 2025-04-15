@@ -12,17 +12,24 @@ public class ChatRoomSpecification {
     private ChatRoomSpecification() {}
 
     public static Specification<ChatRoom> filterBy(User user) {
-        return Specification.where(nameLike(user.getId() + "_%"))
+        return Specification.where(filterBySenderId(user.getId() + "_%"))
                 .and(filterOutBlockedContent(user));
     }
 
-    private static Specification<ChatRoom> nameLike(String senderId) {
-        return (root, query, criteriaBuilder) -> {
+    public static Specification<ChatRoom> filterByName(String name) {
+        return (root, query, cb) ->
+                name == null || name.isEmpty()
+                        ? cb.conjunction()
+                        : cb.like(cb.lower(root.get("name")), name);
+    }
+
+    private static Specification<ChatRoom> filterBySenderId(String senderId) {
+        return (root, query, cb) -> {
             assert query != null;
             if (query.getOrderList().isEmpty()) {
-                query.orderBy(criteriaBuilder.asc(root.get("lastMessage").get("timestamp")));
+                query.orderBy(cb.asc(root.get("lastMessage").get("timestamp")));
             }
-            return criteriaBuilder.like(root.get("name"), senderId);
+            return cb.like(root.get("name"), senderId);
         };
     }
 
