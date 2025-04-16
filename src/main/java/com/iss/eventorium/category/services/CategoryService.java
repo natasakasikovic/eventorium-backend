@@ -98,7 +98,7 @@ public class CategoryService {
 
     public Category findByName(String name) {
         return categoryRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, name)));
+                .orElseThrow(() -> new EntityNotFoundException("Category with name '" + name + "' not found"));
     }
 
     public boolean checkCategoryExistence(Category category, String name) {
