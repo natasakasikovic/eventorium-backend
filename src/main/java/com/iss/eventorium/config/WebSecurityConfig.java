@@ -3,7 +3,6 @@ package com.iss.eventorium.config;
 import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
-import com.iss.eventorium.user.services.UserService;
 import com.iss.eventorium.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -67,7 +66,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/ws/**").permitAll()
                         .requestMatchers("/api/v1/ws").permitAll()
-
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Services
                         .requestMatchers("/api/v1/services/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/services/{id}").permitAll()
