@@ -23,7 +23,7 @@ public interface CategoryApi {
 
     @Operation(
             summary = "Fetches all categories.",
-            description = "Retrieves a list of all available categories.",
+            description = "Returns a list of all available categories.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -242,5 +242,12 @@ public interface CategoryApi {
 
             }
     )
-    ResponseEntity<Void> deleteCategory(Long id);
+    ResponseEntity<Void> deleteCategory(
+            @Parameter(
+                    description = "The unique identifier of the category to delete.",
+                    required = true,
+                    example = "123"
+            )
+            Long id
+    );
 }
