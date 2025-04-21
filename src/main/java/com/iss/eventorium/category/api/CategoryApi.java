@@ -48,7 +48,7 @@ public interface CategoryApi {
     ResponseEntity<PagedResponse<CategoryResponseDto>> getCategoriesPaged(Pageable pageable);
 
     @Operation(
-            summary = "Retrieve a Category by ID",
+            summary = "Retrieve a Category by ID.",
             description =
             """
             Fetches the details of a single category using its unique identifier.
