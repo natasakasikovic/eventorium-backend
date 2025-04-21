@@ -22,8 +22,8 @@ import java.util.List;
 public interface CategoryApi {
 
     @Operation(
-            description = "Retrieves a list of all available categories.",
             summary = "Fetches all categories.",
+            description = "Retrieves a list of all available categories.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -31,10 +31,10 @@ public interface CategoryApi {
     ResponseEntity<List<CategoryResponseDto>> getCategories();
 
     @Operation(
-            description = "Retrieves a paged list of all available categories.",
-            summary =
+            summary = "Retrieves a paginated list of categories.",
+            description =
             """
-            Fetches one page of categories.
+            Returns a subset of categories based on pagination parameters.
             Requires authentication and ADMIN authority.
             Only users with the 'ADMIN' authority can access this endpoint.
             """,
@@ -172,6 +172,18 @@ public interface CategoryApi {
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Category not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "CategoryNotFound",
+                                            summary = "Category not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Category not found.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(
                             responseCode = "407",
                             description = "Category conflict. This may occur if the category with the same name already exists.",
