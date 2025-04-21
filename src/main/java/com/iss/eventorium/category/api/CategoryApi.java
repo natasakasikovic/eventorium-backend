@@ -147,18 +147,6 @@ public interface CategoryApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Category not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "CategoryNotFound",
-                                            summary = "Category not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Category not found.\" }"
-                                    )
-                            )
-                    ),
-                    @ApiResponse(
                             responseCode = "400",
                             description = "Validation error",
                             content = @Content(

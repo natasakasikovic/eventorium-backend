@@ -32,7 +32,7 @@ public interface CategoryProposalApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
             }
@@ -49,7 +49,7 @@ public interface CategoryProposalApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
             }
@@ -67,7 +67,19 @@ public interface CategoryProposalApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidUpdateCategoryStatusExample",
+                                            summary = "Status not provided",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Status is mandatory.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
                     @ApiResponse(
@@ -110,7 +122,19 @@ public interface CategoryProposalApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidCategoryExample",
+                                            summary = "Category without name",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Name is mandatory.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
                     @ApiResponse(
@@ -153,7 +177,19 @@ public interface CategoryProposalApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(description = "Success", responseCode = "200", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success",  useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidCategoryExample",
+                                            summary = "Category without name",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Name is mandatory.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
                     @ApiResponse(
