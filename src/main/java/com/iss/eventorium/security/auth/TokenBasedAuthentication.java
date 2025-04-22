@@ -1,5 +1,6 @@
 package com.iss.eventorium.security.auth;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 
+@EqualsAndHashCode(callSuper = false)
 public class TokenBasedAuthentication extends AbstractAuthenticationToken {
 
     @Serial
@@ -37,14 +39,5 @@ public class TokenBasedAuthentication extends AbstractAuthenticationToken {
         return principle;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }
 

@@ -9,10 +9,7 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SQLRestriction;
@@ -20,11 +17,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 import java.util.Objects;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SQLRestriction("is_deleted = false")

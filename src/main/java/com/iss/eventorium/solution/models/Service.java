@@ -1,21 +1,18 @@
 package com.iss.eventorium.solution.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
 import java.util.Objects;
 
 
-@Getter
-@Setter
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table (name = "services")
 @SQLDelete(sql = "UPDATE services SET is_deleted = true WHERE id = ?")
@@ -54,15 +51,5 @@ public class Service extends Solution {
         setCancellationDeadline(memento.getCancellationDeadline());
         setMinDuration(memento.getMinDuration());
         setMaxDuration(memento.getMaxDuration());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), type, specialties, reservationDeadline, cancellationDeadline, minDuration, maxDuration);
     }
 }
