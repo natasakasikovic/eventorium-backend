@@ -13,6 +13,7 @@ import java.util.Objects;
 @Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table (name = "services")
 @SQLDelete(sql = "UPDATE services SET is_deleted = true WHERE id = ?")

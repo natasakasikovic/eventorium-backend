@@ -20,6 +20,7 @@ import java.util.Objects;
 @Data
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SQLRestriction("is_deleted = false")
