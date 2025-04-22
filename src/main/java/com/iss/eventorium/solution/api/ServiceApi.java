@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
@@ -125,14 +124,15 @@ public interface ServiceApi {
     ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filterServices(ServiceFilterDto filter, Pageable pageable);
 
     @Operation(
-            summary = "Retrieves a paginated list of services based on the provided keyword.",
+            summary = "Search services based on the provided keyword.",
             description =
-            """
-            Returns a subset of services based on the provided keyword. The keyword is only used to match against service names.
-            Excludes services from blocked providers if the user is logged in.
-            Hidden and pending services are excluded for all users, except when the provider is logged in.
-            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
-            """,
+                    """
+                    Searches services based on the provided keyword. The keyword is only used to match against service names.
+                    If no keyword is provided (empty string), all services are eligible.
+                    Excludes services from blocked providers if the user is logged in.
+                    Hidden and pending services are excluded for all users, except when the provider is logged in.
+                    In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -140,15 +140,14 @@ public interface ServiceApi {
     ResponseEntity<List<ServiceSummaryResponseDto>> searchServices(String keyword);
 
     @Operation(
-            summary = "Search services based on the provided keyword.",
+            summary = "Retrieves a paginated list of services based on the provided keyword.",
             description =
-            """
-            Searches services based on the provided keyword. The keyword is only used to match against service names.
-            If no keyword is provided (empty string), all services are eligible.
-            Excludes services from blocked providers if the user is logged in.
-            Hidden and pending services are excluded for all users, except when the provider is logged in.
-            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
-            """,
+                    """
+                    Returns a subset of services based on the provided keyword. The keyword is only used to match against service names.
+                    Excludes services from blocked providers if the user is logged in.
+                    Hidden and pending services are excluded for all users, except when the provider is logged in.
+                    In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -260,23 +259,67 @@ public interface ServiceApi {
     );
 
     @Operation(
+            summary = "Recommend services based on the user's budget, considering both price and service category.",
+            description =
+            """
+            Returns list of recommended options based on the user’s budget,
+            selecting services from relevant category that fit within the specified price range.
+            Requires authentication and EVENT_ORGANIZER authority.
+            Only users with the 'EVENT_ORGANIZER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-            @RequestParam("categoryId") Long id,
-            @RequestParam("eventId") Long eventId,
-            @RequestParam("price") Double price
+            @Parameter(
+                    description = "The unique identifier of the category.",
+                    required = true,
+                    example = "123"
+            )
+            Long id,
+            @Parameter(
+                    description = "The unique identifier of the event.",
+                    required = true,
+                    example = "123"
+            )
+            Long eventId,
+            @Parameter(
+                    description = "The maximum price a user is willing to pay for the service.",
+                    required = true,
+                    example = "123"
+            )
+            Double price
     );
 
     @Operation(
+            summary = "Creates a service",
+            description =
+            """
+            Creates a new service. If the service's category is "proposed", the service will be assigned a status of 'PENDING'.
+            To upload service images, use the endpoint `POST /api/v1/services/{id}/images`.
+            Returns the created service if successful.
+            Requires authentication and PROVIDER authority.
+            Only users with the 'PROVIDER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(
                             responseCode = "400",
                             description = "Validation error",
@@ -303,11 +346,31 @@ public interface ServiceApi {
     );
 
     @Operation(
+            summary = "Uploads images for a service using its unique service ID.",
+            description =
+            """
+            Uploads images for the specified service. The `id` parameter refers to the service ID.
+            For more details on creating a service, please refer to the endpoint `/api/v1/services` (POST).
+            Requires authentication and PROVIDER authority.
+            Only users with the 'PROVIDER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Service not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "ServiceNotFound",
+                                            summary = "Service not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Service not found.\" }"
+                                    )
+                            )
+                    ),
             }
     )
     ResponseEntity<Void> uploadServiceImages(
@@ -317,10 +380,18 @@ public interface ServiceApi {
                     example = "123"
             )
             Long id,
-            @RequestParam("images") List<MultipartFile> images
+            List<MultipartFile> images
     );
 
     @Operation(
+            summary = "Updates a service.",
+            description =
+            """
+            Updates service if exists.
+            Returns the updated service if successful.
+            Requires authentication and PROVIDER authority.
+            Only users with the 'PROVIDER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -337,7 +408,19 @@ public interface ServiceApi {
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Event type not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventTypeNotFound",
+                                            summary = "Event type not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event type not found.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<ServiceResponseDto> updateService(
@@ -356,11 +439,42 @@ public interface ServiceApi {
     );
 
     @Operation(
+            summary = "Deletes a service.",
+            description =
+            """
+            Deletes service if exists and  is not associated with any reservation.
+            Requires authentication and PROVIDER authority.
+            Only users with the 'PROVIDER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Service not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "ServiceNotFound",
+                                            summary = "Service not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Service not found.\" }"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Service conflict. This may occur if the service is reserved.",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "CategoryInUseExample",
+                                            summary = "Category in use",
+                                            value = "{ \"error\": \"Conflict\", \"message\": \"The service cannot be deleted because it is currently reserved.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<Void> deleteService(
