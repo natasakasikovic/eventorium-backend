@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Service extends Solution {
     private ReservationType type;
 
     @Column(nullable = false)
+    @Size(max = 750)
     private String specialties;
 
     @Column(name="reservation_deadline", nullable = false)

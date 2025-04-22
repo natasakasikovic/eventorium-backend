@@ -9,6 +9,7 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,9 +37,11 @@ public abstract class Solution extends CommentableEntity {
     private Long id;
 
     @Column(nullable = false)
+    @Size(max = 75)
     private String name;
 
     @Column(nullable = false, length = 1000)
+    @Size(max = 750)
     private String description;
 
     @Column(nullable = false)

@@ -12,10 +12,10 @@ import lombok.*;
 public class CategoryRequestDto {
 
     @NotBlank(message = "Name is mandatory")
-    @Size(min = 1, max = 75)
+    @Size(min = 1, max = 75, message = "Name must be 75 characters or fewer")
     private String name;
 
     @NotBlank(message = "Description is mandatory")
-    @Size(min = 1, max = 750)
+    @Size(min = 1, max = 750, message = "Description must be 750 characters or fewer")
     private String description;
 }
