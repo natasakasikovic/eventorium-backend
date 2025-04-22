@@ -2,7 +2,6 @@ package com.iss.eventorium.category.services;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
@@ -59,8 +58,7 @@ public class CategoryProposalService {
     public CategoryResponseDto updateCategoryProposal(Long categoryId, CategoryRequestDto request) {
         Category category = getCategoryProposal(categoryId);
 
-        if (categoryService.checkCategoryExistence(category, request.getName()))
-            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        categoryService.ensureCategoryNameAvailability(category, request.getName());
 
         Solution solution = getSolutionProposal(category);
         updateCategoryProposal(category, request);
@@ -85,7 +83,7 @@ public class CategoryProposalService {
     }
 
     public void handleCategoryProposal(Category category) {
-        categoryService.ensureCategoryNameIsUnique(category);
+        categoryService.ensureCategoryNameIsUnique(category.getName());
         category.setSuggested(true);
         sendNotificationToAdmin(category);
     }
