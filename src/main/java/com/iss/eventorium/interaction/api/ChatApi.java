@@ -14,7 +14,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name = "Chat")
+@Tag(
+        name = "Chat",
+        description =
+        """
+        Handles chat functionality.
+        Access to these endpoints is restricted to *authorized* users only.
+        """
+)
 public interface ChatApi {
 
     @Operation(
@@ -23,10 +30,10 @@ public interface ChatApi {
             """
             This endpoint allows you to retrieve all chat messages related to a specific chat room.
             It provides access to the entire message history for a given chat room.
-            All messages are sent with web socket.
-            **WebSocket endpoint:** `/api/v1/ws`
-            **Client sends to:** `/app/chat`
-            **Server broadcasts to:** `/topic/messages/{recipientId}`
+            All messages are sent with web socket. <br/>
+            **WebSocket endpoint:** `/api/v1/ws` <br/>
+            **Client sends to:** `/app/chat` <br/>
+            **Server broadcasts to:** `/user/{recipientId}/queue/messages` <br/>
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

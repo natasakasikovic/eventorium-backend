@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.models;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class Comment {
     private Long id;
 
     @Column(nullable = false)
+    @Size(max = 100)
     private String comment;
 
     @Column(nullable = false)

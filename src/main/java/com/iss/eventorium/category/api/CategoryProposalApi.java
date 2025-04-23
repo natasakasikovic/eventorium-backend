@@ -28,7 +28,7 @@ public interface CategoryProposalApi {
             """
             Retrieves a list of all proposed (pending) categories.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -45,7 +45,7 @@ public interface CategoryProposalApi {
             """
             Returns a subset of proposed (pending) categories based on pagination parameters.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -63,7 +63,7 @@ public interface CategoryProposalApi {
             Accepts or declines the proposed category and updates the solution status to either 'ACCEPTED' or 'DECLINED' accordingly.
             Returns an updated category.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -115,10 +115,10 @@ public interface CategoryProposalApi {
             summary = "Modifies the category and sets solution status to 'ACCEPTED'.",
             description =
             """
-            Updates category and sets solution status to 'ACCEPTED'.
+            Updates category and sets solution status to `ACCEPTED`.
             Returns an updated category.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -170,10 +170,10 @@ public interface CategoryProposalApi {
             summary = "Replaces the proposed category with an existing category and sets solution status to 'ACCEPTED'.",
             description =
             """
-            Replaces the proposed category with an existing category and sets solution status to 'ACCEPTED'.
+            Replaces the proposed category with an existing category and sets solution status to `ACCEPTED`.
             Returns an existing category.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

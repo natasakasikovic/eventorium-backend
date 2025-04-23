@@ -17,10 +17,20 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name = "Comment", description = "Only authorized users can access this endpoints.")
+@Tag(
+        name = "Comment",
+        description =
+        """
+        Handles the solution and event comment endpoints.
+        Access is restricted to *authorized* users only.
+        Only users with `ADMIN` authority are allowed to modify a comment's status.
+        """
+)
 public interface CommentApi {
 
     @Operation(
+            summary = "Retrieves all comments with status 'PENDING'.",
+            description = "Returns a list of all pending comments.",
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -31,6 +41,12 @@ public interface CommentApi {
     ResponseEntity<List<CommentResponseDto>> getPendingComments();
 
     @Operation(
+            summary = "Creates and attaches a user comment to a service",
+            description =
+            """
+            Creates a new user comment and associates it with a service.
+            Returns the created comment if successful.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
@@ -78,6 +94,12 @@ public interface CommentApi {
     );
 
     @Operation(
+            summary = "Creates and attaches a user comment to a product",
+            description =
+            """
+            Creates a new user comment and associates it with a product.
+            Returns the created comment if successful.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
@@ -125,11 +147,41 @@ public interface CommentApi {
     );
 
     @Operation(
+            summary = "Creates and attaches a user comment to a event",
+            description =
+            """
+            Creates a new user comment and associates it with a event.
+            Returns the created comment if successful.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidCommentExample",
+                                            summary = "Empty comment",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Comment is mandatory\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<CommentResponseDto> createEventComment(
@@ -148,11 +200,42 @@ public interface CommentApi {
     );
 
     @Operation(
+            summary = "Updates pending comment status.",
+            description =
+            """
+            Updates pending comment status to `ACCEPTED` or `DECLINED` if exists.
+            Requires authentication and ADMIN authority.
+            Only users with the `ADMIN` authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidCommentStatusExample",
+                                            summary = "Update comment without status",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Status is mandatory.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Comment not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "CommentNotFound",
+                                            summary = "Comment not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Comment not found.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<CommentResponseDto> updateComment(

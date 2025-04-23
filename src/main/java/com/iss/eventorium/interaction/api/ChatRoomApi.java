@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name = "Chat", description = "Only authorized users can access this endpoints.")
+@Tag(name = "Chat")
 public interface ChatRoomApi {
 
     @Operation(

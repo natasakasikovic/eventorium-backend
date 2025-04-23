@@ -13,7 +13,7 @@ import lombok.*;
 public class CreateRatingRequestDto {
 
     @NotNull(message = "Rating is mandatory")
-    @Min(value = 1)
-    @Max(value = 5)
+    @Min(value = 1, message = "Rating cannot be less than 1")
+    @Max(value = 5, message = "Rating cannot be greater than 5")
     private Integer rating;
 }
