@@ -41,7 +41,7 @@ public interface CommentApi {
     ResponseEntity<List<CommentResponseDto>> getPendingComments();
 
     @Operation(
-            summary = "Creates and attaches a user comment to a service",
+            summary = "Creates and attaches a user comment to a service.",
             description =
             """
             Creates a new user comment and associates it with a service.
@@ -94,7 +94,7 @@ public interface CommentApi {
     );
 
     @Operation(
-            summary = "Creates and attaches a user comment to a product",
+            summary = "Creates and attaches a user comment to a product.",
             description =
             """
             Creates a new user comment and associates it with a product.
@@ -147,7 +147,7 @@ public interface CommentApi {
     );
 
     @Operation(
-            summary = "Creates and attaches a user comment to a event",
+            summary = "Creates and attaches a user comment to a event.",
             description =
             """
             Creates a new user comment and associates it with a event.

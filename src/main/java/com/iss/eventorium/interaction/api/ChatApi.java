@@ -28,8 +28,8 @@ public interface ChatApi {
             summary = "Retrieve all messages associated with a specific chat room.",
             description =
             """
-            This endpoint allows you to retrieve all chat messages related to a specific chat room.
-            It provides access to the entire message history for a given chat room.
+            Returns all chat messages related to a specific chat room.
+            Provides access to the entire message history for a given chat room.
             All messages are sent with web socket. <br/>
             **WebSocket endpoint:** `/api/v1/ws` <br/>
             **Client sends to:** `/app/chat` <br/>
