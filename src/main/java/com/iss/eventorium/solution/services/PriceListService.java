@@ -34,14 +34,16 @@ public class PriceListService {
     private final ServiceRepository serviceRepository;
     private final ProductRepository productRepository;
 
+    private final PriceListMapper mapper;
+
     public List<PriceListResponseDto> getPriceListServices() {
         Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
-        return serviceRepository.findAll(specification).stream().map(PriceListMapper::toResponse).toList();
+        return serviceRepository.findAll(specification).stream().map(mapper::toResponse).toList();
     }
 
     public PagedResponse<PriceListResponseDto> getPriceListServicesPaged(Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
-        return PriceListMapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
+        return mapper.toPagedResponse(serviceRepository.findAll(specification, pageable));
     }
 
     public PriceListResponseDto updateService(Long id, UpdatePriceRequestDto updateRequestDto) {
@@ -49,25 +51,24 @@ public class PriceListService {
 
         if(Objects.equals(service.getPrice(), updateRequestDto.getPrice())
                 && Objects.equals(service.getDiscount(), updateRequestDto.getDiscount())) {
-            return PriceListMapper.toResponse(service);
+            return mapper.toResponse(service);
         }
 
         service.setPrice(updateRequestDto.getPrice());
         service.setDiscount(updateRequestDto.getDiscount());
         historyService.addServiceMemento(service);
 
-        return PriceListMapper.toResponse(serviceRepository.save(service));
+        return mapper.toResponse(serviceRepository.save(service));
     }
 
     public List<PriceListResponseDto> getPriceListProducts() {
         Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
-        return productRepository.findAll(specification).stream().map(PriceListMapper::toResponse).toList();
+        return productRepository.findAll(specification).stream().map(mapper::toResponse).toList();
     }
 
     public PagedResponse<PriceListResponseDto> getPriceListProductsPaged(Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
-        return PriceListMapper.toPagedResponse(productRepository.findAll(specification, pageable)
-        );
+        return mapper.toPagedResponse(productRepository.findAll(specification, pageable));
     }
 
     public PriceListResponseDto updateProduct(Long id, UpdatePriceRequestDto updateRequestDto) {
@@ -75,14 +76,14 @@ public class PriceListService {
 
         if (Objects.equals(product.getPrice(), updateRequestDto.getPrice())
                 && Objects.equals(product.getDiscount(), updateRequestDto.getDiscount())) {
-            return PriceListMapper.toResponse(product);
+            return mapper.toResponse(product);
         }
 
         product.setPrice(updateRequestDto.getPrice());
         product.setDiscount(updateRequestDto.getDiscount());
         historyService.addProductMemento(product);
 
-        return PriceListMapper.toResponse(productRepository.save(product));
+        return mapper.toResponse(productRepository.save(product));
     }
 
     public byte[] generatePdf() {

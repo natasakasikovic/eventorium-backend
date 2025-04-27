@@ -42,9 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.iss.eventorium.solution.mappers.ServiceMapper.toDetailsResponse;
-import static com.iss.eventorium.solution.mappers.ServiceMapper.toResponse;
-
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 @Slf4j
@@ -59,6 +56,8 @@ public class ServiceService {
     private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
 
+    private final ServiceMapper mapper;
+    
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -69,46 +68,46 @@ public class ServiceService {
     public List<ServiceSummaryResponseDto> getTopServices(){
         Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
         List<Service> services = repository.findTopFiveServices(pageable);
-        return services.stream().map(ServiceMapper::toSummaryResponse).toList();
+        return services.stream().map(mapper::toSummaryResponse).toList();
     }
 
     public ServiceDetailsDto getService(Long id) {
         Service service = find(id);
-        return toDetailsResponse(service, companyRepository.getCompanyByProviderId(service.getProvider().getId()));
+        return mapper.toDetailsResponse(service, companyRepository.getCompanyByProviderId(service.getProvider().getId()));
     }
 
     public List<ServiceSummaryResponseDto> getServices() {
         Specification<Service> specification = ServiceSpecification.filter(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filter(authService.getCurrentUser());
-        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {
         Specification<Service> specification = ServiceSpecification.filterByName(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> searchServices(String keyword, Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterByName(keyword, authService.getCurrentUser());
-        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> filter(ServiceFilterDto filter) {
         Specification<Service> specification = ServiceSpecification.filterBy(filter, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> filter(ServiceFilterDto filter, Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterBy(filter, authService.getCurrentUser());
-        return ServiceMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public ServiceResponseDto createService(CreateServiceRequestDto createServiceRequestDto) {
-        Service service = ServiceMapper.fromCreateRequest(createServiceRequestDto);
+        Service service = mapper.fromCreateRequest(createServiceRequestDto);
         if(service.getCategory().getId() == null) {
             service.setStatus(Status.PENDING);
             categoryProposalService.handleCategoryProposal(service.getCategory());
@@ -121,7 +120,7 @@ public class ServiceService {
 
         historyService.addServiceMemento(service);
         repository.save(service);
-        return toResponse(service);
+        return mapper.toResponse(service);
     }
 
     public void uploadImages(Long serviceId, List<MultipartFile> images) {
@@ -152,9 +151,9 @@ public class ServiceService {
         Service service = find(serviceId);
 
         List<ImageResponseDto> images = new ArrayList<>();
-        for(ImagePath imagePath : service.getImagePaths()) {
-            byte[] image = getImage(serviceId, imagePath);
-            images.add(new ImageResponseDto(image, imagePath.getContentType()));
+        for(ImagePath path : service.getImagePaths()) {
+            byte[] image = getImage(serviceId, path);
+            images.add(new ImageResponseDto(image, path.getContentType()));
         }
         return images;
     }
@@ -166,7 +165,7 @@ public class ServiceService {
                 .getSuggestedServices(id, price)
                 .stream()
                 .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
-                .map(ServiceMapper::toSummaryResponse)
+                .map(mapper::toSummaryResponse)
                 .toList();
     }
 
@@ -202,12 +201,12 @@ public class ServiceService {
         if (eventTypes.size() != request.getEventTypesIds().size())
             throw new EntityNotFoundException("Event types not found.");
 
-        Service service = ServiceMapper.fromUpdateRequest(request, toUpdate);
+        Service service = mapper.fromUpdateRequest(request, toUpdate);
         service.setEventTypes(eventTypes);
 
         historyService.addServiceMemento(service);
         repository.save(service);
-        return toResponse(service);
+        return mapper.toResponse(service);
     }
 
     public void deleteService(Long id) {

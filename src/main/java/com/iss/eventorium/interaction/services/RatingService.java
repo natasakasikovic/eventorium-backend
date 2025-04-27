@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 
-import static com.iss.eventorium.interaction.mappers.RatingMapper.toResponse;
-
 @Service
 @RequiredArgsConstructor
 public class RatingService {
@@ -35,10 +33,12 @@ public class RatingService {
 
     private final RatingRepository ratingRepository;
 
+    private final RatingMapper mapper;
+
     private final MessageSource messageSource;
 
     public RatingResponseDto createSolutionRating(Long solutionId, CreateRatingRequestDto request) {
-        Rating rating = RatingMapper.fromCreateRequest(request);
+        Rating rating = mapper.fromCreateRequest(request);
         User user = authService.getCurrentUser();
         rating.setUser(user);
 
@@ -46,11 +46,11 @@ public class RatingService {
         solutionService.addRating(solution, rating);
 
         sendNotification(solution, user, rating.getRating());
-        return toResponse(rating);
+        return mapper.toResponse(rating);
     }
 
     public RatingResponseDto createEventRating(Long eventId, CreateRatingRequestDto request) {
-        Rating rating = RatingMapper.fromCreateRequest(request);
+        Rating rating = mapper.fromCreateRequest(request);
         User user = authService.getCurrentUser();
         rating.setUser(user);
 
@@ -58,7 +58,7 @@ public class RatingService {
         eventService.addRating(event, rating);
 
         sendNotification(event, user, rating.getRating());
-        return toResponse(rating);
+        return mapper.toResponse(rating);
     }
 
     public Rating find(Long id) {

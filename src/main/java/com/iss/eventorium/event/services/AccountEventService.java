@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.iss.eventorium.event.mappers.EventMapper.toPagedResponse;
-
 @Service
 @RequiredArgsConstructor
 public class AccountEventService {
@@ -31,19 +29,21 @@ public class AccountEventService {
     private final EventService eventService;
     private final UserRepository userRepository;
 
+    private final EventMapper mapper;
+
     public List<EventSummaryResponseDto> getFavouriteEvents() {
         return authService.getCurrentUser().getPerson().getFavouriteEvents()
-                .stream().map(EventMapper::toSummaryResponse).toList();
+                .stream().map(mapper::toSummaryResponse).toList();
     }
 
     public List<CalendarEventDto> getOrganizerEvents() {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toCalendarEvent).toList();
+        return repository.findAll(specification).stream().map(mapper::toCalendarEvent).toList();
     }
 
     public List<CalendarEventDto> getAttendingEvents() {
         Person person = authService.getCurrentUser().getPerson();
-        return person.getAttendingEvents().stream().map(EventMapper::toCalendarEvent).toList();
+        return person.getAttendingEvents().stream().map(mapper::toCalendarEvent).toList();
     }
 
     public void markAttendance(Long eventId) {
@@ -88,21 +88,21 @@ public class AccountEventService {
 
     public List<EventSummaryResponseDto> getAll() {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 }

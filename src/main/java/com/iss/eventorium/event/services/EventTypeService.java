@@ -16,23 +16,26 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventTypeService {
+
     private final EventTypeRepository repository;
     private final CategoryService categoryService;
+
+    private final EventTypeMapper mapper;
 
     public EventType find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event type not found"));
     }
 
     public List<EventTypeResponseDto> getEventTypes() {
-        return repository.findByDeletedFalse().stream().map(EventTypeMapper::toResponse).toList();
+        return repository.findByDeletedFalse().stream().map(mapper::toResponse).toList();
     }
 
     public EventTypeResponseDto getEventType(Long id) {
-        return EventTypeMapper.toResponse(find(id));
+        return mapper.toResponse(find(id));
     }
 
     public EventTypeResponseDto createEventType(EventTypeRequestDto request) {
-        return EventTypeMapper.toResponse(repository.save(EventTypeMapper.fromRequest(request)));
+        return mapper.toResponse(repository.save(mapper.fromRequest(request)));
     }
 
     public EventTypeResponseDto updateEventType(Long id, EventTypeRequestDto request) {
@@ -45,7 +48,7 @@ public class EventTypeService {
                                     .toList();
         eventType.setSuggestedCategories(categories);
 
-        return EventTypeMapper.toResponse(repository.save(eventType));
+        return mapper.toResponse(repository.save(eventType));
     }
 
     public void deleteEventType(Long id) {

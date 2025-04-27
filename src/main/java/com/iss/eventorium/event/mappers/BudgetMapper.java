@@ -8,21 +8,18 @@ import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BudgetMapper {
-    private static ModelMapper modelMapper;
 
-    @Autowired
-    public BudgetMapper(ModelMapper modelMapper) {
-        BudgetMapper.modelMapper = modelMapper;
-    }
+    private final ModelMapper modelMapper;
+    private final CategoryMapper categoryMapper;
 
-
-    public static BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution, SolutionType itemType) {
+    public BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution, SolutionType itemType) {
         BudgetItem item = modelMapper.map(dto, BudgetItem.class);
         item.setCategory(solution.getCategory());
         item.setSolution(solution);
@@ -30,18 +27,18 @@ public class BudgetMapper {
         return item;
     }
 
-    public static BudgetItemResponseDto toResponse(BudgetItem item) {
+    public BudgetItemResponseDto toResponse(BudgetItem item) {
         BudgetItemResponseDto dto = modelMapper.map(item, BudgetItemResponseDto.class);
-        dto.setCategory(CategoryMapper.toResponse(item.getCategory()));
+        dto.setCategory(categoryMapper.toResponse(item.getCategory()));
         dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
         return dto;
     }
 
-    public static BudgetResponseDto toResponse(Budget budget) {
+    public BudgetResponseDto toResponse(Budget budget) {
         return BudgetResponseDto.builder()
                 .spentAmount(budget.getSpentAmount())
                 .plannedAmount(budget.getPlannedAmount())
-                .items(budget.getItems().stream().map(BudgetMapper::toResponse).toList())
+                .items(budget.getItems().stream().map(this::toResponse).toList())
                 .build();
 
     }

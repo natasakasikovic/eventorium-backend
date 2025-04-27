@@ -14,39 +14,38 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Jwts;
 
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
 
-    @Value("Eventorium")
-    private String APP_NAME;
+    @Value("${spring.application.name}")
+    private String appName;
 
     @Value("${jwt_secret}")
-    public String SECRET;
+    public String secret;
 
     @Getter
-    @Value("259200000")
-    private Long EXPIRES_IN;
+    @Value("${jwt_expires}")
+    private Long expiresIn;
 
-    @Value("Authorization")
-    private String AUTH_HEADER;
+    @Value("${auth_header}")
+    private String authHeader;
 
     private static final String AUDIENCE_WEB = "web";
-    private final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
+    private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .setIssuer(APP_NAME)
+                .setIssuer(appName)
                 .setSubject(user.getEmail())
                 .setAudience(generateAudience())
                 .setIssuedAt(new Date())
                 .claim("userId", user.getId())
                 .claim("roles", user.getRoles().stream()
                         .map(Role::getAuthority)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .setExpiration(generateExpirationDate())
-                .signWith(SIGNATURE_ALGORITHM, SECRET.getBytes()).compact();
+                .signWith(SIGNATURE_ALGORITHM, secret.getBytes()).compact();
     }
 
     private String generateAudience() {
@@ -54,50 +53,44 @@ public class JwtTokenUtil {
     }
 
     private Date generateExpirationDate() {
-        return new Date(new Date().getTime() + EXPIRES_IN);
+        return new Date(new Date().getTime() + expiresIn);
     }
 
     public String getToken(HttpServletRequest request) {
-        String authHeader = getAuthHeaderFromHeader(request);
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            return authHeader.substring(7);
+        String header = getAuthHeaderFromHeader(request);
+        if (header != null && header.startsWith("Bearer "))
+            return header.substring(7);
 
         return null;
     }
 
     public String getUsernameFromToken(String token) {
-        String username;
-
         try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            username = claims.getSubject();
+            final Claims claims = getAllClaimsFromToken(token);
+            return (claims != null) ? claims.getSubject() : null;
         } catch (ExpiredJwtException ex) {
             throw ex;
         } catch (Exception e) {
-            username = null;
+            return null;
         }
-
-        return username;
     }
 
     public Date getIssuedAtDateFromToken(String token) {
-        Date issueAt;
         try {
-            final Claims claims = this.getAllClaimsFromToken(token);
-            issueAt = claims.getIssuedAt();
+            final Claims claims = getAllClaimsFromToken(token);
+            return (claims != null) ? claims.getIssuedAt() : null;
         } catch (ExpiredJwtException ex) {
             throw ex;
         } catch (Exception e) {
-            issueAt = null;
+            return null;
         }
-        return issueAt;
     }
 
     private Claims getAllClaimsFromToken(String token) {
         Claims claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(SECRET.getBytes())
+                    .setSigningKey(secret.getBytes())
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException ex) {
@@ -108,7 +101,7 @@ public class JwtTokenUtil {
         return claims;
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) {
         User user = (User) userDetails;
         final String username = getUsernameFromToken(token);
         final Date created = getIssuedAtDateFromToken(token);
@@ -128,6 +121,6 @@ public class JwtTokenUtil {
     }
 
     public String getAuthHeaderFromHeader(HttpServletRequest request) {
-        return request.getHeader(AUTH_HEADER);
+        return request.getHeader(authHeader);
     }
 }

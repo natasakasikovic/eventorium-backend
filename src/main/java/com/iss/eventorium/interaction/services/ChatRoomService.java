@@ -17,15 +17,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.iss.eventorium.interaction.mappers.ChatMapper.toPagedResponse;
-import static com.iss.eventorium.interaction.mappers.ChatMapper.toResponse;
-
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
 
     private final ChatRoomRepository repository;
     private final AuthService authService;
+
+    private final ChatMapper mapper;
 
     public void createChatRoom(User sender, User recipient, ChatMessage message) {
         String senderRoomName = generateChatRoomName(sender, recipient);
@@ -48,14 +47,14 @@ public class ChatRoomService {
         User currentUser = authService.getCurrentUser();
         Specification<ChatRoom> specification = ChatRoomSpecification.filterBy(currentUser);
         return repository.findAll(specification).stream()
-                .map(room -> toResponse(room, currentUser))
+                .map(room -> mapper.toResponse(room, currentUser))
                 .toList();
     }
 
     public PagedResponse<ChatRoomResponseDto> getChatRoomsPaged(Pageable pageable) {
         User currentUser = authService.getCurrentUser();
         Specification<ChatRoom> specification = ChatRoomSpecification.filterBy(currentUser);
-        return toPagedResponse(repository.findAll(specification, pageable), currentUser);
+        return mapper.toPagedResponse(repository.findAll(specification, pageable), currentUser);
     }
 
     private void updateChatRoom(ChatRoom room, ChatMessage message) {

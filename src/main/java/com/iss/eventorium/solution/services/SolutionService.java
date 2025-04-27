@@ -3,7 +3,6 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.repositories.SolutionRepository;

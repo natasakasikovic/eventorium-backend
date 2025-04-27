@@ -6,7 +6,6 @@ import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter

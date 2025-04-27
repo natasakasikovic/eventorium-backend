@@ -17,8 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
-import static com.iss.eventorium.solution.mappers.ServiceMapper.toPagedResponse;
-
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class AccountServiceService {
@@ -27,34 +25,36 @@ public class AccountServiceService {
     private final AuthService authService;
     private final UserRepository userRepository;
 
+    private final ServiceMapper mapper;
+
     public List<ServiceSummaryResponseDto> getServices() {
         Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> getServicesPaged(Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> filterServices(ServiceFilterDto filter) {
         Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ServiceSummaryResponseDto> filterServicesPaged(ServiceFilterDto filter, Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterForProvider(filter, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public PagedResponse<ServiceSummaryResponseDto> searchServicesPaged(String keyword, Pageable pageable) {
         Specification<Service> specification = ServiceSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ServiceSummaryResponseDto> searchServices(String keyword) {
         Specification<Service> specification = ServiceSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ServiceMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public List<ServiceSummaryResponseDto> getFavouriteServices() {
@@ -62,7 +62,7 @@ public class AccountServiceService {
                 .getPerson()
                 .getFavouriteServices()
                 .stream()
-                .map(ServiceMapper::toSummaryResponse)
+                .map(mapper::toSummaryResponse)
                 .toList();
     }
 
@@ -77,7 +77,6 @@ public class AccountServiceService {
     }
 
     public void removeFavouriteService(Long id) {
-
         Service service = find(id);
 
         List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();

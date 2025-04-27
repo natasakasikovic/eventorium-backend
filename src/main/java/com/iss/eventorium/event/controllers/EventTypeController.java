@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/event-types")
 @RequiredArgsConstructor
-@CrossOrigin
 public class EventTypeController {
 
     private final EventTypeService service;

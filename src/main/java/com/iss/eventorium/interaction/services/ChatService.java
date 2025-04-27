@@ -28,6 +28,8 @@ public class ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
 
+    private final ChatMapper mapper;
+
     private final SimpMessagingTemplate messagingTemplate;
 
     public void sendMessage(ChatMessageRequestDto chatMessage) {
@@ -44,11 +46,11 @@ public class ChatService {
             chatMessage.getMessage()
         );
 
-        ChatMessage message = chatMessageRepository.save(ChatMapper.fromRequest(chatMessage, sender, recipient));
+        ChatMessage message = chatMessageRepository.save(mapper.fromRequest(chatMessage, sender, recipient));
         messagingTemplate.convertAndSendToUser(
                 chatMessage.getRecipientId().toString(),
                 "/queue/messages",
-                ChatMapper.toResponse(message)
+                mapper.toResponse(message)
         );
         chatRoomService.createChatRoom(sender, recipient, message);
     }
@@ -58,7 +60,7 @@ public class ChatService {
                         chatMessageRepository.findBySender_IdAndRecipient_Id(senderId, recipientId).stream(),
                         chatMessageRepository.findBySender_IdAndRecipient_Id(recipientId, senderId).stream()
                 )
-                .map(ChatMapper::toResponse)
+                .map(mapper::toResponse)
                 .sorted(Comparator.comparing(ChatMessageResponseDto::getTimestamp))
                 .toList();
     }

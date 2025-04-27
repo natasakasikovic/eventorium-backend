@@ -5,31 +5,29 @@ import com.iss.eventorium.company.dtos.CompanyRequestDto;
 import com.iss.eventorium.company.dtos.CompanyResponseDto;
 import com.iss.eventorium.company.dtos.ProviderCompanyDto;
 import com.iss.eventorium.company.models.Company;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CompanyMapper {
 
-    private static ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    public CompanyMapper(ModelMapper modelMapper) { CompanyMapper.modelMapper = modelMapper; }
-
-    public static Company fromRequest(CompanyRequestDto companyRequestDto) {
+    public Company fromRequest(CompanyRequestDto companyRequestDto) {
         return modelMapper.map(companyRequestDto, Company.class);
     }
 
-    public static CompanyResponseDto toResponse(Company company) {
+    public CompanyResponseDto toResponse(Company company) {
         return modelMapper.map(company, CompanyResponseDto.class);
     }
 
-    public static ProviderCompanyDto toProviderCompanyResponse(Company company) {
+    public ProviderCompanyDto toProviderCompanyResponse(Company company) {
         return modelMapper.map(company, ProviderCompanyDto.class);
     }
 
-    public static CompanyDetailsDto toCompanyDetailsResponse(Company company) {
+    public CompanyDetailsDto toCompanyDetailsResponse(Company company) {
         return modelMapper.map(company, CompanyDetailsDto.class);
     }
 }

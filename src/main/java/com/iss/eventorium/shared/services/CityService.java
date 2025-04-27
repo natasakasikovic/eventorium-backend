@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -15,8 +14,10 @@ public class CityService {
 
     private final CityRepository cityRepository;
 
+    private final CityMapper mapper;
+
     public List<CityDto> getAll() {
         return cityRepository.findAll().stream()
-                .map(CityMapper::toResponse).collect(Collectors.toList());
+                .map(mapper::toResponse).toList();
     }
 }
