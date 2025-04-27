@@ -25,7 +25,7 @@ public class UserBlockService {
         cleanUserOfBlockedContent(blocked, blocker);
     }
 
-    private void cleanUserOfBlockedContent(User blocker, User blocked ) {
+    private void cleanUserOfBlockedContent(User blocker, User blocked) {
         if (blocked.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
             userService.cleanUserOfBlockedOrganizerContent(blocker, blocked);
         else if (blocked.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName())))

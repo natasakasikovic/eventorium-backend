@@ -7,26 +7,20 @@ import com.iss.eventorium.interaction.models.ChatMessage;
 import com.iss.eventorium.interaction.dtos.chat.MessageSenderDto;
 import com.iss.eventorium.interaction.models.ChatRoom;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.mappers.ServiceMapper;
-import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class ChatMapper {
-    private static ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    public ChatMapper(ModelMapper modelMapper) {
-        ChatMapper.modelMapper = modelMapper;
-    }
-
-    public static ChatMessageResponseDto toResponse(ChatMessage chatMessage) {
+    public ChatMessageResponseDto toResponse(ChatMessage chatMessage) {
         ChatMessageResponseDto dto = modelMapper.map(chatMessage, ChatMessageResponseDto.class);
         dto.setSenderId(chatMessage.getSender().getId());
         dto.setRecipientId(chatMessage.getRecipient().getId());
@@ -40,7 +34,7 @@ public class ChatMapper {
         return dto;
     }
 
-    public static ChatMessage fromRequest(ChatMessageRequestDto dto, User sender, User recipient) {
+    public ChatMessage fromRequest(ChatMessageRequestDto dto, User sender, User recipient) {
         return ChatMessage.builder()
                 .timestamp(LocalDateTime.now())
                 .sender(sender)
@@ -49,7 +43,7 @@ public class ChatMapper {
                 .build();
     }
 
-    public static ChatRoomResponseDto toResponse(ChatRoom chatRoom, User currentUser) {
+    public ChatRoomResponseDto toResponse(ChatRoom chatRoom, User currentUser) {
         User user = chatRoom.getLastMessage().getSender().equals(currentUser)
                 ? chatRoom.getLastMessage().getRecipient()
                 : chatRoom.getLastMessage().getSender();
@@ -64,7 +58,7 @@ public class ChatMapper {
                 .build();
     }
 
-    public static PagedResponse<ChatRoomResponseDto> toPagedResponse(Page<ChatRoom> page, User currentUser) {
+    public PagedResponse<ChatRoomResponseDto> toPagedResponse(Page<ChatRoom> page, User currentUser) {
         return new PagedResponse<>(
                 page.stream().map(room -> toResponse(room, currentUser)).toList(),
                 page.getTotalPages(),

@@ -1,12 +1,17 @@
 package com.iss.eventorium.security.auth;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+
+@EqualsAndHashCode(callSuper = false)
 public class TokenBasedAuthentication extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Setter
@@ -33,4 +38,6 @@ public class TokenBasedAuthentication extends AbstractAuthenticationToken {
     public UserDetails getPrincipal() {
         return principle;
     }
+
 }
+

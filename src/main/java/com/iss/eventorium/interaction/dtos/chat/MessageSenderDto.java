@@ -1,6 +1,5 @@
 package com.iss.eventorium.interaction.dtos.chat;
 
-
 import lombok.*;
 
 @Getter

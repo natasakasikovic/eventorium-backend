@@ -53,6 +53,8 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AccountDeactivationValidator validator;
 
+    private final UserMapper mapper;
+
     @Value("${image-path}")
     private String imagePath;
 
@@ -76,16 +78,16 @@ public class UserService {
         User existingUser = repository.findByEmail(authRequestDto.getEmail()).orElse(null);
 
         if (existingUser == null)
-            return UserMapper.toResponse(createNewRegistrationRequest(authRequestDto));
+            return mapper.toResponse(createNewRegistrationRequest(authRequestDto));
 
         checkActivationStatus(existingUser);
         checkRequestExpired(existingUser);
 
-        return UserMapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
+        return mapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
     }
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
-        User created = UserMapper.fromRequest(authRequestDto);
+        User created = mapper.fromRequest(authRequestDto);
         created.setHash(HashUtils.generateHash());
         created.setPassword(passwordEncoder.encode(authRequestDto.getPassword()));
         sendActivationEmail(created);
@@ -155,7 +157,7 @@ public class UserService {
     }
 
     public void quickRegister(QuickRegistrationRequestDto request) {
-        User user = UserMapper.fromRequest(request);
+        User user = mapper.fromRequest(request);
         setUserDetails(user);
 
         if (repository.existsByEmail(user.getEmail()))
@@ -176,12 +178,11 @@ public class UserService {
 
     public AccountDetailsDto getCurrentUser() {
         User current = authService.getCurrentUser();
-        return UserMapper.toAccountDetails(current);
+        return mapper.toAccountDetails(current);
     }
 
     public AccountDetailsDto getUser(Long id) {
-        User user = find(id);
-        return UserMapper.toAccountDetails(user);
+        return mapper.toAccountDetails(find(id));
     }
 
     public ImagePath getProfilePhotoPath(long id) {

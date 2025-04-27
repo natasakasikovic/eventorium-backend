@@ -41,6 +41,10 @@ public class BudgetService {
     private final EventRepository eventRepository;
     private final BudgetItemRepository budgetItemRepository;
 
+    private final BudgetMapper mapper;
+    private final ProductMapper productMapper;
+    private final SolutionMapper solutionMapper;
+
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
         double netPrice = calculateNetPrice(product);
@@ -49,8 +53,8 @@ public class BudgetService {
         }
 
         Event event = eventService.find(eventId);
-        updateBudget(event, BudgetMapper.fromRequest(request, product, SolutionType.PRODUCT));
-        return ProductMapper.toResponse(product);
+        updateBudget(event, mapper.fromRequest(request, product, SolutionType.PRODUCT));
+        return productMapper.toResponse(product);
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
@@ -62,20 +66,20 @@ public class BudgetService {
             eventRepository.save(event);
         }
 
-        return BudgetMapper.toResponse(budget);
+        return mapper.toResponse(budget);
     }
 
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
         Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user);
         return budgetItemRepository.findAll(specification).stream()
-                .map(item -> SolutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
+                .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        return event.getBudget().getItems().stream().map(BudgetMapper::toResponse).toList();
+        return event.getBudget().getItems().stream().map(mapper::toResponse).toList();
     }
 
     private void updateBudget(Event event, BudgetItem item) {

@@ -4,37 +4,34 @@ import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.shared.models.PagedResponse;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class EventTypeMapper {
-    private static ModelMapper modelMapper;
 
-    @Autowired
-    public EventTypeMapper(ModelMapper modelMapper) {
-        EventTypeMapper.modelMapper = modelMapper;
-    }
+    private final ModelMapper modelMapper;
 
-    public static EventType fromRequest(EventTypeRequestDto eventTypeRequestDto) {
+    public EventType fromRequest(EventTypeRequestDto eventTypeRequestDto) {
         return modelMapper.map(eventTypeRequestDto, EventType.class);
     }
 
-    public static EventTypeResponseDto toResponse(EventType eventType) {
+    public EventTypeResponseDto toResponse(EventType eventType) {
         return modelMapper.map(eventType, EventTypeResponseDto.class);
     }
 
-    public static PagedResponse<EventTypeResponseDto> toPagedResponse(Page<EventType> page) {
+    public PagedResponse<EventTypeResponseDto> toPagedResponse(Page<EventType> page) {
         return new PagedResponse<>(
-                page.stream().map(EventTypeMapper::toResponse).toList(),
+                page.getContent().stream().map(this::toResponse).toList(),
                 page.getTotalPages(),
                 page.getTotalElements()
         );
     }
 
-    public static EventType fromResponse(EventTypeResponseDto eventTypeResponseDto) {
+    public EventType fromResponse(EventTypeResponseDto eventTypeResponseDto) {
         return modelMapper.map(eventTypeResponseDto, EventType.class);
     }
 }

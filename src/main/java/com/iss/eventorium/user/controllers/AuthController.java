@@ -22,7 +22,7 @@ public class AuthController {
     private final AuthService authService;
 
     @Value("${frontend.url}")
-    private String FRONTEND_URL;
+    private String frontendUrl;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody LoginRequestDto request) {
@@ -49,7 +49,7 @@ public class AuthController {
     @GetMapping("activation/{hash}")
     public ResponseEntity<Void> activateAccount(@PathVariable String hash) {
         userService.activateAccount(hash);
-        String redirectUrl = FRONTEND_URL + "/login";
+        String redirectUrl = frontendUrl + "/login";
         return ResponseEntity.status(HttpStatus.SEE_OTHER)
                 .header("Location", redirectUrl)
                 .build();

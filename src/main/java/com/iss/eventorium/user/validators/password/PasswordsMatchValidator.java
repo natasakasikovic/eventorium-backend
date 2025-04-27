@@ -8,6 +8,7 @@ public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMat
     String passwordField;
     String passwordConfirmationField;
 
+    @Override
     public void initialize(PasswordsMatch constraintAnnotation) {
         passwordField = constraintAnnotation.password();
         passwordConfirmationField = constraintAnnotation.passwordConfirmation();

@@ -9,6 +9,7 @@ public class DurationValidator implements ConstraintValidator<DurationConstraint
 
     @Override
     public void initialize(DurationConstraint constraintAnnotation) {
+        // Should not do anything
     }
 
     @Override

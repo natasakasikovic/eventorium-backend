@@ -6,6 +6,7 @@ import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.exceptions.PdfGenerationException;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
+
+import java.util.Optional;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,11 +31,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldError() != null
-                ? ex.getBindingResult().getFieldError().getDefaultMessage()
-                : ex.getBindingResult().getGlobalError() != null
-                ? ex.getBindingResult().getGlobalError().getDefaultMessage()
-                : "Validation error occurred";
+        String errorMessage = Optional.ofNullable(ex.getBindingResult().getFieldError())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElseGet(() -> Optional.ofNullable(ex.getBindingResult().getGlobalError())
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .orElse("Validation error occurred"));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.builder()

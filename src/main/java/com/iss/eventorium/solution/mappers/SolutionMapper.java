@@ -6,27 +6,24 @@ import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.user.models.User;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class SolutionMapper {
 
-    private static ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final RatingMapper ratingMapper;
 
-    @Autowired
-    public SolutionMapper(ModelMapper modelMapper) {
-        SolutionMapper.modelMapper = modelMapper;
-    }
-
-    public static SolutionReviewResponseDto toReviewResponse(User user, Solution solution, SolutionType itemType) {
+    public SolutionReviewResponseDto toReviewResponse(User user, Solution solution, SolutionType itemType) {
         SolutionReviewResponseDto dto = modelMapper.map(solution, SolutionReviewResponseDto.class);
         Rating solutionRating = solution.getRatings().stream()
                 .filter(rating -> rating.getUser().equals(user))
                 .findFirst()
                 .orElse(null);
-        dto.setRating(RatingMapper.toResponse(solutionRating));
+        dto.setRating(ratingMapper.toResponse(solutionRating));
         dto.setType(itemType);
         return dto;
     }

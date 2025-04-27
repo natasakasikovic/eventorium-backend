@@ -32,7 +32,7 @@ public class CompanyRequestDto {
 
     @NotNull(message = "Phone number is required.")
     @NotEmpty(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "Phone number must be between 9 and 15 digits and may optionally start with a +.")
+    @Pattern(regexp = "^\\+?\\d{9,15}$", message = "Phone number must be between 9 and 15 digits and may optionally start with a +.")
     private String phoneNumber;
 
     @NotNull(message = "Description is required.")
