@@ -85,6 +85,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/services/search").permitAll()
                         .requestMatchers("/api/v1/services/filter/all").permitAll()
                         .requestMatchers("/api/v1/services/search/all").permitAll()
+                        .requestMatchers("/api/v1/services/suggestions").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/services/{id}/*").permitAll()
 
                         // Products
@@ -99,9 +100,16 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/products/search").permitAll()
                         .requestMatchers("/api/v1/products/filter/all").permitAll()
                         .requestMatchers("/api/v1/products/search/all").permitAll()
+                        .requestMatchers("/api/v1/products/suggestions").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/products/{id}/*").permitAll()
 
                         // Events
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/events/*/agenda").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/drafted").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/guest-list-pdf").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events").permitAll()
@@ -131,6 +139,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/user-blocking/*").authenticated()
 
                         // Companies
+                        .requestMatchers("/api/v1/companies/my-company").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/companies").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/companies/images").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/companies/images").hasAuthority(PROVIDER)
@@ -197,7 +206,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/budget-items").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/provider-reservations").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
-
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations/{id}").hasAuthority(PROVIDER)
+                        .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
                         // Invitations
                         .requestMatchers("/api/v1/invitations/verification/{hash}").permitAll()
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()

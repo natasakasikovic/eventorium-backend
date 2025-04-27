@@ -29,7 +29,7 @@ public class ServiceReservationSpecification {
 
     public static Specification<Reservation> checkForReservationsInOneHour() {
         return Specification
-                .where(hasStatusAccepted())
+                .where(hasStatus(Status.ACCEPTED))
                 .and(hasEventDateToday())
                 .and(hasStartTimeInNextHour());
     }
@@ -45,12 +45,18 @@ public class ServiceReservationSpecification {
     public static Specification<Reservation> checkForAcceptedFutureReservations(User provider) {
         return Specification
                 .where(hasProviderId(provider.getId()))
-                .and(hasStatusAccepted())
+                .and(hasStatus(Status.ACCEPTED))
                 .and(hasEventDateInFuture());
     }
 
     public static Specification<Reservation> getProviderReservations(User provider) {
-        return Specification.where(hasProviderId(provider.getId())).and(hasStatusAccepted());
+        return Specification.where(hasProviderId(provider.getId())).and(hasStatus(Status.ACCEPTED));
+    }
+
+    public static Specification<Reservation> getPendingReservations(User provider) {
+        return Specification.where(hasProviderId(provider.getId()))
+                .and(hasStatus(Status.PENDING)
+                .and(hasEventDateInFuture()));
     }
 
     public static Specification<Reservation> getEventReservations(Event event) {
@@ -72,8 +78,8 @@ public class ServiceReservationSpecification {
         return (root, query, cb) -> cb.equal(root.get("event").get("date"), LocalDate.now());
     }
 
-    private static Specification<Reservation> hasStatusAccepted() {
-        return (root, query, cb) -> cb.equal(root.get("status"), Status.ACCEPTED);
+    private static Specification<Reservation> hasStatus(Status status) {
+        return (root, query, cb) -> cb.equal(root.get("status"), status);
     }
 
     private static Specification<Reservation> hasEventId(Long eventId) {

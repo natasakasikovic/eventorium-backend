@@ -45,9 +45,7 @@ public class CategoryService {
     }
 
     public CategoryResponseDto createCategory(CategoryRequestDto category) {
-        if(categoryRepository.existsByNameIgnoreCase(category.getName())) {
-            throw new CategoryAlreadyExistsException(category.getName());
-        }
+        ensureCategoryNameIsUnique(category.getName());
         Category created = mapper.fromRequest(category);
         created.setSuggested(false);
         return mapper.toResponse(categoryRepository.save(created));
@@ -56,9 +54,7 @@ public class CategoryService {
     public CategoryResponseDto updateCategory(Long id, CategoryRequestDto category) {
         Category toUpdate = find(id);
 
-        if(checkCategoryExistence(toUpdate, category.getName())) {
-            throw new CategoryAlreadyExistsException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, category.getName()));
-        }
+        ensureCategoryNameAvailability(toUpdate, category.getName());
 
         toUpdate.setName(category.getName());
         toUpdate.setDescription(category.getDescription());
@@ -68,9 +64,8 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category toDelete = find(id);
 
-        if(solutionService.existsCategory(id)) {
+        if(solutionService.existsCategory(id))
             throw new CategoryInUseException("Unable to delete category because it is currently associated with an active solution.");
-        }
         toDelete.setName(Instant.now().toEpochMilli() + "_" + toDelete.getName());
         toDelete.setDeleted(true);
         categoryRepository.save(toDelete);
@@ -86,10 +81,9 @@ public class CategoryService {
         return mapper.toPagedResponse(categoryRepository.findBySuggestedTrue(pageable));
     }
 
-    public void ensureCategoryNameIsUnique(Category category) {
-        if (categoryRepository.existsByNameIgnoreCase(category.getName())) {
-            throw new CategoryAlreadyExistsException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, category.getName()));
-        }
+    public void ensureCategoryNameIsUnique(String categoryName) {
+        if (categoryRepository.existsByNameIgnoreCase(categoryName))
+            throw new CategoryAlreadyExistsException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, categoryName));
     }
 
     public Category find(Long id) {
@@ -98,12 +92,12 @@ public class CategoryService {
 
     public Category findByName(String name) {
         return categoryRepository.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new EntityNotFoundException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, name)));
+                .orElseThrow(() -> new EntityNotFoundException("Category with name '" + name + "' not found"));
     }
 
-    public boolean checkCategoryExistence(Category category, String name) {
-        return !Objects.equals(category.getName(), name)
-                && categoryRepository.existsByNameIgnoreCase(name);
+    public void ensureCategoryNameAvailability(Category category, String name) {
+        if(!Objects.equals(category.getName(), name) && categoryRepository.existsByNameIgnoreCase(name))
+            throw new CategoryAlreadyExistsException(String.format(CATEGORY_ALREADY_EXISTS_MESSAGE, category.getName()));
     }
 
 }

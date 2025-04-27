@@ -5,11 +5,13 @@ import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
+import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
@@ -20,6 +22,7 @@ import com.iss.eventorium.solution.validators.reservation.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.event.EventListener;
@@ -85,6 +88,13 @@ public class ReservationService {
         return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(mapper::toCalendarReservation).toList();
     }
 
+
+    public List<ReservationResponseDto> getPendingReservations() {
+        User user = authService.getCurrentUser();
+        Specification<Reservation> specification = ServiceReservationSpecification.getPendingReservations(user);
+        return repository.findAll(specification).stream().map(ReservationMapper::toResponse).toList();
+    }
+
     @Scheduled(fixedRate = 60000)
     public void checkReservations() {
         List<Reservation> reservations = repository.findAll(ServiceReservationSpecification.checkForReservationsInOneHour());
@@ -138,6 +148,16 @@ public class ReservationService {
         variables.put("startTime", reservation.getStartingTime());
         variables.put("endTime", reservation.getEndingTime());
         return variables;
+    }
+
+    public ReservationResponseDto updateReservation(Long id, Status status) {
+        Reservation reservation = find(id);
+        reservation.setStatus(status);
+        return ReservationMapper.toResponse(repository.save(reservation));
+    }
+
+    public Reservation find(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
     }
 
     private List<Reservation> getEventReservations(Event event) {

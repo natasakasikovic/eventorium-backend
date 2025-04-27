@@ -207,10 +207,10 @@ INSERT INTO reports (reason, timestamp, offender_id, reporter_id, status) VALUES
 INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
 VALUES
     ('18:50:53', False, '17:50:53', 5, 9, 'ACCEPTED'),
-    ('19:50:53', False, '17:50:53', 1, 9, 'ACCEPTED'),
+    ('19:50:53', False, '17:50:53', 1, 9, 'PENDING'),
     ('20:50:53', False, '17:50:53', 5, 10, 'ACCEPTED'),
     ('18:50:53', False, '17:50:53', 4, 10, 'ACCEPTED'),
-    ('20:50:53', False, '17:50:53', 1, 10, 'ACCEPTED'),
+    ('20:50:53', False, '17:50:53', 1, 10, 'PENDING'),
     ('18:50:53', False, '17:50:53', 5, 11, 'ACCEPTED'),
     ('20:50:53', False, '17:50:53', 1, 12, 'ACCEPTED'),
     ('19:50:53', False, '17:50:53', 2, 13, 'ACCEPTED'),
