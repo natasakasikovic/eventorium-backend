@@ -2,12 +2,13 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
+import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.event.repositories.EventTypeRepository;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
@@ -42,8 +43,8 @@ public class ServiceService {
     private final ServiceRepository repository;
     private final AuthService authService;
     private final EventService eventService;
-    private final CompanyRepository companyRepository;
-    private final EventTypeRepository eventTypeRepository;
+    private final CompanyService companyService;
+    private final EventTypeService eventTypeService;
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
@@ -65,7 +66,7 @@ public class ServiceService {
 
     public ServiceDetailsDto getService(Long id) {
         Service service = find(id);
-        return mapper.toDetailsResponse(service, companyRepository.getCompanyByProviderId(service.getProvider().getId()));
+        return mapper.toDetailsResponse(service, companyService.getByProviderId(service.getProvider().getId()));
     }
 
     public List<ServiceSummaryResponseDto> getServices() {
@@ -128,7 +129,7 @@ public class ServiceService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, find(id));
+        return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
     // TODO: refactor method below to use specification
@@ -163,7 +164,7 @@ public class ServiceService {
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto request) {
         Service toUpdate = find(id);
 
-        List<EventType> eventTypes = eventTypeRepository.findAllById(request.getEventTypesIds());
+        List<EventType> eventTypes = eventTypeService.findAllById(request.getEventTypesIds());
 
         if (eventTypes.size() != request.getEventTypesIds().size())
             throw new EntityNotFoundException("Event types not found.");
@@ -184,5 +185,12 @@ public class ServiceService {
 
         service.setIsDeleted(true);
         repository.save(service);
+    }
+
+    public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
+        Service service = find(id);
+        service.getImagePaths().removeIf(image ->
+                removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
+        );
     }
 }

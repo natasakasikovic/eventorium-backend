@@ -51,11 +51,11 @@ public class ImageService {
         return Files.probeContentType(filePath);
     }
 
-    public List<ImageResponseDto> getImages(String imageDir, Long id, ImageHolder entity) {
+    public List<ImageResponseDto> getImages(String imageDir, ImageHolder entity) {
         List<ImageResponseDto> images = new ArrayList<>();
 
         for (ImagePath path : entity.getImagePaths()) {
-            byte[] image = getImage(imageDir, id, path);
+            byte[] image = getImage(imageDir, entity.getId(), path);
             images.add(new ImageResponseDto(path.getId(), image, path.getContentType()));
         }
 

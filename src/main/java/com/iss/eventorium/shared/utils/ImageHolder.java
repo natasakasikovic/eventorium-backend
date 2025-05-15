@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ImageHolder {
     List<ImagePath> getImagePaths();
+    Long getId();
 }

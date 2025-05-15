@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -42,6 +43,12 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/images")
+    public ResponseEntity<Void> deleteImages(@PathVariable("id") Long id, @RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.deleteImages(id, removedImages);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/top-five-products")

@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
@@ -23,6 +24,11 @@ import java.util.List;
 public class ServiceController {
 
     private final ServiceService service;
+
+    @GetMapping("/top-five-services")
+    public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
+        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceSummaryResponseDto>> getAllServices() {
@@ -112,9 +118,10 @@ public class ServiceController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/top-five-services")
-    public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
-        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
+    @DeleteMapping("/{id}/images")
+    public ResponseEntity<Void> deleteImages(@PathVariable("id") Long id, @RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.deleteImages(id, removedImages);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

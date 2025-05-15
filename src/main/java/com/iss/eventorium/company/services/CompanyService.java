@@ -71,7 +71,7 @@ public class CompanyService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, find(id));
+        return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
     public byte[] getImage(Long id, ImagePath path) {
@@ -97,12 +97,16 @@ public class CompanyService {
         repository.save(company);
     }
 
-    public void removeImages(List<RemoveImageRequestDto> removedImages) {
+    public void deleteImages(List<RemoveImageRequestDto> removedImages) {
         User provider = authService.getCurrentUser();
         Company company = repository.getCompanyByProviderId(provider.getId());
         company.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
         repository.save(company);
+    }
+
+    public Company getByProviderId(Long id) {
+        return repository.getCompanyByProviderId(id);
     }
 }

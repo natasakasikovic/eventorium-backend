@@ -8,6 +8,7 @@ import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +56,9 @@ public class EventTypeService {
         EventType eventType = find(id);
         eventType.setDeleted(true);
         repository.save(eventType);
+    }
+
+    public List<EventType> findAllById(List<Long> eventTypesIds) {
+        return repository.findAllById(eventTypesIds);
     }
 }

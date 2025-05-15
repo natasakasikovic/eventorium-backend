@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -92,7 +93,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, find(id));
+        return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
     public ImagePath getImagePath(Long id) {
@@ -143,6 +144,13 @@ public class ProductService {
             product.getImagePaths().addAll(paths);
             repository.save(product);
         }
+    }
+
+    public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
+        Product product = find(id);
+        product.getImagePaths().removeIf(image ->
+                removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
+        );
     }
 
 }
