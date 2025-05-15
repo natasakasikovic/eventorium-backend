@@ -101,14 +101,7 @@ public class ServiceService {
 
     public ServiceResponseDto createService(CreateServiceRequestDto createServiceRequestDto) {
         Service service = mapper.fromCreateRequest(createServiceRequestDto);
-        if(service.getCategory().getId() == null) {
-            service.setStatus(Status.PENDING);
-            categoryProposalService.handleCategoryProposal(service.getCategory());
-        } else {
-            service.setStatus(Status.ACCEPTED);
-            Category category = entityManager.getReference(Category.class, service.getCategory().getId());
-            service.setCategory(category);
-        }
+        handleCategoryAndStatus(service);
         service.setProvider(authService.getCurrentUser());
 
         historyService.addServiceMemento(service);
@@ -192,5 +185,16 @@ public class ServiceService {
         service.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
+    }
+
+    private void handleCategoryAndStatus(Service service) {
+        if(service.getCategory().getId() == null) {
+            service.setStatus(Status.PENDING);
+            categoryProposalService.handleCategoryProposal(service.getCategory());
+        } else {
+            service.setStatus(Status.ACCEPTED);
+            Category category = entityManager.getReference(Category.class, service.getCategory().getId());
+            service.setCategory(category);
+        }
     }
 }

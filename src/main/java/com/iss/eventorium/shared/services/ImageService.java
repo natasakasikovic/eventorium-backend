@@ -5,7 +5,6 @@ import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageHolder;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@Slf4j
 public class ImageService {
 
     @Value("${image-path}")
@@ -44,7 +42,6 @@ public class ImageService {
         }
     }
 
-    // FIXME: content type can be null?
     public String getImageContentType(String uploadDir, String fileName) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         Path filePath = uploadPath.resolve(fileName);
@@ -54,10 +51,10 @@ public class ImageService {
     public List<ImageResponseDto> getImages(String imageDir, ImageHolder entity) {
         List<ImageResponseDto> images = new ArrayList<>();
 
-        for (ImagePath path : entity.getImagePaths()) {
+        entity.getImagePaths().forEach(path -> {
             byte[] image = getImage(imageDir, entity.getId(), path);
             images.add(new ImageResponseDto(path.getId(), image, path.getContentType()));
-        }
+        });
 
         return images;
     }
@@ -69,7 +66,7 @@ public class ImageService {
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to load image");
+            throw new ImageNotFoundException("Failed to load image");
         }
     }
 
