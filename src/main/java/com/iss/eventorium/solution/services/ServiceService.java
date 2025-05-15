@@ -26,21 +26,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -61,9 +53,6 @@ public class ServiceService {
     
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Value("${image-path}")
-    private String imagePath;
 
     private static final String IMG_DIR_NAME = "services";
 
@@ -126,32 +115,20 @@ public class ServiceService {
         return mapper.toResponse(service);
     }
 
-    public void uploadImages(Long serviceId, List<MultipartFile> images) {
-        if (images == null || images.isEmpty())
-            return;
+    public void uploadImages(Long id, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) return;
 
-        Service service = find(serviceId);
-        List<ImagePath> paths = new ArrayList<>();
+        Service service = find(id);
+        List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, id, images);
 
-        for (MultipartFile image : images) {
-            String name = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
-            String fileName = Instant.now().toEpochMilli() + "_" + name;
-            String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
-
-            try {
-                imageService.uploadImage(uploadDir, fileName, image);
-                String contentType = imageService.getImageContentType(uploadDir, fileName);
-                paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
-            } catch (IOException e) {
-                log.error("Failed to upload image {}: {}", fileName, e.getMessage(), e);
-            }
+        if (!paths.isEmpty()) {
+            service.getImagePaths().addAll(paths);
+            repository.save(service);
         }
-        service.getImagePaths().addAll(paths);
-        repository.save(service);
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, this::find);
+        return imageService.getImages(IMG_DIR_NAME, id, find(id));
     }
 
     // TODO: refactor method below to use specification

@@ -6,8 +6,6 @@ import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
-import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
-import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.services.ImageService;
@@ -17,18 +15,10 @@ import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -43,9 +33,6 @@ public class CompanyService {
     private final CompanyMapper mapper;
     private final CityMapper cityMapper;
 
-    @Value("${image-path}")
-    private String imagePath;
-
     private static final String IMG_DIR_NAME = "companies";
 
     public CompanyResponseDto createCompany(CompanyRequestDto companyRequestDto) {
@@ -57,12 +44,10 @@ public class CompanyService {
     }
 
     public void uploadImages(Long id, List<MultipartFile> images) {
-        if (images == null || images.isEmpty()) {
-            return;
-        }
+        if (images == null || images.isEmpty()) return;
 
         Company company = find(id);
-        List<ImagePath> paths = processImages(id, images);
+        List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, id, images);
 
         if (!paths.isEmpty()) {
             company.getImagePaths().addAll(paths);
@@ -72,33 +57,6 @@ public class CompanyService {
 
     private Company find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Company not found."));
-    }
-
-    private List<ImagePath> processImages(Long companyId, List<MultipartFile> images) {
-        List<ImagePath> paths = new ArrayList<>();
-        String uploadDir = StringUtils.cleanPath(imagePath + "companies/" + companyId + "/");
-
-        for (MultipartFile image : images) {
-            try {
-                ImagePath path = saveImage(uploadDir, image);
-                if (path != null) {
-                    paths.add(path);
-                }
-            } catch (IOException e) {
-                throw new ImageUploadException("Error while uploading images");
-            }
-        }
-        return paths;
-    }
-
-    private ImagePath saveImage(String uploadDir, MultipartFile image) throws IOException {
-        String name = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
-        String fileName = Instant.now().toEpochMilli() + "_" + name;
-
-        imageService.uploadImage(uploadDir, fileName, image);
-        String contentType = imageService.getImageContentType(uploadDir, fileName);
-
-        return ImagePath.builder().path(fileName).contentType(contentType).build();
     }
 
     public ProviderCompanyDto getCompany() {
@@ -113,7 +71,7 @@ public class CompanyService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, this::find);
+        return imageService.getImages(IMG_DIR_NAME, id, find(id));
     }
 
     public byte[] getImage(Long id, ImagePath path) {

@@ -5,7 +5,6 @@ import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
-import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
@@ -20,21 +19,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -50,9 +41,6 @@ public class ProductService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-    @Value("${image-path}")
-    private String imagePath;
 
     private static final String IMG_DIR_NAME = "products";
 
@@ -104,7 +92,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        return imageService.getImages(IMG_DIR_NAME, id, this::find);
+        return imageService.getImages(IMG_DIR_NAME, id, find(id));
     }
 
     public ImagePath getImagePath(Long id) {
@@ -149,40 +137,12 @@ public class ProductService {
         if (images.isEmpty()) return;
 
         Product product = find(productId);
-        List<ImagePath> uploadedPaths = processImages(productId, images);
+        List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, productId, images);
 
-        product.getImagePaths().addAll(uploadedPaths);
-        repository.save(product);
-    }
-
-    private List<ImagePath> processImages(Long productId, List<MultipartFile> images) {
-        List<ImagePath> paths = new ArrayList<>();
-        String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");
-
-        for (MultipartFile image : images) {
-            String fileName = generateFileName(image);
-            try {
-                imageService.uploadImage(uploadDir, fileName, image);
-                String contentType = imageService.getImageContentType(uploadDir, fileName);
-                paths.add(createImagePath(fileName, contentType));
-            } catch (IOException e) {
-                throw new ImageUploadException("Failed to upload image");
-            }
+        if (!paths.isEmpty()) {
+            product.getImagePaths().addAll(paths);
+            repository.save(product);
         }
-        return paths;
-    }
-
-    private String generateFileName(MultipartFile image) {
-        String originalName = Objects.requireNonNull(image.getOriginalFilename());
-        String cleanName = StringUtils.cleanPath(originalName);
-        return Instant.now().toEpochMilli() + "_" + cleanName;
-    }
-
-    private ImagePath createImagePath(String path, String contentType) {
-        return ImagePath.builder()
-                .path(path)
-                .contentType(contentType)
-                .build();
     }
 
 }

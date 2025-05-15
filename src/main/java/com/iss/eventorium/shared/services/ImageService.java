@@ -2,6 +2,7 @@ package com.iss.eventorium.shared.services;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
 
 @Service
+@Slf4j
 public class ImageService {
 
     @Value("${image-path}")
@@ -41,14 +44,14 @@ public class ImageService {
         }
     }
 
+    // FIXME: content type can be null?
     public String getImageContentType(String uploadDir, String fileName) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         Path filePath = uploadPath.resolve(fileName);
         return Files.probeContentType(filePath);
     }
 
-    public List<ImageResponseDto> getImages(String imageDir, Long id, Function<Long, ? extends ImageHolder> entityFetcher) {
-        ImageHolder entity = entityFetcher.apply(id);
+    public List<ImageResponseDto> getImages(String imageDir, Long id, ImageHolder entity) {
         List<ImageResponseDto> images = new ArrayList<>();
 
         for (ImagePath path : entity.getImagePaths()) {
@@ -68,5 +71,33 @@ public class ImageService {
         } catch (IOException e) {
             throw new ImageNotFoundException("Fail to load image");
         }
+    }
+
+    public List<ImagePath> uploadImages(String imageDir, Long id, List<MultipartFile> images) {
+        List<ImagePath> paths = new ArrayList<>();
+
+        images.forEach(image -> {
+            String uploadDir = StringUtils.cleanPath(imagePath + imageDir + "/" + id + "/");
+            try {
+                ImagePath path = saveImage(uploadDir, image);
+                if (path != null) {
+                    paths.add(path);
+                }
+            } catch (IOException e) {
+                throw new ImageUploadException("Error while uploading images");
+            }
+        });
+
+        return paths;
+    }
+
+    private ImagePath saveImage(String uploadDir, MultipartFile image) throws IOException {
+        String name = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+        String fileName = Instant.now().toEpochMilli() + "_" + name;
+
+        uploadImage(uploadDir, fileName, image);
+        String contentType = getImageContentType(uploadDir, fileName);
+
+        return ImagePath.builder().path(fileName).contentType(contentType).build();
     }
 }
