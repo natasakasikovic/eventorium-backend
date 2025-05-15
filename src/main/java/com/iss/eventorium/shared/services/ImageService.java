@@ -1,7 +1,9 @@
 package com.iss.eventorium.shared.services;
 
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.shared.utils.ImageHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 @Service
-@Slf4j
 public class ImageService {
 
     @Value("${image-path}")
@@ -43,8 +47,20 @@ public class ImageService {
         return Files.probeContentType(filePath);
     }
 
-    public byte[] getImage(String type, Long id, ImagePath path) {
-        String uploadDir = StringUtils.cleanPath(imagePath + type + "/" + id + "/");
+    public List<ImageResponseDto> getImages(String imageDir, Long id, Function<Long, ? extends ImageHolder> entityFetcher) {
+        ImageHolder entity = entityFetcher.apply(id);
+        List<ImageResponseDto> images = new ArrayList<>();
+
+        for (ImagePath path : entity.getImagePaths()) {
+            byte[] image = getImage(imageDir, id, path);
+            images.add(new ImageResponseDto(path.getId(), image, path.getContentType()));
+        }
+
+        return images;
+    }
+
+    public byte[] getImage(String imageDir, Long id, ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + imageDir + "/" + id + "/");
         File file = new File(uploadDir, path.getPath());
 
         try {

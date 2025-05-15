@@ -65,7 +65,7 @@ public class CompanyService {
         List<ImagePath> paths = processImages(id, images);
 
         if (!paths.isEmpty()) {
-            company.getPhotos().addAll(paths);
+            company.getImagePaths().addAll(paths);
             repository.save(company);
         }
     }
@@ -113,13 +113,7 @@ public class CompanyService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Company company = find(id);
-        List<ImageResponseDto> images = new ArrayList<>();
-        for (ImagePath path : company.getPhotos()) {
-            byte[] image = getImage(id, path);
-            images.add(new ImageResponseDto(path.getId(), image, path.getContentType()));
-        }
-        return images;
+        return imageService.getImages(IMG_DIR_NAME, id, this::find);
     }
 
     public byte[] getImage(Long id, ImagePath path) {
@@ -148,7 +142,7 @@ public class CompanyService {
     public void removeImages(List<RemoveImageRequestDto> removedImages) {
         User provider = authService.getCurrentUser();
         Company company = repository.getCompanyByProviderId(provider.getId());
-        company.getPhotos().removeIf(image ->
+        company.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
         repository.save(company);

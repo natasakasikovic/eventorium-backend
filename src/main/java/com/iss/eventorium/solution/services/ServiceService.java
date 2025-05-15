@@ -150,15 +150,8 @@ public class ServiceService {
         repository.save(service);
     }
 
-    public List<ImageResponseDto> getImages(Long serviceId) {
-        Service service = find(serviceId);
-
-        List<ImageResponseDto> images = new ArrayList<>();
-        for(ImagePath path : service.getImagePaths()) {
-            byte[] image = getImage(serviceId, path);
-            images.add(new ImageResponseDto(image, path.getContentType()));
-        }
-        return images;
+    public List<ImageResponseDto> getImages(Long id) {
+        return imageService.getImages(IMG_DIR_NAME, id, this::find);
     }
 
     // TODO: refactor method below to use specification

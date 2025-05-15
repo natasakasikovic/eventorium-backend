@@ -104,14 +104,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Product product = find(id);
-
-        List<ImageResponseDto> images = new ArrayList<>();
-        for(ImagePath path : product.getImagePaths()) {
-            byte[] image = getImage(id, path);
-            images.add(new ImageResponseDto(image, path.getContentType()));
-        }
-        return images;
+        return imageService.getImages(IMG_DIR_NAME, id, this::find);
     }
 
     public ImagePath getImagePath(Long id) {
@@ -164,7 +157,7 @@ public class ProductService {
 
     private List<ImagePath> processImages(Long productId, List<MultipartFile> images) {
         List<ImagePath> paths = new ArrayList<>();
-        String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");;
+        String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");
 
         for (MultipartFile image : images) {
             String fileName = generateFileName(image);

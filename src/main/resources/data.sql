@@ -60,7 +60,7 @@ VALUES
      'support@partysupplies.com',
      'Party Supplies Hub', '+15554567890', 4);
 
-insert into companies_photos (company_id, photos_id) values
+insert into companies_image_paths (company_id, image_paths_id) values
  (1, 18),
  (1, 19),
  (1, 20),
