@@ -9,7 +9,7 @@ import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -43,6 +43,7 @@ public class ProductService {
     private final ProductRepository repository;
     private final CompanyRepository companyRepository;
     private final AuthService authService;
+    private final ImageService imageService;
     private final CategoryProposalService categoryProposalService;
 
     private final ProductMapper mapper;
@@ -52,6 +53,8 @@ public class ProductService {
 
     @Value("${image-path}")
     private String imagePath;
+
+    private static final String IMG_DIR_NAME = "products";
 
     // TODO: refactor method to use specification
     public List<ProductSummaryResponseDto> getTopProducts(){
@@ -120,14 +123,8 @@ public class ProductService {
         return product.getImagePaths().get(0);
     }
 
-    public byte[] getImage(Long productId, ImagePath path) {
-        String uploadDir = getUploadDirectory(productId);
-        try {
-            File file = new File(uploadDir + path.getPath());
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to load image");
-        }
+    public byte[] getImage(Long id, ImagePath path) {
+        return imageService.getImage(IMG_DIR_NAME, id, path);
     }
 
     public Product find(Long id) {
@@ -167,23 +164,19 @@ public class ProductService {
 
     private List<ImagePath> processImages(Long productId, List<MultipartFile> images) {
         List<ImagePath> paths = new ArrayList<>();
-        String uploadDir = getUploadDirectory(productId);
+        String uploadDir = StringUtils.cleanPath(imagePath + "products/" + productId + "/");;
 
         for (MultipartFile image : images) {
             String fileName = generateFileName(image);
             try {
-                ImageUpload.saveImage(uploadDir, fileName, image);
-                String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+                imageService.uploadImage(uploadDir, fileName, image);
+                String contentType = imageService.getImageContentType(uploadDir, fileName);
                 paths.add(createImagePath(fileName, contentType));
             } catch (IOException e) {
                 throw new ImageUploadException("Failed to upload image");
             }
         }
         return paths;
-    }
-
-    private String getUploadDirectory(Long productId) {
-        return StringUtils.cleanPath(imagePath + "products/" + productId + "/");
     }
 
     private String generateFileName(MultipartFile image) {

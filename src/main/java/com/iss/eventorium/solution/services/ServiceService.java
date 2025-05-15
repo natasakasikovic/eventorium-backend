@@ -11,7 +11,7 @@ import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
@@ -55,6 +55,7 @@ public class ServiceService {
     private final ReservationRepository reservationRepository;
     private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
+    private final ImageService imageService;
 
     private final ServiceMapper mapper;
     
@@ -63,6 +64,8 @@ public class ServiceService {
 
     @Value("${image-path}")
     private String imagePath;
+
+    private static final String IMG_DIR_NAME = "services";
 
     // TODO: refactor method below to use specification
     public List<ServiceSummaryResponseDto> getTopServices(){
@@ -136,8 +139,8 @@ public class ServiceService {
             String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
 
             try {
-                ImageUpload.saveImage(uploadDir, fileName, image);
-                String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+                imageService.uploadImage(uploadDir, fileName, image);
+                String contentType = imageService.getImageContentType(uploadDir, fileName);
                 paths.add(ImagePath.builder().path(fileName).contentType(contentType).build());
             } catch (IOException e) {
                 log.error("Failed to upload image {}: {}", fileName, e.getMessage(), e);
@@ -183,14 +186,8 @@ public class ServiceService {
         return service.getImagePaths().get(0);
     }
 
-    public byte[] getImage(Long serviceId, ImagePath path) {
-        String uploadDir = StringUtils.cleanPath(imagePath + "services/" + serviceId + "/");
-        try {
-            File file = new File(uploadDir + path.getPath());
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to load image");
-        }
+    public byte[] getImage(Long id, ImagePath path) {
+        return imageService.getImage(IMG_DIR_NAME, id, path);
     }
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto request) {

@@ -10,7 +10,7 @@ import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AccountActivationService;
 import com.iss.eventorium.user.services.AuthService;
@@ -38,12 +38,15 @@ public class CompanyService {
     private final AccountActivationService accountActivationService;
     private final UserService userService;
     private final AuthService authService;
+    private final ImageService imageService;
 
     private final CompanyMapper mapper;
     private final CityMapper cityMapper;
 
     @Value("${image-path}")
     private String imagePath;
+
+    private static final String IMG_DIR_NAME = "companies";
 
     public CompanyResponseDto createCompany(CompanyRequestDto companyRequestDto) {
         Company company = mapper.fromRequest(companyRequestDto);
@@ -92,8 +95,8 @@ public class CompanyService {
         String name = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
         String fileName = Instant.now().toEpochMilli() + "_" + name;
 
-        ImageUpload.saveImage(uploadDir, fileName, image);
-        String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+        imageService.uploadImage(uploadDir, fileName, image);
+        String contentType = imageService.getImageContentType(uploadDir, fileName);
 
         return ImagePath.builder().path(fileName).contentType(contentType).build();
     }
@@ -120,14 +123,7 @@ public class CompanyService {
     }
 
     public byte[] getImage(Long id, ImagePath path) {
-        String uploadDir = StringUtils.cleanPath(imagePath + "companies/" + id + "/");
-        File file = new File(uploadDir, path.getPath());
-
-        try {
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to load image");
-        }
+        return imageService.getImage(IMG_DIR_NAME, id, path);
     }
 
     public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
