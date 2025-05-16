@@ -151,6 +151,7 @@ public class ProductService {
         product.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
+        repository.save(product);
     }
 
 }

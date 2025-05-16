@@ -86,6 +86,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/services/filter/all").permitAll()
                         .requestMatchers("/api/v1/services/search/all").permitAll()
                         .requestMatchers("/api/v1/services/suggestions").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/services/{id}/images").hasAuthority(PROVIDER)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/services/{id}/images").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/services/{id}/*").permitAll()
 
                         // Products

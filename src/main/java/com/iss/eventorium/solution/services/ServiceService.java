@@ -185,6 +185,7 @@ public class ServiceService {
         service.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
+        repository.save(service);
     }
 
     private void handleCategoryAndStatus(Service service) {
