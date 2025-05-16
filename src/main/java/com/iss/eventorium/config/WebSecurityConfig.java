@@ -205,6 +205,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/{id}/profile-photo").permitAll()
                         .requestMatchers("/api/v1/budget-items").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/provider-reservations").hasAuthority(PROVIDER)
+                        .requestMatchers("/api/v1/reservations/pending").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations/{id}").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
