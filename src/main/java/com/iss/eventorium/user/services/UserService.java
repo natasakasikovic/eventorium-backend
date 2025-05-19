@@ -4,7 +4,7 @@ import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
@@ -52,6 +52,7 @@ public class UserService {
     private final PersonMapper personMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AccountDeactivationValidator validator;
+    private final ImageService imageService;
 
     private final UserMapper mapper;
 
@@ -131,7 +132,7 @@ public class UserService {
         String uploadDir = getUploadDirectory();
 
         try {
-            ImageUpload.saveImage(uploadDir, fileName, photo);
+            imageService.uploadImage(uploadDir, fileName, photo);
             saveProfilePhoto(user, uploadDir, fileName);
         } catch (IOException e) {
             throw new ImageUploadException("Failed to save profile photo.");
@@ -212,7 +213,7 @@ public class UserService {
     }
 
     private void saveProfilePhoto(User user, String uploadDir, String fileName) throws IOException {
-        String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+        String contentType = imageService.getImageContentType(uploadDir, fileName);
         ImagePath path = ImagePath.builder().path(fileName).contentType(contentType).build();
         user.getPerson().setProfilePhoto(path);
         repository.save(user);

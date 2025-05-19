@@ -2,6 +2,7 @@ package com.iss.eventorium.company.models;
 
 import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "companies")
-public class Company {
+public class Company implements ImageHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +44,7 @@ public class Company {
     private String email;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<ImagePath> photos;
+    private List<ImagePath> imagePaths;
 
     @Column(nullable = false)
     private LocalTime openingHours;

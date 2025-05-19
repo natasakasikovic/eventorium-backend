@@ -4,12 +4,12 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
-import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -20,21 +20,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +35,7 @@ public class ProductService {
     private final ProductRepository repository;
     private final CompanyRepository companyRepository;
     private final AuthService authService;
+    private final ImageService imageService;
     private final CategoryProposalService categoryProposalService;
 
     private final ProductMapper mapper;
@@ -50,8 +43,7 @@ public class ProductService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Value("${image-path}")
-    private String imagePath;
+    private static final String IMG_DIR_NAME = "products";
 
     // TODO: refactor method to use specification
     public List<ProductSummaryResponseDto> getTopProducts(){
@@ -101,14 +93,7 @@ public class ProductService {
     }
 
     public List<ImageResponseDto> getImages(Long id) {
-        Product product = find(id);
-
-        List<ImageResponseDto> images = new ArrayList<>();
-        for(ImagePath path : product.getImagePaths()) {
-            byte[] image = getImage(id, path);
-            images.add(new ImageResponseDto(image, path.getContentType()));
-        }
-        return images;
+        return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
     public ImagePath getImagePath(Long id) {
@@ -120,14 +105,8 @@ public class ProductService {
         return product.getImagePaths().get(0);
     }
 
-    public byte[] getImage(Long productId, ImagePath path) {
-        String uploadDir = getUploadDirectory(productId);
-        try {
-            File file = new File(uploadDir + path.getPath());
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to load image");
-        }
+    public byte[] getImage(Long id, ImagePath path) {
+        return imageService.getImage(IMG_DIR_NAME, id, path);
     }
 
     public Product find(Long id) {
@@ -159,44 +138,20 @@ public class ProductService {
         if (images.isEmpty()) return;
 
         Product product = find(productId);
-        List<ImagePath> uploadedPaths = processImages(productId, images);
+        List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, productId, images);
 
-        product.getImagePaths().addAll(uploadedPaths);
-        repository.save(product);
-    }
-
-    private List<ImagePath> processImages(Long productId, List<MultipartFile> images) {
-        List<ImagePath> paths = new ArrayList<>();
-        String uploadDir = getUploadDirectory(productId);
-
-        for (MultipartFile image : images) {
-            String fileName = generateFileName(image);
-            try {
-                ImageUpload.saveImage(uploadDir, fileName, image);
-                String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
-                paths.add(createImagePath(fileName, contentType));
-            } catch (IOException e) {
-                throw new ImageUploadException("Failed to upload image");
-            }
+        if (!paths.isEmpty()) {
+            product.getImagePaths().addAll(paths);
+            repository.save(product);
         }
-        return paths;
     }
 
-    private String getUploadDirectory(Long productId) {
-        return StringUtils.cleanPath(imagePath + "products/" + productId + "/");
-    }
-
-    private String generateFileName(MultipartFile image) {
-        String originalName = Objects.requireNonNull(image.getOriginalFilename());
-        String cleanName = StringUtils.cleanPath(originalName);
-        return Instant.now().toEpochMilli() + "_" + cleanName;
-    }
-
-    private ImagePath createImagePath(String path, String contentType) {
-        return ImagePath.builder()
-                .path(path)
-                .contentType(contentType)
-                .build();
+    public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
+        Product product = find(id);
+        product.getImagePaths().removeIf(image ->
+                removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
+        );
+        repository.save(product);
     }
 
 }

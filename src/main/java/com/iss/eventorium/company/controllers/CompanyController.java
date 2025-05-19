@@ -59,8 +59,8 @@ public class CompanyController {
     }
 
     @DeleteMapping("/images")
-    public ResponseEntity<Void> removeImages(@RequestBody List<RemoveImageRequestDto> removedImages) {
-        service.removeImages(removedImages);
+    public ResponseEntity<Void> deleteImages(@RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.deleteImages(removedImages);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
