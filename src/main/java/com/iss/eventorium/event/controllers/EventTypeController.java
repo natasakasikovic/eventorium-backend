@@ -51,7 +51,7 @@ public class EventTypeController {
     }
 
     @PutMapping("/{id}/image")
-    public ResponseEntity<byte[]> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<byte[]> updateImage(@PathVariable Long id, @RequestParam("image") MultipartFile file) {
         service.uploadImage(id, file);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
