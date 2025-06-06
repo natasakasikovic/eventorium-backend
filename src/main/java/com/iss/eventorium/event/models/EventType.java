@@ -33,7 +33,7 @@ public class EventType {
     @ManyToMany
     private List<Category> suggestedCategories;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.PERSIST)
     private ImagePath image;
 
     @Override

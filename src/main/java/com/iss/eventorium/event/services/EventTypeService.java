@@ -57,8 +57,8 @@ public class EventTypeService {
                                     .map(category -> categoryService.find(category.getId()))
                                     .toList();
         eventType.setSuggestedCategories(categories);
-
-        return mapper.toResponse(repository.save(eventType));
+        repository.save(eventType);
+        return mapper.toResponse(eventType);
     }
 
     public void uploadImage(Long id, MultipartFile image) {

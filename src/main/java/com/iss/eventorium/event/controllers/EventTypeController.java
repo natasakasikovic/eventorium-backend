@@ -52,7 +52,8 @@ public class EventTypeController {
 
     @PutMapping("/{id}/image")
     public ResponseEntity<byte[]> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return null;
+        service.uploadImage(id, file);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping("/{id}")
@@ -64,10 +65,5 @@ public class EventTypeController {
     public ResponseEntity<Void> deleteEventType(@PathVariable Long id) {
         service.deleteEventType(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{id}/image")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
-        return null;
     }
 }

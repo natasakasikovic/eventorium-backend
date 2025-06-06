@@ -149,6 +149,7 @@ public class WebSecurityConfig {
 
                         // Event types
                         .requestMatchers("/api/v1/event-types/all").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/event-types/{id}/image").permitAll()
                         .requestMatchers("/api/v1/event-types").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/event-types/*").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/event-types/**").hasAuthority(ADMIN)
