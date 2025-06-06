@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 public class EventSummaryResponseDto {
     private Long id;
+    private Long imageId;
     private String name;
     private String city;
 }
