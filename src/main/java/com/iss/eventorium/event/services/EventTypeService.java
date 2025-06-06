@@ -7,9 +7,11 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.services.ImageService;
+import com.iss.eventorium.user.models.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,7 +62,7 @@ public class EventTypeService {
     }
 
     public void uploadImage(Long id, MultipartFile image) {
-        if (image == null || !image.isEmpty()) return;
+        if (image == null || image.isEmpty()) return;
 
         EventType eventType = find(id);
         String fileName = imageService.generateFileName(image);
@@ -71,6 +73,18 @@ public class EventTypeService {
         catch (IOException e) {
             throw new ImageUploadException("Failed to save profile photo.");
         }
+    }
+
+    public ImagePath getImagePath(long id) {
+        EventType eventType = find(id);
+        if (eventType.getImage() == null)
+            throw new ImageNotFoundException("Profile photo not found.");
+
+        return eventType.getImage();
+    }
+
+    public byte[] getImage(ImagePath path) {
+        return imageService.getImage(IMG_DIR_NAME, path);
     }
 
     private void saveImage(EventType eventType, String fileName) throws IOException {

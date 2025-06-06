@@ -3,6 +3,7 @@ package com.iss.eventorium.event.controllers;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.services.EventTypeService;
+import com.iss.eventorium.shared.models.ImagePath;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,14 +37,17 @@ public class EventTypeController {
     }
 
     @PostMapping(path = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Void> uploadImage(@PathVariable Long id, @RequestParam("image") MultipartFile file) {
         service.uploadImage(id, file);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        return null;
+        ImagePath path = service.getImagePath(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(path.getContentType()))
+                .body(service.getImage(path));
     }
 
     @PutMapping("/{id}/image")

@@ -151,6 +151,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/event-types/all").permitAll()
                         .requestMatchers("/api/v1/event-types").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/event-types/*").hasAuthority(ADMIN)
+                        .requestMatchers("/api/v1/event-types/**").hasAuthority(ADMIN)
 
                         // Categories
                         .requestMatchers("/api/v1/categories/all").permitAll()
