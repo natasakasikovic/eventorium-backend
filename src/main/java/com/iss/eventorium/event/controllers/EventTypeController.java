@@ -6,8 +6,10 @@ import com.iss.eventorium.event.services.EventTypeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,6 +35,22 @@ public class EventTypeController {
         return new ResponseEntity<>(service.createEventType(requestDto), HttpStatus.CREATED);
     }
 
+    @PostMapping(path = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        service.uploadImage(id, file);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+        return null;
+    }
+
+    @PutMapping("/{id}/image")
+    public ResponseEntity<byte[]> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return null;
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<EventTypeResponseDto> updateEventType(@Valid @RequestBody EventTypeRequestDto requestDto, @PathVariable Long id) {
         return ResponseEntity.ok(service.updateEventType(id, requestDto));
@@ -42,5 +60,10 @@ public class EventTypeController {
     public ResponseEntity<Void> deleteEventType(@PathVariable Long id) {
         service.deleteEventType(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/image")
+    public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
+        return null;
     }
 }

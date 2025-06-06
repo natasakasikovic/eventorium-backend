@@ -7,11 +7,15 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
+import com.iss.eventorium.shared.exceptions.ImageUploadException;
+import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.shared.services.ImageService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -20,8 +24,11 @@ public class EventTypeService {
 
     private final EventTypeRepository repository;
     private final CategoryService categoryService;
+    private final ImageService imageService;
 
     private final EventTypeMapper mapper;
+
+    private static final String IMG_DIR_NAME = "eventTypes";
 
     public EventType find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event type not found"));
@@ -50,6 +57,27 @@ public class EventTypeService {
         eventType.setSuggestedCategories(categories);
 
         return mapper.toResponse(repository.save(eventType));
+    }
+
+    public void uploadImage(Long id, MultipartFile image) {
+        if (image == null || !image.isEmpty()) return;
+
+        EventType eventType = find(id);
+        String fileName = imageService.generateFileName(image);
+        try {
+            imageService.uploadImage(IMG_DIR_NAME, fileName, image);
+            saveImage(eventType, fileName);
+        }
+        catch (IOException e) {
+            throw new ImageUploadException("Failed to save profile photo.");
+        }
+    }
+
+    private void saveImage(EventType eventType, String fileName) throws IOException {
+        String contentType = imageService.getImageContentType(IMG_DIR_NAME, fileName);
+        ImagePath path = ImagePath.builder().path(fileName).contentType(contentType).build();
+        eventType.setImage(path);
+        repository.save(eventType);
     }
 
     public void deleteEventType(Long id) {

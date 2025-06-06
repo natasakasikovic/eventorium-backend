@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.shared.models.ImagePath;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class EventType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -31,6 +32,9 @@ public class EventType {
 
     @ManyToMany
     private List<Category> suggestedCategories;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private ImagePath image;
 
     @Override
     public String toString() {
