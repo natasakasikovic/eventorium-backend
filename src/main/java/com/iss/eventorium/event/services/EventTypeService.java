@@ -72,14 +72,14 @@ public class EventTypeService {
             saveImage(eventType, fileName);
         }
         catch (IOException e) {
-            throw new ImageUploadException("Failed to save profile photo.");
+            throw new ImageUploadException("Failed to save image.");
         }
     }
 
     public ImagePath getImagePath(long id) {
         EventType eventType = find(id);
         if (eventType.getImage() == null)
-            throw new ImageNotFoundException("Profile photo not found.");
+            throw new ImageNotFoundException("Image not found.");
 
         return eventType.getImage();
     }
