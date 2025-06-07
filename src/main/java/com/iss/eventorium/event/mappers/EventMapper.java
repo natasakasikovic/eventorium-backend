@@ -21,7 +21,7 @@ public class EventMapper {
     private final UserMapper userMapper;
 
     public EventSummaryResponseDto toSummaryResponse(Event event) {
-        return new EventSummaryResponseDto(event.getId(), event.getName(), event.getCity().getName());
+        return new EventSummaryResponseDto(event.getId(), event.getType().getId(), event.getName(), event.getCity().getName());
     }
 
     public PagedResponse<EventSummaryResponseDto> toPagedResponse(Page<Event> page) {

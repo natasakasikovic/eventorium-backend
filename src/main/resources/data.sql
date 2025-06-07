@@ -32,7 +32,10 @@ INSERT INTO images (content_type, path) VALUES
     ('image/png', 'event_planned_by_us.png'), --20
     ('image/png', 'logo.png'), --21
     ('image/png', 'bday_decoration.png'), --22
-    ('image/png', 'decorated_by_us.png'); --23
+    ('image/png', 'decorated_by_us.png'), --23
+    ('image/jpg', 'wed.jpg'), --24
+    ('image/jpg', 'corporate-event-planning.jpg'), --25
+    ('image/jpg', 'birthday.jpg'); --25
 
 
 INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id, deactivated) VALUES
@@ -82,14 +85,13 @@ INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Marketing', 'Promotions and event advertising',   false, false);
 
 
-INSERT INTO event_types (name, description, deleted) VALUES
-('Wedding', 'Event type for organizing weddings', false),
-('Corporate Event', 'Event type for organizing corporate events', false),
-('Birthday Party', 'Event type for organizing birthdays', false);
+INSERT INTO event_types (name, description, deleted, image_id) VALUES
+('Wedding', 'Event type for organizing weddings', false, 24),
+('Corporate Event', 'Event type for organizing corporate events', false, 25),
+('Birthday Party', 'Event type for organizing birthdays', false, 26);
 
 
 INSERT INTO event_types_suggested_categories VALUES (1, 2),(1, 4),(1,9),(1,7),(2,1),(3,2),(3,4),(3, 7);
-
 
 INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
 (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),

@@ -29,7 +29,7 @@ public class ImageService {
     private String imagePath;
 
     public void uploadImage(String uploadDir, String fileName, MultipartFile multipartFile) throws IOException {
-        Path uploadPath = Paths.get(uploadDir);
+        Path uploadPath = Paths.get(StringUtils.cleanPath(imagePath + uploadDir));
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -40,6 +40,11 @@ public class ImageService {
         } catch (IOException e) {
             throw new IOException("Could not upload image file: " + fileName, e);
         }
+    }
+
+    public String generateFileName(MultipartFile photo) {
+        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
+        return Instant.now().toEpochMilli() + "_" + originalFileName;
     }
 
     public String getImageContentType(String uploadDir, String fileName) throws IOException {
@@ -57,6 +62,17 @@ public class ImageService {
         });
 
         return images;
+    }
+
+    public byte[] getImage(String imageDir, ImagePath path) {
+        String uploadDir = StringUtils.cleanPath(imagePath + imageDir + "/");
+        File file = new File(uploadDir, path.getPath());
+
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new ImageNotFoundException("Failed to load image");
+        }
     }
 
     public byte[] getImage(String imageDir, Long id, ImagePath path) {
