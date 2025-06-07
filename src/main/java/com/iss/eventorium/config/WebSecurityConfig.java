@@ -192,6 +192,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/account/products/favourites/{id}").authenticated()
 
                         // Interactions
+                        .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
                         .requestMatchers("/api/v1/comments/**").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/messages/**").authenticated()
                         .requestMatchers("/api/v1/chat-rooms").authenticated()
