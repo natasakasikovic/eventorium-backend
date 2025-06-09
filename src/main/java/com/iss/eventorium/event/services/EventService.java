@@ -132,7 +132,8 @@ public class EventService {
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
         event.setMaxParticipants(request.getMaxParticipants());
-        event.setType(eventTypeMapper.fromResponse(request.getEventType()));
+        if (request.getEventType() == null) event.setType(null);
+        else event.setType(eventTypeMapper.fromResponse(request.getEventType()));
         event.setCity(cityMapper.fromRequest(request.getCity()));
         event.setAddress(request.getAddress());
 
@@ -145,10 +146,17 @@ public class EventService {
                 !Objects.equals(event.getDescription(), request.getDescription()) ||
                 !Objects.equals(event.getDate(), request.getDate()) ||
                 !Objects.equals(event.getMaxParticipants(), request.getMaxParticipants()) ||
-                !Objects.equals(event.getType().getId(), request.getEventType().getId()) ||
-                !Objects.equals(event.getCity().getId(), request.getCity().getId()) ||
+                !Objects.equals(
+                        event.getType() != null ? event.getType().getId() : null,
+                        request.getEventType() != null ? request.getEventType().getId() : null
+                ) ||
+                !Objects.equals(
+                        event.getCity() != null ? event.getCity().getId() : null,
+                        request.getCity() != null ? request.getCity().getId() : null
+                ) ||
                 !Objects.equals(event.getAddress(), request.getAddress());
     }
+
 
     private void notifyGuestsAboutChanges(Event event) {
         List<User> guests = userService.findByEventAttendance(event.getId());
