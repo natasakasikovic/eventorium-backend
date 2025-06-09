@@ -20,6 +20,10 @@ public class CommentSpecification {
                 .and(hasStatus(Status.ACCEPTED));
     }
 
+    public static Specification<Comment> filterPendingComments() {
+        return Specification.where(hasStatus(Status.PENDING));
+    }
+
     private static Specification<Comment> hasObjectId(Long objectId) {
         return (root, query, cb) -> objectId == null
                 ? cb.conjunction()

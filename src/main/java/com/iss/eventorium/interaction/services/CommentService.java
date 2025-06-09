@@ -19,6 +19,8 @@ import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,31 +42,23 @@ public class CommentService {
 
     private final MessageSource messageSource;
 
-    public CommentResponseDto addComment(Long objectId, CommentType type, CreateCommentRequestDto request) {
-        Comment comment = mapper.fromRequest(request, type, objectId);
+    public CommentResponseDto createComment(CreateCommentRequestDto request) {
+        Comment comment = mapper.fromRequest(request);
         comment.setAuthor(authService.getCurrentUser());
+        repository.save(comment);
         return mapper.toResponse(comment, getDisplayName(comment));
     }
 
     public List<CommentResponseDto> getPendingComments() {
-        List<Comment> comments = repository.findByStatusOrderByCreationDateDesc(Status.PENDING);
+        Specification<Comment> specification = CommentSpecification.filterPendingComments();
+        List<Comment> comments = repository.findAll(specification, Sort.by(Sort.Direction.DESC, "creationDate"));
         return comments.stream().map(comment -> mapper.toResponse(comment, getDisplayName(comment))).toList();
     }
 
     public List<CommentResponseDto> getAcceptedCommentsForTarget(CommentType type, Long objectId) {
-        List<Comment> comments = repository.findAll(CommentSpecification.filterBy(type, objectId, authService.getCurrentUser()));
+        Specification<Comment> specification = CommentSpecification.filterBy(type, objectId, authService.getCurrentUser());
+        List<Comment> comments = repository.findAll(specification, Sort.by(Sort.Direction.DESC, "creationDate"));
         return comments.stream().map(comment -> mapper.toResponse(comment, getDisplayName(comment))).toList();
-    }
-
-    public String getDisplayName(Comment comment) { // display name is name of obj that needs to be shown in table
-        Long objectId = comment.getObjectId();
-        CommentType type = comment.getCommentType();
-
-        return switch (type) {
-            case PRODUCT -> productService.find(objectId).getName();
-            case SERVICE -> serviceService.find(objectId).getName();
-            case EVENT -> eventService.find(objectId).getName();
-        };
     }
 
     public Comment find(Long id) {
@@ -97,5 +91,16 @@ public class CommentService {
                 new Object[] { person, displayName },
                 Locale.getDefault()
         );
+    }
+
+    private String getDisplayName(Comment comment) { // display name is name of obj that needs to be shown in table
+        Long objectId = comment.getObjectId();
+        CommentType type = comment.getCommentType();
+
+        return switch (type) {
+            case PRODUCT -> productService.find(objectId).getName();
+            case SERVICE -> serviceService.find(objectId).getName();
+            case EVENT -> eventService.find(objectId).getName();
+        };
     }
 }

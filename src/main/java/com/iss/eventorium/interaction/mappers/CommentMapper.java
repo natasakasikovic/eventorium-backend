@@ -16,11 +16,8 @@ public class CommentMapper {
     private final ModelMapper modelMapper;
     private final UserMapper userMapper;
 
-    public Comment fromRequest(CreateCommentRequestDto request, CommentType type, Long objectId) {
-        Comment comment = modelMapper.map(request, Comment.class);
-        comment.setCommentType(type);
-        comment.setObjectId(objectId);
-        return comment;
+    public Comment fromRequest(CreateCommentRequestDto request) {
+        return modelMapper.map(request, Comment.class);
     }
 
     public CommentResponseDto toResponse(Comment comment, String displayName) {
