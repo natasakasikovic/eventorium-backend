@@ -7,6 +7,7 @@ import com.iss.eventorium.interaction.mappers.CommentMapper;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.CommentType;
 import com.iss.eventorium.interaction.repositories.CommentRepository;
+import com.iss.eventorium.interaction.specifications.CommentSpecification;
 import com.iss.eventorium.notifications.models.Notification;
 import com.iss.eventorium.notifications.models.NotificationType;
 import com.iss.eventorium.notifications.services.NotificationService;
@@ -50,8 +51,8 @@ public class CommentService {
         return comments.stream().map(comment -> mapper.toResponse(comment, getDisplayName(comment))).toList();
     }
 
-    public List<CommentResponseDto> getAcceptedCommentsForTarget(CommentType type, Long objectId, Status status) {
-        List<Comment> comments = repository.findByCommentTypeAndObjectIdAndStatusOrderByCreationDateDesc(type, objectId, status);
+    public List<CommentResponseDto> getAcceptedCommentsForTarget(CommentType type, Long objectId) {
+        List<Comment> comments = repository.findAll(CommentSpecification.filterBy(type, objectId, authService.getCurrentUser()));
         return comments.stream().map(comment -> mapper.toResponse(comment, getDisplayName(comment))).toList();
     }
 

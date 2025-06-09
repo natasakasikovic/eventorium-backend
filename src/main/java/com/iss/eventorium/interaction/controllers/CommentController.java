@@ -5,7 +5,6 @@ import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.dtos.comment.UpdateCommentRequestDto;
 import com.iss.eventorium.interaction.models.CommentType;
 import com.iss.eventorium.interaction.services.CommentService;
-import com.iss.eventorium.shared.models.Status;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,10 +28,9 @@ public class CommentController {
     @GetMapping("/comments")
     public ResponseEntity<List<CommentResponseDto>> getComments(
             @RequestParam("type") CommentType type,
-            @RequestParam("id") Long objectId,
-            @RequestParam(value = "status", defaultValue = "ACCEPTED") Status status) {
+            @RequestParam("id") Long objectId) {
 
-        List<CommentResponseDto> comments = service.getAcceptedCommentsForTarget(type, objectId, status);
+        List<CommentResponseDto> comments = service.getAcceptedCommentsForTarget(type, objectId);
         return ResponseEntity.ok(comments);
     }
 
