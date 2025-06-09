@@ -243,7 +243,7 @@ INSERT INTO invitations (email, event_id, hash) VALUES
 ('provider@gmail.com', 21, '3');
 
 -- Comments for events
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('What a beautiful wedding, I loved the decorations!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 1),
     ('The reception was elegant, and the food was amazing. Would love to attend again!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 1),
@@ -277,7 +277,7 @@ VALUES
     ('Everything was perfect, but it could have been more interactive.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 4);
 
 -- Comments for products
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('These custom invitations are so beautiful. Exactly what I was looking for!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'PRODUCT', 1),
     ('The quality of the invitations is outstanding! Highly recommend.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 1),
@@ -295,7 +295,7 @@ VALUES
     ('Loved the customization options. Everyone at the event was wearing them!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 5);
 
 -- Comments for services
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('The photographer was amazing! Caught all the special moments.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 9),
     ('The photos were incredible. Worth every penny!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 9),
@@ -314,7 +314,7 @@ VALUES
     ('The lighting setup was nice, but the bulbs burned out too soon.', CURRENT_TIMESTAMP, 'PENDING', 2, 'SERVICE', 13);
 
 -- Ratings for solutions
-INSERT INTO ratings (rating, user_id, creation_date, solution_id)
+INSERT INTO ratings (rating, rater_id, creation_date, solution_id)
 VALUES
     (5, 1, CURRENT_TIMESTAMP, 1),
     (4, 2, CURRENT_TIMESTAMP, 2),
@@ -331,7 +331,7 @@ VALUES
     (2, 4, CURRENT_TIMESTAMP, 1);
 
 -- Ratings for events
-INSERT INTO ratings (rating, user_id, creation_date, event_id)
+INSERT INTO ratings (rating, rater_id, creation_date, event_id)
 VALUES
     (5, 1, CURRENT_TIMESTAMP, 1),
     (4, 2, CURRENT_TIMESTAMP, 2),

@@ -20,7 +20,7 @@ public class SolutionMapper {
     public SolutionReviewResponseDto toReviewResponse(User user, Solution solution, SolutionType itemType) {
         SolutionReviewResponseDto dto = modelMapper.map(solution, SolutionReviewResponseDto.class);
         Rating solutionRating = solution.getRatings().stream()
-                .filter(rating -> rating.getUser().equals(user))
+                .filter(rating -> rating.getRater().equals(user))
                 .findFirst()
                 .orElse(null);
         dto.setRating(ratingMapper.toResponse(solutionRating));
