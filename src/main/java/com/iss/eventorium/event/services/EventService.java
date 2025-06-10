@@ -81,7 +81,7 @@ public class EventService {
         return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
     }
 
-    public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> searchEventsPaged(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
         return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
@@ -96,7 +96,12 @@ public class EventService {
         return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
+    public List<EventSummaryResponseDto> filterEvents(EventFilterDto filter) {
+        Specification<Event> specification = EventSpecification.filterBy(filter, authService.getCurrentUser());
+        return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<EventSummaryResponseDto> filterEventsPaged(EventFilterDto filter, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterBy(filter, authService.getCurrentUser());
         return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }

@@ -51,12 +51,17 @@ public class EventController {
 
     @GetMapping("/filter")
     public ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(@Valid @ModelAttribute EventFilterDto filter, Pageable pageable) {
-        return ResponseEntity.ok(service.filterEvents(filter, pageable));
+        return ResponseEntity.ok(service.filterEventsPaged(filter, pageable));
+    }
+
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<EventSummaryResponseDto>> filterEvents(@Valid @ModelAttribute EventFilterDto filter) {
+        return ResponseEntity.ok(service.filterEvents(filter));
     }
 
     @GetMapping("/search")
     public ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword, Pageable pageable){
-        return ResponseEntity.ok(service.searchEvents(keyword, pageable));
+        return ResponseEntity.ok(service.searchEventsPaged(keyword, pageable));
     }
 
     @GetMapping("/drafted")
