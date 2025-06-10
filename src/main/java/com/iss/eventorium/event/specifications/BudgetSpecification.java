@@ -25,12 +25,11 @@ public class BudgetSpecification {
 
             Root<Event> eventRoot = query.from(Event.class);
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
-            Join<Budget, BudgetItem> budgetItemJoin = budgetJoin.join("items");
+            budgetJoin.join("items");
 
             query.where(
                     criteriaBuilder.and(
-                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId),
-                            criteriaBuilder.isNotNull(budgetItemJoin.get("purchased"))
+                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId)
                     )
             );
 

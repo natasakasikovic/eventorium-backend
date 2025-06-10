@@ -20,4 +20,7 @@ public class ReservationRequestDto {
     @NotNull(message = "Ending time is required!")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
     private LocalTime endingTime;
+
+    @NotNull(message = "Planned amount is mandatory!")
+    private Double plannedAmount;
 }

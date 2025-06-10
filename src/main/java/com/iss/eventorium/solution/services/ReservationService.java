@@ -4,8 +4,8 @@ import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
@@ -47,6 +47,7 @@ public class ReservationService {
     private final ServiceService serviceService;
     private final EmailService emailService;
     private final AuthService authService;
+    private final BudgetService budgetService;
 
     private final ReservationMapper mapper;
 
@@ -59,6 +60,7 @@ public class ReservationService {
 
         validateReservation(reservation);
         saveEntity(reservation);
+        budgetService.addReservation(reservation, request.getPlannedAmount());
 
         sendEmails(reservation, false);
     }
@@ -153,6 +155,10 @@ public class ReservationService {
     public ReservationResponseDto updateReservation(Long id, Status status) {
         Reservation reservation = find(id);
         reservation.setStatus(status);
+
+        if(status == Status.ACCEPTED)
+            budgetService.markAsReserved(reservation);
+
         return ReservationMapper.toResponse(repository.save(reservation));
     }
 
@@ -160,7 +166,7 @@ public class ReservationService {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
     }
 
-    private List<Reservation> getEventReservations(Event event) {
+    public List<Reservation> getEventReservations(Event event) {
         Specification<Reservation> specification = ServiceReservationSpecification.getEventReservations(event);
         return repository.findAll(specification);
     }
