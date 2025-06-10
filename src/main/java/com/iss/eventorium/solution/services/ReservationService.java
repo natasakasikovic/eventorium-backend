@@ -58,7 +58,7 @@ public class ReservationService {
         Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
         Service service = serviceService.find(serviceId);
         if(request.getPlannedAmount() < service.getPrice() * (1 - service.getDiscount() / 100)) {
-            throw new InsufficientFundsException("You do not have enough funds for this purchase!");
+            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
         }
         Reservation reservation = mapper.fromRequest(request, event, service);
 
