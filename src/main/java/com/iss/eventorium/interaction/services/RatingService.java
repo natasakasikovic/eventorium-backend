@@ -2,6 +2,7 @@ package com.iss.eventorium.interaction.services;
 
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.interaction.exceptions.AlreadyRatedException;
 import com.iss.eventorium.interaction.dtos.ratings.CreateRatingRequestDto;
 import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
 import com.iss.eventorium.interaction.mappers.RatingMapper;
@@ -38,6 +39,7 @@ public class RatingService {
         rating.setRater(user);
 
         Solution solution = solutionService.find(solutionId);
+        checkIfAlreadyRated(solution, user);
         solutionService.addRating(solution, rating);
 
         sendNotification(solution.getProvider(), solution.getName(), user, rating.getRating());
@@ -50,6 +52,7 @@ public class RatingService {
         rating.setRater(rater);
 
         Event event = eventService.find(eventId);
+        checkIfAlreadyRated(event, rater);
         eventService.addRating(event, rating);
 
         sendNotification(event.getOrganizer(), event.getName(), rater, rating.getRating());
@@ -71,5 +74,21 @@ public class RatingService {
                 new Object[] { displayName, rating, person },
                 Locale.getDefault()
         );
+    }
+
+    public void checkIfAlreadyRated(Solution solution, User user) {
+        for (Rating r : solution.getRatings()) {
+            if (r.getRater().equals(user)) {
+                throw new AlreadyRatedException("Solution is already rated");
+            }
+        }
+    }
+
+    public void checkIfAlreadyRated(Event event, User user) {
+        for (Rating r : event.getRatings()) {
+            if (r.getRater().equals(user)) {
+                throw new AlreadyRatedException("Event is already rated");
+            }
+        }
     }
 }
