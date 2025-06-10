@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
@@ -56,6 +57,9 @@ public class ReservationService {
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
         Service service = serviceService.find(serviceId);
+        if(request.getPlannedAmount() < service.getPrice() * (1 - service.getDiscount() / 100)) {
+            throw new InsufficientFundsException("You do not have enough funds for this purchase!");
+        }
         Reservation reservation = mapper.fromRequest(request, event, service);
 
         validateReservation(reservation);
