@@ -68,5 +68,17 @@ public class Event {
 
     @Column(name = "is_draft")
     private boolean isDraft = true;
+
+    public Double calculateAvgRating() {
+        try {
+            return getRatings()
+                    .stream()
+                    .mapToInt(Rating::getRating)
+                    .average()
+                    .orElse(0.0d);
+        } catch (NullPointerException e) {
+            return 0.0d;
+        }
+    }
 }
 
