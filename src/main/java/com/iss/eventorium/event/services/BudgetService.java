@@ -81,10 +81,14 @@ public class BudgetService {
     public void addReservation(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
+        if(budget == null) {
+            budget = new Budget();
+            reservation.getEvent().setBudget(budget);
+        }
         budget.getItems().add(BudgetItem.builder()
                 .itemType(SolutionType.SERVICE)
                 .plannedAmount(plannedAmount)
-                .purchased(service.getType() == ReservationType.MANUAL ? LocalDateTime.now() : null)
+                .purchased(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
                 .solution(service)
                 .category(service.getCategory())
                 .build());
@@ -123,6 +127,7 @@ public class BudgetService {
         Budget budget = event.getBudget();
         if(budget == null) {
             budget = new Budget();
+            event.setBudget(budget);
         }
         if(containsCategory(budget, item.getCategory())) {
             throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
