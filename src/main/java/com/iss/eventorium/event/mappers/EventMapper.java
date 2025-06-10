@@ -58,6 +58,7 @@ public class EventMapper {
         if (event.getType() == null)
             dto.setEventType("All");
         dto.setOrganizer(userMapper.toUserDetails(event.getOrganizer()));
+        dto.setAvgRating(event.calculateAvgRating());
         return dto;
     }
 

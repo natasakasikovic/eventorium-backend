@@ -107,6 +107,7 @@ public class WebSecurityConfig {
 
                         // Events
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.POST,"/api/v1/events/{id}/ratings").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/*/agenda").hasAuthority(ORGANIZER)
@@ -172,6 +173,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/account/events/favourites").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites/{id}").authenticated()
                         .requestMatchers("/api/v1/account/events/my-attending-events").authenticated()
+                        .requestMatchers("/api/v1/account/events/{id}/rating-eligibility").authenticated()
 
                         // Account Services
                         .requestMatchers("/api/v1/account/services").hasAuthority(PROVIDER)
