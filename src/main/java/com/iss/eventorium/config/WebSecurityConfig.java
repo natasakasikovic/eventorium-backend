@@ -111,7 +111,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/*/agenda").hasAuthority(ORGANIZER)
-                        .requestMatchers("/api/v1/events/drafted").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/future").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/guest-list-pdf").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events/{id}").permitAll()
