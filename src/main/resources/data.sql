@@ -35,7 +35,7 @@ INSERT INTO images (content_type, path) VALUES
     ('image/png', 'decorated_by_us.png'), --23
     ('image/jpg', 'wed.jpg'), --24
     ('image/jpg', 'corporate-event-planning.jpg'), --25
-    ('image/jpg', 'birthday.jpg'); --25
+    ('image/jpg', 'birthday.jpg'); --26
 
 
 INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id, deactivated) VALUES
@@ -147,7 +147,16 @@ VALUES
 ('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, null),
 ('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'CLOSED', 50, 2, '234 Retreat Ave', 3, 1, false, null),
 ('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'CLOSED', 200, 3, '111 Fest Rd', 1, 1, false, null),
-('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null);
+('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null),
+('Belgrade Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY , 'OPEN', 100, 3, '444 Culture St', 6, 2, false, null),
+('Sunset Jazz Fest', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 200, 3, '12 Jazz Ave', 1, 1, false, null),
+('Autumn Food Carnival', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 200, 3, '88 Harvest Rd', 1, 1, false, null),
+('Downtown Beats', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '4' DAY, 'CLOSED', 200, 3, '99 Groove St', 1, 1, false, null),
+('Riverfront Light Parade', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 100, 3, '5 Riverside Blvd', 6, 2, false, null),
+('Midnight Art Jam', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 100, 3, '21 Canvas Ln', 6, 2, false, null),
+('Old Town Storytelling', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 100, 3, '77 Heritage Ct', 6, 2, false, null),
+('Garden Groove Gathering', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 200, 3, '33 Bloom St', 1, 1, false, null);
+
 
 
 INSERT INTO activities (name, description, start_time, end_time, location, event_id)
@@ -347,7 +356,22 @@ VALUES
     (5, 2, CURRENT_TIMESTAMP, 12),
     (3, 3, CURRENT_TIMESTAMP, 13),
     (4, 4, CURRENT_TIMESTAMP, 14),
-    (1, 5, CURRENT_TIMESTAMP, 15);
+    (1, 5, CURRENT_TIMESTAMP, 15),
+    (5, 2, CURRENT_TIMESTAMP, 23),
+    (3, 2, CURRENT_TIMESTAMP, 24);
 
 
-INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);
+INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1),
+                                                                         (2, 1),
+                                                                         (3,1),
+                                                                         (4,1),
+                                                                         (5,1),
+                                                                         (1, 22),
+                                                                         (3, 23),
+                                                                         (2, 23),
+                                                                         (3, 24),
+                                                                         (2, 24),
+                                                                         (3, 25),
+                                                                         (3, 26),
+                                                                         (3, 28),
+                                                                         (3, 29);
