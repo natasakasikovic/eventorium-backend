@@ -23,15 +23,18 @@ import java.util.List;
         description =
         """
         Handles the solution and event comment endpoints.
-        Access is restricted to *authorized* users only.
-        Only users with `ADMIN` authority are allowed to modify a comment's status.
         """
 )
 public interface CommentApi {
 
     @Operation(
             summary = "Retrieves all comments with status 'PENDING'.",
-            description = "Returns a list of all pending comments.",
+            description =
+            """
+            Returns a list of all pending comments.
+            Requires authentication and ADMIN authority.
+            Only users with the `ADMIN` authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -47,6 +50,7 @@ public interface CommentApi {
             """
             Creates a new comment.
             Returns the created comment if successful.
+            Access is restricted to *authorized* users only.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -150,7 +154,6 @@ public interface CommentApi {
             Fetches comments linked to an object (service, product, or event) identified by its unique ID and specified
             comment type.
             """,
-            security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(
