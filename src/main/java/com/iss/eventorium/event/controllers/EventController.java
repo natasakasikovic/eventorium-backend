@@ -44,6 +44,11 @@ public class EventController {
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/passed")
+    public ResponseEntity<List<EventTableOverviewDto>> getPassedEvents() {
+        return new ResponseEntity<>(service.getPassedEvents(), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<PagedResponse<EventSummaryResponseDto>> getEventsPaged(Pageable pageable) {
         return ResponseEntity.ok(service.getEventsPaged(pageable));
@@ -71,7 +76,7 @@ public class EventController {
   
     @GetMapping("/search/all")
     public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
-        return  ResponseEntity.ok(service.searchEvents(keyword));
+        return ResponseEntity.ok(service.searchEvents(keyword));
     }
 
     @PostMapping
@@ -107,5 +112,4 @@ public class EventController {
         HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("guest_list.pdf");
         return new ResponseEntity<>(service.generateGuestListPdf(id), headers, HttpStatus.OK);
     }
-
 }

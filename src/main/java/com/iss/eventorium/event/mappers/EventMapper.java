@@ -65,4 +65,8 @@ public class EventMapper {
     public CalendarEventDto toCalendarEvent(Event event) {
         return modelMapper.map(event, CalendarEventDto.class);
     }
+
+    public EventTableOverviewDto toTableOverviewDto(Event event) {
+        return modelMapper.map(event, EventTableOverviewDto.class);
+    }
 }

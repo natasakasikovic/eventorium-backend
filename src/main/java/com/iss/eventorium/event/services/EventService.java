@@ -81,6 +81,11 @@ public class EventService {
         return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
     }
 
+    public List<EventTableOverviewDto> getPassedEvents() {
+        Specification<Event> specification = EventSpecification.filterPassedEvents();
+        return repository.findAll(specification).stream().map(eventMapper::toTableOverviewDto).toList();
+    }
+
     public PagedResponse<EventSummaryResponseDto> searchEventsPaged(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
         return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
