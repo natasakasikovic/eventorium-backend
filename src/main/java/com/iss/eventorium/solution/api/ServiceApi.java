@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.api;
 
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
@@ -484,5 +485,42 @@ public interface ServiceApi {
                     example = "123"
             )
             Long id
+    );
+
+    @Operation(
+            summary = "Deletes a service images.",
+            description =
+                    """
+                    Deletes service images if services exists.
+                    Requires authentication and PROVIDER authority.
+                    Only users with the 'PROVIDER' authority can access this endpoint.
+                    """,
+            security = { @SecurityRequirement(name="bearerAuth") },
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Service not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "ServiceNotFound",
+                                            summary = "Service not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Service not found.\" }"
+                                    )
+                            )
+                    )
+            }
+    )
+    ResponseEntity<Void> deleteImages(
+            @Parameter(
+                    description = "The unique identifier of the service.",
+                    required = true,
+                    example = "123"
+            )
+            Long id,
+            List<RemoveImageRequestDto> removedImages
     );
 }
