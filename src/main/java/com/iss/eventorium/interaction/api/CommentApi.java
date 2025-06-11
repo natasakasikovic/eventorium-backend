@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.api;
 import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
 import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.dtos.comment.UpdateCommentRequestDto;
+import com.iss.eventorium.interaction.models.CommentType;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,10 +42,10 @@ public interface CommentApi {
     ResponseEntity<List<CommentResponseDto>> getPendingComments();
 
     @Operation(
-            summary = "Creates and attaches a user comment to a service.",
+            summary = "Creates a comment.",
             description =
             """
-            Creates a new user comment and associates it with a service.
+            Creates a new comment.
             Returns the created comment if successful.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
@@ -78,125 +79,13 @@ public interface CommentApi {
                     )
             }
     )
-    ResponseEntity<CommentResponseDto> createServiceComment(
+    ResponseEntity<CommentResponseDto> createComment(
             @RequestBody(
-                    description = "The data used to create the service comment.",
+                    description = "The data used to create comment.",
                     required = true,
                     content = @Content(schema = @Schema(implementation = CreateCommentRequestDto.class))
             )
-            CreateCommentRequestDto request,
-            @Parameter(
-                    description = "The unique identifier of the service.",
-                    required = true,
-                    example = "123"
-            )
-            Long id
-    );
-
-    @Operation(
-            summary = "Creates and attaches a user comment to a product.",
-            description =
-            """
-            Creates a new user comment and associates it with a product.
-            Returns the created comment if successful.
-            """,
-            security = { @SecurityRequirement(name="bearerAuth") },
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "InvalidCommentExample",
-                                            summary = "Empty comment",
-                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Comment is mandatory\" }"
-                                    )
-                            )
-                    ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Product not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "ProductNotFound",
-                                            summary = "Product not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Product not found.\" }"
-                                    )
-                            )
-                    )
-            }
-    )
-    ResponseEntity<CommentResponseDto> createProductComment(
-            @RequestBody(
-                    description = "The data used to create the product comment.",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = CreateCommentRequestDto.class))
-            )
-            CreateCommentRequestDto request,
-            @Parameter(
-                    description = "The unique identifier of the product.",
-                    required = true,
-                    example = "123"
-            )
-            Long id
-    );
-
-    @Operation(
-            summary = "Creates and attaches a user comment to a event.",
-            description =
-            """
-            Creates a new user comment and associates it with a event.
-            Returns the created comment if successful.
-            """,
-            security = { @SecurityRequirement(name="bearerAuth") },
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Validation error",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "InvalidCommentExample",
-                                            summary = "Empty comment",
-                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Comment is mandatory\" }"
-                                    )
-                            )
-                    ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Event not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "EventNotFound",
-                                            summary = "Event not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
-                                    )
-                            )
-                    )
-            }
-    )
-    ResponseEntity<CommentResponseDto> createEventComment(
-            @RequestBody(
-                    description = "The data used to create the event comment.",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = CreateCommentRequestDto.class))
-            )
-            CreateCommentRequestDto request,
-            @Parameter(
-                    description = "The unique identifier of the event.",
-                    required = true,
-                    example = "123"
-            )
-            Long id
+            CreateCommentRequestDto request
     );
 
     @Operation(
@@ -204,6 +93,7 @@ public interface CommentApi {
             description =
             """
             Updates pending comment status to `ACCEPTED` or `DECLINED` if exists.
+            Returns the updated comment if successful.
             Requires authentication and ADMIN authority.
             Only users with the `ADMIN` authority can access this endpoint.
             """,
@@ -251,5 +141,53 @@ public interface CommentApi {
                     content = @Content(schema = @Schema(implementation = UpdateCommentRequestDto.class))
             )
             UpdateCommentRequestDto request
+    );
+
+    @Operation(
+            summary = "Retrieves all comments associated with a specific object type and ID.",
+            description =
+            """
+            Fetches comments linked to an object (service, product, or event) identified by its unique ID and specified
+            comment type.
+            """,
+            security = { @SecurityRequirement(name="bearerAuth") },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "InvalidCommentStatusExample",
+                                            summary = "Update comment without status",
+                                            value = "{ \"error\": \"Bad Request\", \"message\": \"Status is mandatory.\" }"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
+                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Product not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "CommentNotFound",
+                                            summary = "Comment not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Product not found.\" }"
+                                    )
+                            )
+                    )
+            }
+    )
+    ResponseEntity<List<CommentResponseDto>> getComments(
+            CommentType type,
+            @Parameter(
+                    description = "The unique identifier for the object (service, product, or event) to which the comments are associated.",
+                    required = true,
+                    example = "123"
+            )
+            Long objectId
     );
 }
