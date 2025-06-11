@@ -83,9 +83,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientFundsException.class)
     public ResponseEntity<ExceptionResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ExceptionResponse.builder()
-                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .error(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }

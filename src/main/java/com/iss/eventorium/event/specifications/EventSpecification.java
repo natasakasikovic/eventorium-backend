@@ -16,12 +16,7 @@ public class EventSpecification {
 
     public static Specification<Event> filterFutureEvents(User organizer) {
         return Specification.where(filterByOrganizer(organizer))
-                .and(isInFuture());
-    }
-
-    public static Specification<Event> isInFuture() {
-        return (root, query, cb) ->
-                cb.greaterThan(root.get("date"), LocalDate.now());
+                .and(hasDateAfter(LocalDate.now()));
     }
 
     public static Specification<Event> filterBy(EventFilterDto filter, User user) {
