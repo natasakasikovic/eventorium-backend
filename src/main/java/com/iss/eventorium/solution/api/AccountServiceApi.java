@@ -197,7 +197,7 @@ public interface AccountServiceApi {
     ResponseEntity<ServiceResponseDto> addFavouriteService(Long id);
 
     @Operation(
-            summary = "Removes a service to the provider's list of favorites",
+            summary = "Removes a service from the provider's list of favorites",
             description =
             """
             Removes a service from the provider's list of favorites. If the service is not already a favorite, no action is taken.
