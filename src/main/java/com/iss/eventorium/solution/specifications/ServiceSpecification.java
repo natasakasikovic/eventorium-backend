@@ -120,18 +120,14 @@ public class ServiceSpecification {
 
     private static Specification<Service> applyUserRoleFilter(User user) {
         return (root, query, cb) -> {
-            boolean isProvider = user != null && user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()));
-
-            if (user == null || !isProvider)
+            if (user == null || user.getRoles().stream()
+                    .noneMatch(role -> "PROVIDER".equals(role.getName()) || "ADMIN".equals(role.getName()))) {
                 return cb.and(
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
-
-            return cb.or(
-                    cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),
-                    cb.equal(root.get("provider").get("id"), user.getId())
-            );
+            }
+            return cb.conjunction();
         };
     }
 

@@ -118,31 +118,20 @@ public class ProductSpecification {
 
     private static Specification<Product> applyUserRoleFilter(User user) {
         return (root, query, cb) -> {
-            if (user == null) {
+            if (user == null || user.getRoles().stream()
+                    .noneMatch(role -> "PROVIDER".equals(role.getName()) || "ADMIN".equals(role.getName()))) {
                 return cb.and(
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
             }
-
-            if (user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()))) {
-                return cb.or(
-                        cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))), // If user is PROVIDER, filter by accepted and visible services
-                        cb.equal(root.get("provider").get("id"), user.getId())                 // or services that belong to the provider
-                );
-            } else {
-                return cb.and(
-                        cb.isTrue(root.get("isVisible")),
-                        cb.notEqual(root.get("status"), "ACCEPTED")
-                );
-            }
+            return cb.conjunction();
         };
     }
 
     private static Specification<Product> filterOutBlockedContent(User blocker) {
         return (root, query, cb) -> {
             if (blocker == null) return cb.conjunction();
-
             Long blockerId = blocker.getId();
 
             Subquery<Long> subquery = query.subquery(Long.class);
