@@ -162,7 +162,8 @@ public interface ServiceApi {
             Returns the details of a single service using its unique identifier.
             The service information is returned only if it exists and is not from a blocked provider,
             nor is it hidden or pending.
-            If the provider is logged in, their hidden and pending services will also be retrieved.
+            Hidden and pending services are excluded for all users, except when the provider is logged in.
+            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
