@@ -339,39 +339,34 @@ VALUES
     (3, 3, CURRENT_TIMESTAMP, 1),
     (2, 4, CURRENT_TIMESTAMP, 1);
 
--- Ratings for events
-INSERT INTO ratings (rating, rater_id, creation_date, event_id)
-VALUES
-    (5, 1, CURRENT_TIMESTAMP, 1),
-    (4, 2, CURRENT_TIMESTAMP, 2),
-    (3, 3, CURRENT_TIMESTAMP, 3),
-    (5, 4, CURRENT_TIMESTAMP, 4),
-    (2, 5, CURRENT_TIMESTAMP, 5),
-    (4, 1, CURRENT_TIMESTAMP, 6),
-    (3, 2, CURRENT_TIMESTAMP, 7),
-    (1, 3, CURRENT_TIMESTAMP, 8),
-    (4, 4, CURRENT_TIMESTAMP, 9),
-    (5, 5, CURRENT_TIMESTAMP, 10),
-    (2, 1, CURRENT_TIMESTAMP, 11),
-    (5, 2, CURRENT_TIMESTAMP, 12),
-    (3, 3, CURRENT_TIMESTAMP, 13),
-    (4, 4, CURRENT_TIMESTAMP, 14),
-    (1, 5, CURRENT_TIMESTAMP, 15),
-    (5, 2, CURRENT_TIMESTAMP, 23),
-    (3, 2, CURRENT_TIMESTAMP, 24);
 
+INSERT INTO users_attending_events (user_id, attending_events_id) VALUES
+                                                                      (1, 25), (1, 26), (1, 27), (1, 28),
+                                                                      (2, 25), (2, 26), (2, 28), (2, 29),
+                                                                      (3, 26), (3, 27), (3, 29),
+                                                                      (4, 25), (4, 26), (4, 27), (4, 28),
+                                                                      (5, 27), (5, 28), (5, 29);
 
-INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1),
-                                                                         (2, 1),
-                                                                         (3,1),
-                                                                         (4,1),
-                                                                         (5,1),
-                                                                         (1, 22),
-                                                                         (3, 23),
-                                                                         (2, 23),
-                                                                         (3, 24),
-                                                                         (2, 24),
-                                                                         (3, 25),
-                                                                         (3, 26),
-                                                                         (3, 28),
-                                                                         (3, 29);
+INSERT INTO ratings (rating, rater_id, creation_date, event_id) VALUES
+                                                                    (5, 1, CURRENT_TIMESTAMP, 25),
+                                                                    (4, 1, CURRENT_TIMESTAMP, 26),
+                                                                    (3, 1, CURRENT_TIMESTAMP, 27),
+                                                                    (5, 1, CURRENT_TIMESTAMP, 28),
+
+                                                                    (3, 2, CURRENT_TIMESTAMP, 25),
+                                                                    (5, 2, CURRENT_TIMESTAMP, 26),
+                                                                    (4, 2, CURRENT_TIMESTAMP, 28),
+                                                                    (2, 2, CURRENT_TIMESTAMP, 29),
+
+                                                                    (4, 3, CURRENT_TIMESTAMP, 26),
+                                                                    (5, 3, CURRENT_TIMESTAMP, 27),
+                                                                    (4, 3, CURRENT_TIMESTAMP, 29),
+
+                                                                    (2, 4, CURRENT_TIMESTAMP, 25),
+                                                                    (3, 4, CURRENT_TIMESTAMP, 26),
+                                                                    (5, 4, CURRENT_TIMESTAMP, 27),
+                                                                    (4, 4, CURRENT_TIMESTAMP, 28),
+
+                                                                    (4, 5, CURRENT_TIMESTAMP, 27),
+                                                                    (5, 5, CURRENT_TIMESTAMP, 28),
+                                                                    (3, 5, CURRENT_TIMESTAMP, 29);

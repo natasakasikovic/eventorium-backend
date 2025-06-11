@@ -3,6 +3,7 @@ package com.iss.eventorium.event.controllers;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.utils.ResponseHeaderUtils;
@@ -111,5 +112,10 @@ public class EventController {
     public ResponseEntity<byte[]> getGuestListPdf(@PathVariable Long id) {
         HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("guest_list.pdf");
         return new ResponseEntity<>(service.generateGuestListPdf(id), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<EventRatingsStatisticsDto> getEventRatingStatistics(@PathVariable Long id) {
+        return new ResponseEntity<>(service.getEventRatingStatistics(id), HttpStatus.CREATED);
     }
 }

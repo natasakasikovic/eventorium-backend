@@ -3,6 +3,7 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -32,6 +33,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.*;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @RequiredArgsConstructor
@@ -249,4 +252,26 @@ public class EventService {
         event.getRatings().add(rating);
         repository.save(event);
     }
+
+    public EventRatingsStatisticsDto getEventRatingStatistics(Long id) {
+        Event event = find(id);
+        int totalVisitors = userService.findByEventAttendance(event.getId()).size();
+        int totalRatings = event.getRatings().size();
+
+        Map<Integer, Integer> ratingsCount = IntStream.rangeClosed(1, 5)
+                .boxed()
+                .collect(Collectors.toMap(r -> r, r -> 0));
+
+        event.getRatings().forEach(r ->
+                ratingsCount.merge(r.getRating(), 1, Integer::sum)
+        );
+
+        return EventRatingsStatisticsDto.builder()
+                .eventName(event.getName())
+                .totalVisitors(totalVisitors)
+                .totalRatings(totalRatings)
+                .ratingsCount(ratingsCount)
+                .build();
+    }
+
 }
