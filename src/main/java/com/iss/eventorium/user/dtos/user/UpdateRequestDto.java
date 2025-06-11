@@ -24,7 +24,7 @@ public class UpdateRequestDto {
     private String address;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^(\\+)?[0-9]{9,15}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^(\\+)?\\d{9,15}$", message = "Invalid phone number format")
     private String phoneNumber;
 
     @NotNull(message = "City is required")

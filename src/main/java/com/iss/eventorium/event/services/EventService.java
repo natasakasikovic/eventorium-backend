@@ -12,7 +12,6 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
-import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
@@ -46,16 +45,21 @@ public class EventService {
     private final EmailService emailService;
     private final ApplicationEventPublisher eventPublisher;
 
+    private final ActivityMapper activityMapper;
+    private final EventMapper eventMapper;
+    private final EventTypeMapper eventTypeMapper;
+
     public static final String EMAIL_SUBJECT = "Notification from Eventorium";
     public static final String EVENT_UPDATE_NOTIFICATION_TEMPLATE = "event-update-notification";
     private final SpringTemplateEngine templateEngine;
+    private final CityMapper cityMapper;
 
     public EditableEventDto getEvent(Long id) {
-        return EventMapper.toEditableEvent(find(id));
+        return eventMapper.toEditableEvent(find(id));
     }
 
     public EventDetailsDto getEventDetails(Long id) {
-        return EventMapper.toEventDetailsDto(find(id));
+        return eventMapper.toEventDetailsDto(find(id));
     }
 
     public List<EventSummaryResponseDto> getTopEvents() {
@@ -63,7 +67,7 @@ public class EventService {
         List<Event> events = repository.findAll(specification).stream()
                                         .sorted(Comparator.comparing(Event::getDate))
                                         .limit(5).toList();
-        return events.stream().map(EventMapper::toSummaryResponse).toList();
+        return events.stream().map(eventMapper::toSummaryResponse).toList();
     }
 
     private String getUserCity() {  // If the user is logged in, it returns the city from the profile, otherwise defaults to "Novi Sad".
@@ -74,27 +78,32 @@ public class EventService {
 
     public List<EventSummaryResponseDto> getAll() {
         Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
     }
 
-    public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
+    public PagedResponse<EventSummaryResponseDto> searchEventsPaged(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
-        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
         Specification<Event> specification = EventSpecification.filterByName(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
-        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public PagedResponse<EventSummaryResponseDto> filterEvents(EventFilterDto filter, Pageable pageable) {
+    public List<EventSummaryResponseDto> filterEvents(EventFilterDto filter) {
         Specification<Event> specification = EventSpecification.filterBy(filter, authService.getCurrentUser());
-        return EventMapper.toPagedResponse(repository.findAll(specification, pageable));
+        return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
+    }
+
+    public PagedResponse<EventSummaryResponseDto> filterEventsPaged(EventFilterDto filter, Pageable pageable) {
+        Specification<Event> specification = EventSpecification.filterBy(filter, authService.getCurrentUser());
+        return eventMapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public Event find(Long id) {
@@ -104,11 +113,11 @@ public class EventService {
 
     public EventResponseDto createEvent(EventRequestDto eventRequestDto) {
         Event created = repository.save(prepareEvent(eventRequestDto));
-        return EventMapper.toResponse(created);
+        return eventMapper.toResponse(created);
     }
 
     private Event prepareEvent(EventRequestDto eventRequestDto) {
-        Event event = EventMapper.fromRequest(eventRequestDto);
+        Event event = eventMapper.fromRequest(eventRequestDto);
         event.setOrganizer(authService.getCurrentUser());
         return event;
     }
@@ -128,8 +137,9 @@ public class EventService {
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
         event.setMaxParticipants(request.getMaxParticipants());
-        event.setType(EventTypeMapper.fromResponse(request.getEventType()));
-        event.setCity(CityMapper.fromRequest(request.getCity()));
+        if (request.getEventType() == null) event.setType(null);
+        else event.setType(eventTypeMapper.fromResponse(request.getEventType()));
+        event.setCity(cityMapper.fromRequest(request.getCity()));
         event.setAddress(request.getAddress());
 
         repository.save(event);
@@ -141,10 +151,17 @@ public class EventService {
                 !Objects.equals(event.getDescription(), request.getDescription()) ||
                 !Objects.equals(event.getDate(), request.getDate()) ||
                 !Objects.equals(event.getMaxParticipants(), request.getMaxParticipants()) ||
-                !Objects.equals(event.getType().getId(), request.getEventType().getId()) ||
-                !Objects.equals(event.getCity().getId(), request.getCity().getId()) ||
+                !Objects.equals(
+                        event.getType() != null ? event.getType().getId() : null,
+                        request.getEventType() != null ? request.getEventType().getId() : null
+                ) ||
+                !Objects.equals(
+                        event.getCity() != null ? event.getCity().getId() : null,
+                        request.getCity() != null ? request.getCity().getId() : null
+                ) ||
                 !Objects.equals(event.getAddress(), request.getAddress());
     }
+
 
     private void notifyGuestsAboutChanges(Event event) {
         List<User> guests = userService.findByEventAttendance(event.getId());
@@ -182,7 +199,7 @@ public class EventService {
         Event event = find(id);
 
         List<Activity> activities = request.stream()
-                .map(ActivityMapper::fromRequest)
+                .map(activityMapper::fromRequest)
                 .toList();
 
         event.getActivities().clear();
@@ -195,14 +212,14 @@ public class EventService {
     }
 
     public List<ActivityResponseDto> getAgenda(Long id) {
-        return find(id).getActivities().stream().map(ActivityMapper::toResponse).toList();
+        return find(id).getActivities().stream().map(activityMapper::toResponse).toList();
     }
 
     // TODO: this method needs to be replaces with method which will get my events in future
     public List<EventResponseDto> getDraftedEvents() {
         return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
                 .stream()
-                .map(EventMapper::toResponse)
+                .map(eventMapper::toResponse)
                 .toList();
     }
 
@@ -225,11 +242,6 @@ public class EventService {
 
     public void addRating(Event event, Rating rating) {
         event.getRatings().add(rating);
-        repository.save(event);
-    }
-
-    public void addComment(Event event, Comment comment) {
-        event.getComments().add(comment);
         repository.save(event);
     }
 }

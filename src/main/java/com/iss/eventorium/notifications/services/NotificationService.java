@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.iss.eventorium.notifications.mappers.NotificationMapper.toResponse;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,12 +23,14 @@ public class NotificationService {
     private final AuthService authService;
     private final NotificationRepository repository;
 
+    private final NotificationMapper mapper;
+
     public void sendNotification(User user, Notification notification) {
         log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
         messagingTemplate.convertAndSendToUser(
                 user.getId().toString(),
                 "/notifications",
-                toResponse(notification)
+                mapper.toResponse(notification)
         );
         notification.setRecipient(user);
         repository.save(notification);
@@ -40,14 +40,14 @@ public class NotificationService {
         log.info("Sending notification to admins: {}", notification.getMessage());
         messagingTemplate.convertAndSend(
           "/topic/admin",
-          toResponse(notification)
+          mapper.toResponse(notification)
         );
 
         repository.save(notification);
     }
 
     public List<NotificationResponseDto> getAllNotifications() {
-        return getNotifications().stream().map(NotificationMapper::toResponse).toList();
+        return getNotifications().stream().map(mapper::toResponse).toList();
     }
 
     private List<Notification> getNotifications() {

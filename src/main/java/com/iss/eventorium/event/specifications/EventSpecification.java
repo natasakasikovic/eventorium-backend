@@ -1,11 +1,8 @@
 package com.iss.eventorium.event.specifications;
 
-import com.iss.eventorium.event.models.Budget;
-import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
 import com.iss.eventorium.event.models.Privacy;
-import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.*;
@@ -14,6 +11,8 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 
 public class EventSpecification {
+
+    private EventSpecification() {}
 
     public static Specification<Event> filterBy(EventFilterDto filter, User user) {
         return Specification

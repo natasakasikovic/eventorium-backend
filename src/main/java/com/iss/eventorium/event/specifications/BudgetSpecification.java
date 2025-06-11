@@ -12,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class BudgetSpecification {
 
+    private BudgetSpecification() {}
+
     public static Specification<BudgetItem> filterForOrganizer(User organizer) {
         return filterBudgetItems(organizer.getId()).and(filterOutBlockedContent(organizer));
     }

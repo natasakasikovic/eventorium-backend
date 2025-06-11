@@ -7,6 +7,7 @@ import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.specifications.EventSpecification;
+import com.iss.eventorium.interaction.services.RatingService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.models.User;
@@ -20,8 +21,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.iss.eventorium.event.mappers.EventMapper.toPagedResponse;
-
 @Service
 @RequiredArgsConstructor
 public class AccountEventService {
@@ -31,19 +30,21 @@ public class AccountEventService {
     private final EventService eventService;
     private final UserRepository userRepository;
 
+    private final EventMapper mapper;
+
     public List<EventSummaryResponseDto> getFavouriteEvents() {
         return authService.getCurrentUser().getPerson().getFavouriteEvents()
-                .stream().map(EventMapper::toSummaryResponse).toList();
+                .stream().map(mapper::toSummaryResponse).toList();
     }
 
     public List<CalendarEventDto> getOrganizerEvents() {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toCalendarEvent).toList();
+        return repository.findAll(specification).stream().map(mapper::toCalendarEvent).toList();
     }
 
     public List<CalendarEventDto> getAttendingEvents() {
         Person person = authService.getCurrentUser().getPerson();
-        return person.getAttendingEvents().stream().map(EventMapper::toCalendarEvent).toList();
+        return person.getAttendingEvents().stream().map(mapper::toCalendarEvent).toList();
     }
 
     public void markAttendance(Long eventId) {
@@ -61,6 +62,23 @@ public class AccountEventService {
     private void addEventToUserAttendance(User user, Event event) {
         user.getPerson().getAttendingEvents().add(event);
         userRepository.save(user);
+    }
+
+    public boolean isUserEligibleToRate(Long eventId) {
+        // NOTE: A user can rate the event only if they marked attendance, the event has already ended, and they haven't already rated it.
+        Event event = eventService.find(eventId);
+        if (event.getDate().isAfter(LocalDate.now())) return false;
+        User user = authService.getCurrentUser();
+        return hasUserAttendedEvent(user, event) && !isRatedByUser(event, user);
+    }
+
+    private boolean hasUserAttendedEvent(User user, Event event) {
+        return user.getPerson().getAttendingEvents().contains(event);
+    }
+
+    public boolean isRatedByUser(Event event, User user) {
+        return event.getRatings().stream()
+                .anyMatch(rating -> rating.getRater().equals(user));
     }
 
     public void addFavouriteEvent(Long id) {
@@ -88,21 +106,21 @@ public class AccountEventService {
 
     public List<EventSummaryResponseDto> getAll() {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<EventSummaryResponseDto> searchEvents(String keyword) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(EventMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 }

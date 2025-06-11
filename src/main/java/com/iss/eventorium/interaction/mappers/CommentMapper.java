@@ -4,34 +4,26 @@ import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
 import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.CommentType;
-import com.iss.eventorium.shared.dtos.CommentableResponseDto;
-import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.user.mappers.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CommentMapper {
 
-    private static ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    public CommentMapper(ModelMapper modelMapper) {
-        CommentMapper.modelMapper = modelMapper;
+    public Comment fromRequest(CreateCommentRequestDto request) {
+        return modelMapper.map(request, Comment.class);
     }
 
-    public static Comment fromRequest(CreateCommentRequestDto request, CommentType type, Long id) {
-        Comment comment = modelMapper.map(request, Comment.class);
-        comment.setCommentType(type);
-        comment.setCommentableId(id);
-        return comment;
-    }
-
-    public static CommentResponseDto toResponse(Comment comment, CommentableEntity commentable) {
+    public CommentResponseDto toResponse(Comment comment, String displayName) {
         CommentResponseDto dto = modelMapper.map(comment, CommentResponseDto.class);
-        dto.setUser(UserMapper.toUserDetails(comment.getUser()));
-        dto.setCommentable(new CommentableResponseDto(commentable.getId(), commentable.getDisplayName()));
+        dto.setUser(userMapper.toUserDetails(comment.getAuthor()));
+        dto.setDisplayName(displayName);
         return dto;
     }
 }

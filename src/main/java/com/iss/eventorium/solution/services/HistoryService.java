@@ -21,8 +21,11 @@ public class HistoryService {
 
     private static final Long HISTORY_ID = 1L;
 
+    private final ProductMapper productMapper;
+    private final ServiceMapper serviceMapper;
+
     public void addServiceMemento(Service service) {
-        Memento memento = ServiceMapper.toMemento(service);
+        Memento memento = serviceMapper.toMemento(service);
         memento.setId(null);
         memento.setSolutionId(service.getId());
         memento.setValidFrom(LocalDateTime.now());
@@ -43,7 +46,7 @@ public class HistoryService {
     }
 
     public void addProductMemento(Product product) {
-        Memento memento = ProductMapper.toMemento(product);
+        Memento memento = productMapper.toMemento(product);
         memento.setId(null);
         memento.setSolutionId(product.getId());
         memento.setValidFrom(LocalDateTime.now());

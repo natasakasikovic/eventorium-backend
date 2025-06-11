@@ -14,6 +14,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class ServiceSpecification {
 
+    private ServiceSpecification() {}
+
     public static Specification<Service> filterBy(ServiceFilterDto filter, User user) {
         return Specification
                 .where(hasName(filter.getName()))
@@ -54,7 +56,8 @@ public class ServiceSpecification {
 
     public static Specification<Service> filterById(Long id, User user) {
         return Specification.where(hasId(id)
-                .and(filterOutBlockedContent(user)));
+                .and(filterOutBlockedContent(user)))
+                .and(applyUserRoleFilter(user));
     }
 
     private static Specification<Service> hasId(Long id){

@@ -1,16 +1,14 @@
 package com.iss.eventorium.solution.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +21,7 @@ public class Service extends Solution {
     private ReservationType type;
 
     @Column(nullable = false)
+    @Size(max = 750)
     private String specialties;
 
     @Column(name="reservation_deadline", nullable = false)

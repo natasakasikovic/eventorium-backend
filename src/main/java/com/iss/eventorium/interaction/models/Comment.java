@@ -33,11 +33,11 @@ public class Comment {
     private Status status = Status.PENDING;
 
     @ManyToOne
-    private User user;
+    private User author;
 
     @Enumerated(EnumType.STRING)
     private CommentType commentType;
 
-    @Column(name = "commentable_id", nullable = false)
-    private Long commentableId;
+    @Column(name = "object_id", nullable = false) // ID of the entity being commented; its type is defined by the commentType field
+    private Long objectId;
 }

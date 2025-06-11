@@ -16,6 +16,8 @@ import java.time.LocalTime;
 
 public class ServiceReservationSpecification {
 
+    private ServiceReservationSpecification() {}
+
     public static Specification<Reservation> checkForOverlappingReservations(Reservation reservation) {
         return Specification
                 .where(hasEventId(reservation.getEvent().getId()))

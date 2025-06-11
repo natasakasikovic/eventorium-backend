@@ -20,4 +20,5 @@ public class EventDetailsDto {
     private String city;
     private String date;
     private UserDetailsDto organizer;
+    private Double avgRating;
 }

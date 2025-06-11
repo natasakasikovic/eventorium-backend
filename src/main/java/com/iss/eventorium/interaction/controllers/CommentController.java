@@ -15,44 +15,35 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/comments")
 @RequiredArgsConstructor
-public class CommentController implements CommentApi {
+public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentService service;
 
-    @GetMapping("/comments/pending")
+    @GetMapping("/pending")
     public ResponseEntity<List<CommentResponseDto>> getPendingComments() {
-        return ResponseEntity.ok(commentService.getPendingComments());
+        return ResponseEntity.ok(service.getPendingComments());
     }
 
-    @PostMapping("/services/{service-id}/comments")
-    public ResponseEntity<CommentResponseDto> createServiceComment(
-            @RequestBody @Valid CreateCommentRequestDto request,
-            @PathVariable("service-id") Long id
+    @GetMapping
+    public ResponseEntity<List<CommentResponseDto>> getComments(
+            @RequestParam("type") CommentType type,
+            @RequestParam("id") Long objectId) {
+
+        List<CommentResponseDto> comments = service.getAcceptedCommentsForTarget(type, objectId);
+        return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping
+    public ResponseEntity<CommentResponseDto> createComment(
+            @RequestBody @Valid CreateCommentRequestDto request
     ) {
-        return new ResponseEntity<>(commentService.createComment(id, CommentType.SERVICE, request), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.createComment(request), HttpStatus.CREATED);
     }
 
-    @PostMapping("/products/{product-id}/comments")
-    public ResponseEntity<CommentResponseDto> createProductComment(
-            @RequestBody @Valid CreateCommentRequestDto request,
-            @PathVariable("product-id") Long id
-    ) {
-        return new ResponseEntity<>(commentService.createComment(id, CommentType.PRODUCT, request), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/events/{event-id}/comments")
-    public ResponseEntity<CommentResponseDto> createEventComment(
-            @RequestBody @Valid CreateCommentRequestDto request,
-            @PathVariable("event-id") Long id
-    ) {
-        return new ResponseEntity<>(commentService.createComment(id, CommentType.EVENT, request), HttpStatus.CREATED);
-    }
-
-    @PatchMapping("/comments/{id}")
-    @Override
+    @PatchMapping("/{id}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long id, @RequestBody @Valid UpdateCommentRequestDto request) {
-        return ResponseEntity.ok(commentService.updateCommentStatus(id, request.getStatus()));
+        return ResponseEntity.ok(service.updateCommentStatus(id, request.getStatus()));
     }
 }

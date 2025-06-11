@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
 
+    private UserSpecification() {}
+
     public static Specification<User> filterByEventAttendance(Long eventId) {
         return (root, query, criteriaBuilder) -> {
             Join<User, Person> personJoin = root.join("person");

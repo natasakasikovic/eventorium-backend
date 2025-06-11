@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RemoveImageRequestDto {
-    Long id;
+    private Long id;
 }

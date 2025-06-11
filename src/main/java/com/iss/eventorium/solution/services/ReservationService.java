@@ -41,20 +41,21 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final ReservationRepository repository;
+    private final CompanyRepository companyRepository;
     private final EventService eventService;
     private final ServiceService serviceService;
     private final EmailService emailService;
     private final AuthService authService;
 
-    private final CompanyRepository companyRepository;
-    private final ReservationRepository repository;
+    private final ReservationMapper mapper;
 
     private final SpringTemplateEngine templateEngine;
 
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
         Service service = serviceService.find(serviceId);
-        Reservation reservation = ReservationMapper.fromRequest(request, event, service);
+        Reservation reservation = mapper.fromRequest(request, event, service);
 
         validateReservation(reservation);
         saveEntity(reservation);
@@ -84,7 +85,7 @@ public class ReservationService {
 
     public List<CalendarReservationDto> getProviderReservations() {
         User provider = authService.getCurrentUser();
-        return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(ReservationMapper::toCalendarReservation).toList();
+        return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(mapper::toCalendarReservation).toList();
     }
 
 
