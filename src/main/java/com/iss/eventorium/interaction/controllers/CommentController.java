@@ -1,5 +1,6 @@
 package com.iss.eventorium.interaction.controllers;
 
+import com.iss.eventorium.interaction.api.CommentApi;
 import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
 import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.dtos.comment.UpdateCommentRequestDto;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/comments")
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentController implements CommentApi {
 
     private final CommentService service;
 

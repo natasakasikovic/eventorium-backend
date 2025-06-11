@@ -18,7 +18,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name="Category")
+@Tag(
+        name="Category",
+        description =
+        """
+        Handles the category endpoints.
+        Only users with `ADMIN` authority are allowed to modify and create categories.
+        """
+)
 public interface CategoryApi {
 
     @Operation(
@@ -36,7 +43,7 @@ public interface CategoryApi {
             """
             Returns a subset of categories based on pagination parameters.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -54,7 +61,7 @@ public interface CategoryApi {
             Fetches the details of a single category using its unique identifier.
             Returns the category information if it exists.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -91,7 +98,7 @@ public interface CategoryApi {
             Creates a new category.
             Returns the created category if successful.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -141,7 +148,7 @@ public interface CategoryApi {
             Updates category if exists.
             Returns the updated category if successful.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -208,7 +215,7 @@ public interface CategoryApi {
             """
             Deletes the category if it exists and is not associated with any solutions.
             Requires authentication and ADMIN authority.
-            Only users with the 'ADMIN' authority can access this endpoint.
+            Only users with the `ADMIN` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

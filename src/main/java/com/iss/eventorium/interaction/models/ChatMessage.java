@@ -2,6 +2,7 @@ package com.iss.eventorium.interaction.models;
 
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class ChatMessage {
     @JoinColumn(name = "recipient_id")
     private User recipient;
 
+    @Size(max = 100)
     private String message;
     private LocalDateTime timestamp;
 }
