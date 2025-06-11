@@ -8,6 +8,7 @@ import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
@@ -30,9 +31,11 @@ public abstract class Solution implements ImageHolder {
     private Long id;
 
     @Column(nullable = false)
+    @Size(max = 75)
     private String name;
 
     @Column(nullable = false, length = 1000)
+    @Size(max = 750)
     private String description;
 
     @Column(nullable = false)

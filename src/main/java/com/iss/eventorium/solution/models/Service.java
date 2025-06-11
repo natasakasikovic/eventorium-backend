@@ -1,12 +1,10 @@
 package com.iss.eventorium.solution.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
-
-import java.util.Objects;
-
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -23,6 +21,7 @@ public class Service extends Solution {
     private ReservationType type;
 
     @Column(nullable = false)
+    @Size(max = 750)
     private String specialties;
 
     @Column(name="reservation_deadline", nullable = false)

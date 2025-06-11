@@ -53,7 +53,8 @@ public class ProductSpecification {
 
     public static Specification<Product> filterById(Long id, User user) {
         return Specification.where(hasId(id)
-                .and(filterOutBlockedContent(user)));
+                .and(filterOutBlockedContent(user)))
+                .and(applyUserRoleFilter(user));
     }
 
     private static Specification<Product> hasId(Long id){

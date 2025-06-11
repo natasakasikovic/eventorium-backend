@@ -16,9 +16,9 @@ public class ServiceFilterDto {
     private String category;
     private Boolean availability;
 
-    @Min(value = 0, message = "The value of minimal price must be greater than or equal to zero!")
+    @Min(value = 0, message = "The value of minimal price must be greater than or equal to zero")
     private Double minPrice;
 
-    @Positive(message = "The value of maximum price must be greater than zero!")
+    @Positive(message = "The value of maximum price must be greater than zero")
     private Double maxPrice;
 }

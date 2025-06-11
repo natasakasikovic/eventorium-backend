@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.AccountServiceApi;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.dtos.services.ServiceResponseDto;
 import com.iss.eventorium.solution.dtos.services.ServiceSummaryResponseDto;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/account/services")
 @RequiredArgsConstructor
-public class AccountServiceController {
+public class AccountServiceController implements AccountServiceApi {
 
     private final AccountServiceService accountService;
 

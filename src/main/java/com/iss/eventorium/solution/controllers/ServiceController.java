@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.ServiceApi;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1/services")
-public class ServiceController {
+public class ServiceController implements ServiceApi {
 
     private final ServiceService service;
 
@@ -81,9 +82,9 @@ public class ServiceController {
 
     @GetMapping("/suggestions")
     public ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-        @RequestParam("categoryId") Long id,
-        @RequestParam("eventId") Long eventId,
-        @RequestParam("price") Double price
+            @RequestParam("categoryId") Long id,
+            @RequestParam("eventId") Long eventId,
+            @RequestParam("price") Double price
     ) {
         return ResponseEntity.ok(service.getBudgetSuggestions(id, eventId, price));
     }
