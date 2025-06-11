@@ -13,6 +13,8 @@ import jakarta.persistence.criteria.Expression;
 
 public class ProductSpecification {
 
+    private ProductSpecification() {}
+
     public static Specification<Product> filterBy(ProductFilterDto filter, User user) {
         return Specification.where(hasName(filter.getName()))
                 .and(hasDescription(filter.getDescription()))

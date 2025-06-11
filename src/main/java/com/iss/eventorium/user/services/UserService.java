@@ -4,7 +4,7 @@ import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.HashUtils;
-import com.iss.eventorium.shared.utils.ImageUpload;
+import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
@@ -24,7 +24,6 @@ import com.iss.eventorium.user.specifications.UserSpecification;
 import com.iss.eventorium.user.validators.deactivation.AccountDeactivationValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,12 +33,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -52,9 +49,11 @@ public class UserService {
     private final PersonMapper personMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AccountDeactivationValidator validator;
+    private final ImageService imageService;
 
-    @Value("${image-path}")
-    private String imagePath;
+    private final UserMapper mapper;
+
+    private static final String IMG_DIR_NAME = "profilePhotos";
 
     public User find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
@@ -76,16 +75,16 @@ public class UserService {
         User existingUser = repository.findByEmail(authRequestDto.getEmail()).orElse(null);
 
         if (existingUser == null)
-            return UserMapper.toResponse(createNewRegistrationRequest(authRequestDto));
+            return mapper.toResponse(createNewRegistrationRequest(authRequestDto));
 
         checkActivationStatus(existingUser);
         checkRequestExpired(existingUser);
 
-        return UserMapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
+        return mapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
     }
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {
-        User created = UserMapper.fromRequest(authRequestDto);
+        User created = mapper.fromRequest(authRequestDto);
         created.setHash(HashUtils.generateHash());
         created.setPassword(passwordEncoder.encode(authRequestDto.getPassword()));
         sendActivationEmail(created);
@@ -125,24 +124,14 @@ public class UserService {
         if (photo == null || photo.isEmpty()) return;
 
         User user = find(userId);
-        String fileName = generateFileName(photo);
-        String uploadDir = getUploadDirectory();
+        String fileName = imageService.generateFileName(photo);
 
         try {
-            ImageUpload.saveImage(uploadDir, fileName, photo);
-            saveProfilePhoto(user, uploadDir, fileName);
+            imageService.uploadImage(IMG_DIR_NAME, fileName, photo);
+            saveProfilePhoto(user, fileName);
         } catch (IOException e) {
             throw new ImageUploadException("Failed to save profile photo.");
         }
-    }
-
-    private String generateFileName(MultipartFile photo) {
-        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(photo.getOriginalFilename()));
-        return Instant.now().toEpochMilli() + "_" + originalFileName;
-    }
-
-    private String getUploadDirectory() {
-        return StringUtils.cleanPath(imagePath + "profilePhotos/");
     }
 
     public void activateAccount(String hash) {
@@ -155,7 +144,7 @@ public class UserService {
     }
 
     public void quickRegister(QuickRegistrationRequestDto request) {
-        User user = UserMapper.fromRequest(request);
+        User user = mapper.fromRequest(request);
         setUserDetails(user);
 
         if (repository.existsByEmail(user.getEmail()))
@@ -176,12 +165,11 @@ public class UserService {
 
     public AccountDetailsDto getCurrentUser() {
         User current = authService.getCurrentUser();
-        return UserMapper.toAccountDetails(current);
+        return mapper.toAccountDetails(current);
     }
 
     public AccountDetailsDto getUser(Long id) {
-        User user = find(id);
-        return UserMapper.toAccountDetails(user);
+        return mapper.toAccountDetails(find(id));
     }
 
     public ImagePath getProfilePhotoPath(long id) {
@@ -193,13 +181,7 @@ public class UserService {
     }
 
     public byte[] getProfilePhoto(ImagePath path) {
-        String uploadDir = getUploadDirectory();
-        try {
-            File file = new File(uploadDir + path.getPath());
-            return Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            throw new ImageNotFoundException("Fail to read image");
-        }
+        return imageService.getImage(IMG_DIR_NAME, path);
     }
 
     public void update(UpdateRequestDto person) {
@@ -210,8 +192,8 @@ public class UserService {
         repository.save(user);
     }
 
-    private void saveProfilePhoto(User user, String uploadDir, String fileName) throws IOException {
-        String contentType = ImageUpload.getImageContentType(uploadDir, fileName);
+    private void saveProfilePhoto(User user, String fileName) throws IOException {
+        String contentType = imageService.getImageContentType(IMG_DIR_NAME, fileName);
         ImagePath path = ImagePath.builder().path(fileName).contentType(contentType).build();
         user.getPerson().setProfilePhoto(path);
         repository.save(user);

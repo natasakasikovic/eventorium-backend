@@ -4,32 +4,27 @@ import com.iss.eventorium.interaction.dtos.ratings.CreateRatingRequestDto;
 import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.user.mappers.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
+@RequiredArgsConstructor
 public class RatingMapper {
 
-    private static ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    public RatingMapper(ModelMapper modelMapper) {
-        RatingMapper.modelMapper = modelMapper;
-    }
-
-    public static RatingResponseDto toResponse(Rating rating) {
-        if(rating == null) {
+    public RatingResponseDto toResponse(Rating rating) {
+        if(rating == null)
             return null;
-        }
+
         RatingResponseDto dto = modelMapper.map(rating, RatingResponseDto.class);
-        dto.setUser(UserMapper.toUserDetails(rating.getUser()));
+        dto.setUser(userMapper.toUserDetails(rating.getRater()));
         return dto;
     }
 
-    public static Rating fromCreateRequest(CreateRatingRequestDto createRatingRequestDto) {
+    public Rating fromCreateRequest(CreateRatingRequestDto createRatingRequestDto) {
         return modelMapper.map(createRatingRequestDto, Rating.class);
     }
 

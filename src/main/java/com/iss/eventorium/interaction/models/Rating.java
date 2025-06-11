@@ -31,5 +31,5 @@ public class Rating {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private User user;
+    private User rater;
 }

@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.iss.eventorium.solution.mappers.ProductMapper.toPagedResponse;
-
 @Service
 @RequiredArgsConstructor
 public class AccountProductService {
@@ -27,9 +25,11 @@ public class AccountProductService {
     private final AuthService authService;
     private final UserRepository userRepository;
 
+    private final ProductMapper mapper;
+
     public List<ProductSummaryResponseDto> getFavouriteProducts() {
         return authService.getCurrentUser().getPerson().getFavouriteProducts()
-                .stream().map(ProductMapper::toSummaryResponse).toList();
+                .stream().map(mapper::toSummaryResponse).toList();
     }
 
     public void addFavouriteProduct(Long id) {
@@ -63,31 +63,31 @@ public class AccountProductService {
 
     public List<ProductSummaryResponseDto> getAll() {
         Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> getProductsPaged(Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterForProvider(authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> searchProducts(String keyword) {
         Specification<Product> specification = ProductSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> searchProducts(String keyword, Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterByNameForProvider(keyword, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
     public List<ProductSummaryResponseDto> filterProducts(ProductFilterDto filter) {
         Specification<Product> specification = ProductSpecification.filterForProvider(filter, authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(ProductMapper::toSummaryResponse).toList();
+        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<ProductSummaryResponseDto> filterProducts(ProductFilterDto filter, Pageable pageable) {
         Specification<Product> specification = ProductSpecification.filterForProvider(filter, authService.getCurrentUser());
-        return toPagedResponse(repository.findAll(specification, pageable));
+        return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 }

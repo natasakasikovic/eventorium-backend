@@ -2,6 +2,7 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.solution.api.ServiceApi;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
@@ -18,13 +19,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.List;
 
-@CrossOrigin
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/v1/services")
 public class ServiceController implements ServiceApi {
 
     private final ServiceService service;
+
+    @GetMapping("/top-five-services")
+    public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
+        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<ServiceSummaryResponseDto>> getAllServices() {
@@ -34,11 +39,6 @@ public class ServiceController implements ServiceApi {
     @GetMapping
     public ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getServicesPaged(Pageable pageable) {
         return ResponseEntity.ok(service.getServicesPaged(pageable));
-    }
-
-    @GetMapping("/top-five-services")
-    public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
-        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
     }
 
     @GetMapping("/filter/all")
@@ -118,4 +118,11 @@ public class ServiceController implements ServiceApi {
         service.deleteService(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}/images")
+    public ResponseEntity<Void> deleteImages(@PathVariable("id") Long id, @RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.deleteImages(id, removedImages);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

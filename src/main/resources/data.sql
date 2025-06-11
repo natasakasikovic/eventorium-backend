@@ -32,7 +32,10 @@ INSERT INTO images (content_type, path) VALUES
     ('image/png', 'event_planned_by_us.png'), --20
     ('image/png', 'logo.png'), --21
     ('image/png', 'bday_decoration.png'), --22
-    ('image/png', 'decorated_by_us.png'); --23
+    ('image/png', 'decorated_by_us.png'), --23
+    ('image/jpg', 'wed.jpg'), --24
+    ('image/jpg', 'corporate-event-planning.jpg'), --25
+    ('image/jpg', 'birthday.jpg'); --26
 
 
 INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, email, lastname, name, password, phone_number, last_password_reset, hash, profile_photo_id, deactivated) VALUES
@@ -60,7 +63,7 @@ VALUES
      'support@partysupplies.com',
      'Party Supplies Hub', '+15554567890', 4);
 
-insert into companies_photos (company_id, photos_id) values
+insert into companies_image_paths (company_id, image_paths_id) values
  (1, 18),
  (1, 19),
  (1, 20),
@@ -82,14 +85,13 @@ INSERT INTO categories (name, description, deleted, suggested) VALUES
  ('Marketing', 'Promotions and event advertising',   false, false);
 
 
-INSERT INTO event_types (name, description, deleted) VALUES
-('Wedding', 'Event type for organizing weddings', false),
-('Corporate Event', 'Event type for organizing corporate events', false),
-('Birthday Party', 'Event type for organizing birthdays', false);
+INSERT INTO event_types (name, description, deleted, image_id) VALUES
+('Wedding', 'Event type for organizing weddings', false, 24),
+('Corporate Event', 'Event type for organizing corporate events', false, 25),
+('Birthday Party', 'Event type for organizing birthdays', false, 26);
 
 
 INSERT INTO event_types_suggested_categories VALUES (1, 2),(1, 4),(1,9),(1,7),(2,1),(3,2),(3,4),(3, 7);
-
 
 INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
 (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 2.50, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
@@ -145,7 +147,16 @@ VALUES
 ('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, null),
 ('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'CLOSED', 50, 2, '234 Retreat Ave', 3, 1, false, null),
 ('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'CLOSED', 200, 3, '111 Fest Rd', 1, 1, false, null),
-('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null);
+('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null),
+('Belgrade Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY , 'OPEN', 100, 3, '444 Culture St', 6, 2, false, null),
+('Sunset Jazz Fest', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 200, 3, '12 Jazz Ave', 1, 1, false, null),
+('Autumn Food Carnival', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 200, 3, '88 Harvest Rd', 1, 1, false, null),
+('Downtown Beats', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '4' DAY, 'CLOSED', 200, 3, '99 Groove St', 1, 1, false, null),
+('Riverfront Light Parade', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 100, 3, '5 Riverside Blvd', 6, 2, false, null),
+('Midnight Art Jam', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 100, 3, '21 Canvas Ln', 6, 2, false, null),
+('Old Town Storytelling', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 100, 3, '77 Heritage Ct', 6, 2, false, null),
+('Garden Groove Gathering', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 200, 3, '33 Bloom St', 1, 1, false, null);
+
 
 
 INSERT INTO activities (name, description, start_time, end_time, location, event_id)
@@ -241,7 +252,7 @@ INSERT INTO invitations (email, event_id, hash) VALUES
 ('provider@gmail.com', 21, '3');
 
 -- Comments for events
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('What a beautiful wedding, I loved the decorations!', CURRENT_TIMESTAMP, 'ACCEPTED', 3, 'EVENT', 1),
     ('The reception was elegant, and the food was amazing. Would love to attend again!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'EVENT', 1),
@@ -275,7 +286,7 @@ VALUES
     ('Everything was perfect, but it could have been more interactive.', CURRENT_TIMESTAMP, 'PENDING', 2, 'EVENT', 4);
 
 -- Comments for products
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('These custom invitations are so beautiful. Exactly what I was looking for!', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'PRODUCT', 1),
     ('The quality of the invitations is outstanding! Highly recommend.', CURRENT_TIMESTAMP, 'PENDING', 2, 'PRODUCT', 1),
@@ -293,7 +304,7 @@ VALUES
     ('Loved the customization options. Everyone at the event was wearing them!', CURRENT_TIMESTAMP, 'ACCEPTED', 1, 'PRODUCT', 5);
 
 -- Comments for services
-INSERT INTO comments (comment, creation_date, status, user_id, comment_type, commentable_id)
+INSERT INTO comments (comment, creation_date, status, author_id, comment_type, object_id)
 VALUES
     ('The photographer was amazing! Caught all the special moments.', CURRENT_TIMESTAMP, 'ACCEPTED', 4, 'SERVICE', 9),
     ('The photos were incredible. Worth every penny!', CURRENT_TIMESTAMP, 'ACCEPTED', 2, 'SERVICE', 9),
@@ -312,7 +323,7 @@ VALUES
     ('The lighting setup was nice, but the bulbs burned out too soon.', CURRENT_TIMESTAMP, 'PENDING', 2, 'SERVICE', 13);
 
 -- Ratings for solutions
-INSERT INTO ratings (rating, user_id, creation_date, solution_id)
+INSERT INTO ratings (rating, rater_id, creation_date, solution_id)
 VALUES
     (5, 1, CURRENT_TIMESTAMP, 1),
     (4, 2, CURRENT_TIMESTAMP, 2),
@@ -329,7 +340,7 @@ VALUES
     (2, 4, CURRENT_TIMESTAMP, 1);
 
 -- Ratings for events
-INSERT INTO ratings (rating, user_id, creation_date, event_id)
+INSERT INTO ratings (rating, rater_id, creation_date, event_id)
 VALUES
     (5, 1, CURRENT_TIMESTAMP, 1),
     (4, 2, CURRENT_TIMESTAMP, 2),
@@ -345,7 +356,22 @@ VALUES
     (5, 2, CURRENT_TIMESTAMP, 12),
     (3, 3, CURRENT_TIMESTAMP, 13),
     (4, 4, CURRENT_TIMESTAMP, 14),
-    (1, 5, CURRENT_TIMESTAMP, 15);
+    (1, 5, CURRENT_TIMESTAMP, 15),
+    (5, 2, CURRENT_TIMESTAMP, 23),
+    (3, 2, CURRENT_TIMESTAMP, 24);
 
 
-INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1), (2, 1), (3,1), (4,1), (5,1);
+INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 1),
+                                                                         (2, 1),
+                                                                         (3,1),
+                                                                         (4,1),
+                                                                         (5,1),
+                                                                         (1, 22),
+                                                                         (3, 23),
+                                                                         (2, 23),
+                                                                         (3, 24),
+                                                                         (2, 24),
+                                                                         (3, 25),
+                                                                         (3, 26),
+                                                                         (3, 28),
+                                                                         (3, 29);

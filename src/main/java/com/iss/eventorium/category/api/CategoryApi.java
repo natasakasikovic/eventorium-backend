@@ -23,7 +23,7 @@ public interface CategoryApi {
 
     @Operation(
             summary = "Fetches all categories.",
-            description = "Retrieves a list of all available categories.",
+            description = "Returns a list of all available categories.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -173,7 +173,7 @@ public interface CategoryApi {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "407",
+                            responseCode = "409",
                             description = "Category conflict. This may occur if the category with the same name already exists.",
                             content = @Content(
                                     schema = @Schema(implementation = ExceptionResponse.class),
@@ -206,7 +206,7 @@ public interface CategoryApi {
             summary = "Deletes a category.",
             description =
             """
-            Deletes category if exists.
+            Deletes the category if it exists and is not associated with any solutions.
             Requires authentication and ADMIN authority.
             Only users with the 'ADMIN' authority can access this endpoint.
             """,
@@ -228,7 +228,7 @@ public interface CategoryApi {
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "407",
+                            responseCode = "409",
                             description = "Category conflict. This may occur if the category is in use.",
                             content = @Content(
                                     schema = @Schema(implementation = ExceptionResponse.class),
@@ -242,5 +242,12 @@ public interface CategoryApi {
 
             }
     )
-    ResponseEntity<Void> deleteCategory(Long id);
+    ResponseEntity<Void> deleteCategory(
+            @Parameter(
+                    description = "The unique identifier of the category to delete.",
+                    required = true,
+                    example = "123"
+            )
+            Long id
+    );
 }

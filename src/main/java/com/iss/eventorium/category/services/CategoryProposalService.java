@@ -2,7 +2,7 @@ package com.iss.eventorium.category.services;
 
 import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.category.exceptions.CategoryAlreadyExistsException;
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.repositories.CategoryRepository;
 import com.iss.eventorium.notifications.models.Notification;
@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Locale;
 
-import static com.iss.eventorium.category.mappers.CategoryMapper.toResponse;
-
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +32,8 @@ public class CategoryProposalService {
     private final SolutionService solutionService;
 
     private final CategoryRepository categoryRepository;
+
+    private final CategoryMapper mapper;
 
     private final MessageSource messageSource;
 
@@ -52,14 +52,13 @@ public class CategoryProposalService {
 
         solutionService.saveStatus(solution, status);
         sendStatusUpdateNotification(category, status, solution.getProvider());
-        return toResponse(categoryRepository.save(category));
+        return mapper.toResponse(categoryRepository.save(category));
     }
 
     public CategoryResponseDto updateCategoryProposal(Long categoryId, CategoryRequestDto request) {
         Category category = getCategoryProposal(categoryId);
 
-        if (categoryService.checkCategoryExistence(category, request.getName()))
-            throw new CategoryAlreadyExistsException("Category with name " + category.getName() + " already exists!");
+        categoryService.ensureCategoryNameAvailability(category, request.getName());
 
         Solution solution = getSolutionProposal(category);
         updateCategoryProposal(category, request);
@@ -68,7 +67,7 @@ public class CategoryProposalService {
         solutionService.saveStatus(solution, Status.ACCEPTED);
 
         sendUpdateNotification(category, solution.getProvider());
-        return toResponse(response);
+        return mapper.toResponse(response);
     }
 
     public CategoryResponseDto changeCategoryProposal(Long categoryId, CategoryRequestDto request) {
@@ -80,11 +79,11 @@ public class CategoryProposalService {
         solutionService.setCategory(solution, categoryService.findByName(request.getName()));
 
         sendChangeNotification(category, solution, request);
-        return toResponse(solution.getCategory());
+        return mapper.toResponse(solution.getCategory());
     }
 
     public void handleCategoryProposal(Category category) {
-        categoryService.ensureCategoryNameIsUnique(category);
+        categoryService.ensureCategoryNameIsUnique(category.getName());
         category.setSuggested(true);
         sendNotificationToAdmin(category);
     }

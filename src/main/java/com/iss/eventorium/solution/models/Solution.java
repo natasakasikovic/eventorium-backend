@@ -2,34 +2,28 @@ package com.iss.eventorium.solution.models;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.interaction.models.Comment;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 import java.util.Objects;
 
-@Getter
-@Setter
+@Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @SQLRestriction("is_deleted = false")
-public abstract class Solution extends CommentableEntity {
+public abstract class Solution implements ImageHolder {
 
     @Id
     @SequenceGenerator(name = "solutionSeqGen", sequenceName = "solutionSequence", allocationSize = 1)
@@ -104,16 +98,6 @@ public abstract class Solution extends CommentableEntity {
         if (this == o) return true;
         if (!(o instanceof Solution solution)) return false;
         return Objects.equals(id, solution.id);
-    }
-
-    @Override
-    public String getDisplayName() {
-        return name;
-    }
-
-    @Override
-    public User getCreator() {
-        return provider;
     }
 
     @Override

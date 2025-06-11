@@ -14,6 +14,7 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository repository;
+    private final RoleMapper mapper;
 
     public Role findById(Long id) {
         return this.repository.getReferenceById(id);
@@ -26,7 +27,7 @@ public class RoleService {
     public List<RoleDto> getRegistrationRoles() {
         List<Role> roles = repository.findByNameIn(List.of("PROVIDER", "EVENT_ORGANIZER"));
         return roles.stream()
-                .map(RoleMapper::toResponse)
+                .map(mapper::toResponse)
                 .toList();
     }
 

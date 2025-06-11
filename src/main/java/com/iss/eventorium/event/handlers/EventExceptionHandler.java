@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class EventExceptionHandler {
+
     @ExceptionHandler(EventAlreadyPassedException.class)
     public ResponseEntity<ExceptionResponse> handleEventAlreadyPassed(EventAlreadyPassedException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

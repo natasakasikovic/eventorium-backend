@@ -4,10 +4,7 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
-import com.iss.eventorium.interaction.mappers.RatingMapper;
-import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
 import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
@@ -16,56 +13,57 @@ import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Product;
 
 import com.iss.eventorium.user.mappers.UserMapper;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
-    private static ModelMapper modelMapper;
 
-    @Autowired
-    public ProductMapper(ModelMapper modelMapper) {
-        ProductMapper.modelMapper = modelMapper;
-    }
+    private final ModelMapper modelMapper;
+    private final CategoryMapper categoryMapper;
+    private final EventTypeMapper eventTypeMapper;
+    private final CompanyMapper companyMapper;
+    private final UserMapper userMapper;
 
-    public static ProductSummaryResponseDto toSummaryResponse(Product product) {
+    public ProductSummaryResponseDto toSummaryResponse(Product product) {
         ProductSummaryResponseDto dto = modelMapper.map(product, ProductSummaryResponseDto.class);
         dto.setRating(product.calculateAverageRating());
         return dto;
     }
 
-    public static PagedResponse<ProductSummaryResponseDto> toPagedResponse(Page<Product> page) {
+    public PagedResponse<ProductSummaryResponseDto> toPagedResponse(Page<Product> page) {
         return new PagedResponse<>(
-                page.stream().map(ProductMapper::toSummaryResponse).toList(),
+                page.getContent().stream().map(this::toSummaryResponse).toList(),
                 page.getTotalPages(),
                 page.getTotalElements()
         );
     }
 
-    public static ProductResponseDto toResponse(Product product) {
+    public ProductResponseDto toResponse(Product product) {
         ProductResponseDto dto = modelMapper.map(product, ProductResponseDto.class);
-        dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
-        dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
+        dto.setCategory(categoryMapper.toResponse(product.getCategory()));
+        dto.setEventTypes(product.getEventTypes().stream().map(eventTypeMapper::toResponse).toList());
         dto.setRating(product.calculateAverageRating());
-        dto.setProvider(UserMapper.toUserDetails(product.getProvider()));
+        dto.setProvider(userMapper.toUserDetails(product.getProvider()));
         return dto;
     }
 
-    public static ProductDetailsDto toDetailsResponse(Product product, Company company) {
+    public ProductDetailsDto toDetailsResponse(Product product, Company company) {
         ProductDetailsDto dto = modelMapper.map(product, ProductDetailsDto.class);
-        dto.setCategory(CategoryMapper.toResponse(product.getCategory()));
-        dto.setEventTypes(product.getEventTypes().stream().map(EventTypeMapper::toResponse).toList());
+        dto.setCategory(categoryMapper.toResponse(product.getCategory()));
+        dto.setEventTypes(product.getEventTypes().stream().map(eventTypeMapper::toResponse).toList());
         dto.setRating(product.calculateAverageRating());
-        dto.setProvider(UserMapper.toUserDetails(product.getProvider()));
-        dto.setCompany(CompanyMapper.toResponse(company));
+        dto.setProvider(userMapper.toUserDetails(product.getProvider()));
+        dto.setCompany(companyMapper.toResponse(company));
         return dto;
     }
 
-    public static Product fromCreateRequest(CreateProductRequestDto request) {
+    public Product fromCreateRequest(CreateProductRequestDto request) {
         return Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -75,12 +73,12 @@ public class ProductMapper {
                 .isDeleted(false)
                 .isAvailable(request.getIsAvailable())
                 .ratings(new ArrayList<>())
-                .category(CategoryMapper.fromResponse(request.getCategory()))
-                .eventTypes(request.getEventTypes().stream().map(EventTypeMapper::fromResponse).toList())
+                .category(categoryMapper.fromResponse(request.getCategory()))
+                .eventTypes(request.getEventTypes().stream().map(eventTypeMapper::fromResponse).toList())
                 .build();
     }
 
-    public static Memento toMemento(Product product) {
+    public Memento toMemento(Product product) {
         return modelMapper.map(product, Memento.class);
     }
 }
