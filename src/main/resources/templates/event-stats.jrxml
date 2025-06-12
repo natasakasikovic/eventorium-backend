@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+			  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+			  name="event_stats"
+			  pageWidth="595"
+			  pageHeight="842"
+			  columnWidth="555"
+			  leftMargin="20"
+			  rightMargin="20"
+			  topMargin="20"
+			  bottomMargin="20"
+			  uuid="ced95029-b569-4027-895c-af2843a4e088">
+
+	<parameter name="eventName" class="java.lang.String"/>
+	<parameter name="totalRatings" class="java.lang.Integer"/>
+	<parameter name="totalVisitors" class="java.lang.Integer"/>
+	<parameter name="chartDataSource" class="net.sf.jasperreports.engine.JRDataSource"/>
+
+	<queryString><![CDATA[]]></queryString>
+
+	<field name="rating" class="java.lang.Integer"/>
+	<field name="count" class="java.lang.Integer"/>
+
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+
+	<title>
+		<band height="50">
+			<textField>
+				<reportElement x="0" y="10" width="535" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{eventName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+
+	<summary>
+		<band height="300" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="80" width="60" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" size="12"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+
+			<barChart>
+				<chart evaluationTime="Report">
+					<reportElement x="80" y="0" width="400" height="200"/>
+					<chartTitle/>
+					<chartLegend/>
+				</chart>
+
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Ratings"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{rating}.toString()]]></categoryExpression>
+						<valueExpression><![CDATA[$F{count}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+
+				<barPlot>
+					<plot>
+						<seriesColor color="#4CAF50"  seriesOrder="0"/>
+					</plot>
+					<itemLabel />
+					<categoryAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+
+			<textField>
+				<reportElement x="80" y="210" width="200" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total Ratings: " + $P{totalRatings}]]></textFieldExpression>
+			</textField>
+
+			<textField>
+				<reportElement x="80" y="235" width="200" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total Visitors: " + $P{totalVisitors}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+
+</jasperReport>

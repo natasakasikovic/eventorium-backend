@@ -241,6 +241,20 @@ public class EventService {
         return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
     }
 
+    public byte[] generateEventStatisticsPdf(Long id) {
+        EventRatingsStatisticsDto statistics = getEventRatingStatistics(id);
+        List<RatingCount> chartData = statistics.getRatingsCount().entrySet().stream()
+                .map(entry -> new RatingCount(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> params = generateParams(find(id));
+        params.put("totalRatings", statistics.getTotalRatings());
+        params.put("totalVisitors", statistics.getTotalVisitors());
+
+        return pdfService.generate("/templates/event-stats.jrxml", chartData, params);
+//        return pdfService.generate("/templates/event-stats.jrxml", List.of(statistics), generateParams(find(id)));
+    }
+
     private Map<String, Object> generateParams(Event event) {
         Map<String, Object> params = new HashMap<>();
         params.put("eventName", event.getName());

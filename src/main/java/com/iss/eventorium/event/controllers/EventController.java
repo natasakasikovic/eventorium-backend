@@ -118,4 +118,10 @@ public class EventController {
     public ResponseEntity<EventRatingsStatisticsDto> getEventRatingStatistics(@PathVariable Long id) {
         return new ResponseEntity<>(service.getEventRatingStatistics(id), HttpStatus.CREATED);
     }
+
+    @GetMapping("/{id}/pdf-statistics")
+    public ResponseEntity<byte[]> getEventStatisticsPdf(@PathVariable Long id) {
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("event_statistics.pdf");
+        return new ResponseEntity<>(service.generateEventStatisticsPdf(id), headers, HttpStatus.CREATED);
+    }
 }

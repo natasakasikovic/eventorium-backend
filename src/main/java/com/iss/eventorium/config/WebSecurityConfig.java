@@ -106,7 +106,6 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/products/{id}/*").permitAll()
 
                         // Events
-                        .requestMatchers("/api/v1/events/{id}/statistics").hasAuthority(ADMIN)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST,"/api/v1/events/{id}/ratings").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
@@ -114,6 +113,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/*/agenda").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/drafted").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/guest-list-pdf").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/statistics").hasAuthority(ADMIN)
+                        .requestMatchers("/api/v1/events/{id}/pdf-statistics").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/events/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events").permitAll()
