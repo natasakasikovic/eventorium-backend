@@ -64,7 +64,7 @@ public class Event {
     private User organizer;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Budget budget;
+    private Budget budget = new Budget();
 
     @Column(name = "is_draft")
     private boolean isDraft = true;

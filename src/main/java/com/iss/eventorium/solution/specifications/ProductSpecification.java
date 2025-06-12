@@ -119,31 +119,30 @@ public class ProductSpecification {
 
     private static Specification<Product> applyUserRoleFilter(User user) {
         return (root, query, cb) -> {
-            if (user == null) {
+            // Unauthenticated users and organizers can only see visible and accepted products
+            if (user == null || user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName()))) {
                 return cb.and(
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
             }
 
-            if (user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()))) {
-                return cb.or(
-                        cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))), // If user is PROVIDER, filter by accepted and visible services
-                        cb.equal(root.get("provider").get("id"), user.getId())                 // or services that belong to the provider
-                );
-            } else {
-                return cb.and(
-                        cb.isTrue(root.get("isVisible")),
-                        cb.notEqual(root.get("status"), "ACCEPTED")
-                );
+            // Allow admin to see every product.
+            if (user.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName()))) {
+                return cb.conjunction();
             }
+
+            // Provider can see his hidden and pending products.
+            return cb.or(
+                    cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),
+                    cb.equal(root.get("provider").get("id"), user.getId())
+            );
         };
     }
 
     private static Specification<Product> filterOutBlockedContent(User blocker) {
         return (root, query, cb) -> {
             if (blocker == null) return cb.conjunction();
-
             Long blockerId = blocker.getId();
 
             Subquery<Long> subquery = query.subquery(Long.class);

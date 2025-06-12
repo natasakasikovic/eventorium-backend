@@ -64,9 +64,9 @@ public class EventController {
         return ResponseEntity.ok(service.searchEventsPaged(keyword, pageable));
     }
 
-    @GetMapping("/drafted")
-    public ResponseEntity<List<EventResponseDto>> draftedEvents() {
-        return ResponseEntity.ok(service.getDraftedEvents());
+    @GetMapping("/future")
+    public ResponseEntity<List<EventResponseDto>> getFutureEvents() {
+        return ResponseEntity.ok(service.getFutureEvents());
     }
   
     @GetMapping("/search/all")

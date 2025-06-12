@@ -1,9 +1,6 @@
 package com.iss.eventorium.shared.handlers;
 
-import com.iss.eventorium.shared.exceptions.EmailSendingException;
-import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
-import com.iss.eventorium.shared.exceptions.ImageUploadException;
-import com.iss.eventorium.shared.exceptions.PdfGenerationException;
+import com.iss.eventorium.shared.exceptions.*;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -82,6 +79,15 @@ public class GlobalExceptionHandler {
                 .body(ExceptionResponse.builder()
                 .message(ex.getMessage())
                 .build());
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ExceptionResponse> handleInsufficientFundsException(InsufficientFundsException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(PdfGenerationException.class)

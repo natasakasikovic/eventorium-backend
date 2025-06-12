@@ -215,9 +215,9 @@ public class EventService {
         return find(id).getActivities().stream().map(activityMapper::toResponse).toList();
     }
 
-    // TODO: this method needs to be replaces with method which will get my events in future
-    public List<EventResponseDto> getDraftedEvents() {
-        return repository.findByIsDraftTrueAndOrganizer_Id(authService.getCurrentUser().getId())
+    public List<EventResponseDto> getFutureEvents() {
+        Specification<Event> specification = EventSpecification.filterFutureEvents(authService.getCurrentUser());
+        return repository.findAll(specification)
                 .stream()
                 .map(eventMapper::toResponse)
                 .toList();
