@@ -14,6 +14,11 @@ public class EventSpecification {
 
     private EventSpecification() {}
 
+    public static Specification<Event> filterFutureEvents(User organizer) {
+        return Specification.where(filterByOrganizer(organizer))
+                .and(hasDateAfter(LocalDate.now()));
+    }
+
     public static Specification<Event> filterBy(EventFilterDto filter, User user) {
         return Specification
                 .where(hasName(filter.getName()))

@@ -2,7 +2,6 @@ package com.iss.eventorium.event.models;
 
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.City;
-import com.iss.eventorium.shared.models.CommentableEntity;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "events")
 @Entity
-public class Event extends CommentableEntity {
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,19 +65,21 @@ public class Event extends CommentableEntity {
     private User organizer;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Budget budget;
+    private Budget budget = new Budget();
 
     @Column(name = "is_draft")
     private boolean isDraft = true;
 
-    @Override
-    public String getDisplayName() {
-        return name;
-    }
-
-    @Override
-    public User getCreator() {
-        return organizer;
+    public Double calculateAvgRating() {
+        try {
+            return getRatings()
+                    .stream()
+                    .mapToInt(Rating::getRating)
+                    .average()
+                    .orElse(0.0d);
+        } catch (NullPointerException e) {
+            return 0.0d;
+        }
     }
 }
 

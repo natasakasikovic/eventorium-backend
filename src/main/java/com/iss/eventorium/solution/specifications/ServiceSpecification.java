@@ -56,7 +56,8 @@ public class ServiceSpecification {
 
     public static Specification<Service> filterById(Long id, User user) {
         return Specification.where(hasId(id)
-                .and(filterOutBlockedContent(user)));
+                .and(filterOutBlockedContent(user)))
+                .and(applyUserRoleFilter(user));
     }
 
     private static Specification<Service> hasId(Long id){
@@ -120,14 +121,20 @@ public class ServiceSpecification {
 
     private static Specification<Service> applyUserRoleFilter(User user) {
         return (root, query, cb) -> {
-            boolean isProvider = user != null && user.getRoles().stream().anyMatch(role -> "PROVIDER".equals(role.getName()));
-
-            if (user == null || !isProvider)
+            // Unauthenticated users and organizers can only see visible and accepted services
+            if (user == null || user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName()))) {
                 return cb.and(
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
+            }
 
+            // Allow admin to see every service.
+            if (user.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName()))) {
+                return cb.conjunction();
+            }
+
+            // Provider can see his hidden and pending services.
             return cb.or(
                     cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),
                     cb.equal(root.get("provider").get("id"), user.getId())

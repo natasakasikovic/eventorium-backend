@@ -3,6 +3,7 @@ package com.iss.eventorium.interaction.models;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class Comment {
     private Long id;
 
     @Column(nullable = false)
+    @Size(max = 100)
     private String comment;
 
     @Column(nullable = false)
@@ -31,11 +33,11 @@ public class Comment {
     private Status status = Status.PENDING;
 
     @ManyToOne
-    private User user;
+    private User author;
 
     @Enumerated(EnumType.STRING)
     private CommentType commentType;
 
-    @Column(name = "commentable_id", nullable = false)
-    private Long commentableId;
+    @Column(name = "object_id", nullable = false) // ID of the entity being commented; its type is defined by the commentType field
+    private Long objectId;
 }

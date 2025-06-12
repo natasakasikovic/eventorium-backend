@@ -2,6 +2,7 @@ package com.iss.eventorium.solution.controllers;
 
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.utils.ResponseHeaderUtils;
+import com.iss.eventorium.solution.api.PriceListApi;
 import com.iss.eventorium.solution.dtos.pricelists.PriceListResponseDto;
 import jakarta.validation.Valid;
 import com.iss.eventorium.solution.dtos.pricelists.UpdatePriceRequestDto;
@@ -18,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/price-list")
 @RequiredArgsConstructor
-public class PriceListController {
+public class PriceListController implements PriceListApi {
 
     private final PriceListService priceListService;
 
@@ -28,7 +29,7 @@ public class PriceListController {
     }
 
     @GetMapping("/services")
-    public ResponseEntity<PagedResponse<PriceListResponseDto>> getPriceListServices(Pageable pageable) {
+    public ResponseEntity<PagedResponse<PriceListResponseDto>> getPriceListServicesPaged(Pageable pageable) {
         return ResponseEntity.ok(priceListService.getPriceListServicesPaged(pageable));
     }
 
@@ -38,7 +39,7 @@ public class PriceListController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<PagedResponse<PriceListResponseDto>> getPriceListProducts(Pageable pageable) {
+    public ResponseEntity<PagedResponse<PriceListResponseDto>> getPriceListProductsPaged(Pageable pageable) {
         return ResponseEntity.ok(priceListService.getPriceListProductsPaged(pageable));
     }
 

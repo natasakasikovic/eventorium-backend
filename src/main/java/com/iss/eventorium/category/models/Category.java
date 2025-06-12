@@ -1,6 +1,7 @@
 package com.iss.eventorium.category.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -19,9 +20,11 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @Size(max = 75)
     private String name;
 
     @Column(nullable = false)
+    @Size(max = 750)
     private String description;
 
     private boolean suggested;

@@ -5,7 +5,8 @@ import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
-import com.iss.eventorium.event.exceptions.InsufficientFundsException;
+import com.iss.eventorium.event.repositories.BudgetItemRepository;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -15,30 +16,31 @@ import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
-import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Solution;
-import com.iss.eventorium.solution.models.SolutionType;
+import com.iss.eventorium.solution.models.*;
 import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class BudgetService {
 
     private final ProductService productService;
     private final EventService eventService;
-    private final AccountEventService accountEventService;
     private final AuthService authService;
+    private final AccountEventService accountEventService;
 
     private final EventRepository eventRepository;
+    private final BudgetItemRepository budgetItemRepository;
 
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
@@ -59,12 +61,6 @@ public class BudgetService {
     public BudgetResponseDto getBudget(Long eventId) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
-        if(budget == null) {
-            budget = new Budget();
-            event.setBudget(budget);
-            eventRepository.save(event);
-        }
-
         return mapper.toResponse(budget);
     }
 
@@ -77,9 +73,42 @@ public class BudgetService {
                 .toList();
     }
 
+    public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
+        Budget budget = reservation.getEvent().getBudget();
+        Service service = reservation.getService();
+        budget.addItem(BudgetItem.builder()
+                .itemType(SolutionType.SERVICE)
+                .plannedAmount(plannedAmount)
+                .processedAt(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
+                .solution(service)
+                .category(service.getCategory())
+                .build());
+
+        eventRepository.save(reservation.getEvent());
+    }
+
+    public void markAsReserved(Reservation reservation) {
+        Event event = reservation.getEvent();
+        Budget budget = event.getBudget();
+        Long serviceId = reservation.getService().getId();
+
+        BudgetItem budgetItem = budget.getItems().stream()
+                .filter(item -> Objects.equals(item.getSolution().getId(), serviceId)
+                        && item.getItemType() == SolutionType.SERVICE)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
+
+        budgetItem.setProcessedAt(LocalDateTime.now());
+        budgetItemRepository.save(budgetItem);
+    }
+
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        return event.getBudget().getItems().stream().map(mapper::toResponse).toList();
+        return event.getBudget()
+                .getItems()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     private void updateBudget(Event event, BudgetItem item) {
@@ -87,7 +116,7 @@ public class BudgetService {
         if(containsCategory(budget, item.getCategory())) {
             throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
         }
-        item.setPurchased(LocalDateTime.now());
+        item.setProcessedAt(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
     }

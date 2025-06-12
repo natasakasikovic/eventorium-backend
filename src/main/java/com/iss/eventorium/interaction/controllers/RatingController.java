@@ -1,5 +1,6 @@
 package com.iss.eventorium.interaction.controllers;
 
+import com.iss.eventorium.interaction.api.RatingApi;
 import com.iss.eventorium.interaction.dtos.ratings.CreateRatingRequestDto;
 import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
 import com.iss.eventorium.interaction.services.RatingService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1")
 @RequiredArgsConstructor
-public class RatingController {
+public class RatingController implements RatingApi {
 
     private final RatingService ratingService;
 

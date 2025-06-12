@@ -1,20 +1,18 @@
 package com.iss.eventorium.notifications.controllers;
 
+import com.iss.eventorium.notifications.api.NotificationApi;
 import com.iss.eventorium.notifications.dtos.NotificationResponseDto;
 import com.iss.eventorium.notifications.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/notifications")
-public class NotificationController {
+public class NotificationController implements NotificationApi {
 
     private final NotificationService service;
 

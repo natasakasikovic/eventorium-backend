@@ -38,6 +38,11 @@ public class AccountEventController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/{id}/rating-eligibility")
+    public ResponseEntity<Boolean> getRatingEligibility(@PathVariable Long id) {
+        return ResponseEntity.ok(service.isUserEligibleToRate(id));
+    }
+
     @GetMapping("/favourites")
     public ResponseEntity<List<EventSummaryResponseDto>> getFavouriteEvents() {
         return ResponseEntity.ok(service.getFavouriteEvents());

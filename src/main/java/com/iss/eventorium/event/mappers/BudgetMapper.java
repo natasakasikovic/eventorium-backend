@@ -30,7 +30,15 @@ public class BudgetMapper {
     public BudgetItemResponseDto toResponse(BudgetItem item) {
         BudgetItemResponseDto dto = modelMapper.map(item, BudgetItemResponseDto.class);
         dto.setCategory(categoryMapper.toResponse(item.getCategory()));
-        dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
+        dto.setPlannedAmount(item.getPlannedAmount());
+        dto.setType(item.getItemType());
+        dto.setSolutionId(item.getSolution().getId());
+        dto.setSolutionName(item.getSolution().getName());
+        if(item.getProcessedAt() != null) {
+            dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
+        } else {
+            dto.setSpentAmount(0.0);
+        }
         return dto;
     }
 

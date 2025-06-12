@@ -16,11 +16,11 @@ public class RatingMapper {
     private final UserMapper userMapper;
 
     public RatingResponseDto toResponse(Rating rating) {
-        if(rating == null) {
+        if(rating == null)
             return null;
-        }
+
         RatingResponseDto dto = modelMapper.map(rating, RatingResponseDto.class);
-        dto.setUser(userMapper.toUserDetails(rating.getUser()));
+        dto.setUser(userMapper.toUserDetails(rating.getRater()));
         return dto;
     }
 

@@ -16,12 +16,15 @@ import java.util.List;
 public class UpdateServiceRequestDto {
 
     @NotBlank(message = "Name is mandatory")
+    @Size(min = 1, max = 75, message = "Name must be 75 characters or fewer")
     private String name;
 
     @NotBlank(message = "Description is mandatory")
+    @Size(min = 1, max = 750, message = "Description must be 750 characters or fewer")
     private String description;
 
     @NotBlank(message = "Specialties are mandatory")
+    @Size(min = 1, max = 750, message = "Specialties must be 750 characters or fewer")
     private String specialties;
 
     @NotNull(message = "Price is mandatory")

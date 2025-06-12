@@ -3,9 +3,10 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.notifications.services.NotificationService;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
@@ -47,6 +48,7 @@ public class ReservationService {
     private final ServiceService serviceService;
     private final EmailService emailService;
     private final AuthService authService;
+    private final BudgetService budgetService;
 
     private final ReservationMapper mapper;
 
@@ -57,13 +59,18 @@ public class ReservationService {
         Service service = serviceService.find(serviceId);
         Reservation reservation = mapper.fromRequest(request, event, service);
 
-        validateReservation(reservation);
+        validateReservation(reservation, request.getPlannedAmount());
         saveEntity(reservation);
+        budgetService.addReservationAsBudgetItem(reservation, request.getPlannedAmount());
 
         sendEmails(reservation, false);
     }
 
-    private void validateReservation(Reservation reservation) {
+    private void validateReservation(Reservation reservation, double plannedAmount) {
+        Service service = reservation.getService();
+        if(plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100)) {
+            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
+        }
         List<ReservationValidator> validators = List.of(new ReservationDeadlineValidator(),
                                                         new ServiceDurationValidator(),
                                                         new WorkingHoursValidator(getCompany(reservation.getService())),
@@ -153,6 +160,10 @@ public class ReservationService {
     public ReservationResponseDto updateReservation(Long id, Status status) {
         Reservation reservation = find(id);
         reservation.setStatus(status);
+
+        if(status == Status.ACCEPTED)
+            budgetService.markAsReserved(reservation);
+
         return ReservationMapper.toResponse(repository.save(reservation));
     }
 
@@ -160,7 +171,7 @@ public class ReservationService {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
     }
 
-    private List<Reservation> getEventReservations(Event event) {
+    public List<Reservation> getEventReservations(Event event) {
         Specification<Reservation> specification = ServiceReservationSpecification.getEventReservations(event);
         return repository.findAll(specification);
     }

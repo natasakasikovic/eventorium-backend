@@ -21,7 +21,8 @@ public class EventMapper {
     private final UserMapper userMapper;
 
     public EventSummaryResponseDto toSummaryResponse(Event event) {
-        return new EventSummaryResponseDto(event.getId(), event.getName(), event.getCity().getName());
+        Long eventTypeId = event.getType() != null ? event.getType().getId() : null;
+        return new EventSummaryResponseDto(event.getId(), eventTypeId, event.getName(), event.getCity().getName());
     }
 
     public PagedResponse<EventSummaryResponseDto> toPagedResponse(Page<Event> page) {
@@ -57,6 +58,7 @@ public class EventMapper {
         if (event.getType() == null)
             dto.setEventType("All");
         dto.setOrganizer(userMapper.toUserDetails(event.getOrganizer()));
+        dto.setAvgRating(event.calculateAvgRating());
         return dto;
     }
 

@@ -10,11 +10,6 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class BudgetSpecification {
 
     private BudgetSpecification() {}
@@ -29,12 +24,11 @@ public class BudgetSpecification {
 
             Root<Event> eventRoot = query.from(Event.class);
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
-            Join<Budget, BudgetItem> budgetItemJoin = budgetJoin.join("items");
+            budgetJoin.join("items");
 
             query.where(
                     criteriaBuilder.and(
-                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId),
-                            criteriaBuilder.isNotNull(budgetItemJoin.get("purchased"))
+                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId)
                     )
             );
 
@@ -56,15 +50,5 @@ public class BudgetSpecification {
 
             return cb.not(root.get("solution").get("provider").get("id").in(subquery));
         };
-    }
-
-    public static List<BudgetItem> ensureUniqueSolutions(List<BudgetItem> budgetItems) {
-        Map<Long, BudgetItem> uniqueSolutionMap = new HashMap<>();
-
-        for (BudgetItem item : budgetItems) {
-            uniqueSolutionMap.putIfAbsent(item.getSolution().getId(), item);
-        }
-
-        return new ArrayList<>(uniqueSolutionMap.values());
     }
 }
