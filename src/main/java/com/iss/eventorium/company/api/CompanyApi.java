@@ -34,10 +34,7 @@ public interface CompanyApi {
             Creates a new company.
             To upload company images, use the endpoint `POST /api/v1/companies/{id}/images`.
             Returns the created company if successful.
-            Requires authentication and PROVIDER authority.
-            Only users with the `PROVIDER` authority can access this endpoint.
             """,
-            security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(
@@ -52,8 +49,6 @@ public interface CompanyApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
                     @ApiResponse(
                             responseCode = "502",
                             description = "Bad gateway",
@@ -84,14 +79,9 @@ public interface CompanyApi {
             """
             Uploads images for the specified company. The `id` parameter refers to the company ID.
             For more details on creating a company, please refer to the endpoint `POST /api/v1/companies`.
-            Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
             """,
-            security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Company not found",
