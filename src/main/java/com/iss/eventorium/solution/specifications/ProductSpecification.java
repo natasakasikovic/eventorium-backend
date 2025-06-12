@@ -118,15 +118,24 @@ public class ProductSpecification {
 
     private static Specification<Product> applyUserRoleFilter(User user) {
         return (root, query, cb) -> {
-            if (user == null || user.getRoles().stream()
-                    .noneMatch(role -> "PROVIDER".equals(role.getName()) || "ADMIN".equals(role.getName()))) {
+            // Unauthenticated users and organizers can only see visible and accepted products
+            if (user == null || user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName()))) {
                 return cb.and(
                         cb.isTrue(root.get("isVisible")),
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
             }
 
-            return cb.conjunction();
+            // Allow admin to see every product.
+            if (user.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName()))) {
+                return cb.conjunction();
+            }
+
+            // Provider can see his hidden and pending products.
+            return cb.or(
+                    cb.and(cb.equal(root.get("status"), "ACCEPTED"), cb.isTrue(root.get("isVisible"))),
+                    cb.equal(root.get("provider").get("id"), user.getId())
+            );
         };
     }
 
