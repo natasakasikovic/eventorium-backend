@@ -34,7 +34,7 @@ public class BudgetMapper {
         dto.setType(item.getItemType());
         dto.setSolutionId(item.getSolution().getId());
         dto.setSolutionName(item.getSolution().getName());
-        if(item.getPurchased() != null) {
+        if(item.getProcessedAt() != null) {
             dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
         } else {
             dto.setSpentAmount(0.0);

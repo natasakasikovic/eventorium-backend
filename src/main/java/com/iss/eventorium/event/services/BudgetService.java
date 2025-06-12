@@ -77,17 +77,17 @@ public class BudgetService {
                 .toList();
     }
 
-    public void addReservation(Reservation reservation, double plannedAmount) {
+    public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
         if(budget == null) {
             budget = new Budget();
             reservation.getEvent().setBudget(budget);
         }
-        budget.getItems().add(BudgetItem.builder()
+        budget.addItem(BudgetItem.builder()
                 .itemType(SolutionType.SERVICE)
                 .plannedAmount(plannedAmount)
-                .purchased(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
+                .processedAt(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
                 .solution(service)
                 .category(service.getCategory())
                 .build());
@@ -106,7 +106,7 @@ public class BudgetService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
 
-        budgetItem.setPurchased(LocalDateTime.now());
+        budgetItem.setProcessedAt(LocalDateTime.now());
         budgetItemRepository.save(budgetItem);
     }
 
@@ -131,7 +131,7 @@ public class BudgetService {
         if(containsCategory(budget, item.getCategory())) {
             throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
         }
-        item.setPurchased(LocalDateTime.now());
+        item.setProcessedAt(LocalDateTime.now());
         budget.addItem(item);
         eventRepository.save(event);
     }

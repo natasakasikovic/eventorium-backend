@@ -125,6 +125,7 @@ public class ProductSpecification {
                         cb.equal(root.get("status"), "ACCEPTED")
                 );
             }
+
             return cb.conjunction();
         };
     }

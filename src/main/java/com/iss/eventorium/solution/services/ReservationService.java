@@ -57,19 +57,20 @@ public class ReservationService {
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
         Service service = serviceService.find(serviceId);
-        if(request.getPlannedAmount() < service.getPrice() * (1 - service.getDiscount() / 100)) {
-            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
-        }
         Reservation reservation = mapper.fromRequest(request, event, service);
 
-        validateReservation(reservation);
+        validateReservation(reservation, request.getPlannedAmount());
         saveEntity(reservation);
-        budgetService.addReservation(reservation, request.getPlannedAmount());
+        budgetService.addReservationAsBudgetItem(reservation, request.getPlannedAmount());
 
         sendEmails(reservation, false);
     }
 
-    private void validateReservation(Reservation reservation) {
+    private void validateReservation(Reservation reservation, double plannedAmount) {
+        Service service = reservation.getService();
+        if(plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100)) {
+            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
+        }
         List<ReservationValidator> validators = List.of(new ReservationDeadlineValidator(),
                                                         new ServiceDurationValidator(),
                                                         new WorkingHoursValidator(getCompany(reservation.getService())),

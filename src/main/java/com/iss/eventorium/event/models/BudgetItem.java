@@ -33,5 +33,5 @@ public class BudgetItem {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Category category;
 
-    private LocalDateTime purchased;
+    private LocalDateTime processedAt;
 }
