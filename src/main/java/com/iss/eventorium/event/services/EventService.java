@@ -252,7 +252,6 @@ public class EventService {
         params.put("totalVisitors", statistics.getTotalVisitors());
 
         return pdfService.generate("/templates/event-stats.jrxml", chartData, params);
-//        return pdfService.generate("/templates/event-stats.jrxml", List.of(statistics), generateParams(find(id)));
     }
 
     private Map<String, Object> generateParams(Event event) {
