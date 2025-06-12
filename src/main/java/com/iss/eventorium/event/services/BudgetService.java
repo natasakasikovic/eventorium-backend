@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,12 +59,6 @@ public class BudgetService {
     public BudgetResponseDto getBudget(Long eventId) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
-        if(budget == null) {
-            budget = new Budget();
-            event.setBudget(budget);
-            eventRepository.save(event);
-        }
-
         return mapper.toResponse(budget);
     }
 
@@ -80,10 +73,6 @@ public class BudgetService {
     public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
-        if(budget == null) {
-            budget = new Budget();
-            reservation.getEvent().setBudget(budget);
-        }
         budget.addItem(BudgetItem.builder()
                 .itemType(SolutionType.SERVICE)
                 .plannedAmount(plannedAmount)
@@ -112,9 +101,6 @@ public class BudgetService {
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        if(event.getBudget() == null) {
-            return new ArrayList<>();
-        }
         return event.getBudget()
                 .getItems()
                 .stream()
@@ -124,10 +110,6 @@ public class BudgetService {
 
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
-        if(budget == null) {
-            budget = new Budget();
-            event.setBudget(budget);
-        }
         if(containsCategory(budget, item.getCategory())) {
             throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
         }

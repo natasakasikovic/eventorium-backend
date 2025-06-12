@@ -24,7 +24,7 @@ public class BudgetItem {
     @Column(nullable = false, name = "planned_amount")
     private Double plannedAmount;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToOne
     private Solution solution;
 
     @Enumerated(EnumType.STRING)

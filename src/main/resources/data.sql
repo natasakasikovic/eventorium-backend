@@ -123,7 +123,10 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
 (nextval('solution_sequence'), 'Live DJ Performance', 'Energetic DJ services for weddings and parties', 'Music, DJ', 300.00, 25.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 2, 5, 5, 4),
 (nextval('solution_sequence'), 'Live Band Performance', 'Energetic live music band available for weddings, parties, and corporate events', 'Music, Live Performance, Entertainment', 800.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'AUTOMATIC', 10, 5, 2, 4, 5, 4);
 
-INSERT INTO budgets VALUES (167.0, 159.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0);
+INSERT INTO budgets VALUES (167.0, 159.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0),
+                           (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0),
+                           (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0),
+                           (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0), (0,0);
 
 INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type) VALUES
     (10,9,CURRENT_DATE, 8, 'PRODUCT'),
@@ -144,27 +147,28 @@ VALUES
 ('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 2, false, 5),
 ('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 2, false, 6),
 ('Corporate Seminar in Novi Sad', 'A corporate seminar about leadership and growth.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 70, 2, '999 Conference Blvd', 2, 1, false, 7),
-('Trebinje Wedding Ceremony', 'A traditional wedding ceremony in Trebinje.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 120, 1, '555 Wedding Plaza', 3, 2, false, null),
-('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 50, 3, '888 Party St', 5, 1, false, null),
-('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 1, false, null),
-('Team Building Event in Kragujevac', 'An outdoor team building event with games and activities.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 60, 2, '123 Team Rd', 7, 2, false, null),
-('Wedding Gala in Novi Sad', 'An extravagant wedding gala with special guests and entertainment.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 1, '444 Gala St', 2, 2, false, null),
-('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 1, false, null), ('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 1, false, null),
-('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 2, false, null),
-('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false, null),
-('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false, null),
-('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, null),
-('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'CLOSED', 50, 2, '234 Retreat Ave', 3, 1, false, null),
-('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'CLOSED', 200, 3, '111 Fest Rd', 1, 1, false, null),
-('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, null),
-('Belgrade Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY , 'OPEN', 100, 3, '444 Culture St', 6, 2, false, null),
-('Sunset Jazz Fest', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 200, 3, '12 Jazz Ave', 1, 1, false, null),
-('Autumn Food Carnival', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 200, 3, '88 Harvest Rd', 1, 1, false, null),
-('Downtown Beats', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '4' DAY, 'CLOSED', 200, 3, '99 Groove St', 1, 1, false, null),
-('Riverfront Light Parade', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 100, 3, '5 Riverside Blvd', 6, 2, false, null),
-('Midnight Art Jam', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 100, 3, '21 Canvas Ln', 6, 2, false, null),
-('Old Town Storytelling', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 100, 3, '77 Heritage Ct', 6, 2, false, null),
-('Garden Groove Gathering', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 200, 3, '33 Bloom St', 1, 1, false, null);
+('Trebinje Wedding Ceremony', 'A traditional wedding ceremony in Trebinje.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 120, 1, '555 Wedding Plaza', 3, 2, false, 8),
+('Kraljevo Birthday Party', 'A birthday party with a surprise guest performance.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 50, 3, '888 Party St', 5, 1, false, 9),
+('Corporate Launch in Sremska Mitrovica', 'A corporate product launch event with media coverage.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 200, 2, '777 Launch Ave', 4, 1, false, 10),
+('Team Building Event in Kragujevac', 'An outdoor team building event with games and activities.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 60, 2, '123 Team Rd', 7, 2, false, 11),
+('Wedding Gala in Novi Sad', 'An extravagant wedding gala with special guests and entertainment.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 200, 1, '444 Gala St', 2, 2, false, 12),
+('Birthday Extravaganza in Novi Sad', 'A large birthday party with multiple DJs and live performances.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 300, 3, '123 Party Plaza', 2, 1, false, 13),
+('Beograd Business Summit', 'A high-level business summit for industry leaders.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 250, 2, '555 Summit Rd', 1, 2, false, 14),
+('Kraljevo Music Festival', 'A large outdoor music festival with multiple stages and bands.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 1000, 3, '678 Festival Blvd', 5, 1, false, 15),
+('Wedding Expo in Novi Sad', 'A wedding exhibition with bridal gowns, cakes, and services.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 300, 1, '333 Expo Ave', 2, 2, false, 16),
+('Sombor Annual Fair', 'An annual fair showcasing local businesses and crafts.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 500, 2, '123 Fair Rd', 6, 4, false, 17),
+('Corporate Retreat in Trebinje', 'A corporate retreat for team bonding and relaxation.', CURRENT_DATE + INTERVAL '5' DAY, 'CLOSED', 50, 2, '234 Retreat Ave', 3, 1, false, 18),
+('Birthday Fest in Beograd', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE + INTERVAL '3' DAY, 'CLOSED', 200, 3, '111 Fest Rd', 1, 1, false, 19),
+('Sombor Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 100, 3, '444 Culture St', 6, 2, false, 20),
+('Belgrade Cultural Night', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY , 'OPEN', 100, 3, '444 Culture St', 6, 2, false, 21),
+('Sunset Jazz Fest', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 200, 3, '12 Jazz Ave', 1, 1, false, 22),
+('Autumn Food Carnival', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 200, 3, '88 Harvest Rd', 1, 1, false, 23),
+('Downtown Beats', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '4' DAY, 'CLOSED', 200, 3, '99 Groove St', 1, 1, false, 24),
+('Riverfront Light Parade', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 100, 3, '5 Riverside Blvd', 6, 2, false, 25),
+('Midnight Art Jam', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '7' DAY, 'CLOSED', 100, 3, '21 Canvas Ln', 6, 2, false, 26),
+('Old Town Storytelling', 'A cultural night celebrating local artists, music, and food.', CURRENT_DATE - INTERVAL '5' DAY, 'CLOSED', 100, 3, '77 Heritage Ct', 6, 2, false, 27),
+('Garden Groove Gathering', 'A multi-location birthday festival with food trucks, music, and games.', CURRENT_DATE - INTERVAL '3' DAY, 'CLOSED', 200, 3, '33 Bloom St', 1, 1, false, 28),
+('Sombor Conference', 'A professional conference on innovation and technology in Sombor.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 100, 2, '222 Conference St', 6, 1, false, 29);
 
 
 

@@ -32,7 +32,7 @@ public class Budget {
         this.items.add(item);
         if(item.getProcessedAt() != null) {
             this.spentAmount += item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100);
-            this.plannedAmount += item.getPlannedAmount();
         }
+        this.plannedAmount += item.getPlannedAmount();
     }
 }
