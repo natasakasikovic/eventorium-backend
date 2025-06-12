@@ -41,9 +41,9 @@ INSERT INTO event_types (name, description, deleted) VALUES
     ('Corporate Event', 'Event type for organizing corporate events', false),
     ('Birthday Party', 'Event type for organizing birthdays', false);
 
-INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0);
+INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (0.0,0.0);
 
-INSERT INTO budget_items (planned_amount, category_id, purchased, solution_id, item_type) VALUES
+INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type) VALUES
     (20.0,9,CURRENT_DATE, 1, 'PRODUCT'),
     (45.0, 10, CURRENT_DATE, 2, 'PRODUCT'),
     (20.0,1, CURRENT_DATE, 3, 'PRODUCT'),
@@ -65,7 +65,7 @@ VALUES
     ('Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 3, '789 Birthday Blvd', 6, 4, false, 3),
     ('Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 2, '234 Business Rd', 6, 5, false, 4),
     ('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 5, false, 5),
-    ('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, false, null);
+    ('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, false, 6);
 
 
 INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES

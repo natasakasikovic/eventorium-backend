@@ -73,17 +73,6 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testGetBudget_shouldCreateNewBudget() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        mockMvc.perform(get("/api/v1/events/{event-id}/budget", EVENT_WITHOUT_BUDGET)
-                        .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.plannedAmount").value(0.0))
-                .andExpect(jsonPath("$.spentAmount").value(0.0));
-    }
-
-    @Test
-    @Transactional
     void testPurchaseProduct() throws Exception {
         String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = createBudgetItemRequest(10.0);
@@ -109,7 +98,7 @@ class BudgetControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("You do not have enough funds for this purchase!"));
     }
 

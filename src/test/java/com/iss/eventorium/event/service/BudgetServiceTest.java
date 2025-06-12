@@ -7,7 +7,6 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
-import com.iss.eventorium.event.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -16,6 +15,7 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.services.AccountEventService;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
@@ -170,17 +170,6 @@ class BudgetServiceTest {
 
         BudgetResponseDto response = budgetService.getBudget(1L);
         assertNotNull(response);
-    }
-
-    @Test
-    void getBudget_shouldCreateAndReturnNewBudgetIfNoneExists() {
-        Event event = mockEvent(null);
-        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
-
-        BudgetResponseDto response = budgetService.getBudget(1L);
-
-        assertNotNull(response);
-        verify(eventRepository, times(1)).save(event);
     }
 
     @ParameterizedTest

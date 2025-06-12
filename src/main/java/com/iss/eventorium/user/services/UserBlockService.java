@@ -6,6 +6,8 @@ import com.iss.eventorium.user.repositories.UserBlockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserBlockService {
@@ -13,6 +15,7 @@ public class UserBlockService {
     private final UserBlockRepository repository;
     private final UserService userService;
     private final AuthService authService;
+    private final UserBlockRepository userBlockRepository;
 
     public void blockUser(Long id) {
         User blocker = authService.getCurrentUser();
@@ -23,6 +26,10 @@ public class UserBlockService {
 
         cleanUserOfBlockedContent(blocker, blocked);
         cleanUserOfBlockedContent(blocked, blocker);
+    }
+
+    public List<Long> findBlockedUsers() {
+        return userBlockRepository.findBlockedUsersByBlockerId(authService.getCurrentUser().getId());
     }
 
     private void cleanUserOfBlockedContent(User blocker, User blocked) {

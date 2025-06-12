@@ -15,7 +15,6 @@ public class TestUtil {
 
     public static final LoginRequestDto ORGANIZER_LOGIN = new LoginRequestDto("organizer@gmail.com", "pera");
     public static final Long EVENT_WITH_BUDGET = 1L;
-    public static final Long EVENT_WITHOUT_BUDGET = 6L;
     public static final Long INVALID_EVENT = 500L;
     public static final Long INVALID_PRODUCT = 500L;
 

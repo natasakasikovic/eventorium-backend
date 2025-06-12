@@ -20,15 +20,13 @@ import com.iss.eventorium.solution.models.*;
 import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
+import com.iss.eventorium.user.services.UserBlockService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Map;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -38,6 +36,7 @@ public class BudgetService {
     private final EventService eventService;
     private final AuthService authService;
     private final AccountEventService accountEventService;
+    private final UserBlockService userBlockService;
 
     private final EventRepository eventRepository;
     private final BudgetItemRepository budgetItemRepository;
@@ -67,8 +66,13 @@ public class BudgetService {
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
         List<Event> events = accountEventService.findOrganizerEvents(user);
-        return getUniqueBudgetItems(events)
-                .stream()
+
+        List<BudgetItem> uniqueItems = getUniqueBudgetItems(events);
+
+        List<Long> blockedUserIds = userBlockService.findBlockedUsers();
+        List<BudgetItem> filteredItems = filterOutBlockedContent(uniqueItems, user, blockedUserIds);
+
+        return filteredItems.stream()
                 .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
@@ -130,10 +134,29 @@ public class BudgetService {
     }
 
     private List<BudgetItem> getUniqueBudgetItems(List<Event> events) {
-        Map<Long, BudgetItem> items = new HashMap<>();
-        events.stream().filter(event -> event.getBudget() != null)
-                .forEach(event -> event.getBudget().getItems()
-                        .forEach(item -> items.putIfAbsent(item.getSolution().getId(), item)));
-        return items.values().stream().toList();
+        Map<Long, BudgetItem> uniqueItems = new HashMap<>();
+
+        events.stream()
+                .flatMap(event -> event.getBudget().getItems().stream())
+                .forEach(item -> {
+                    Long solutionId = item.getSolution().getId();
+                    uniqueItems.putIfAbsent(solutionId, item);
+                });
+
+        return new ArrayList<>(uniqueItems.values());
     }
+
+    private List<BudgetItem> filterOutBlockedContent(List<BudgetItem> items, User blocker, List<Long> blockedUserIds) {
+        if (blocker == null || blockedUserIds == null || blockedUserIds.isEmpty()) {
+            return items;
+        }
+
+        return items.stream()
+                .filter(item -> {
+                    Long providerId = item.getSolution().getProvider().getId();
+                    return !blockedUserIds.contains(providerId);
+                })
+                .toList();
+    }
+
 }
