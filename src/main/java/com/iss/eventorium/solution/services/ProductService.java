@@ -20,7 +20,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -45,10 +44,9 @@ public class ProductService {
 
     private static final String IMG_DIR_NAME = "products";
 
-    // TODO: refactor method to use specification
-    public List<ProductSummaryResponseDto> getTopProducts(){
-        Pageable pageable = PageRequest.of(0, 5);
-        List<Product> products = repository.findTopFiveProducts(pageable);
+    public List<ProductSummaryResponseDto> getTopFiveProducts() {
+        Specification<Product> specification = ProductSpecification.filterTopProducts(authService.getCurrentUser());
+        List<Product> products = repository.findAll(specification).stream().limit(5).toList();
         return products.stream().map(mapper::toSummaryResponse).toList();
     }
 

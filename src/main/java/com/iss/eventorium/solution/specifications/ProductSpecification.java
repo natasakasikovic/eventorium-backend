@@ -1,15 +1,12 @@
 package com.iss.eventorium.solution.specifications;
 
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
-
-import jakarta.persistence.criteria.Expression;
 
 public class ProductSpecification {
 
@@ -55,6 +52,20 @@ public class ProductSpecification {
         return Specification.where(hasId(id)
                 .and(filterOutBlockedContent(user)))
                 .and(applyUserRoleFilter(user));
+    }
+
+    public static Specification<Product> filterTopProducts(User user) {
+        return Specification.where(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user))
+                .and((root, query, cb) -> {
+
+                    Join<Product, Rating> ratingJoin = root.join("ratings");
+                    query.groupBy(root);
+                    Expression<Double> avgRating = cb.avg(ratingJoin.get("rating"));
+                    query.orderBy(cb.desc(avgRating));
+
+                    return cb.conjunction();
+                });
     }
 
     private static Specification<Product> hasId(Long id){
@@ -128,9 +139,9 @@ public class ProductSpecification {
             }
 
             // Allow admin to see every product.
-            if (user.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName()))) {
+            if (user.getRoles().stream().anyMatch(role -> "ADMIN".equals(role.getName())))
                 return cb.conjunction();
-            }
+
 
             // Provider can see his hidden and pending products.
             return cb.or(
@@ -159,5 +170,4 @@ public class ProductSpecification {
         Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
         return cb.prod(root.get("price"), discount);
     }
-
 }

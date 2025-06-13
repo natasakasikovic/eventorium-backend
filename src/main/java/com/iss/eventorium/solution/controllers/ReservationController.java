@@ -20,13 +20,6 @@ public class ReservationController {
 
     private final ReservationService service;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReservationResponseDto> getReservation(@PathVariable Long id) {
-        // TODO: call -> reservationService.get(id);
-        ReservationResponseDto reservation = new ReservationResponseDto();
-        return new ResponseEntity<>(reservation, HttpStatus.OK);
-    }
-
     @PostMapping("/events/{event-id}/services/{service-id}/reservation")
     public ResponseEntity<Void> createReservation (@Valid @RequestBody ReservationRequestDto reservation,
                                                    @PathVariable("event-id") Long eventId,
@@ -46,10 +39,7 @@ public class ReservationController {
     }
 
     @PatchMapping("/reservations/{id}")
-    public ResponseEntity<ReservationResponseDto> updateReservation(
-        @PathVariable Long id,
-        @Valid @RequestBody UpdateReservationStatusRequestDto request
-    ) {
+    public ResponseEntity<ReservationResponseDto> updateReservation(@PathVariable Long id, @Valid @RequestBody UpdateReservationStatusRequestDto request) {
         return ResponseEntity.ok(service.updateReservation(id, request.getStatus()));
     }
 }

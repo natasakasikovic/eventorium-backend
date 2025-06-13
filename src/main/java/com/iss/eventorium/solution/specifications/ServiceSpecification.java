@@ -1,15 +1,13 @@
 package com.iss.eventorium.solution.specifications;
 
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.models.Service;
 
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 
-import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ServiceSpecification {
@@ -58,6 +56,20 @@ public class ServiceSpecification {
         return Specification.where(hasId(id)
                 .and(filterOutBlockedContent(user)))
                 .and(applyUserRoleFilter(user));
+    }
+
+    public static Specification<Service> filterTopServices(User user) {
+        return Specification.where(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user))
+                .and((root, query, cb) -> {
+
+                    Join<Service, Rating> ratingJoin = root.join("ratings");
+                    query.groupBy(root);
+                    Expression<Double> avgRating = cb.avg(ratingJoin.get("rating"));
+                    query.orderBy(cb.desc(avgRating));
+
+                    return cb.conjunction();
+                });
     }
 
     private static Specification<Service> hasId(Long id){
