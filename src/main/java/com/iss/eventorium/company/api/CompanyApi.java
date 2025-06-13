@@ -81,7 +81,7 @@ public interface CompanyApi {
             For more details on creating a company, please refer to the endpoint `POST /api/v1/companies`.
             """,
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Company not found",
@@ -119,18 +119,6 @@ public interface CompanyApi {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Company not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "CompanyNotFound",
-                                            summary = "Company not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Company not found.\" }"
-                                    )
-                            )
-                    )
             }
     )
     ResponseEntity<ProviderCompanyDto> getCompany();
@@ -259,21 +247,9 @@ public interface CompanyApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Company not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "CompanyNotFound",
-                                            summary = "Company not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Company not found.\" }"
-                                    )
-                            )
-                    ),
             }
     )
     ResponseEntity<Void> uploadNewImages(List<MultipartFile> newImages);
@@ -288,21 +264,10 @@ public interface CompanyApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Company not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "CompanyNotFound",
-                                            summary = "Company not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Company not found.\" }"
-                                    )
-                            )
-                    )
             }
     )
     ResponseEntity<Void> deleteImages(List<RemoveImageRequestDto> removedImages);
