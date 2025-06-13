@@ -59,9 +59,12 @@ public interface ServiceApi {
             """
             Returns the top 5 services based on their average rating,
             excluding those from blocked providers if the user is logged in.
-            Hidden and pending services are excluded for all users, except when the provider is logged in.
-            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
-            Services without ratings are not included.
+            Hidden services are excluded for ORGANIZER and unauth user.
+            When PROVIDER is logged in he can view their own hidden services
+            if they are among top five.
+            Among top services hidden will be shown to ADMIN if they are among top five
+            Services without ratings are not included!
+            Pending will be excluded since they dont have ratings!
             If fewer than 5 services have a rating, fewer than 5 will be returned.
             """,
             responses = {
