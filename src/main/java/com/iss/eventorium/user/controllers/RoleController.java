@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
+import com.iss.eventorium.user.api.RoleApi;
 import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.services.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/roles")
-public class RoleController {
+public class RoleController implements RoleApi {
 
     private final RoleService service;
 
