@@ -28,7 +28,7 @@ public class ServiceController implements ServiceApi {
 
     @GetMapping("/top-five-services")
     public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
-        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
+        return new ResponseEntity<>(service.getTopFiveServices(), HttpStatus.OK);
     }
 
     @GetMapping("/all")

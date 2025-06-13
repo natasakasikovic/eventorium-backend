@@ -1,5 +1,6 @@
 package com.iss.eventorium.shared.controllers;
 
+import com.iss.eventorium.shared.api.CityApi;
 import com.iss.eventorium.shared.dtos.CityDto;
 import com.iss.eventorium.shared.services.CityService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/cities")
-public class CityController {
+public class CityController implements CityApi {
 
     private final CityService cityService;
 

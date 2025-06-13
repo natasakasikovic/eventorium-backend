@@ -59,9 +59,12 @@ public interface ServiceApi {
             """
             Returns the top 5 services based on their average rating,
             excluding those from blocked providers if the user is logged in.
-            Hidden and pending services are excluded for all users, except when the provider is logged in.
-            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
-            Services without ratings are not included.
+            Hidden services are excluded for ORGANIZER and unauth user.
+            When PROVIDER is logged in he can view their own hidden services
+            if they are among top five.
+            Among top services hidden will be shown to ADMIN if they are among top five
+            Services without ratings are not included!
+            Pending will be excluded since they dont have ratings!
             If fewer than 5 services have a rating, fewer than 5 will be returned.
             """,
             responses = {
@@ -303,7 +306,7 @@ public interface ServiceApi {
             description =
             """
             Uploads images for the specified service. The `id` parameter refers to the service ID.
-            For more details on creating a service, please refer to the endpoint `/api/v1/services` (POST).
+            For more details on creating a service, please refer to the endpoint `POST /api/v1/services`.
             Requires authentication and PROVIDER authority.
             Only users with the 'PROVIDER' authority can access this endpoint.
             """,
@@ -442,11 +445,11 @@ public interface ServiceApi {
     @Operation(
             summary = "Deletes a service images.",
             description =
-                    """
-                    Deletes service images if services exists.
-                    Requires authentication and PROVIDER authority.
-                    Only users with the 'PROVIDER' authority can access this endpoint.
-                    """,
+            """
+            Deletes service images if service exists.
+            Requires authentication and PROVIDER authority.
+            Only users with the 'PROVIDER' authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),

@@ -26,7 +26,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,10 +54,9 @@ public class ServiceService {
 
     private static final String IMG_DIR_NAME = "services";
 
-    // TODO: refactor method below to use specification
-    public List<ServiceSummaryResponseDto> getTopServices(){
-        Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
-        List<Service> services = repository.findTopFiveServices(pageable);
+    public List<ServiceSummaryResponseDto> getTopFiveServices() {
+        Specification<Service> specification = ServiceSpecification.filterTopServices(authService.getCurrentUser());
+        List<Service> services = repository.findAll(specification).stream().limit(5).toList();
         return services.stream().map(mapper::toSummaryResponse).toList();
     }
 

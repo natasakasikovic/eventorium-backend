@@ -52,8 +52,8 @@ public class ProductController {
     }
 
     @GetMapping("/top-five-products")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts(){
-        return ResponseEntity.ok(service.getTopProducts());
+    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts() {
+        return ResponseEntity.ok(service.getTopFiveProducts());
     }
 
     @GetMapping("/all")
