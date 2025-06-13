@@ -4,7 +4,6 @@ import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -94,7 +93,7 @@ public class ProductSpecification {
         return (root, query, cb) -> {
             if (minPrice == null) return cb.conjunction();
 
-            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            Expression<Double> discountedPrice = SolutionSpecification.calculateDiscountedPrice(root, cb);
 
             return cb.greaterThanOrEqualTo(discountedPrice, minPrice);
         };
@@ -104,7 +103,7 @@ public class ProductSpecification {
         return (root, query, cb) -> {
             if (maxPrice == null) return cb.conjunction();
 
-            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            Expression<Double> discountedPrice = SolutionSpecification.calculateDiscountedPrice(root, cb);
 
             return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
         };
@@ -154,10 +153,4 @@ public class ProductSpecification {
             return cb.not(root.get("provider").get("id").in(subquery));
         };
     }
-
-    private static Expression<Double> calculateDiscountedPrice(Root<Product> root, CriteriaBuilder cb) {
-        Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
-        return cb.prod(root.get("price"), discount);
-    }
-
 }

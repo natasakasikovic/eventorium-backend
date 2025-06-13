@@ -106,7 +106,7 @@ public class ServiceSpecification {
     private static Specification<Service> hasMinPrice(Double minPrice) {
         return (root, query, cb) -> {
             if (minPrice == null) return cb.conjunction();
-            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            Expression<Double> discountedPrice = SolutionSpecification.calculateDiscountedPrice(root, cb);
             return cb.greaterThanOrEqualTo(discountedPrice, minPrice);
         };
     }
@@ -114,7 +114,7 @@ public class ServiceSpecification {
     private static Specification<Service> hasMaxPrice(Double maxPrice) {
         return (root, query, cb) -> {
             if (maxPrice == null) return cb.conjunction();
-            Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
+            Expression<Double> discountedPrice = SolutionSpecification.calculateDiscountedPrice(root, cb);
             return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
         };
     }
@@ -156,10 +156,5 @@ public class ServiceSpecification {
 
             return cb.not(root.get("provider").get("id").in(subquery));
         };
-    }
-
-    private static Expression<Double> calculateDiscountedPrice(Root<Service> root, CriteriaBuilder cb) {
-        Expression<Double> discount = cb.prod(cb.diff(cb.literal(100.0), root.get("discount")), cb.literal(0.01));
-        return cb.prod(root.get("price"), discount);
     }
 }
