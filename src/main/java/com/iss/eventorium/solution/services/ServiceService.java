@@ -102,7 +102,7 @@ public class ServiceService {
         handleCategoryAndStatus(service);
         service.setProvider(authService.getCurrentUser());
 
-        historyService.addServiceMemento(service);
+        historyService.addMemento(service);
         repository.save(service);
         return mapper.toResponse(service);
     }
@@ -152,7 +152,7 @@ public class ServiceService {
         Service service = mapper.fromUpdateRequest(request, toUpdate);
         service.setEventTypes(eventTypes);
 
-        historyService.addServiceMemento(service);
+        historyService.addMemento(service);
         repository.save(service);
         return mapper.toResponse(service);
     }

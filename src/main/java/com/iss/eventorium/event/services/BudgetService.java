@@ -120,7 +120,7 @@ public class BudgetService {
         List<BudgetItem> items = event.getBudget().getItems();
         for(BudgetItem item : items) {
             if(item.getProcessedAt() != null) {
-                Memento memento = historyService.getValidSolution(item.getItemType(), item.getProcessedAt());
+                Memento memento = historyService.getValidSolution(item.getSolution().getId(), item.getProcessedAt());
                 item.getSolution().restore(memento);
             }
         }

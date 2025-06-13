@@ -21,10 +21,6 @@ public class Product extends Solution {
     public void restore(Memento memento) {
         setName(memento.getName());
         setPrice(memento.getPrice());
-        setDescription(memento.getDescription());
         setDiscount(memento.getDiscount());
-        setEventTypes(memento.getEventTypes());
-        setIsVisible(memento.isVisible());
-        setIsAvailable(memento.isAvailable());
     }
 }
