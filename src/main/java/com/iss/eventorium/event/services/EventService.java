@@ -85,7 +85,12 @@ public class EventService {
     }
 
     public List<EventTableOverviewDto> getPassedEvents() {
-        Specification<Event> specification = EventSpecification.filterPassedEvents();
+        Specification<Event> specification;
+        User user = authService.getCurrentUser();
+        if (user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
+            specification = EventSpecification.filterPassedEventsByOrganizer(user);
+        else
+            specification = EventSpecification.filterPassedEvents();
         return repository.findAll(specification).stream().map(eventMapper::toTableOverviewDto).toList();
     }
 

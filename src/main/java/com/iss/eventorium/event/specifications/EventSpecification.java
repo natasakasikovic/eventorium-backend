@@ -57,6 +57,10 @@ public class EventSpecification {
         return Specification.where(hasDateBefore(LocalDate.now()));
     }
 
+    public static Specification<Event> filterPassedEventsByOrganizer(User organizer) {
+        return Specification.where(hasDateBefore(LocalDate.now())).and(hasOrganizer(organizer));
+    }
+
     public static Specification<Event> filterByNameForOrganizer(String keyword, User user) {
         return Specification.where(hasName(keyword))
                 .and(hasOrganizer(user));
