@@ -3,6 +3,7 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -32,6 +33,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.*;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @RequiredArgsConstructor
@@ -79,6 +82,16 @@ public class EventService {
     public List<EventSummaryResponseDto> getAll() {
         Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
+    }
+
+    public List<EventTableOverviewDto> getPassedEvents() {
+        Specification<Event> specification;
+        User user = authService.getCurrentUser();
+        if (user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
+            specification = EventSpecification.filterPassedEventsByOrganizer(user);
+        else
+            specification = EventSpecification.filterPassedEvents();
+        return repository.findAll(specification).stream().map(eventMapper::toTableOverviewDto).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEventsPaged(String keyword, Pageable pageable) {
@@ -233,6 +246,19 @@ public class EventService {
         return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
     }
 
+    public byte[] generateEventStatisticsPdf(Long id) {
+        EventRatingsStatisticsDto statistics = getEventRatingStatistics(id);
+        List<RatingCount> chartData = statistics.getRatingsCount().entrySet().stream()
+                .map(entry -> new RatingCount(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> params = generateParams(find(id));
+        params.put("totalRatings", statistics.getTotalRatings());
+        params.put("totalVisitors", statistics.getTotalVisitors());
+
+        return pdfService.generate("/templates/event-stats.jrxml", chartData, params);
+    }
+
     private Map<String, Object> generateParams(Event event) {
         Map<String, Object> params = new HashMap<>();
         params.put("eventName", event.getName());
@@ -244,4 +270,26 @@ public class EventService {
         event.getRatings().add(rating);
         repository.save(event);
     }
+
+    public EventRatingsStatisticsDto getEventRatingStatistics(Long id) {
+        Event event = find(id);
+        int totalVisitors = userService.findByEventAttendance(event.getId()).size();
+        int totalRatings = event.getRatings().size();
+
+        Map<Integer, Integer> ratingsCount = IntStream.rangeClosed(1, 5)
+                .boxed()
+                .collect(Collectors.toMap(r -> r, r -> 0));
+
+        event.getRatings().forEach(r ->
+                ratingsCount.merge(r.getRating(), 1, Integer::sum)
+        );
+
+        return EventRatingsStatisticsDto.builder()
+                .eventName(event.getName())
+                .totalVisitors(totalVisitors)
+                .totalRatings(totalRatings)
+                .ratingsCount(ratingsCount)
+                .build();
+    }
+
 }
