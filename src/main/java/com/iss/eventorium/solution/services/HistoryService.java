@@ -2,10 +2,7 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
-import com.iss.eventorium.solution.models.Memento;
-import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Service;
-import com.iss.eventorium.solution.models.SolutionHistory;
+import com.iss.eventorium.solution.models.*;
 import com.iss.eventorium.solution.repositories.HistoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +32,12 @@ public class HistoryService {
         historyRepository.save(solutionHistory);
     }
 
-    public Memento getValidService(LocalDateTime givenTime) {
-        List<Memento> mementos = getSolutionHistory().getServiceHistories();
-        return findValidSolution(givenTime, mementos);
-    }
+    public Memento getValidSolution(SolutionType type, LocalDateTime validFrom) {
+        if(type == SolutionType.SERVICE)
+            return getValidService(validFrom);
+        else
+            return getValidProduct(validFrom);
 
-    public Memento getValidProduct(LocalDateTime givenTime) {
-        List<Memento> mementos = getSolutionHistory().getProductHistories();
-        return findValidSolution(givenTime, mementos);
     }
 
     public void addProductMemento(Product product) {
@@ -56,6 +51,15 @@ public class HistoryService {
         historyRepository.save(solutionHistory);
     }
 
+    private Memento getValidService(LocalDateTime givenTime) {
+        List<Memento> mementos = getSolutionHistory().getServiceHistories();
+        return findValidSolution(givenTime, mementos);
+    }
+
+    private Memento getValidProduct(LocalDateTime givenTime) {
+        List<Memento> mementos = getSolutionHistory().getProductHistories();
+        return findValidSolution(givenTime, mementos);
+    }
 
     private Memento findValidSolution(LocalDateTime givenTime, List<Memento> mementos) {
         if(mementos.size() == 1) {

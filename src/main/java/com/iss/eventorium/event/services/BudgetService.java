@@ -20,6 +20,7 @@ import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.*;
+import com.iss.eventorium.solution.services.HistoryService;
 import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
@@ -43,6 +44,7 @@ public class BudgetService {
     private final EventService eventService;
     private final AuthService authService;
     private final CategoryService categoryService;
+    private final HistoryService historyService;
 
     private final EventRepository eventRepository;
     private final BudgetItemRepository budgetItemRepository;
@@ -115,11 +117,14 @@ public class BudgetService {
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        return event.getBudget()
-                .getItems()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        List<BudgetItem> items = event.getBudget().getItems();
+        for(BudgetItem item : items) {
+            if(item.getProcessedAt() != null) {
+                Memento memento = historyService.getValidSolution(item.getItemType(), item.getProcessedAt());
+                item.getSolution().restore(memento);
+            }
+        }
+        return items.stream().map(mapper::toResponse).toList();
     }
 
     private void updateBudget(Event event, BudgetItem item) {
