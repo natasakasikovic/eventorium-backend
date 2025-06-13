@@ -55,7 +55,7 @@ public class ReservationService {
     private final SpringTemplateEngine templateEngine;
 
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
-        Event event = eventService.find(eventId); // TODO: reservations can be made only for draft events
+        Event event = eventService.find(eventId);
         Service service = serviceService.find(serviceId);
         Reservation reservation = mapper.fromRequest(request, event, service);
 
@@ -67,16 +67,19 @@ public class ReservationService {
     }
 
     private void validateReservation(Reservation reservation, double plannedAmount) {
-        Service service = reservation.getService();
-        if(plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100)) {
-            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
-        }
-        List<ReservationValidator> validators = List.of(new ReservationDeadlineValidator(),
+
+        List<ReservationValidator> validators = List.of(new EventInPastValidator(),
+                                                        new ReservationDeadlineValidator(),
                                                         new ServiceDurationValidator(),
                                                         new WorkingHoursValidator(getCompany(reservation.getService())),
                                                         new ReservationConflictValidator(repository));
         for (ReservationValidator validator : validators)
             validator.validate(reservation);
+
+        Service service = reservation.getService();
+
+        if(plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100))
+            throw new InsufficientFundsException("You do not have enough funds for this reservation!");
     }
 
     private void saveEntity(Reservation reservation) {
