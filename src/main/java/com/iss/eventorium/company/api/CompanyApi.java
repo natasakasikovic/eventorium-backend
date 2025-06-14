@@ -112,7 +112,7 @@ public interface CompanyApi {
             """
             Returns the details of a company using the provider's unique identifier.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -194,7 +194,7 @@ public interface CompanyApi {
             To update company images, use the endpoint `PUT /api/v1/companies/{id}/images`.
             Returns the updated company id and name if successful.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -243,7 +243,7 @@ public interface CompanyApi {
             Updates images for the specified company using the provider's unique identifier.
             For more details on updating a company, please refer to the endpoint `PUT /api/v1/companies`.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -260,7 +260,7 @@ public interface CompanyApi {
             """
             Deletes company images if company exists.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

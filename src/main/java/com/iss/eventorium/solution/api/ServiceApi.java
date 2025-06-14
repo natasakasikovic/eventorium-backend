@@ -320,7 +320,7 @@ public interface ServiceApi {
             To upload service images, use the endpoint `POST /api/v1/services/{id}/images`.
             Returns the created service if successful.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -357,7 +357,7 @@ public interface ServiceApi {
             Uploads images for the specified service. The `id` parameter refers to the service ID.
             For more details on creating a service, please refer to the endpoint `POST /api/v1/services`.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -395,7 +395,7 @@ public interface ServiceApi {
             Updates service if exists.
             Returns the updated service if successful.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -449,7 +449,7 @@ public interface ServiceApi {
             """
             Deletes service if exists and  is not associated with any reservation.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -497,7 +497,7 @@ public interface ServiceApi {
             """
             Deletes service images if service exists.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

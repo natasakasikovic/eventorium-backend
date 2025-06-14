@@ -55,7 +55,7 @@ public interface CategoryApi {
     ResponseEntity<PagedResponse<CategoryResponseDto>> getCategoriesPaged(Pageable pageable);
 
     @Operation(
-            summary = "Retrieve a Category by ID.",
+            summary = "Retrieve a category by ID.",
             description =
             """
             Fetches the details of a single category using its unique identifier.
@@ -195,18 +195,18 @@ public interface CategoryApi {
             }
     )
     ResponseEntity<CategoryResponseDto> updateCategory(
-            @RequestBody(
-                    description = "The data used to update the category.",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = CategoryRequestDto.class))
-            )
-            CategoryRequestDto requestDto,
             @Parameter(
                     description = "The unique identifier of the category to update.",
                     required = true,
                     example = "123"
             )
-            Long id
+            Long id,
+            @RequestBody(
+                    description = "The data used to update the category.",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = CategoryRequestDto.class))
+            )
+            CategoryRequestDto requestDto
     );
 
     @Operation(

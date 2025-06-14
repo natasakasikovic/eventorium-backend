@@ -43,8 +43,8 @@ public class CategoryController implements CategoryApi {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
-            @Valid @RequestBody CategoryRequestDto requestDto,
-            @PathVariable Long id
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequestDto requestDto
     ) {
         return ResponseEntity.ok(categoryService.updateCategory(id, requestDto));
     }

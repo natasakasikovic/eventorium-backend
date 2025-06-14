@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.api.EventTypeApi;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.services.EventTypeService;
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/event-types")
 @RequiredArgsConstructor
-public class EventTypeController {
+public class EventTypeController implements EventTypeApi {
 
     private final EventTypeService service;
 
@@ -57,7 +58,7 @@ public class EventTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventTypeResponseDto> updateEventType(@Valid @RequestBody EventTypeRequestDto requestDto, @PathVariable Long id) {
+    public ResponseEntity<EventTypeResponseDto> updateEventType(@PathVariable Long id, @Valid @RequestBody EventTypeRequestDto requestDto) {
         return ResponseEntity.ok(service.updateEventType(id, requestDto));
     }
 
