@@ -40,16 +40,6 @@ public class Service extends Solution {
     public void restore(Memento memento) {
         setName(memento.getName());
         setPrice(memento.getPrice());
-        setDescription(memento.getDescription());
-        setSpecialties(memento.getSpecialties());
         setDiscount(memento.getDiscount());
-        setEventTypes(memento.getEventTypes());
-        setIsVisible(memento.isVisible());
-        setIsAvailable(memento.isAvailable());
-        setReservationDeadline(memento.getReservationDeadline());
-        setType(memento.getType());
-        setCancellationDeadline(memento.getCancellationDeadline());
-        setMinDuration(memento.getMinDuration());
-        setMaxDuration(memento.getMaxDuration());
     }
 }

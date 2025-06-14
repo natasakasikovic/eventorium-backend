@@ -80,15 +80,6 @@ public class ServiceController implements ServiceApi {
                 .body(service.getImage(id, path));
     }
 
-    @GetMapping("/suggestions")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-            @RequestParam("categoryId") Long id,
-            @RequestParam("eventId") Long eventId,
-            @RequestParam("price") Double price
-    ) {
-        return ResponseEntity.ok(service.getBudgetSuggestions(id, eventId, price));
-    }
-
     @PostMapping
     public ResponseEntity<ServiceResponseDto> createService(
             @Valid @RequestBody CreateServiceRequestDto createServiceRequestDto

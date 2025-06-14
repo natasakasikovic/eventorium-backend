@@ -1,12 +1,9 @@
 package com.iss.eventorium.solution.models;
 
-import com.iss.eventorium.event.models.EventType;
-import com.iss.eventorium.shared.models.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -19,26 +16,13 @@ public class Memento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long solutionId;
+    @ManyToOne
+    private Solution solution;
+
     private String name;
-    private String description;
-    private String specialties;
     private double price;
     private double discount;
-    @Enumerated(EnumType.STRING)
-    private Status status;
-    private boolean isAvailable;
-    private boolean isVisible;
-
-    @ManyToMany
-    private List<EventType> eventTypes;
 
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
-    @Enumerated(EnumType.STRING)
-    private ReservationType type;
-    private Integer reservationDeadline;
-    private Integer cancellationDeadline;
-    private Integer minDuration;
-    private Integer maxDuration;
 }

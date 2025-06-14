@@ -3,9 +3,11 @@ package com.iss.eventorium.event.specifications;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,21 +21,22 @@ public class BudgetSpecification {
     }
 
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
-        return (root, query, criteriaBuilder) -> {
+        return (root, query, cb) -> {
             assert query != null;
             query.distinct(true);
 
             Root<Event> eventRoot = query.from(Event.class);
+
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
-            budgetJoin.join("items");
+            Join<Budget, BudgetItem> itemsJoin = budgetJoin.join("items");
 
-            query.where(
-                    criteriaBuilder.and(
-                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId)
-                    )
-            );
+            Join<BudgetItem, Solution> solutionJoin = itemsJoin.join("solution");
 
-            return query.getRestriction();
+            Predicate linkToRoot = cb.equal(root, itemsJoin);
+            Predicate organizerMatches = cb.equal(eventRoot.get("organizer").get("id"), organizerId);
+            Predicate isVisible = cb.isTrue(solutionJoin.get("isVisible"));
+
+            return cb.and(linkToRoot, organizerMatches, isVisible);
         };
     }
 

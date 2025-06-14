@@ -85,11 +85,6 @@ public class ProductService {
         return mapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
-    // TODO: method below needs to be refactored to use specification
-    public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
-        return repository.getBudgetSuggestions(categoryId, price).stream().map(mapper::toSummaryResponse).toList();
-    }
-
     public List<ImageResponseDto> getImages(Long id) {
         return imageService.getImages(IMG_DIR_NAME, find(id));
     }

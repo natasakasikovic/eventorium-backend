@@ -1,9 +1,11 @@
 package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
 import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
@@ -18,11 +20,14 @@ import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.*;
+import com.iss.eventorium.solution.services.HistoryService;
 import com.iss.eventorium.solution.services.ProductService;
+import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -31,11 +36,15 @@ import java.util.Objects;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
+@Slf4j
 public class BudgetService {
 
+    private final SolutionService solutionService;
     private final ProductService productService;
     private final EventService eventService;
     private final AuthService authService;
+    private final CategoryService categoryService;
+    private final HistoryService historyService;
 
     private final EventRepository eventRepository;
     private final BudgetItemRepository budgetItemRepository;
@@ -54,6 +63,13 @@ public class BudgetService {
         Event event = eventService.find(eventId);
         updateBudget(event, mapper.fromRequest(request, product, SolutionType.PRODUCT));
         return productMapper.toResponse(product);
+    }
+
+    public List<BudgetSuggestionResponseDto> getBudgetSuggestions(Long eventId, Long categoryId, double price) {
+        Category category = categoryService.find(categoryId);
+        Event event = eventService.find(eventId);
+        List<Solution> solutions = solutionService.findSuggestions(category, price, event.getDate());
+        return solutions.stream().map(mapper::toSuggestionResponse).toList();
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
@@ -101,11 +117,14 @@ public class BudgetService {
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        return event.getBudget()
-                .getItems()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        List<BudgetItem> items = event.getBudget().getItems();
+        for(BudgetItem item : items) {
+            if(item.getProcessedAt() != null) {
+                Memento memento = historyService.getValidSolution(item.getSolution().getId(), item.getProcessedAt());
+                item.getSolution().restore(memento);
+            }
+        }
+        return items.stream().map(mapper::toResponse).toList();
     }
 
     private void updateBudget(Event event, BudgetItem item) {

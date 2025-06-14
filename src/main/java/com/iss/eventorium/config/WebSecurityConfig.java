@@ -107,6 +107,7 @@ public class WebSecurityConfig {
 
                         // Events
                         .requestMatchers("/api/v1/events/{id}/budget/budget-items").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/budget/suggestions").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST,"/api/v1/events/{id}/ratings").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
