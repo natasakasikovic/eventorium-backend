@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.*;
 import com.iss.eventorium.solution.repositories.MementoRepository;
+import com.iss.eventorium.solution.specifications.MementoSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +19,9 @@ public class HistoryService {
     private final SolutionMapper solutionMapper;
 
     public void addMemento(Solution solution) {
-        updateOldMemento(mementoRepository.findBySolutionIdOrderByValidFromDesc(solution.getId()));
+        updateOldMemento(mementoRepository.findAll(
+                MementoSpecification.filterBySolution(solution.getId())
+        ));
 
         Memento memento = solutionMapper.toMemento(solution);
         memento.setId(0L);
@@ -28,7 +31,7 @@ public class HistoryService {
     }
 
     public Memento getValidSolution(Long id, LocalDateTime givenTime) {
-        return findValidSolution(givenTime,  mementoRepository.findBySolutionId(id));
+        return findValidSolution(givenTime,  mementoRepository.findAll(MementoSpecification.hasSolution(id)));
     }
 
     private void updateOldMemento(List<Memento> mementos) {
