@@ -74,10 +74,6 @@ public class CompanyService {
         return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
-    public byte[] getImage(Long id, ImagePath path) {
-        return imageService.getImage(IMG_DIR_NAME, id, path);
-    }
-
     public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
         Company company = find(updateRequestDto.getId());
         company.setAddress(updateRequestDto.getAddress());

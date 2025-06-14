@@ -153,6 +153,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}/*").permitAll()
                         .requestMatchers("/api/v1/companies/{id}/images").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/companies").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/companies/{id}/images").permitAll()
 
                         // Event types
                         .requestMatchers("/api/v1/event-types/all").permitAll()

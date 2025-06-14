@@ -245,7 +245,7 @@ public class UserService {
         user.getPerson().setAddress(request.getAddress());
         user.getPerson().setPhoneNumber(request.getPhoneNumber());
 
-        user = find(user.getId()); // think: is this need?
+        repository.save(user);
 
         String jwt = jwtTokenUtil.generateToken(user);
         Long expiresIn = jwtTokenUtil.getExpiresIn();
