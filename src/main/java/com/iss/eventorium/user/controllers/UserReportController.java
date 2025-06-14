@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
+import com.iss.eventorium.user.api.UserReportApi;
 import com.iss.eventorium.user.dtos.report.UserReportResponseDto;
 import com.iss.eventorium.user.dtos.report.UpdateReportRequestDto;
 import com.iss.eventorium.user.dtos.report.UserReportRequestDto;
@@ -15,7 +16,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user-reports")
-public class UserReportController {
+public class UserReportController implements UserReportApi {
 
     private final UserReportService service;
 
