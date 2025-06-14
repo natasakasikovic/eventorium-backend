@@ -154,10 +154,9 @@ public class SolutionSpecification {
             if (eventDate == null) return cb.conjunction();
 
             LocalDate today = LocalDate.now();
-            long daysUntilEvent = ChronoUnit.DAYS.between(today, eventDate);
-            int daysUntilEventInt = (int) daysUntilEvent;
+            int daysUntilEvent = (int) ChronoUnit.DAYS.between(today, eventDate);
 
-            if (daysUntilEventInt < 0) {
+            if (daysUntilEvent < 0) {
                 return cb.disjunction();
             }
 
@@ -166,7 +165,7 @@ public class SolutionSpecification {
             Root<Service> serviceRoot = cb.treat(root, Service.class);
             Path<Integer> reservationDeadline = serviceRoot.get("reservationDeadline");
 
-            Predicate isWithinDeadline = cb.lessThanOrEqualTo(reservationDeadline, daysUntilEventInt);
+            Predicate isWithinDeadline = cb.lessThanOrEqualTo(reservationDeadline, daysUntilEvent);
 
             return cb.or(isNotService, isWithinDeadline);
         };

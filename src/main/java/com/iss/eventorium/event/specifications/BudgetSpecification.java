@@ -7,6 +7,7 @@ import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,18 +26,17 @@ public class BudgetSpecification {
             query.distinct(true);
 
             Root<Event> eventRoot = query.from(Event.class);
+
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
-            Join<Budget, BudgetItem> itemsJoin =  budgetJoin.join("items");
+            Join<Budget, BudgetItem> itemsJoin = budgetJoin.join("items");
+
             Join<BudgetItem, Solution> solutionJoin = itemsJoin.join("solution");
 
-            query.where(
-                    cb.and(
-                            cb.equal(eventRoot.get("organizer").get("id"), organizerId),
-                            cb.equal(solutionJoin.get("isVisible"), true)
-                    )
-            );
+            Predicate linkToRoot = cb.equal(root, itemsJoin);
+            Predicate organizerMatches = cb.equal(eventRoot.get("organizer").get("id"), organizerId);
+            Predicate isVisible = cb.isTrue(solutionJoin.get("isVisible"));
 
-            return query.getRestriction();
+            return cb.and(linkToRoot, organizerMatches, isVisible);
         };
     }
 
