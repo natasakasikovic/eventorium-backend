@@ -128,14 +128,16 @@ INSERT INTO budgets VALUES (167.0, 159.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (
                            (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0),
                            (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0, 0), (0,0);
 
-INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type) VALUES
-    (10,9,CURRENT_DATE, 8, 'PRODUCT'),
-    (50, 10, CURRENT_DATE, 2, 'PRODUCT'),
-    (2,7, CURRENT_DATE, 6, 'PRODUCT'),
-    (105, 4, CURRENT_DATE, 9, 'SERVICE');
+INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type, status) VALUES
+    (10,9,CURRENT_DATE, 8, 'PRODUCT', 'PROCESSED'),
+    (50, 10, null, 2, 'PRODUCT', 'PLANNED'),
+    (2,7, CURRENT_DATE, 6, 'PRODUCT', 'PROCESSED'),
+    (105, 4, CURRENT_DATE, 9, 'SERVICE', 'PROCESSED'),
+    (300, 5, null, 19, 'SERVICE', 'DENIED'),
+    (1200, 3, null, 18, 'SERVICE', 'PENDING');
 
 
-INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (1,4);
+INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (1,4), (1,5), (1,6);
 
 
 INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft, budget_id)

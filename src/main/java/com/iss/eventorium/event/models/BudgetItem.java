@@ -33,5 +33,8 @@ public class BudgetItem {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Category category;
 
+    @Enumerated(EnumType.STRING)
+    private BudgetItemStatus status;
+
     private LocalDateTime processedAt;
 }

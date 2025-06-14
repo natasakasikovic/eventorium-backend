@@ -7,6 +7,7 @@ import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
 import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
@@ -89,10 +90,12 @@ public class BudgetService {
     public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
+        boolean isAutomatic = service.getType() == ReservationType.AUTOMATIC;
         budget.addItem(BudgetItem.builder()
                 .itemType(SolutionType.SERVICE)
                 .plannedAmount(plannedAmount)
-                .processedAt(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
+                .status(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING)
+                .processedAt(isAutomatic ? LocalDateTime.now() : null)
                 .solution(service)
                 .category(service.getCategory())
                 .build());
@@ -111,6 +114,7 @@ public class BudgetService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
 
+        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         budgetItem.setProcessedAt(LocalDateTime.now());
         budgetItemRepository.save(budgetItem);
     }
@@ -133,6 +137,7 @@ public class BudgetService {
             throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
         }
         item.setProcessedAt(LocalDateTime.now());
+        item.setStatus(BudgetItemStatus.PROCESSED);
         budget.addItem(item);
         eventRepository.save(event);
     }
