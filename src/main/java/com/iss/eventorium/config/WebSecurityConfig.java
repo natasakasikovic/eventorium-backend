@@ -39,6 +39,7 @@ public class WebSecurityConfig {
     private static final String PROVIDER = "PROVIDER";
     private static final String ORGANIZER = "EVENT_ORGANIZER";
     private static final String ADMIN = "ADMIN";
+    private static final String USER = "USER";
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -131,6 +132,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
 
                         // Users
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/account-role").hasAuthority(USER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users").authenticated()
                         .requestMatchers("/api/v1/users/password").authenticated()

@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.security.utils.JwtTokenUtil;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -8,9 +9,11 @@ import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
+import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
 import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
 import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
+import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
 import com.iss.eventorium.user.exceptions.ActivationTimeoutException;
 import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
@@ -27,14 +30,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class UserService {
     private final UserMapper mapper;
 
     private static final String IMG_DIR_NAME = "profilePhotos";
+    private final JwtTokenUtil jwtTokenUtil;
 
     public User find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
@@ -235,5 +237,18 @@ public class UserService {
     public List<User> findByEventAttendance(Long eventId) {
         Specification<User> specification = UserSpecification.filterByEventAttendance(eventId);
         return repository.findAll(specification);
+    }
+
+    public UserTokenState upgradeAccount(UpgradeAccountRequestDto request) {
+        User user = authService.getCurrentUser();
+        user.setRoles(new ArrayList<>(List.of(roleService.findById(request.getRole().getId()))));
+        user.getPerson().setAddress(request.getAddress());
+        user.getPerson().setPhoneNumber(request.getPhoneNumber());
+
+        user = find(user.getId()); // think: is this need?
+
+        String jwt = jwtTokenUtil.generateToken(user);
+        Long expiresIn = jwtTokenUtil.getExpiresIn();
+        return new UserTokenState(jwt, expiresIn);
     }
 }
