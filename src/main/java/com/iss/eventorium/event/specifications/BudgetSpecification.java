@@ -3,6 +3,7 @@ package com.iss.eventorium.event.specifications;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import jakarta.persistence.criteria.Join;
@@ -19,17 +20,19 @@ public class BudgetSpecification {
     }
 
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
-        return (root, query, criteriaBuilder) -> {
+        return (root, query, cb) -> {
             assert query != null;
             query.distinct(true);
 
             Root<Event> eventRoot = query.from(Event.class);
             Join<Event, Budget> budgetJoin = eventRoot.join("budget");
-            budgetJoin.join("items");
+            Join<Budget, BudgetItem> itemsJoin =  budgetJoin.join("items");
+            Join<BudgetItem, Solution> solutionJoin = itemsJoin.join("solution");
 
             query.where(
-                    criteriaBuilder.and(
-                            criteriaBuilder.equal(eventRoot.get("organizer").get("id"), organizerId)
+                    cb.and(
+                            cb.equal(eventRoot.get("organizer").get("id"), organizerId),
+                            cb.equal(solutionJoin.get("isVisible"), true)
                     )
             );
 

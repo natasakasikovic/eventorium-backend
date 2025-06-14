@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.category.models.Category;
+import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
@@ -95,6 +96,19 @@ public class SolutionSpecification {
     public static<T extends Solution> Specification<T> hasId(Long id){
         return (root, query, cb) -> cb.equal(root.get("id"), id);
     }
+
+    public static<T extends Solution> Specification<T> filterTopSolutions() {
+        return Specification.where((root, query, cb) -> {
+
+            Join<Solution, Rating> ratingJoin = root.join("ratings");
+            query.groupBy(root);
+            Expression<Double> avgRating = cb.avg(ratingJoin.get("rating"));
+            query.orderBy(cb.desc(avgRating));
+
+            return cb.conjunction();
+        });
+    }
+
 
     public static<T extends Solution> Specification<T> filterOutBlockedContent(User blocker) {
         return (root, query, cb) -> {
