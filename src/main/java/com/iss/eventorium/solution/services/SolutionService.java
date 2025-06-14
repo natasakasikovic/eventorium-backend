@@ -39,12 +39,12 @@ public class SolutionService {
     }
 
     public boolean existsCategory(Long categoryId) {
-        return repository.existsByCategory_Id(categoryId);
+        return repository.count(SolutionSpecification.hasCategory(categoryId)) > 0;
     }
 
     public Solution findSolutionByCategory(Category category) {
-        return repository.findByCategoryId(category.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
+        return repository.findOne(SolutionSpecification.hasCategory(category.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("Solution with category '" + category.getName() + "' not found"));
     }
 
     public void saveStatus(Solution solution, Status status) {

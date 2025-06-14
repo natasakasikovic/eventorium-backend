@@ -29,6 +29,11 @@ public class SolutionSpecification {
         return (root, query, cb) -> cb.isTrue(root.get("isVisible"));
     }
 
+    public static<T extends Solution> Specification<T> hasCategory(Long categoryId) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+    }
+
     public static<T extends Solution> Specification<T> hasCategory(String category) {
         return (root, query, cb) ->
                 category == null || category.isEmpty()

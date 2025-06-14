@@ -15,12 +15,12 @@ public class HistoryService {
 
     private final MementoRepository mementoRepository;
 
-    private final SolutionMapper mapper;
+    private final SolutionMapper solutionMapper;
 
     public void addMemento(Solution solution) {
         updateOldMemento(mementoRepository.findBySolutionIdOrderByValidFromDesc(solution.getId()));
 
-        Memento memento = mapper.toMemento(solution);
+        Memento memento = solutionMapper.toMemento(solution);
         memento.setId(0L);
         memento.setSolution(solution);
         memento.setValidFrom(LocalDateTime.now());
@@ -49,7 +49,7 @@ public class HistoryService {
                         (m.getValidFrom() == null || !m.getValidFrom().isAfter(givenTime)) &&
                                 (m.getValidTo() == null || !m.getValidTo().isBefore(givenTime)))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Memento not found!"));
+                .orElseThrow(() -> new EntityNotFoundException("Solution not found!"));
     }
 
 }
