@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
+import com.iss.eventorium.user.api.UserBlockApi;
 import com.iss.eventorium.user.services.UserBlockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @RestController
 @RequestMapping("/api/v1/user-blocking")
 @RequiredArgsConstructor
-public class UserBlockController {
+public class UserBlockController implements UserBlockApi {
 
     private final UserBlockService service;
 
