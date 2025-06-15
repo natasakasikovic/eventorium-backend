@@ -35,6 +35,7 @@ public class ProductService {
     private final CompanyRepository companyRepository;
     private final AuthService authService;
     private final ImageService imageService;
+    private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
 
     private final ProductMapper mapper;
@@ -113,6 +114,8 @@ public class ProductService {
         product.setProvider(authService.getCurrentUser());
 
         repository.save(product);
+        historyService.addMemento(product);
+
         return mapper.toResponse(product);
     }
 
