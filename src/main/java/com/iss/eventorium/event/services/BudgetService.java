@@ -34,6 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -62,7 +63,7 @@ public class BudgetService {
         }
 
         Event event = eventService.find(eventId);
-        updateBudget(event, mapper.fromRequest(request, product, SolutionType.PRODUCT));
+        updateBudget(event, mapper.fromRequest(request, product));
         return productMapper.toResponse(product);
     }
 
@@ -91,14 +92,23 @@ public class BudgetService {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
         boolean isAutomatic = service.getType() == ReservationType.AUTOMATIC;
-        budget.addItem(BudgetItem.builder()
-                .itemType(SolutionType.SERVICE)
-                .plannedAmount(plannedAmount)
-                .status(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING)
-                .processedAt(isAutomatic ? LocalDateTime.now() : null)
-                .solution(service)
-                .category(service.getCategory())
-                .build());
+
+        BudgetItem budgetItem = getSolutionFromBudget(budget, service).orElseGet(() -> {
+            BudgetItem item = BudgetItem.builder()
+                    .itemType(SolutionType.SERVICE)
+                    .plannedAmount(plannedAmount)
+                    .status(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING)
+                    .processedAt(isAutomatic ? LocalDateTime.now() : null)
+                    .solution(service)
+                    .category(service.getCategory())
+                    .build();
+            budget.addItem(item);
+            return item;
+        });
+
+        budgetItem.setStatus(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING);
+        budgetItem.setProcessedAt(isAutomatic ? LocalDateTime.now() : null);
+        budgetItem.setPlannedAmount(plannedAmount);
 
         eventRepository.save(reservation.getEvent());
     }
@@ -131,19 +141,64 @@ public class BudgetService {
         return items.stream().map(mapper::toResponse).toList();
     }
 
+    public BudgetItemResponseDto createBudgetItem(Long eventId, BudgetItemRequestDto request) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+
+        BudgetItem item = budget.getItems().stream()
+                .filter(bi -> Objects.equals(bi.getSolution().getId(), request.getItemId()))
+                .findFirst()
+                .map(existingItem -> {
+                    existingItem.setPlannedAmount(request.getPlannedAmount());
+                    return existingItem;
+                })
+                .orElseGet(() -> {
+                    Solution solution = solutionService.find(request.getItemId());
+                    BudgetItem newItem = mapper.fromRequest(request, solution);
+                    newItem.setProcessedAt(null);
+                    newItem.setStatus(BudgetItemStatus.PLANNED);
+                    budget.addItem(newItem);
+                    return newItem;
+                });
+        eventRepository.save(event);
+        return mapper.toResponse(item);
+    }
+
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
-        if(containsCategory(budget, item.getCategory())) {
-            throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
-        }
-        item.setProcessedAt(LocalDateTime.now());
-        item.setStatus(BudgetItemStatus.PROCESSED);
-        budget.addItem(item);
+        BudgetItem budgetItem = getFromBudget(budget, item);
+
+        budgetItem.setProcessedAt(LocalDateTime.now());
+        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         eventRepository.save(event);
     }
 
-    private boolean containsCategory(Budget budget, Category category) {
-        return budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(category);
+    private BudgetItem getFromBudget(Budget budget, BudgetItem item) {
+        return budget.getItems().stream().filter(bi ->
+                bi.getSolution().getId().equals(item.getSolution().getId()))
+                .findFirst()
+                .map(bi -> {
+                    if (bi.getProcessedAt() != null) {
+                        throw new AlreadyPurchasedException("Product is already purchased");
+                    }
+                    return bi;
+                })
+                .orElseGet(() -> {
+                    budget.addItem(item);
+                    return item;
+                });
+    }
+
+    private Optional<BudgetItem> getSolutionFromBudget(Budget budget, Solution solution) {
+        return budget.getItems().stream().filter(bi ->
+                        bi.getSolution().getId().equals(solution.getId()))
+                .findFirst()
+                .map(bi -> {
+                    if (bi.getProcessedAt() != null) {
+                        throw new AlreadyPurchasedException("Product is already purchased");
+                    }
+                    return bi;
+                });
     }
 
     private double calculateNetPrice(Solution solution) {
