@@ -27,6 +27,7 @@ import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -160,6 +161,23 @@ public class BudgetService {
                     budget.addItem(newItem);
                     return newItem;
                 });
+        eventRepository.save(event);
+        return mapper.toResponse(item);
+    }
+
+    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, BudgetItemRequestDto request) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        BudgetItem item = budget.getItems().stream()
+                .filter(existingItem -> Objects.equals(existingItem.getSolution().getId(), itemId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
+
+        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution())) {
+            throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
+        }
+
+        item.setPlannedAmount(request.getPlannedAmount());
         eventRepository.save(event);
         return mapper.toResponse(item);
     }

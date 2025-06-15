@@ -52,7 +52,7 @@ public class BudgetController {
             @PathVariable("event-id") Long eventId,
             @Valid @RequestBody BudgetItemRequestDto request
     ) {
-        return ResponseEntity.ok(budgetService.createBudgetItem(eventId, request));
+        return new ResponseEntity<>(budgetService.createBudgetItem(eventId, request), HttpStatus.CREATED);
     }
 
     @PostMapping("/events/{event-id}/budget/purchase")
@@ -61,5 +61,14 @@ public class BudgetController {
             @Valid @RequestBody BudgetItemRequestDto budgetItemRequestDto
     ) {
         return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<BudgetItemResponseDto> updateBudgetItemPlannedAmount(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId,
+            @Valid @RequestBody BudgetItemRequestDto request
+    ) {
+        return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
     }
 }
