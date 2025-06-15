@@ -3,6 +3,8 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.repositories.CompanyRepository;
+import com.iss.eventorium.event.models.EventType;
+import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
@@ -39,6 +41,7 @@ public class ProductService {
     private final CategoryProposalService categoryProposalService;
 
     private final ProductMapper mapper;
+    private final EventTypeService eventTypeService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -147,6 +150,28 @@ public class ProductService {
         product.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
+        repository.save(product);
+    }
+
+    public ProductResponseDto updateProduct(Long id, UpdateProductRequestDto request) {
+        Product toUpdate = find(id);
+
+        List<EventType> eventTypes = eventTypeService.findAllById(request.getEventTypesIds());
+
+        if (eventTypes.size() != request.getEventTypesIds().size()) {
+            throw new EntityNotFoundException("Event types not found");
+        }
+
+        Product product = mapper.fromUpdateRequest(request, toUpdate);
+        product.setEventTypes(eventTypes);
+        historyService.addMemento(product);
+        repository.save(product);
+        return mapper.toResponse(product);
+    }
+
+    public void deleteProduct(Long id) {
+        Product product = find(id);
+        product.setIsDeleted(true);
         repository.save(product);
     }
 
