@@ -100,8 +100,8 @@ public class ServiceService {
         handleCategoryAndStatus(service);
         service.setProvider(authService.getCurrentUser());
 
-        historyService.addMemento(service);
         repository.save(service);
+        historyService.addMemento(service);
         return mapper.toResponse(service);
     }
 
