@@ -155,6 +155,7 @@ public class BudgetService {
                 .orElseGet(() -> {
                     Solution solution = solutionService.find(request.getItemId());
                     BudgetItem newItem = mapper.fromRequest(request, solution);
+                    newItem.setId(0L);
                     newItem.setProcessedAt(null);
                     newItem.setStatus(BudgetItemStatus.PLANNED);
                     budget.addItem(newItem);
@@ -168,7 +169,7 @@ public class BudgetService {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
         BudgetItem item = budget.getItems().stream()
-                .filter(existingItem -> Objects.equals(existingItem.getSolution().getId(), itemId))
+                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
 

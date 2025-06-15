@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "budget_items")
 public class BudgetItem {
 
