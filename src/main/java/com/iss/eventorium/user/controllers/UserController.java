@@ -1,11 +1,9 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
 import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
 import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
-import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.validation.Valid;
@@ -62,10 +60,5 @@ public class UserController {
     public ResponseEntity<Void> deactivateAccount() {
         service.deactivateAccount();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PutMapping("/account-role")
-    public ResponseEntity<UserTokenState> upgradeAccount(@RequestBody UpgradeAccountRequestDto request) {
-        return ResponseEntity.ok(service.upgradeAccount(request));
     }
 }

@@ -55,7 +55,6 @@ public class UserService {
     private final UserMapper mapper;
 
     private static final String IMG_DIR_NAME = "profilePhotos";
-    private final JwtTokenUtil jwtTokenUtil;
 
     public User find(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
@@ -237,18 +236,5 @@ public class UserService {
     public List<User> findByEventAttendance(Long eventId) {
         Specification<User> specification = UserSpecification.filterByEventAttendance(eventId);
         return repository.findAll(specification);
-    }
-
-    public UserTokenState upgradeAccount(UpgradeAccountRequestDto request) {
-        User user = authService.getCurrentUser();
-        user.setRoles(new ArrayList<>(List.of(roleService.findById(request.getRole().getId()))));
-        user.getPerson().setAddress(request.getAddress());
-        user.getPerson().setPhoneNumber(request.getPhoneNumber());
-
-        repository.save(user);
-
-        String jwt = jwtTokenUtil.generateToken(user);
-        Long expiresIn = jwtTokenUtil.getExpiresIn();
-        return new UserTokenState(jwt, expiresIn);
     }
 }

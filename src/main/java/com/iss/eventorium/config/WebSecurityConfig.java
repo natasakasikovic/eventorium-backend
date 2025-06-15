@@ -132,7 +132,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
 
                         // Users
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/account-role").hasAuthority(USER)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/auth/account-role").hasAuthority(USER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users").authenticated()
                         .requestMatchers("/api/v1/users/password").authenticated()
