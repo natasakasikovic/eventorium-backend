@@ -2,6 +2,7 @@ package com.iss.eventorium.user.services;
 
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.user.dtos.auth.UserTokenState;
+import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
 import com.iss.eventorium.user.exceptions.AccountAccessDeniedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import com.iss.eventorium.user.models.User;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final RoleService roleService;
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -93,5 +97,16 @@ public class AuthService {
         else
             message += String.format("It will be reactivated in %d hours and %d minutes.", remainingHours, remainingMinutesAfterHours);
         return message;
+    }
+
+    public UserTokenState upgradeAccount(UpgradeAccountRequestDto request) {
+        User user = getCurrentUser();
+        user.setRoles(new ArrayList<>(List.of(roleService.findById(request.getRole().getId()))));
+        user.getPerson().setAddress(request.getAddress());
+        user.getPerson().setPhoneNumber(request.getPhoneNumber());
+        userRepository.save(user);
+        String jwt = jwtTokenUtil.generateToken(user);
+        Long expiresIn = jwtTokenUtil.getExpiresIn();
+        return new UserTokenState(jwt, expiresIn);
     }
 }
