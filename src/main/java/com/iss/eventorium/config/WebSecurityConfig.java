@@ -220,8 +220,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations/{id}").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
+
                         // Invitations
                         .requestMatchers("/api/v1/invitations/verification/{hash}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/invitations/{hash}").permitAll()
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
                         .requestMatchers("/api/v1/invitations/*").hasAuthority(ORGANIZER)
 
