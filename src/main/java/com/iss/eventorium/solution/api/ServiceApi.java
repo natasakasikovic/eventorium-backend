@@ -264,55 +264,6 @@ public interface ServiceApi {
     );
 
     @Operation(
-            summary = "Recommend services based on the user's budget, considering both price and service category.",
-            description =
-            """
-            Returns list of recommended options based on the user’s budget,
-            selecting services from relevant category that fit within the specified price range.
-            Requires authentication and EVENT_ORGANIZER authority.
-            Only users with the 'EVENT_ORGANIZER' authority can access this endpoint.
-            """,
-            security = { @SecurityRequirement(name="bearerAuth") },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Event not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "EventNotFound",
-                                            summary = "Event not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
-                                    )
-                            )
-                    )
-            }
-    )
-    ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-            @Parameter(
-                    description = "The unique identifier of the category.",
-                    required = true,
-                    example = "123"
-            )
-            Long id,
-            @Parameter(
-                    description = "The unique identifier of the event.",
-                    required = true,
-                    example = "123"
-            )
-            Long eventId,
-            @Parameter(
-                    description = "The maximum price a user is willing to pay for the service.",
-                    required = true,
-                    example = "123"
-            )
-            Double price
-    );
-
-    @Operation(
             summary = "Creates a service",
             description =
             """

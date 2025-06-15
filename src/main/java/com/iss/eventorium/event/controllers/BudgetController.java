@@ -3,9 +3,11 @@ package com.iss.eventorium.event.controllers;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
+import com.iss.eventorium.solution.models.Solution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +27,18 @@ public class BudgetController {
         return ResponseEntity.ok(budgetService.getBudget(eventId));
     }
 
-    @PostMapping("/events/{event-id}/budget/purchase")
-    public ResponseEntity<ProductResponseDto> purchaseProduct(
-            @PathVariable("event-id") Long eventId,
-            @RequestBody BudgetItemRequestDto budgetItemRequestDto
-    ) {
-        return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
-    }
-
     @GetMapping("/events/{event-id}/budget/budget-items")
     public ResponseEntity<List<BudgetItemResponseDto>> getBudgetItems(@PathVariable("event-id") Long eventId) {
         return ResponseEntity.ok(budgetService.getBudgetItems(eventId));
+    }
+
+    @GetMapping("/events/{event-id}/budget/suggestions")
+    public ResponseEntity<List<BudgetSuggestionResponseDto>> getBudgetSuggestions(
+            @PathVariable("event-id") Long eventId,
+            @RequestParam("category-id") Long categoryId,
+            @RequestParam("price") Double price
+    ) {
+        return ResponseEntity.ok(budgetService.getBudgetSuggestions(eventId, categoryId, price));
     }
 
     @GetMapping("/budget-items")
@@ -43,4 +46,11 @@ public class BudgetController {
         return ResponseEntity.ok(budgetService.getAllBudgetItems());
     }
 
+    @PostMapping("/events/{event-id}/budget/purchase")
+    public ResponseEntity<ProductResponseDto> purchaseProduct(
+            @PathVariable("event-id") Long eventId,
+            @RequestBody BudgetItemRequestDto budgetItemRequestDto
+    ) {
+        return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
+    }
 }

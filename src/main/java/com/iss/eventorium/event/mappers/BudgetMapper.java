@@ -4,8 +4,10 @@ import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
+import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +51,20 @@ public class BudgetMapper {
                 .items(budget.getItems().stream().map(this::toResponse).toList())
                 .build();
 
+    }
+
+    public BudgetSuggestionResponseDto toSuggestionResponse(Solution solution) {
+        BudgetSuggestionResponseDto dto = new BudgetSuggestionResponseDto();
+        dto.setDiscount(solution.getDiscount());
+        dto.setPrice(solution.getPrice());
+        dto.setId(solution.getId());
+        dto.setName(solution.getName());
+        if(solution instanceof Service) {
+            dto.setSolutionType(SolutionType.SERVICE);
+        } else {
+            dto.setSolutionType(SolutionType.PRODUCT);
+        }
+        dto.setRating(solution.calculateAverageRating());
+        return dto;
     }
 }

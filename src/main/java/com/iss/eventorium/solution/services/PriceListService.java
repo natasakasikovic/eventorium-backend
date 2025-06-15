@@ -56,7 +56,7 @@ public class PriceListService {
 
         service.setPrice(updateRequestDto.getPrice());
         service.setDiscount(updateRequestDto.getDiscount());
-        historyService.addServiceMemento(service);
+        historyService.addMemento(service);
 
         return mapper.toResponse(serviceRepository.save(service));
     }
@@ -81,7 +81,7 @@ public class PriceListService {
 
         product.setPrice(updateRequestDto.getPrice());
         product.setDiscount(updateRequestDto.getDiscount());
-        historyService.addProductMemento(product);
+        historyService.addMemento(product);
 
         return mapper.toResponse(productRepository.save(product));
     }

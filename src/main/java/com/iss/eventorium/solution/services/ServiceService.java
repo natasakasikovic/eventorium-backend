@@ -3,7 +3,6 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.services.CompanyService;
-import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.services.EventTypeService;
@@ -31,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -102,8 +100,8 @@ public class ServiceService {
         handleCategoryAndStatus(service);
         service.setProvider(authService.getCurrentUser());
 
-        historyService.addServiceMemento(service);
         repository.save(service);
+        historyService.addMemento(service);
         return mapper.toResponse(service);
     }
 
@@ -121,17 +119,6 @@ public class ServiceService {
 
     public List<ImageResponseDto> getImages(Long id) {
         return imageService.getImages(IMG_DIR_NAME, find(id));
-    }
-
-    // TODO: refactor method below to use specification
-    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Long eventId, Double price) {
-        Event event = eventService.find(eventId);
-        return repository
-                .getSuggestedServices(id, price)
-                .stream()
-                .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
-                .map(mapper::toSummaryResponse)
-                .toList();
     }
 
     public Service find(Long id) {
@@ -163,7 +150,7 @@ public class ServiceService {
         Service service = mapper.fromUpdateRequest(request, toUpdate);
         service.setEventTypes(eventTypes);
 
-        historyService.addServiceMemento(service);
+        historyService.addMemento(service);
         repository.save(service);
         return mapper.toResponse(service);
     }

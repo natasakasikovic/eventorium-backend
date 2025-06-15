@@ -91,14 +91,6 @@ public class ProductController {
         return ResponseEntity.ok(service.search(keyword));
     }
 
-    @GetMapping("/suggestions")
-    public ResponseEntity<List<ProductSummaryResponseDto>> getBudgetSuggestions(
-            @RequestParam("categoryId") Long categoryId,
-            @RequestParam("price") Double price
-    ) {
-        return ResponseEntity.ok(service.getBudgetSuggestions(categoryId, price));
-    }
-
     @GetMapping("/{id}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id){
         ImagePath path = service.getImagePath(id);

@@ -35,6 +35,7 @@ public class ProductService {
     private final CompanyRepository companyRepository;
     private final AuthService authService;
     private final ImageService imageService;
+    private final HistoryService historyService;
     private final CategoryProposalService categoryProposalService;
 
     private final ProductMapper mapper;
@@ -85,11 +86,6 @@ public class ProductService {
         return mapper.toDetailsResponse(product, companyRepository.getCompanyByProviderId(product.getProvider().getId()));
     }
 
-    // TODO: method below needs to be refactored to use specification
-    public List<ProductSummaryResponseDto> getBudgetSuggestions(Long categoryId, Double price) {
-        return repository.getBudgetSuggestions(categoryId, price).stream().map(mapper::toSummaryResponse).toList();
-    }
-
     public List<ImageResponseDto> getImages(Long id) {
         return imageService.getImages(IMG_DIR_NAME, find(id));
     }
@@ -118,6 +114,8 @@ public class ProductService {
         product.setProvider(authService.getCurrentUser());
 
         repository.save(product);
+        historyService.addMemento(product);
+
         return mapper.toResponse(product);
     }
 

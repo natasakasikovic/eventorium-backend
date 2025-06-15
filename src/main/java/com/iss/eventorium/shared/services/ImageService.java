@@ -29,7 +29,7 @@ public class ImageService {
     private String imagePath;
 
     public void uploadImage(String uploadDir, String fileName, MultipartFile multipartFile) throws IOException {
-        Path uploadPath = Paths.get(StringUtils.cleanPath(imagePath + uploadDir));
+        Path uploadPath = Paths.get(imagePath, uploadDir).normalize();
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -90,7 +90,7 @@ public class ImageService {
         List<ImagePath> paths = new ArrayList<>();
 
         images.forEach(image -> {
-            String uploadDir = StringUtils.cleanPath(imagePath + imageDir + "/" + id + "/");
+            String uploadDir = StringUtils.cleanPath(imageDir + "/" + id + "/");
             try {
                 ImagePath path = saveImage(uploadDir, image);
                 if (path != null) {

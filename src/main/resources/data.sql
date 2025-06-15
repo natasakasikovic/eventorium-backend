@@ -198,8 +198,6 @@ INSERT INTO solution_event_types (solution_id, event_type_id) VALUES
 (18, 1), (18, 2), (18, 3), (19, 1), (19, 3), (20,1), (20,2), (20,3);
 
 
-INSERT INTO solutions_history VALUES (1);
-
 INSERT INTO solution_image_paths (image_paths_id, solution_id) VALUES
 (1, 1), (2, 2), (3, 3),
 (4, 4), (5, 5), (6, 6),
@@ -355,6 +353,30 @@ VALUES
     (3, 3, CURRENT_TIMESTAMP, 1),
     (2, 4, CURRENT_TIMESTAMP, 1);
 
+INSERT INTO mementos (solution_id, name, price, discount, valid_from, valid_to) VALUES
+-- Products
+(1, 'Custom Invitations', 2.50, 50.00, CURRENT_DATE, NULL),
+(2, 'Event Banner', 50.00, 10.00, CURRENT_DATE, NULL),
+(3, 'Party Favors', 1.50, 20.00, CURRENT_DATE, NULL),
+(4, 'Decorative Balloons', 0.80, 10.00, CURRENT_DATE, NULL),
+(5, 'Event T-Shirts', 15.00, 5.00, CURRENT_DATE, NULL),
+(6, 'Party Hats', 2.00, 50.00, CURRENT_DATE, NULL),
+(7, 'Event Mugs', 5.00, 20.00, CURRENT_DATE, NULL),
+(8, 'Photo Frames', 8.00, 15.00, CURRENT_DATE, NULL),
+
+-- Services
+(9, 'Event Photography', 150.00, 30.00, CURRENT_DATE, NULL),
+(10, 'Catering Service', 500.00, 50.00, CURRENT_DATE, NULL),
+(11, 'Event Planning', 1200.00, 0.00, CURRENT_DATE, NULL),
+(12, 'Sound System Setup', 250.00, 40.00, CURRENT_DATE, NULL),
+(13, 'Decorative Lighting', 300.00, 50.00, CURRENT_DATE, NULL),
+(14, 'Venue Booking', 1000.00, 100.00, CURRENT_DATE, NULL),
+(15, 'Transportation Service', 350.00, 60.00, CURRENT_DATE, NULL),
+(16, 'Full Event Coordination', 1000.00, 5.00, CURRENT_DATE, NULL),
+(17, 'Buffet Catering', 700.00, 10.00, CURRENT_DATE, NULL),
+(18, 'Banquet Hall Booking', 1200.00, 25.00, CURRENT_DATE, NULL),
+(19, 'Live DJ Performance', 300.00, 25.00, CURRENT_DATE, NULL),
+(20, 'Live Band Performance', 800.00, 10.00, CURRENT_DATE, NULL);
 
 INSERT INTO users_attending_events (user_id, attending_events_id) VALUES
                                                                       (1, 25), (1, 26), (1, 27), (1, 28),

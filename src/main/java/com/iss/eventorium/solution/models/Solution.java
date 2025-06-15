@@ -77,18 +77,14 @@ public abstract class Solution implements ImageHolder {
 
     public abstract void restore(Memento memento);
 
-    public void addRating(Rating rating) {
-        getRatings().add(rating);
-    }
-
     public Double calculateAverageRating() {
-        try {
+        if(getRatings() != null) {
             return getRatings()
                     .stream()
                     .mapToInt(Rating::getRating)
                     .average()
                     .orElse(0.0d);
-        } catch (NullPointerException e) {
+        } else {
             return 0.0d;
         }
     }
