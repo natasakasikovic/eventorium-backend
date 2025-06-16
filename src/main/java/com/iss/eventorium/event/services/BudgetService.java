@@ -2,11 +2,8 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
-import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.event.dtos.budget.*;
+import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
 import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
@@ -149,11 +146,17 @@ public class BudgetService {
                 .filter(bi -> Objects.equals(bi.getSolution().getId(), request.getItemId()))
                 .findFirst()
                 .map(existingItem -> {
+                    if(existingItem.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+
                     existingItem.setPlannedAmount(request.getPlannedAmount());
                     return existingItem;
                 })
                 .orElseGet(() -> {
                     Solution solution = solutionService.find(request.getItemId());
+                    if(request.getPlannedAmount() < calculateNetPrice(solution))
+                        throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
+
                     BudgetItem newItem = mapper.fromRequest(request, solution);
                     newItem.setId(0L);
                     newItem.setProcessedAt(null);
@@ -165,7 +168,7 @@ public class BudgetService {
         return mapper.toResponse(item);
     }
 
-    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, BudgetItemRequestDto request) {
+    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
         BudgetItem item = budget.getItems().stream()
@@ -173,9 +176,11 @@ public class BudgetService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
 
-        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution())) {
+        if(item.getProcessedAt() != null)
+            throw new AlreadyProcessedException("Solution is already precessed");
+
+        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
-        }
 
         item.setPlannedAmount(request.getPlannedAmount());
         eventRepository.save(event);
@@ -196,9 +201,9 @@ public class BudgetService {
                 bi.getSolution().getId().equals(item.getSolution().getId()))
                 .findFirst()
                 .map(bi -> {
-                    if (bi.getProcessedAt() != null) {
-                        throw new AlreadyPurchasedException("Product is already purchased");
-                    }
+                    if (bi.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -212,9 +217,8 @@ public class BudgetService {
                         bi.getSolution().getId().equals(solution.getId()))
                 .findFirst()
                 .map(bi -> {
-                    if (bi.getProcessedAt() != null) {
-                        throw new AlreadyPurchasedException("Product is already purchased");
-                    }
+                    if (bi.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
                     return bi;
                 });
     }

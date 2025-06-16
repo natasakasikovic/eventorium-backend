@@ -1,10 +1,7 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.api.BudgetApi;
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
+import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
@@ -67,7 +64,7 @@ public class BudgetController implements BudgetApi {
     public ResponseEntity<BudgetItemResponseDto> updateBudgetItemPlannedAmount(
             @PathVariable("event-id") Long eventId,
             @PathVariable("item-id") Long itemId,
-            @Valid @RequestBody BudgetItemRequestDto request
+            @Valid @RequestBody UpdateBudgetItemRequestDto request
     ) {
         return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
     }
