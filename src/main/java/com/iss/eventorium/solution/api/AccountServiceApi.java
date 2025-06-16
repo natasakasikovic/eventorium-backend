@@ -18,7 +18,10 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name = "Account Service")
+@Tag(
+        name = "Account Service",
+        description = "Handles the account service endpoints."
+)
 public interface AccountServiceApi {
 
     @Operation(

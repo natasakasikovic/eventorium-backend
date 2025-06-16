@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@Tag(name = "Reservations")
+@Tag(
+        name = "Reservations",
+        description = "Handles the reservation endpoints."
+)
 public interface ReservationApi {
 
     @Operation(

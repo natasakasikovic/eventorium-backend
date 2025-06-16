@@ -21,7 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.List;
 
-@Tag(name = "Service")
+@Tag(
+        name = "Service",
+        description = "Handles the service endpoints."
+)
 public interface ServiceApi {
 
     @Operation(
