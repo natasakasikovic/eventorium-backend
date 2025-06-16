@@ -50,8 +50,8 @@ public interface ReservationApi {
                                     }
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Event or service not found",
@@ -140,14 +140,8 @@ public interface ReservationApi {
                                     array = @ArraySchema(schema = @Schema(implementation = CalendarReservationDto.class))
                             )
                     ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized - user is not authenticated"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - authenticated user is not a provider"
-                    )
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<CalendarReservationDto>> getProviderReservations();
@@ -169,14 +163,8 @@ public interface ReservationApi {
                                     array = @ArraySchema(schema = @Schema(implementation = ReservationResponseDto.class))
                             )
                     ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized - user is not authenticated"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - authenticated user is not a provider"
-                    )
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ReservationResponseDto>> getPendingReservations();
@@ -202,8 +190,8 @@ public interface ReservationApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - user is not authenticated"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - authenticated user is not the provider who owns this reservation")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<ReservationResponseDto> updateReservation(

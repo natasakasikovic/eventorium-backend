@@ -35,8 +35,8 @@ public interface NotificationApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<NotificationResponseDto>> getNotifications();
@@ -50,8 +50,8 @@ public interface NotificationApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<Void> markNotificationsAsSeen();
@@ -62,7 +62,7 @@ public interface NotificationApi {
             security = { @SecurityRequirement(name = "bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success - returns true if notifications are silenced, false otherwise", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid authentication token")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
     ResponseEntity<Boolean> getSilenceStatus();
@@ -77,8 +77,8 @@ public interface NotificationApi {
             security = { @SecurityRequirement(name = "bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Notification settings updated successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - missing or invalid authentication token"),
-                    @ApiResponse(responseCode = "400", description = "Bad Request - invalid parameter")
+                    @ApiResponse(responseCode = "400", description = "Bad Request - invalid parameter"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
     ResponseEntity<Void> silenceNotifications(

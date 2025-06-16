@@ -28,10 +28,10 @@ public interface UserBlockApi {
             security = { @SecurityRequirement(name = "bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "User successfully blocked"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - authentication token is missing or invalid"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
-    public ResponseEntity<Void> blockUser(
+    ResponseEntity<Void> blockUser(
             @Parameter(
                     description = "The unique identifier of the user who will blocked.",
                     required = true,
