@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.AccountProductApi;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/account/products")
 @RequiredArgsConstructor
-public class AccountProductController {
+public class AccountProductController implements AccountProductApi {
 
     private final AccountProductService service;
 
