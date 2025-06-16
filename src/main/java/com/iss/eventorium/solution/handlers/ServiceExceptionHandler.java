@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.handlers;
 
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.exceptions.*;
 import org.springframework.http.HttpStatus;

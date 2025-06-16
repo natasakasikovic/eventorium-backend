@@ -8,6 +8,7 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
@@ -20,6 +21,7 @@ import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.specifications.ServiceSpecification;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +33,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -107,8 +110,9 @@ public class ServiceService {
 
     public void uploadImages(Long id, List<MultipartFile> images) {
         if (images == null || images.isEmpty()) return;
-
         Service service = find(id);
+        assertOwnership(service);
+
         List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, id, images);
 
         if (!paths.isEmpty()) {
@@ -141,6 +145,7 @@ public class ServiceService {
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto request) {
         Service toUpdate = find(id);
+        assertOwnership(toUpdate);
 
         List<EventType> eventTypes = eventTypeService.findAllById(request.getEventTypesIds());
 
@@ -157,6 +162,7 @@ public class ServiceService {
 
     public void deleteService(Long id) {
         Service service = find(id);
+        assertOwnership(service);
 
         if (reservationRepository.existsByServiceId(id))
             throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
@@ -167,11 +173,14 @@ public class ServiceService {
 
     public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
         Service service = find(id);
+        assertOwnership(service);
+
         service.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
         repository.save(service);
     }
+
 
     private void handleCategoryAndStatus(Service service) {
         if(service.getCategory().getId() == null) {
@@ -181,6 +190,13 @@ public class ServiceService {
             service.setStatus(Status.ACCEPTED);
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
+        }
+    }
+
+    private void assertOwnership(Service service) {
+        User provider = authService.getCurrentUser();
+        if(!Objects.equals(provider.getId(), service.getProvider().getId())) {
+            throw new ForbiddenEditException("You are not authorized to change this service.");
         }
     }
 }
