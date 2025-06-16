@@ -162,7 +162,7 @@ public interface EventTypeApi {
     );
 
     @Operation(
-            summary = "Retrieve the image for a event (type) using its unique service ID.",
+            summary = "Retrieve the image for a event (type) using its unique ID.",
             description =
             """
             Fetches image associated with a specific event (type) using its unique identifier (event type ID).
@@ -176,7 +176,7 @@ public interface EventTypeApi {
                                     schema = @Schema(implementation = ExceptionResponse.class),
                                     examples = @ExampleObject(
                                             name = "ImageNotFound",
-                                            summary = "Event type not found",
+                                            summary = "Image not found",
                                             value = "{ \"error\": \"Not found\", \"message\": \"Image not found.\" }"
                                     )
                             )
@@ -218,6 +218,18 @@ public interface EventTypeApi {
                                     )
                             )
                     ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Failed to upload image",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "FailedToUploadImage",
+                                            summary = "Error while uploading images",
+                                            value = "{ \"error\": \"Internal Server Error\", \"message\": \"Error while uploading images.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<byte[]> updateImage(
