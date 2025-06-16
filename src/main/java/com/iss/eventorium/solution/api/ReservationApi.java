@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.api;
 
+import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
@@ -77,8 +78,21 @@ public interface ReservationApi {
                                             )
                                     }
                             )
-                    )
-                    ,
+                    ),
+                    @ApiResponse(
+                            responseCode = "422",
+                            description = "Insufficient funds to complete the reservation",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(value = """
+                                    {
+                                      "error": "Unprocessable Entity",
+                                      "message": "You do not have enough funds to make this reservation."
+                                    }
+                                """)
+                            )
+                    ),
                     @ApiResponse(
                             responseCode = "502",
                             description = "Failed to send confirmation email",
