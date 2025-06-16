@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.solution.api.ProductApi;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.ProductService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/products")
 @RequiredArgsConstructor
-public class ProductController {
+public class ProductController implements ProductApi {
 
     private final ProductService service;
 

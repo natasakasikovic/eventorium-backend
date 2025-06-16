@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 @Tag(
-        name="Invitaion",
+        name="Invitation",
         description = "Handles the invitation endpoints."
 )
 public interface InvitationApi {
