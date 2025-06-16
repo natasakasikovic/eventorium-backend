@@ -367,7 +367,9 @@ public interface EventApi {
                     """
                     Finds event by unique ID and updates it if data is valid and user has proper authorization.
                     Requires authentication and ORGANIZER authority.
+                    
                     Only users with the `ORGANIZER` authority can access this endpoint.
+                    Additionally, only the organizer who originally created the event is allowed to edit it.
                     """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
