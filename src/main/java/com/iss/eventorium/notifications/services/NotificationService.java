@@ -5,7 +5,9 @@ import com.iss.eventorium.notifications.dtos.NotificationResponseDto;
 import com.iss.eventorium.notifications.mappers.NotificationMapper;
 import com.iss.eventorium.notifications.models.Notification;
 import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
+import com.iss.eventorium.user.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,17 +23,21 @@ public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final AuthService authService;
+
     private final NotificationRepository repository;
+    private final UserRepository userRepository;
 
     private final NotificationMapper mapper;
 
     public void sendNotification(User user, Notification notification) {
-        log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
-        messagingTemplate.convertAndSendToUser(
-                user.getId().toString(),
-                "/notifications",
-                mapper.toResponse(notification)
-        );
+        if(Boolean.FALSE.equals(user.getNotificationsSilenced())) {
+            log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
+            messagingTemplate.convertAndSendToUser(
+                    user.getId().toString(),
+                    "/notifications",
+                    mapper.toResponse(notification)
+            );
+        }
         notification.setRecipient(user);
         repository.save(notification);
     }
@@ -68,5 +74,15 @@ public class NotificationService {
             notification.setSeen(true);
             repository.save(notification);
         });
+    }
+
+    public void silenceNotifications(boolean silence) {
+        User user = authService.getCurrentUser();
+        user.setNotificationsSilenced(silence);
+        userRepository.save(user);
+    }
+
+    public Boolean getSilenceStatus() {
+        return authService.getCurrentUser().getNotificationsSilenced();
     }
 }
