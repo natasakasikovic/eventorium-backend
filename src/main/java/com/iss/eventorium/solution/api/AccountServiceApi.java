@@ -26,6 +26,8 @@ public interface AccountServiceApi {
             description =
             """
             Returns a list of all provider's services.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -41,6 +43,8 @@ public interface AccountServiceApi {
             description =
             """
             Returns a subset of provider's services.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -56,6 +60,8 @@ public interface AccountServiceApi {
             description =
             """
             Filters provider's services based on various criteria, including name, type, price, etc.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -71,6 +77,8 @@ public interface AccountServiceApi {
             description =
             """
             Returns a subset of provider's services based on pagination parameters and filter criteria.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -89,6 +97,8 @@ public interface AccountServiceApi {
             description =
             """
             Searches provider's services based on the provided keyword. The keyword is only used to match against service names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -106,6 +116,8 @@ public interface AccountServiceApi {
             """
             Returns a subset of provider's services based on the provided keyword.
             The keyword is only used to match against service names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {

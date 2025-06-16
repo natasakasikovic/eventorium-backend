@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.api;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,8 @@ public interface AccountProductApi {
             description =
             """
             Returns a list of all provider's products.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -44,6 +47,8 @@ public interface AccountProductApi {
             description =
             """
             Returns a subset of provider's products.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -59,6 +64,8 @@ public interface AccountProductApi {
             description =
             """
             Filters provider's products based on various criteria, including name, type, price, etc.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -74,6 +81,8 @@ public interface AccountProductApi {
             description =
             """
             Returns a subset of provider's products based on pagination parameters and filter criteria.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -89,6 +98,8 @@ public interface AccountProductApi {
             description =
             """
             Searches provider's products based on the provided keyword. The keyword is only used to match against product names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -105,6 +116,8 @@ public interface AccountProductApi {
             """
             Returns a subset of provider's products based on the provided keyword.
             The keyword is only used to match against product names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -188,7 +201,7 @@ public interface AccountProductApi {
                     )
             }
     )
-    ResponseEntity<Void> addFavouriteProduct(
+    ResponseEntity<ProductResponseDto> addFavouriteProduct(
             @Parameter(
                     description = "The unique identifier of the product.",
                     required = true,
