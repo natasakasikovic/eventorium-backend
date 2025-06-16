@@ -376,6 +376,18 @@ public interface ServiceApi {
                                     )
                             )
                     ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Failed to upload image",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "FailedToUploadImage",
+                                            summary = "Error while uploading images",
+                                            value = "{ \"error\": \"Internal Server Error\", \"message\": \"Error while uploading images.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<Void> uploadServiceImages(

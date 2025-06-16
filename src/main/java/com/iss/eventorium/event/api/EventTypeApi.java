@@ -77,7 +77,7 @@ public interface EventTypeApi {
             description =
             """
             Creates a new event type.
-            To upload event type image, use the endpoint `POST /api/v1/event-type/{id}/images`.
+            To upload event type image, use the endpoint `POST /api/v1/event-types/{id}/image`.
             Returns the created event type if successful.
             Requires authentication and ADMIN authority.
             Only users with the `ADMIN` authority can access this endpoint.
@@ -137,6 +137,18 @@ public interface EventTypeApi {
                                     )
                             )
                     ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Failed to upload image",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "FailedToUploadImage",
+                                            summary = "Error while uploading images",
+                                            value = "{ \"error\": \"Internal Server Error\", \"message\": \"Error while uploading images.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<Void> uploadImage(
