@@ -172,6 +172,7 @@ public class WebSecurityConfig {
                         // Notifications
                         .requestMatchers("/api/v1/notifications").authenticated()
                         .requestMatchers("/api/v1/notifications/seen").authenticated()
+                        .requestMatchers("/api/v1/notifications/silence").authenticated()
 
                         // Account Events
                         .requestMatchers("/api/v1/account/events").hasAuthority(ORGANIZER)

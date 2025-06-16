@@ -21,6 +21,17 @@ public class NotificationController implements NotificationApi {
         return ResponseEntity.ok(service.getAllNotifications());
     }
 
+    @GetMapping("/silence")
+    public ResponseEntity<Boolean> getSilenceStatus() {
+        return ResponseEntity.ok(service.getSilenceStatus());
+    }
+
+    @PatchMapping("/silence")
+    public ResponseEntity<Void> silenceNotifications(@RequestParam boolean silence) {
+        service.silenceNotifications(silence);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/seen")
     public ResponseEntity<Void> markNotificationsAsSeen() {
         service.markAsSeen();
