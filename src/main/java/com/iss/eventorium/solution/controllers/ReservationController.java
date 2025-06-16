@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.ReservationApi;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
-public class ReservationController {
+public class ReservationController implements ReservationApi {
 
     private final ReservationService service;
 
