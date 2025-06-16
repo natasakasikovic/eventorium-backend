@@ -21,11 +21,10 @@ public class BudgetMapper {
     private final ModelMapper modelMapper;
     private final CategoryMapper categoryMapper;
 
-    public BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution, SolutionType itemType) {
+    public BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution) {
         BudgetItem item = modelMapper.map(dto, BudgetItem.class);
         item.setCategory(solution.getCategory());
         item.setSolution(solution);
-        item.setItemType(itemType);
         return item;
     }
 

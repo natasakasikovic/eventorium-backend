@@ -8,6 +8,7 @@ import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.models.Solution;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,11 +47,28 @@ public class BudgetController {
         return ResponseEntity.ok(budgetService.getAllBudgetItems());
     }
 
+    @PostMapping("/events/{event-id}/budget/budget-items")
+    public ResponseEntity<BudgetItemResponseDto> createBudgetItem(
+            @PathVariable("event-id") Long eventId,
+            @Valid @RequestBody BudgetItemRequestDto request
+    ) {
+        return new ResponseEntity<>(budgetService.createBudgetItem(eventId, request), HttpStatus.CREATED);
+    }
+
     @PostMapping("/events/{event-id}/budget/purchase")
     public ResponseEntity<ProductResponseDto> purchaseProduct(
             @PathVariable("event-id") Long eventId,
-            @RequestBody BudgetItemRequestDto budgetItemRequestDto
+            @Valid @RequestBody BudgetItemRequestDto budgetItemRequestDto
     ) {
         return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<BudgetItemResponseDto> updateBudgetItemPlannedAmount(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId,
+            @Valid @RequestBody BudgetItemRequestDto request
+    ) {
+        return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
     }
 }
