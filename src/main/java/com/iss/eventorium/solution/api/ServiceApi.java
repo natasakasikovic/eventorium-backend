@@ -21,7 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.List;
 
-@Tag(name = "Service")
+@Tag(
+        name = "Service",
+        description = "Handles the service endpoints."
+)
 public interface ServiceApi {
 
     @Operation(
@@ -31,6 +34,7 @@ public interface ServiceApi {
             Returns a list of all available services, excluding those from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -46,6 +50,7 @@ public interface ServiceApi {
             excluding those from any blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                 @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -81,6 +86,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully", useReturnTypeSchema = true),
@@ -108,6 +114,7 @@ public interface ServiceApi {
             excluding those from any blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending services, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -136,6 +143,7 @@ public interface ServiceApi {
                     Excludes services from blocked providers if the user is logged in.
                     Hidden and pending services are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    Admins have the ability to view hidden and pending services, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -151,6 +159,7 @@ public interface ServiceApi {
                     Excludes services from blocked providers if the user is logged in.
                     Hidden and pending services are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    Admins have the ability to view hidden and pending services, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -167,6 +176,7 @@ public interface ServiceApi {
             nor is it hidden or pending.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -202,6 +212,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can get images for their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending services, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -237,6 +248,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can get image for their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),

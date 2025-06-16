@@ -1,6 +1,8 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.AccountProductApi;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.AccountProductService;
@@ -15,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/account/products")
 @RequiredArgsConstructor
-public class AccountProductController {
+public class AccountProductController implements AccountProductApi {
 
     private final AccountProductService service;
 
@@ -62,9 +64,8 @@ public class AccountProductController {
     }
 
     @PostMapping("/favourites/{id}")
-    public ResponseEntity<Void> addFavouriteProduct(@PathVariable Long id) {
-        service.addFavouriteProduct(id);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDto> addFavouriteProduct(@PathVariable Long id) {
+        return new ResponseEntity<>(service.addFavouriteProduct(id), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/favourites/{id}")

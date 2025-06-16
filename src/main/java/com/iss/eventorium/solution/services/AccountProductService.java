@@ -2,6 +2,7 @@ package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
+import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -32,7 +33,7 @@ public class AccountProductService {
                 .stream().map(mapper::toSummaryResponse).toList();
     }
 
-    public void addFavouriteProduct(Long id) {
+    public ProductResponseDto addFavouriteProduct(Long id) {
         Product product = find(id);
 
         List<Product> favouriteProduct = authService.getCurrentUser().getPerson().getFavouriteProducts();
@@ -40,6 +41,7 @@ public class AccountProductService {
             favouriteProduct.add(product);
             userRepository.save(authService.getCurrentUser());
         }
+        return mapper.toResponse(product);
     }
 
     public void removeFavouriteProduct(Long id) {
