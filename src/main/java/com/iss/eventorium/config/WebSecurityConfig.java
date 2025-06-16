@@ -1,5 +1,6 @@
 package com.iss.eventorium.config;
 
+import com.iss.eventorium.security.auth.CustomAccessDeniedHandler;
 import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
@@ -33,6 +34,7 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -69,7 +71,10 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
-        http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
+        http.exceptionHandling(e -> e
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+        );
         http.authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/ws/**").permitAll()
                         .requestMatchers("/api/v1/ws").permitAll()
