@@ -37,6 +37,7 @@ public interface ProductApi {
                     nor is it hidden or pending.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -245,11 +246,12 @@ public interface ProductApi {
     @Operation(
             summary = "Fetches all available products.",
             description =
-                    """
-                    Returns a list of all available products, excluding those from blocked providers if the user is logged in.
-                    Hidden and pending products are excluded for all users, except when the provider is logged in.
-                    In that case, the provider can view their own hidden and pending products, while other users cannot access them.
-                    """,
+            """
+            Returns a list of all available products, excluding those from blocked providers if the user is logged in.
+            Hidden and pending products are excluded for all users, except when the provider is logged in.
+            In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+            Admins have the ability to view hidden and pending products, regardless of the provider.
+            """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
             }
@@ -264,6 +266,7 @@ public interface ProductApi {
                     excluding those from any blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -279,7 +282,9 @@ public interface ProductApi {
                     If images exist for the product, a list of them will be returned.
                     Excludes products from blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
-                    In that case, the provider can get images for their own hidden and pending products, while other users cannot access them.
+                    In that case, the provider can get images for their own hidden and pending products, while other 
+                    users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -314,6 +319,7 @@ public interface ProductApi {
                     excluding those from any blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -341,6 +347,7 @@ public interface ProductApi {
                     Excludes products from blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully", useReturnTypeSchema = true),
@@ -368,6 +375,7 @@ public interface ProductApi {
                     Excludes products from blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -384,6 +392,7 @@ public interface ProductApi {
                     Excludes products from blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -400,6 +409,7 @@ public interface ProductApi {
                     Excludes products from blocked providers if the user is logged in.
                     Hidden and pending products are excluded for all users, except when the provider is logged in.
                     In that case, the provider can get images for their own hidden and pending products, while other users cannot access them.
+                    Admins have the ability to view hidden and pending products, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
