@@ -7,6 +7,7 @@ import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -17,6 +18,7 @@ import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.repositories.ProductRepository;
 import com.iss.eventorium.solution.specifications.ProductSpecification;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -137,6 +140,8 @@ public class ProductService {
         if (images.isEmpty()) return;
 
         Product product = find(productId);
+        assertOwnership(product);
+
         List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, productId, images);
 
         if (!paths.isEmpty()) {
@@ -147,6 +152,8 @@ public class ProductService {
 
     public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
         Product product = find(id);
+        assertOwnership(product);
+
         product.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
@@ -155,6 +162,7 @@ public class ProductService {
 
     public ProductResponseDto updateProduct(Long id, UpdateProductRequestDto request) {
         Product toUpdate = find(id);
+        assertOwnership(toUpdate);
 
         List<EventType> eventTypes = eventTypeService.findAllById(request.getEventTypesIds());
 
@@ -171,8 +179,17 @@ public class ProductService {
 
     public void deleteProduct(Long id) {
         Product product = find(id);
+        assertOwnership(product);
+
         product.setIsDeleted(true);
         repository.save(product);
+    }
+
+    private void assertOwnership(Product product) {
+        User provider = authService.getCurrentUser();
+        if(!Objects.equals(provider.getId(), product.getProvider().getId())) {
+            throw new ForbiddenEditException("You are not authorized to change this product.");
+        }
     }
 
 }

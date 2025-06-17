@@ -14,6 +14,7 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -142,6 +143,8 @@ public class EventService {
 
     public void updateEvent(Long id, UpdateEventRequestDto request) {
         Event event = find(id);
+        assertOwnership(event);
+
         if (!hasChanges(event, request)) return;
         if (!Objects.equals(event.getDate(), request.getDate()))
             eventPublisher.publishEvent(new EventDateChangedEvent(this, id));
@@ -290,6 +293,13 @@ public class EventService {
                 .totalRatings(totalRatings)
                 .ratingsCount(ratingsCount)
                 .build();
+    }
+
+    private void assertOwnership(Event event) {
+        User provider = authService.getCurrentUser();
+        if(!Objects.equals(provider.getId(), event.getOrganizer().getId())) {
+            throw new ForbiddenEditException("You are not authorized to change this event.");
+        }
     }
 
 }

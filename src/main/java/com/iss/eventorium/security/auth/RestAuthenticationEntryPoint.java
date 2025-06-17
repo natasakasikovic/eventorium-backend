@@ -1,5 +1,7 @@
 package com.iss.eventorium.security.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iss.eventorium.shared.models.ExceptionResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -15,7 +17,17 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse();
+        exceptionResponse.setError("Unauthorized");
+        exceptionResponse.setMessage(authException.getMessage());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonResponse = mapper.writeValueAsString(exceptionResponse);
+
+        response.getWriter().write(jsonResponse);
     }
 
 }
