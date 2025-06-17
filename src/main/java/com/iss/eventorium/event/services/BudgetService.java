@@ -29,9 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -79,8 +77,9 @@ public class BudgetService {
 
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
-        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user);
-        return budgetItemRepository.findAll(specification).stream()
+        Specification<BudgetItem> specification = BudgetSpecification.filterAllBudgetItems(user);
+        List<BudgetItem> items = budgetItemRepository.findAll(specification);
+        return removeDuplicateItems(items).stream()
                 .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
@@ -194,6 +193,13 @@ public class BudgetService {
         budgetItem.setProcessedAt(LocalDateTime.now());
         budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         eventRepository.save(event);
+    }
+
+    private Collection<BudgetItem> removeDuplicateItems(List<BudgetItem> items) {
+        HashMap<Long, BudgetItem> uniqueItems = new HashMap<>();
+        for(BudgetItem item : items)
+            uniqueItems.put(item.getSolution().getId(), item);
+        return uniqueItems.values();
     }
 
     private BudgetItem getFromBudget(Budget budget, BudgetItem item) {
