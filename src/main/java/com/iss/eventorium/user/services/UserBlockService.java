@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.user.exceptions.SelfBlockNotAllowedException;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
 import com.iss.eventorium.user.repositories.UserBlockRepository;
@@ -17,6 +18,9 @@ public class UserBlockService {
     public void blockUser(Long id) {
         User blocker = authService.getCurrentUser();
         User blocked = userService.find(id);
+
+        if (blocker.getId().equals(id))
+            throw new SelfBlockNotAllowedException("User cannot block themselves.");
 
         saveUserBlock(blocker, blocked);
         saveUserBlock(blocked, blocker);
