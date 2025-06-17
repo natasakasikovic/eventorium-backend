@@ -1,6 +1,5 @@
 package com.iss.eventorium.user.services;
 
-import com.iss.eventorium.security.utils.JwtTokenUtil;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
@@ -9,11 +8,9 @@ import com.iss.eventorium.shared.services.ImageService;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
-import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
 import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
 import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
-import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
 import com.iss.eventorium.user.exceptions.ActivationTimeoutException;
 import com.iss.eventorium.user.exceptions.EmailAlreadyTakenException;
 import com.iss.eventorium.user.exceptions.InvalidOldPasswordException;
@@ -35,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -82,6 +78,10 @@ public class UserService {
         checkRequestExpired(existingUser);
 
         return mapper.toResponse(recreateRegistrationRequest(existingUser, authRequestDto));
+    }
+
+    public List<User> getByRole(String roleName) {
+        return repository.findAll(UserSpecification.filterByRole(roleName));
     }
 
     private User createNewRegistrationRequest(AuthRequestDto authRequestDto) {

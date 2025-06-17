@@ -22,6 +22,7 @@ import java.util.List;
 public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserService userService;
     private final AuthService authService;
 
     private final NotificationRepository repository;
@@ -44,12 +45,19 @@ public class NotificationService {
 
     public void sendNotificationToAdmin(Notification notification) {
         log.info("Sending notification to admins: {}", notification.getMessage());
+
         messagingTemplate.convertAndSend(
           "/topic/admin",
           mapper.toResponse(notification)
         );
 
         repository.save(notification);
+    }
+
+    public void sendNotificationToProviders(Notification notification) {
+        List<User> providers = userService.getByRole("PROVIDER");
+        for (User provider : providers)
+            sendNotification(provider, new Notification(notification));
     }
 
     public List<NotificationResponseDto> getAllNotifications() {
