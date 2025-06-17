@@ -185,10 +185,15 @@ public class UserService {
         return imageService.getImage(IMG_DIR_NAME, path);
     }
 
-    public void update(UpdateRequestDto person) {
+    public void update(UpdateRequestDto request) {
         User user = authService.getCurrentUser();
-        Person updated = personMapper.fromRequest(person);
+        Person person = user.getPerson();
+        Person updated = personMapper.fromRequest(request);
         updated.setProfilePhoto(user.getPerson().getProfilePhoto());
+        updated.setAttendingEvents(person.getAttendingEvents());
+        updated.setFavouriteServices(person.getFavouriteServices());
+        updated.setFavouriteProducts(person.getFavouriteProducts());
+        updated.setFavouriteEvents(person.getFavouriteEvents());
         user.setPerson(updated);
         repository.save(user);
     }
