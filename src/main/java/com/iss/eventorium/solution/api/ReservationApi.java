@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 @Tag(
-        name = "Reservations",
+        name = "Reservation",
         description = "Handles the reservation endpoints."
 )
 public interface ReservationApi {
@@ -28,12 +28,15 @@ public interface ReservationApi {
     @Operation(
             summary = "Creates a reservation for service",
             description =
-                    """
-                    Creates a reservation for a specific service under a specific event and sends a confirmation email
-                    to the user who made the reservation.
-                    Requires authentication and ORGANIZER authority.
-                    Only users with the `ORGANIZER` authority can access this endpoint.
-                    """,
+            """
+            Creates a reservation for a specific service under a specific event and sends a confirmation email
+            to the user who made the reservation. The reservation is automatically added to the event's budget.
+            If the reservation type is `AUTOMATIC`, it is immediately marked as `PROCESSED`.
+            If it is `MANUAL`, it remains `PENDING` until the provider approves or rejects the reservation.
+            To update the status of a `MANUAL` reservation, use `PATCH /api/v1/reservations/{id}`.
+            Requires authentication and the `ORGANIZER` authority.
+            Only users with the `ORGANIZER` role can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Reservation successfully created", useReturnTypeSchema = true),
@@ -50,8 +53,8 @@ public interface ReservationApi {
                                     }
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Event or service not found",
@@ -140,14 +143,8 @@ public interface ReservationApi {
                                     array = @ArraySchema(schema = @Schema(implementation = CalendarReservationDto.class))
                             )
                     ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized - user is not authenticated"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - authenticated user is not a provider"
-                    )
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<CalendarReservationDto>> getProviderReservations();
@@ -169,14 +166,8 @@ public interface ReservationApi {
                                     array = @ArraySchema(schema = @Schema(implementation = ReservationResponseDto.class))
                             )
                     ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized - user is not authenticated"
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - authenticated user is not a provider"
-                    )
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ReservationResponseDto>> getPendingReservations();
@@ -202,8 +193,8 @@ public interface ReservationApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - user is not authenticated"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - authenticated user is not the provider who owns this reservation")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<ReservationResponseDto> updateReservation(

@@ -2,6 +2,7 @@ package com.iss.eventorium.event.specifications;
 
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.user.models.User;
@@ -19,6 +20,11 @@ public class BudgetSpecification {
     public static Specification<BudgetItem> filterForOrganizer(User organizer) {
         return filterBudgetItems(organizer.getId()).and(filterOutBlockedContent(organizer));
     }
+
+    public static Specification<BudgetItem> filterAllBudgetItems(User organizer) {
+        return filterForOrganizer(organizer).and(isProcessed());
+    }
+
 
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
         return (root, query, cb) -> {
@@ -38,6 +44,10 @@ public class BudgetSpecification {
 
             return cb.and(linkToRoot, organizerMatches, isVisible);
         };
+    }
+
+    private static Specification<BudgetItem> isProcessed() {
+        return (root, query, cb) -> cb.equal(root.get("status"), BudgetItemStatus.PROCESSED);
     }
 
     private static Specification<BudgetItem> filterOutBlockedContent(User blocker) {
