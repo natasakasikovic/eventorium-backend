@@ -71,4 +71,13 @@ public class BudgetController {
     ) {
         return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
     }
+
+    @DeleteMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<Void> deleteBudgetItem(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId
+    ) {
+        budgetService.deleteBudgetItem(eventId, itemId);
+        return ResponseEntity.noContent().build();
+    }
 }

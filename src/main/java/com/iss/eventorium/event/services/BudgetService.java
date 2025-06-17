@@ -168,18 +168,25 @@ public class BudgetService {
     public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, BudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
-        BudgetItem item = budget.getItems().stream()
-                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
+        BudgetItem item = getFromBudget(budget, itemId);
 
-        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution())) {
+        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
-        }
 
         item.setPlannedAmount(request.getPlannedAmount());
         eventRepository.save(event);
         return mapper.toResponse(item);
+    }
+
+    public void deleteBudgetItem(Long eventId, Long itemId) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        BudgetItem item = getFromBudget(budget, itemId);
+        if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
+            throw new AlreadyPurchasedException("Solution is already processed");
+
+        budget.removeItem(item);
+        eventRepository.save(event);
     }
 
     private void updateBudget(Event event, BudgetItem item) {
@@ -196,9 +203,8 @@ public class BudgetService {
                 bi.getSolution().getId().equals(item.getSolution().getId()))
                 .findFirst()
                 .map(bi -> {
-                    if (bi.getProcessedAt() != null) {
+                    if (bi.getProcessedAt() != null)
                         throw new AlreadyPurchasedException("Product is already purchased");
-                    }
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -207,14 +213,21 @@ public class BudgetService {
                 });
     }
 
+    private BudgetItem getFromBudget(Budget budget, Long itemId) {
+        return budget.getItems().stream()
+                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
+    }
+
     private Optional<BudgetItem> getSolutionFromBudget(Budget budget, Solution solution) {
         return budget.getItems().stream().filter(bi ->
                         bi.getSolution().getId().equals(solution.getId()))
                 .findFirst()
                 .map(bi -> {
-                    if (bi.getProcessedAt() != null) {
+                    if (bi.getProcessedAt() != null)
                         throw new AlreadyPurchasedException("Product is already purchased");
-                    }
+
                     return bi;
                 });
     }
@@ -222,4 +235,5 @@ public class BudgetService {
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
     }
+
 }

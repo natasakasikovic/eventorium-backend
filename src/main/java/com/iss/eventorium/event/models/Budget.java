@@ -35,4 +35,11 @@ public class Budget {
         }
         this.plannedAmount += item.getPlannedAmount();
     }
+
+    public void removeItem(BudgetItem item) {
+        if(item.getProcessedAt() == null) {
+            this.items.remove(item);
+            this.plannedAmount -= item.getPlannedAmount();
+        }
+    }
 }
