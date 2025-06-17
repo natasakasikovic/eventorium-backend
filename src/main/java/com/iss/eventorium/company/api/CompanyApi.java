@@ -117,8 +117,8 @@ public interface CompanyApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<ProviderCompanyDto> getCompany();
@@ -211,8 +211,8 @@ public interface CompanyApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Company not found",
@@ -248,8 +248,8 @@ public interface CompanyApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<Void> uploadNewImages(List<MultipartFile> newImages);
@@ -266,8 +266,8 @@ public interface CompanyApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<Void> deleteImages(List<RemoveImageRequestDto> removedImages);

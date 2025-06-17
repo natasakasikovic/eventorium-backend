@@ -47,7 +47,7 @@ public interface InvitationApi {
 
             }
     )
-    public ResponseEntity<Void> verifyInvitation(@Parameter(
+    ResponseEntity<Void> verifyInvitation(@Parameter(
             description = "Unique hash identifier of the invitation",
             example = "a1b2c3d4e5f6g7h8") String hash);
 
@@ -56,13 +56,13 @@ public interface InvitationApi {
     @Operation(
             summary = "Retrieve invitation email by invitation hash",
             description = """
-        Retrieves the email address associated with the invitation identified by the given hash.
-        This endpoint is primarily used for quick registration on the UI, 
-        where the email field is auto-filled based on the invitation hash, 
-        and the user provides the remaining details.
-        
-        No authentication is required.
-        """,
+                Retrieves the email address associated with the invitation identified by the given hash.
+                This endpoint is primarily used for quick registration on the UI, 
+                where the email field is auto-filled based on the invitation hash, 
+                and the user provides the remaining details.
+                
+                No authentication is required.
+                """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Invitation found and email retrieved successfully"),
                     @ApiResponse(responseCode = "404", description = "Invitation not found"),
@@ -80,7 +80,7 @@ public interface InvitationApi {
                     )
             }
     )
-    public ResponseEntity<InvitationResponseDto> getInvitation(
+    ResponseEntity<InvitationResponseDto> getInvitation(
             @Parameter(
                     description = "Unique hash identifier of the invitation used to retrieve the associated email for quick registration",
                     example = "a1b2c3d4e5f6g7h8",
@@ -91,15 +91,16 @@ public interface InvitationApi {
 
 
     @Operation( summary = "Send invitations for an event",
-            description = """
-        Sends one or more invitations for the specified event.
-        Requires AUTHENTICATION.
-        User must have the ORGANIZER role to access this endpoint.
-        """,
+            description =
+            """
+            Sends one or more invitations for the specified event.
+            Requires AUTHENTICATION.
+            User must have the ORGANIZER role to access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Invitations successfully sent"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "403",
                             description = "User does not have permission to send invitations (must be organizer)",
@@ -138,8 +139,7 @@ public interface InvitationApi {
                     )
             }
     )
-    public ResponseEntity<Void> sendInvitations(
-
+    ResponseEntity<Void> sendInvitations(
             @Parameter(
                     description = "List of invitation request objects containing recipient details (email)",
                     required = true,
@@ -155,7 +155,6 @@ public interface InvitationApi {
                     )
             )
             @RequestBody List<InvitationRequestDto> invitations,
-
             @Parameter(
                     description = "Unique identifier of the event for which invitations are being sent",
                     example = "123",
@@ -165,17 +164,20 @@ public interface InvitationApi {
     );
 
 
-    @Operation( description = """
-        Retrieves all invitations for the currently AUTHENTICATED user. 
-        If the user has blocked an event organizer, invitations from that organizer will not be shown.
-        Only AUTHORIZED USERS can access this endpoint.
-        """,
+    @Operation(
+            summary = "Retrieves all invitations for the authenticated user",
+            description =
+            """
+            Retrieves all invitations for the currently AUTHENTICATED user. 
+            If the user has blocked an event organizer, invitations from that organizer will not be shown.
+            Only AUTHORIZED USERS can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
-    public ResponseEntity<List<InvitationDetailsDto>> getInvitations();
+    ResponseEntity<List<InvitationDetailsDto>> getInvitations();
 
 }

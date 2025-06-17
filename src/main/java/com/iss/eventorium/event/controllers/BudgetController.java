@@ -1,13 +1,10 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
+import com.iss.eventorium.event.api.BudgetApi;
+import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
-import com.iss.eventorium.solution.models.Solution;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
-public class BudgetController {
+public class BudgetController implements BudgetApi {
 
     private final BudgetService budgetService;
 
@@ -67,7 +64,7 @@ public class BudgetController {
     public ResponseEntity<BudgetItemResponseDto> updateBudgetItemPlannedAmount(
             @PathVariable("event-id") Long eventId,
             @PathVariable("item-id") Long itemId,
-            @Valid @RequestBody BudgetItemRequestDto request
+            @Valid @RequestBody UpdateBudgetItemRequestDto request
     ) {
         return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
     }

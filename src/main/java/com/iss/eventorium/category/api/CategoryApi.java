@@ -48,8 +48,8 @@ public interface CategoryApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<PagedResponse<CategoryResponseDto>> getCategoriesPaged(Pageable pageable);
@@ -66,8 +66,8 @@ public interface CategoryApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Category not found",
@@ -115,8 +115,8 @@ public interface CategoryApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "409",
                             description = "Category conflict. This may occur if the category with the same name already exists.",
@@ -165,8 +165,8 @@ public interface CategoryApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Category not found",
@@ -220,8 +220,8 @@ public interface CategoryApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Category not found",

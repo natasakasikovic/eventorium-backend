@@ -51,6 +51,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Token expired\"}");
             return;
+        } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Internal Server Error\"}");
+            return;
         }
         chain.doFilter(request, response);
     }

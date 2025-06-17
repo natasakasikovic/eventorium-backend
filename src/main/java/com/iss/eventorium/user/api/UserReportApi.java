@@ -33,11 +33,11 @@ public interface UserReportApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
-    public ResponseEntity<Collection<UserReportResponseDto>> getPendingReports();
+    ResponseEntity<Collection<UserReportResponseDto>> getPendingReports();
 
 
     @Operation(
@@ -61,11 +61,11 @@ public interface UserReportApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
     )
-    public ResponseEntity<Void> createReport(
+    ResponseEntity<Void> createReport(
             @RequestBody(
                     description = "The data used to create report.",
                     required = true,
@@ -116,11 +116,11 @@ public interface UserReportApi {
                                     }
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
-    public ResponseEntity<Void> updateStatus(
+    ResponseEntity<Void> updateStatus(
             @Parameter(
                     description = "ID of the report to be updated",
                     required = true,

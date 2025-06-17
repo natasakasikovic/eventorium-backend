@@ -46,8 +46,8 @@ public interface RatingApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -99,8 +99,8 @@ public interface RatingApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Product not found",
@@ -152,8 +152,8 @@ public interface RatingApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Event not found",

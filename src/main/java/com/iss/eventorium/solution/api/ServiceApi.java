@@ -300,8 +300,8 @@ public interface ServiceApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<ServiceResponseDto> createService(
@@ -325,8 +325,8 @@ public interface ServiceApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -387,8 +387,8 @@ public interface ServiceApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Event type not found",
@@ -429,8 +429,8 @@ public interface ServiceApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -477,8 +477,8 @@ public interface ServiceApi {
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",

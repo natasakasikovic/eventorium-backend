@@ -65,6 +65,15 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(ForbiddenEditException.class)
+    public ResponseEntity<ExceptionResponse> handleForbiddenEdit(ForbiddenEditException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -96,15 +105,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExceptionResponse.builder()
                         .message(e.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ExceptionResponse.builder()
-                        .error(HttpStatus.INTERNAL_SERVER_ERROR.toString())
-                        .message(ex.getMessage())
                         .build());
     }
 }

@@ -2,11 +2,8 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetSuggestionResponseDto;
-import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.event.dtos.budget.*;
+import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
 import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
@@ -32,9 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -82,8 +77,9 @@ public class BudgetService {
 
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
-        Specification<BudgetItem> specification = BudgetSpecification.filterForOrganizer(user);
-        return budgetItemRepository.findAll(specification).stream()
+        Specification<BudgetItem> specification = BudgetSpecification.filterAllBudgetItems(user);
+        List<BudgetItem> items = budgetItemRepository.findAll(specification);
+        return removeDuplicateItems(items).stream()
                 .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
@@ -149,11 +145,17 @@ public class BudgetService {
                 .filter(bi -> Objects.equals(bi.getSolution().getId(), request.getItemId()))
                 .findFirst()
                 .map(existingItem -> {
+                    if(existingItem.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+
                     existingItem.setPlannedAmount(request.getPlannedAmount());
                     return existingItem;
                 })
                 .orElseGet(() -> {
                     Solution solution = solutionService.find(request.getItemId());
+                    if(request.getPlannedAmount() < calculateNetPrice(solution))
+                        throw new InsufficientFundsException("You didn't plan to invest this much money.");
+
                     BudgetItem newItem = mapper.fromRequest(request, solution);
                     newItem.setId(0L);
                     newItem.setProcessedAt(null);
@@ -165,10 +167,13 @@ public class BudgetService {
         return mapper.toResponse(item);
     }
 
-    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, BudgetItemRequestDto request) {
+    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
+
+        if(item.getProcessedAt() != null)
+            throw new AlreadyProcessedException("Solution is already precessed");
 
         if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
@@ -183,7 +188,7 @@ public class BudgetService {
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
         if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
-            throw new AlreadyPurchasedException("Solution is already processed");
+            throw new AlreadyProcessedException("Solution is already processed");
 
         budget.removeItem(item);
         eventRepository.save(event);
@@ -198,13 +203,20 @@ public class BudgetService {
         eventRepository.save(event);
     }
 
+    private Collection<BudgetItem> removeDuplicateItems(List<BudgetItem> items) {
+        HashMap<Long, BudgetItem> uniqueItems = new HashMap<>();
+        for(BudgetItem item : items)
+            uniqueItems.put(item.getSolution().getId(), item);
+        return uniqueItems.values();
+    }
+
     private BudgetItem getFromBudget(Budget budget, BudgetItem item) {
         return budget.getItems().stream().filter(bi ->
                 bi.getSolution().getId().equals(item.getSolution().getId()))
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyPurchasedException("Product is already purchased");
+                        throw new AlreadyProcessedException("Solution is already precessed");
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -226,8 +238,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyPurchasedException("Product is already purchased");
-
+                        throw new AlreadyProcessedException("Solution is already precessed");
                     return bi;
                 });
     }
