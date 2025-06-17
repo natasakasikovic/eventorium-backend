@@ -15,8 +15,10 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Collection;
 import java.util.List;
@@ -178,7 +180,10 @@ public interface EventApi {
                     )
             }
     )
-    ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilterDto filter, Pageable pageable);
+    ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(
+            @Valid @RequestBody EventFilterDto filter,
+            Pageable pageable
+    );
 
     @Operation(
             summary = "Filters upcoming opened events based on the provided filter criteria.",
@@ -203,7 +208,9 @@ public interface EventApi {
                     )
             }
     )
-    ResponseEntity<List<EventSummaryResponseDto>> filterEvents(EventFilterDto filter);
+    ResponseEntity<List<EventSummaryResponseDto>> filterEvents(
+            @Valid @RequestBody EventFilterDto filter
+    );
 
     @Operation(
             summary = "Retrieves a paginated list of upcoming opened events based on the provided keyword.",
@@ -280,7 +287,7 @@ public interface EventApi {
             }
     )
     ResponseEntity<EventResponseDto> createEvent(
-            @RequestBody(
+            @Valid @RequestBody(
                     description = "The data used to create the event.",
                     required = true,
                     content = @Content(schema = @Schema(implementation = EventRequestDto.class))
@@ -298,7 +305,7 @@ public interface EventApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(
                             responseCode = "400",
                             description = "Validation error",
@@ -316,16 +323,12 @@ public interface EventApi {
             }
     )
     ResponseEntity<Void> createAgenda(
-            @RequestBody(
+            @Valid @RequestBody(
                     description = "List of activities",
-                    required = true
+                    required = false
             )
             List<ActivityRequestDto> request,
-            @Parameter(
-                    description = "The unique identifier of the event.",
-                    required = true,
-                    example = "123"
-            )
+            @PathVariable(required = true)
             Long id
     );
 
@@ -397,7 +400,7 @@ public interface EventApi {
                     example = "123"
             )
             Long id,
-            @RequestBody(
+            @Valid @RequestBody(
                     description = "The data used to update the event.",
                     required = true,
                     content = @Content(schema = @Schema(implementation = UpdateEventRequestDto.class))
