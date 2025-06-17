@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
@@ -49,6 +51,7 @@ public class BudgetService {
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
     private final SolutionMapper solutionMapper;
+    private final CategoryMapper categoryMapper;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
@@ -247,4 +250,12 @@ public class BudgetService {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
     }
 
+    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
+        budget.setActiveCategories(new ArrayList<>(categories));
+        eventRepository.save(event);
+        return mapper.toResponse(budget);
+    }
 }
