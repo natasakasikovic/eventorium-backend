@@ -107,13 +107,4 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ExceptionResponse.builder()
-                        .error(HttpStatus.INTERNAL_SERVER_ERROR.toString())
-                        .message(ex.getMessage())
-                        .build());
-    }
 }
