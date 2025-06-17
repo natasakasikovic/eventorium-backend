@@ -110,7 +110,7 @@ public interface EventApi {
     ResponseEntity<List<EventSummaryResponseDto>> getTopEvents();
 
     @Operation(
-            summary = "Fetches all upcoming events.",
+            summary = "Fetches all upcoming opened events.",
             description =
             """
             Returns a list of all upcoming events, excluding those from blocked organizer if the user is logged in.
@@ -143,10 +143,10 @@ public interface EventApi {
     ResponseEntity<List<EventTableOverviewDto>> getPassedEvents();
 
     @Operation(
-            summary = "Retrieves a paginated list of events.",
+            summary = "Retrieves a paginated list of opened events.",
             description =
             """
-            Returns a subset of events based on pagination parameters,
+            Returns a subset of opened events based on pagination parameters,
             excluding those from any blocked organizers if the user is logged in.
             """,
             responses = {
@@ -156,7 +156,7 @@ public interface EventApi {
     ResponseEntity<PagedResponse<EventSummaryResponseDto>> getEventsPaged(Pageable pageable);
 
     @Operation(
-            summary = "Retrieves a paginated list of upcoming events based on the provided filter criteria.",
+            summary = "Retrieves a paginated list of opened upcoming events based on the provided filter criteria.",
             description =
                     """
                     Returns a subset of upcoming events based on pagination parameters and filter criteria.
@@ -181,7 +181,7 @@ public interface EventApi {
     ResponseEntity<PagedResponse<EventSummaryResponseDto>> filterEvents(EventFilterDto filter, Pageable pageable);
 
     @Operation(
-            summary = "Filters upcoming events based on the provided filter criteria.",
+            summary = "Filters upcoming opened events based on the provided filter criteria.",
             description =
                     """
                     Filters upcoming events based on various criteria, including name, event type, address, etc.
@@ -206,7 +206,7 @@ public interface EventApi {
     ResponseEntity<List<EventSummaryResponseDto>> filterEvents(EventFilterDto filter);
 
     @Operation(
-            summary = "Retrieves a paginated list of upcoming events based on the provided keyword.",
+            summary = "Retrieves a paginated list of upcoming opened events based on the provided keyword.",
             description =
                     """
                     Returns a subset of upcoming events based on the provided keyword.
@@ -221,7 +221,7 @@ public interface EventApi {
     ResponseEntity<PagedResponse<EventSummaryResponseDto>> searchEvents(String keyword, Pageable pageable);
 
     @Operation(
-            summary = "Search upcoming events based on the provided keyword.",
+            summary = "Search upcoming opened events based on the provided keyword.",
             description =
             """
             Searches upcoming events based on the provided keyword. The keyword is only used to match against event names.

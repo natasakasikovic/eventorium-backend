@@ -39,7 +39,7 @@ public interface AccountEventApi {
     ResponseEntity<List<CalendarEventDto>> getAttendingEvents();
 
     @Operation(
-            summary = "Fetches all organizer's upcoming events.",
+            summary = "Fetches all organizer's events.",
             description =
                     """
                     Returns a list of events created by the currently authenticated user with the ORGANIZER role.
@@ -67,6 +67,7 @@ public interface AccountEventApi {
             security = { @SecurityRequirement(name = "bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success - attendance marked or already present"),
+                    @ApiResponse(responseCode = "400", description = "Event already passed"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
                     @ApiResponse(responseCode = "404", description = "Not Found - event with given ID does not exist")
             }
@@ -217,7 +218,7 @@ public interface AccountEventApi {
     );
 
     @Operation(
-            summary = "Fetches all organizer's upcoming events.",
+            summary = "Fetches all organizer's events.",
             description =
                     """
                     Returns a list of all organizer's events.
