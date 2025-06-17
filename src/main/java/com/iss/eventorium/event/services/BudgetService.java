@@ -154,7 +154,7 @@ public class BudgetService {
                 .orElseGet(() -> {
                     Solution solution = solutionService.find(request.getItemId());
                     if(request.getPlannedAmount() < calculateNetPrice(solution))
-                        throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
+                        throw new InsufficientFundsException("You didn't plan to invest this much money.");
 
                     BudgetItem newItem = mapper.fromRequest(request, solution);
                     newItem.setId(0L);

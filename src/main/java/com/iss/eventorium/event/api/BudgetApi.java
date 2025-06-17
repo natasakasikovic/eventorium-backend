@@ -210,7 +210,7 @@ public interface BudgetApi {
                                             """
                                             {
                                               "error": "Unprocessable Entity",
-                                              "message": "You do not have enough funds for this purchase/reservation!"
+                                              "message": "You didn't plan to invest this much money."
                                             }
                                             """
                                     )
