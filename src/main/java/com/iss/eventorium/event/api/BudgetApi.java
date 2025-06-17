@@ -189,6 +189,18 @@ public interface BudgetApi {
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "409",
                             description = "Already processed",
                             content = @Content(
@@ -251,6 +263,18 @@ public interface BudgetApi {
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "409",
                             description = "Already processed",
                             content = @Content(
@@ -296,7 +320,7 @@ public interface BudgetApi {
     );
 
     @Operation(
-            summary = "Update planned amount of a budget item",
+            summary = "Update planned amount of a budget item.",
             description =
             """
             If a solution with the same ID is already added to the budget and is not processed,
@@ -311,6 +335,18 @@ public interface BudgetApi {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    ),
                     @ApiResponse(
                             responseCode = "409",
                             description = "Already processed",
@@ -360,5 +396,60 @@ public interface BudgetApi {
                     content = @Content(schema = @Schema(implementation = UpdateBudgetItemRequestDto.class))
             )
             UpdateBudgetItemRequestDto request
+    );
+
+    @Operation(
+            summary = "Delete a budget item from a budget.",
+            description =
+            """
+            Removes a planned budget item from the budget of a specific event, only if its status is `PLANNED`.
+            Items with any other status cannot be deleted.
+            Requires authentication and the `ORGANIZER` authority.
+            Only users with the `ORGANIZER` role can access this endpoint.
+            """,
+            security = { @SecurityRequirement(name="bearerAuth") },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Already processed",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "BudgetConflictExample",
+                                            summary = "Solution is already precessed",
+                                            value = "{ \"error\": \"Conflict\", \"message\": \"Solution is already precessed\" }"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Event not found",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "EventNotFound",
+                                            summary = "Event not found",
+                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
+                                    )
+                            )
+                    )
+            }
+    )
+    ResponseEntity<Void> deleteBudgetItem(
+            @Parameter(
+                    description = "The unique identifier of the item id.",
+                    required = true,
+                    example = "123"
+            )
+            Long eventId,
+            @Parameter(
+                    description = "The unique identifier of the item id.",
+                    required = true,
+                    example = "123"
+            )
+            Long itemId
     );
 }
