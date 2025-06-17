@@ -107,4 +107,13 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(InvalidTimeRangeException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidTimeRangeException(InvalidTimeRangeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .message(e.getMessage())
+                        .build());
+    }
 }
