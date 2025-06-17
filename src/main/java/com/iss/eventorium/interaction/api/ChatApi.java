@@ -39,7 +39,6 @@ public interface ChatApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "User not found",

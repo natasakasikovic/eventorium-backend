@@ -101,7 +101,6 @@ public interface InvitationApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "403",
                             description = "User does not have permission to send invitations (must be organizer)",
@@ -177,7 +176,6 @@ public interface InvitationApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<InvitationDetailsDto>> getInvitations();

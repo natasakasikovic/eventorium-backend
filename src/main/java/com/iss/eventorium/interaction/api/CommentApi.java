@@ -168,8 +168,6 @@ public interface CommentApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Product not found",

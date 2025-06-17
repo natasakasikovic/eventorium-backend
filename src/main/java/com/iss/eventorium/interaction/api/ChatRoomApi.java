@@ -21,7 +21,6 @@ public interface ChatRoomApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ChatRoomResponseDto>> getChatRooms();
@@ -33,7 +32,6 @@ public interface ChatRoomApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
-                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<PagedResponse<ChatRoomResponseDto>> getChatRooms(Pageable pageable);

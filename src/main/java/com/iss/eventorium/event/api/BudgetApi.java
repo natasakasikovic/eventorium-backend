@@ -185,7 +185,7 @@ public interface BudgetApi {
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
@@ -245,8 +245,9 @@ public interface BudgetApi {
             Requires authentication and the `ORGANIZER` authority.
             Only users with the `ORGANIZER` role can access this endpoint.
             """,
+            security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+                    @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
