@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.controllers;
 
+import com.iss.eventorium.user.api.AuthApi;
 import com.iss.eventorium.user.dtos.auth.*;
 import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
 import com.iss.eventorium.user.services.AuthService;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @CrossOrigin
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final UserService userService;
     private final AuthService service;
@@ -57,7 +58,7 @@ public class AuthController {
     }
 
     @PutMapping("/account-role")
-    public ResponseEntity<UserTokenState> upgradeAccount(@RequestBody UpgradeAccountRequestDto request) {
+    public ResponseEntity<UserTokenState> upgradeAccount(@Valid @RequestBody UpgradeAccountRequestDto request) {
         return ResponseEntity.ok(service.upgradeAccount(request));
     }
 }
