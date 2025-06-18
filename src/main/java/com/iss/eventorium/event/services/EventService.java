@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -217,6 +218,7 @@ public class EventService {
         List<Activity> activities = request.stream()
                 .map(activityMapper::fromRequest)
                 .toList();
+        validateActivities(activities);
 
         event.getActivities().clear();
         event.getActivities().addAll(activities);
@@ -225,6 +227,20 @@ public class EventService {
             setIsDraftFalse(event);
         else
             repository.save(event);
+    }
+
+    private void validateActivities(List<Activity> activities) {
+        for (Activity a : activities) {
+            if (!a.getEndTime().isAfter(a.getStartTime())) {
+                String message = String.format(
+                        "Invalid time range for activity '%s': end time (%s) must be after start time (%s).",
+                        a.getName(),
+                        a.getEndTime(),
+                        a.getStartTime()
+                );
+                throw new InvalidTimeRangeException(message);
+            }
+        }
     }
 
     public List<ActivityResponseDto> getAgenda(Long id) {
