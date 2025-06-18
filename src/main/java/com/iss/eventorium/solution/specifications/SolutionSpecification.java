@@ -67,12 +67,14 @@ public class SolutionSpecification {
 
     public static<T extends Solution> Specification<T> hasMaxPrice(Double maxPrice) {
         return (root, query, cb) -> {
-            if (maxPrice == null) {
+            if (maxPrice == null)
                 return cb.conjunction();
-            }
 
+            double delta = 0.001;
             Expression<Double> discountedPrice = calculateDiscountedPrice(root, cb);
-            return cb.lessThanOrEqualTo(discountedPrice, maxPrice);
+            Expression<Double> maxPriceWithDelta = cb.sum(cb.literal(maxPrice), cb.literal(delta));
+
+            return cb.lessThanOrEqualTo(discountedPrice, maxPriceWithDelta);
         };
     }
 
