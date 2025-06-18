@@ -36,7 +36,7 @@ public class UpdateServiceRequestDto {
     @Max(value = 100, message = "Discount cannot exceed 100")
     private Double discount;
 
-    @NotEmpty(message = "Event types IDs are mandatory")
+    @NotEmpty(message = "Event types are mandatory")
     private List<Long> eventTypesIds;
 
     @NotNull(message = "Reservation type is mandatory")

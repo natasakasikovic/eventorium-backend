@@ -54,4 +54,13 @@ public class ServiceExceptionHandler {
                         .message(ex.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(ReservationForPastEventException.class)
+    public ResponseEntity<ExceptionResponse> handleReservationForPastEvent(ReservationForPastEventException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
 }

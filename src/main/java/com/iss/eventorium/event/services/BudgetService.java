@@ -1,11 +1,13 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.category.services.CategoryService;
+import com.iss.eventorium.event.dtos.budget.*;
+import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.event.repositories.BudgetItemRepository;
+import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
@@ -17,10 +19,11 @@ import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.*;
+import com.iss.eventorium.solution.services.HistoryService;
 import com.iss.eventorium.solution.services.ProductService;
+import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
-import com.iss.eventorium.user.services.UserBlockService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,11 +35,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BudgetService {
 
+    private final SolutionService solutionService;
     private final ProductService productService;
     private final EventService eventService;
     private final AuthService authService;
-    private final AccountEventService accountEventService;
-    private final UserBlockService userBlockService;
+    private final CategoryService categoryService;
+    private final HistoryService historyService;
 
     private final EventRepository eventRepository;
     private final BudgetItemRepository budgetItemRepository;
@@ -44,6 +48,7 @@ public class BudgetService {
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
     private final SolutionMapper solutionMapper;
+    private final CategoryMapper categoryMapper;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
@@ -53,8 +58,15 @@ public class BudgetService {
         }
 
         Event event = eventService.find(eventId);
-        updateBudget(event, mapper.fromRequest(request, product, SolutionType.PRODUCT));
+        updateBudget(event, mapper.fromRequest(request, product));
         return productMapper.toResponse(product);
+    }
+
+    public List<BudgetSuggestionResponseDto> getBudgetSuggestions(Long eventId, Long categoryId, double price) {
+        Category category = categoryService.find(categoryId);
+        Event event = eventService.find(eventId);
+        List<Solution> solutions = solutionService.findSuggestions(category, price, event.getDate());
+        return solutions.stream().map(mapper::toSuggestionResponse).toList();
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
@@ -65,14 +77,9 @@ public class BudgetService {
 
     public List<SolutionReviewResponseDto> getAllBudgetItems() {
         User user = authService.getCurrentUser();
-        List<Event> events = accountEventService.findOrganizerEvents(user);
-
-        List<BudgetItem> uniqueItems = getUniqueBudgetItems(events);
-
-        List<Long> blockedUserIds = userBlockService.findBlockedUsers();
-        List<BudgetItem> filteredItems = filterOutBlockedContent(uniqueItems, user, blockedUserIds);
-
-        return filteredItems.stream()
+        Specification<BudgetItem> specification = BudgetSpecification.filterAllBudgetItems(user);
+        List<BudgetItem> items = budgetItemRepository.findAll(specification);
+        return removeDuplicateItems(items).stream()
                 .map(item -> solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
                 .toList();
     }
@@ -80,13 +87,24 @@ public class BudgetService {
     public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
         Service service = reservation.getService();
-        budget.addItem(BudgetItem.builder()
-                .itemType(SolutionType.SERVICE)
-                .plannedAmount(plannedAmount)
-                .processedAt(service.getType() == ReservationType.AUTOMATIC ? LocalDateTime.now() : null)
-                .solution(service)
-                .category(service.getCategory())
-                .build());
+        boolean isAutomatic = service.getType() == ReservationType.AUTOMATIC;
+
+        BudgetItem budgetItem = getSolutionFromBudget(budget, service).orElseGet(() -> {
+            BudgetItem item = BudgetItem.builder()
+                    .itemType(SolutionType.SERVICE)
+                    .plannedAmount(plannedAmount)
+                    .status(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING)
+                    .processedAt(isAutomatic ? LocalDateTime.now() : null)
+                    .solution(service)
+                    .category(service.getCategory())
+                    .build();
+            budget.addItem(item);
+            return item;
+        });
+
+        budgetItem.setStatus(isAutomatic ? BudgetItemStatus.PROCESSED : BudgetItemStatus.PENDING);
+        budgetItem.setProcessedAt(isAutomatic ? LocalDateTime.now() : null);
+        budgetItem.setPlannedAmount(plannedAmount);
 
         eventRepository.save(reservation.getEvent());
     }
@@ -102,61 +120,139 @@ public class BudgetService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
 
+        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         budgetItem.setProcessedAt(LocalDateTime.now());
         budgetItemRepository.save(budgetItem);
     }
 
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
         Event event = eventService.find(eventId);
-        return event.getBudget()
-                .getItems()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        List<BudgetItem> items = event.getBudget().getItems();
+        for(BudgetItem item : items) {
+            if(item.getProcessedAt() != null) {
+                Memento memento = historyService.getValidSolution(item.getSolution().getId(), item.getProcessedAt());
+                item.getSolution().restore(memento);
+            }
+        }
+        return items.stream().map(mapper::toResponse).toList();
+    }
+
+    public BudgetItemResponseDto createBudgetItem(Long eventId, BudgetItemRequestDto request) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+
+        BudgetItem item = budget.getItems().stream()
+                .filter(bi -> Objects.equals(bi.getSolution().getId(), request.getItemId()))
+                .findFirst()
+                .map(existingItem -> {
+                    if(existingItem.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+
+                    existingItem.setPlannedAmount(request.getPlannedAmount());
+                    return existingItem;
+                })
+                .orElseGet(() -> {
+                    Solution solution = solutionService.find(request.getItemId());
+                    if(request.getPlannedAmount() < calculateNetPrice(solution))
+                        throw new InsufficientFundsException("You didn't plan to invest this much money.");
+
+                    BudgetItem newItem = mapper.fromRequest(request, solution);
+                    newItem.setId(0L);
+                    newItem.setProcessedAt(null);
+                    newItem.setStatus(BudgetItemStatus.PLANNED);
+                    budget.addItem(newItem);
+                    return newItem;
+                });
+        eventRepository.save(event);
+        return mapper.toResponse(item);
+    }
+
+    public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        BudgetItem item = getFromBudget(budget, itemId);
+
+        if(item.getProcessedAt() != null)
+            throw new AlreadyProcessedException("Solution is already precessed");
+
+        if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
+            throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
+
+        item.setPlannedAmount(request.getPlannedAmount());
+        eventRepository.save(event);
+        return mapper.toResponse(item);
+    }
+
+    public void deleteBudgetItem(Long eventId, Long itemId) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        BudgetItem item = getFromBudget(budget, itemId);
+        if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
+            throw new AlreadyProcessedException("Solution is already processed");
+
+        budget.removeItem(item);
+        eventRepository.save(event);
     }
 
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
-        if(containsCategory(budget, item.getCategory())) {
-            throw new AlreadyPurchasedException("Solution with the same category is already purchased!");
-        }
-        item.setProcessedAt(LocalDateTime.now());
-        budget.addItem(item);
+        BudgetItem budgetItem = getFromBudget(budget, item);
+
+        budgetItem.setProcessedAt(LocalDateTime.now());
+        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         eventRepository.save(event);
     }
 
-    private boolean containsCategory(Budget budget, Category category) {
-        return budget.getItems().stream().map(BudgetItem::getCategory).toList().contains(category);
+    private Collection<BudgetItem> removeDuplicateItems(List<BudgetItem> items) {
+        HashMap<Long, BudgetItem> uniqueItems = new HashMap<>();
+        for(BudgetItem item : items)
+            uniqueItems.put(item.getSolution().getId(), item);
+        return uniqueItems.values();
+    }
+
+    private BudgetItem getFromBudget(Budget budget, BudgetItem item) {
+        return budget.getItems().stream().filter(bi ->
+                bi.getSolution().getId().equals(item.getSolution().getId()))
+                .findFirst()
+                .map(bi -> {
+                    if (bi.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+                    return bi;
+                })
+                .orElseGet(() -> {
+                    budget.addItem(item);
+                    return item;
+                });
+    }
+
+    private BudgetItem getFromBudget(Budget budget, Long itemId) {
+        return budget.getItems().stream()
+                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
+    }
+
+    private Optional<BudgetItem> getSolutionFromBudget(Budget budget, Solution solution) {
+        return budget.getItems().stream().filter(bi ->
+                        bi.getSolution().getId().equals(solution.getId()))
+                .findFirst()
+                .map(bi -> {
+                    if (bi.getProcessedAt() != null)
+                        throw new AlreadyProcessedException("Solution is already precessed");
+                    return bi;
+                });
     }
 
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
     }
 
-    private List<BudgetItem> getUniqueBudgetItems(List<Event> events) {
-        Map<Long, BudgetItem> uniqueItems = new HashMap<>();
-
-        events.stream()
-                .flatMap(event -> event.getBudget().getItems().stream())
-                .forEach(item -> {
-                    Long solutionId = item.getSolution().getId();
-                    uniqueItems.putIfAbsent(solutionId, item);
-                });
-
-        return new ArrayList<>(uniqueItems.values());
+    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
+        budget.setActiveCategories(new ArrayList<>(categories));
+        eventRepository.save(event);
+        return mapper.toResponse(budget);
     }
-
-    private List<BudgetItem> filterOutBlockedContent(List<BudgetItem> items, User blocker, List<Long> blockedUserIds) {
-        if (blocker == null || blockedUserIds == null || blockedUserIds.isEmpty()) {
-            return items;
-        }
-
-        return items.stream()
-                .filter(item -> {
-                    Long providerId = item.getSolution().getProvider().getId();
-                    return !blockedUserIds.contains(providerId);
-                })
-                .toList();
-    }
-
 }

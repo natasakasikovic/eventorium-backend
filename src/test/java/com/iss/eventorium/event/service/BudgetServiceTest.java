@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.exceptions.AlreadyPurchasedException;
+import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -108,7 +108,7 @@ class BudgetServiceTest {
 
         BudgetItem item = mock(BudgetItem.class);
         item.setSolution(product);
-        when(mapper.fromRequest(any(), any(), any())).thenReturn(item);
+        when(mapper.fromRequest(any(), any())).thenReturn(item);
 
         ProductResponseDto dto = mock(ProductResponseDto.class);
         when(productMapper.toResponse(any())).thenReturn(dto);
@@ -153,13 +153,13 @@ class BudgetServiceTest {
 
         BudgetItem existingItem = mock(BudgetItem.class);
         Category existingCategory = mock(Category.class);
-        when(mapper.fromRequest(any(), any(), any())).thenReturn(existingItem);
+        when(mapper.fromRequest(any(), any())).thenReturn(existingItem);
         when(existingItem.getCategory()).thenReturn(existingCategory);
         when(budget.getItems()).thenReturn(List.of(existingItem));
 
         BudgetItemRequestDto request = createRequest(180.0);
 
-        assertThrows(AlreadyPurchasedException.class, () -> budgetService.purchaseProduct(1L, request));
+        assertThrows(AlreadyProcessedException.class, () -> budgetService.purchaseProduct(1L, request));
     }
 
     @Test

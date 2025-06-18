@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.controllers;
 
+import com.iss.eventorium.solution.api.ReservationApi;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
@@ -16,16 +17,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
-public class ReservationController {
+public class ReservationController implements ReservationApi {
 
     private final ReservationService service;
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ReservationResponseDto> getReservation(@PathVariable Long id) {
-        // TODO: call -> reservationService.get(id);
-        ReservationResponseDto reservation = new ReservationResponseDto();
-        return new ResponseEntity<>(reservation, HttpStatus.OK);
-    }
 
     @PostMapping("/events/{event-id}/services/{service-id}/reservation")
     public ResponseEntity<Void> createReservation (@Valid @RequestBody ReservationRequestDto reservation,
@@ -46,10 +40,7 @@ public class ReservationController {
     }
 
     @PatchMapping("/reservations/{id}")
-    public ResponseEntity<ReservationResponseDto> updateReservation(
-        @PathVariable Long id,
-        @Valid @RequestBody UpdateReservationStatusRequestDto request
-    ) {
+    public ResponseEntity<ReservationResponseDto> updateReservation(@PathVariable Long id, @Valid @RequestBody UpdateReservationStatusRequestDto request) {
         return ResponseEntity.ok(service.updateReservation(id, request.getStatus()));
     }
 }

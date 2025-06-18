@@ -21,7 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.List;
 
-@Tag(name = "Service")
+@Tag(
+        name = "Service",
+        description = "Handles the service endpoints."
+)
 public interface ServiceApi {
 
     @Operation(
@@ -31,6 +34,7 @@ public interface ServiceApi {
             Returns a list of all available services, excluding those from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -46,6 +50,7 @@ public interface ServiceApi {
             excluding those from any blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                 @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -59,9 +64,12 @@ public interface ServiceApi {
             """
             Returns the top 5 services based on their average rating,
             excluding those from blocked providers if the user is logged in.
-            Hidden and pending services are excluded for all users, except when the provider is logged in.
-            In that case, the provider can view their own hidden and pending services, while other users cannot access them.
-            Services without ratings are not included.
+            Hidden services are excluded for ORGANIZER and unauth user.
+            When PROVIDER is logged in he can view their own hidden services
+            if they are among top five.
+            Among top services hidden will be shown to ADMIN if they are among top five
+            Services without ratings are not included!
+            Pending will be excluded since they dont have ratings!
             If fewer than 5 services have a rating, fewer than 5 will be returned.
             """,
             responses = {
@@ -78,6 +86,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully", useReturnTypeSchema = true),
@@ -105,6 +114,7 @@ public interface ServiceApi {
             excluding those from any blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending services, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -133,6 +143,7 @@ public interface ServiceApi {
                     Excludes services from blocked providers if the user is logged in.
                     Hidden and pending services are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    Admins have the ability to view hidden and pending services, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -148,6 +159,7 @@ public interface ServiceApi {
                     Excludes services from blocked providers if the user is logged in.
                     Hidden and pending services are excluded for all users, except when the provider is logged in.
                     In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+                    Admins have the ability to view hidden and pending services, regardless of the provider.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true)
@@ -164,6 +176,7 @@ public interface ServiceApi {
             nor is it hidden or pending.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can view their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -199,6 +212,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can get images for their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending services, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -234,6 +248,7 @@ public interface ServiceApi {
             Excludes services from blocked providers if the user is logged in.
             Hidden and pending services are excluded for all users, except when the provider is logged in.
             In that case, the provider can get image for their own hidden and pending services, while other users cannot access them.
+            Admins have the ability to view hidden and pending service, regardless of the provider.
             """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -261,55 +276,6 @@ public interface ServiceApi {
     );
 
     @Operation(
-            summary = "Recommend services based on the user's budget, considering both price and service category.",
-            description =
-            """
-            Returns list of recommended options based on the user’s budget,
-            selecting services from relevant category that fit within the specified price range.
-            Requires authentication and EVENT_ORGANIZER authority.
-            Only users with the 'EVENT_ORGANIZER' authority can access this endpoint.
-            """,
-            security = { @SecurityRequirement(name="bearerAuth") },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Event not found",
-                            content = @Content(
-                                    schema = @Schema(implementation = ExceptionResponse.class),
-                                    examples = @ExampleObject(
-                                            name = "EventNotFound",
-                                            summary = "Event not found",
-                                            value = "{ \"error\": \"Not found\", \"message\": \"Event not found.\" }"
-                                    )
-                            )
-                    )
-            }
-    )
-    ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-            @Parameter(
-                    description = "The unique identifier of the category.",
-                    required = true,
-                    example = "123"
-            )
-            Long id,
-            @Parameter(
-                    description = "The unique identifier of the event.",
-                    required = true,
-                    example = "123"
-            )
-            Long eventId,
-            @Parameter(
-                    description = "The maximum price a user is willing to pay for the service.",
-                    required = true,
-                    example = "123"
-            )
-            Double price
-    );
-
-    @Operation(
             summary = "Creates a service",
             description =
             """
@@ -317,7 +283,7 @@ public interface ServiceApi {
             To upload service images, use the endpoint `POST /api/v1/services/{id}/images`.
             Returns the created service if successful.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -334,8 +300,8 @@ public interface ServiceApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<ServiceResponseDto> createService(
@@ -352,15 +318,15 @@ public interface ServiceApi {
             description =
             """
             Uploads images for the specified service. The `id` parameter refers to the service ID.
-            For more details on creating a service, please refer to the endpoint `/api/v1/services` (POST).
+            For more details on creating a service, please refer to the endpoint `POST /api/v1/services`.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -373,6 +339,18 @@ public interface ServiceApi {
                                     )
                             )
                     ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Failed to upload image",
+                            content = @Content(
+                                    schema = @Schema(implementation = ExceptionResponse.class),
+                                    examples = @ExampleObject(
+                                            name = "FailedToUploadImage",
+                                            summary = "Error while uploading images",
+                                            value = "{ \"error\": \"Internal Server Error\", \"message\": \"Error while uploading images.\" }"
+                                    )
+                            )
+                    )
             }
     )
     ResponseEntity<Void> uploadServiceImages(
@@ -392,7 +370,7 @@ public interface ServiceApi {
             Updates service if exists.
             Returns the updated service if successful.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
@@ -409,8 +387,8 @@ public interface ServiceApi {
                                     )
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Event type not found",
@@ -446,13 +424,13 @@ public interface ServiceApi {
             """
             Deletes service if exists and  is not associated with any reservation.
             Requires authentication and PROVIDER authority.
-            Only users with the 'PROVIDER' authority can access this endpoint.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -491,16 +469,16 @@ public interface ServiceApi {
     @Operation(
             summary = "Deletes a service images.",
             description =
-                    """
-                    Deletes service images if services exists.
-                    Requires authentication and PROVIDER authority.
-                    Only users with the 'PROVIDER' authority can access this endpoint.
-                    """,
+            """
+            Deletes service images if service exists.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
+            """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",

@@ -28,7 +28,7 @@ public class ServiceController implements ServiceApi {
 
     @GetMapping("/top-five-services")
     public ResponseEntity<Collection<ServiceSummaryResponseDto>> getTopServices(){
-        return new ResponseEntity<>(service.getTopServices(), HttpStatus.OK);
+        return new ResponseEntity<>(service.getTopFiveServices(), HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -78,15 +78,6 @@ public class ServiceController implements ServiceApi {
                 .ok()
                 .contentType(MediaType.parseMediaType(path.getContentType()))
                 .body(service.getImage(id, path));
-    }
-
-    @GetMapping("/suggestions")
-    public ResponseEntity<List<ServiceSummaryResponseDto>> getBudgetSuggestions(
-            @RequestParam("categoryId") Long id,
-            @RequestParam("eventId") Long eventId,
-            @RequestParam("price") Double price
-    ) {
-        return ResponseEntity.ok(service.getBudgetSuggestions(id, eventId, price));
     }
 
     @PostMapping

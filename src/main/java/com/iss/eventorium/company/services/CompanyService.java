@@ -4,6 +4,7 @@ import com.iss.eventorium.company.dtos.*;
 import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
+import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.mappers.CityMapper;
@@ -37,10 +38,22 @@ public class CompanyService {
 
     public CompanyResponseDto createCompany(CompanyRequestDto companyRequestDto) {
         Company company = mapper.fromRequest(companyRequestDto);
+        validateWorkingHours(company);
         User provider = userService.find(companyRequestDto.getProviderId());
         company.setProvider(provider);
         accountActivationService.sendActivationEmail(provider);
         return mapper.toResponse(repository.save(company));
+    }
+
+    private void validateWorkingHours(Company company) {
+        if (!company.getClosingHours().isAfter(company.getOpeningHours())) {
+            String message = String.format(
+                    "Invalid working hours: closing time (%s) must be after opening time (%s).",
+                    company.getClosingHours(),
+                    company.getOpeningHours()
+            );
+            throw new InvalidTimeRangeException(message);
+        }
     }
 
     public void uploadImages(Long id, List<MultipartFile> images) {
@@ -74,10 +87,6 @@ public class CompanyService {
         return imageService.getImages(IMG_DIR_NAME, find(id));
     }
 
-    public byte[] getImage(Long id, ImagePath path) {
-        return imageService.getImage(IMG_DIR_NAME, id, path);
-    }
-
     public CompanyResponseDto updateCompany(UpdateCompanyRequestDto updateRequestDto) {
         Company company = find(updateRequestDto.getId());
         company.setAddress(updateRequestDto.getAddress());
@@ -86,6 +95,7 @@ public class CompanyService {
         company.setDescription(updateRequestDto.getDescription());
         company.setOpeningHours(updateRequestDto.getOpeningHours());
         company.setClosingHours(updateRequestDto.getClosingHours());
+        validateWorkingHours(company);
         repository.save(company);
         return mapper.toResponse(company);
     }

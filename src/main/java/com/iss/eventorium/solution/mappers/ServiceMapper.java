@@ -7,7 +7,6 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
-import com.iss.eventorium.solution.models.Memento;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.user.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -77,10 +76,6 @@ public class ServiceMapper {
         service.setIsDeleted(toUpdate.getIsDeleted());
         service.setProvider(toUpdate.getProvider());
         return service;
-    }
-
-    public Memento toMemento(Service service) {
-        return modelMapper.map(service, Memento.class);
     }
 
     public ServiceResponseDto toResponse(Service service) {

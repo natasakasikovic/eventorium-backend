@@ -4,6 +4,7 @@ import com.iss.eventorium.user.dtos.role.RoleDto;
 import com.iss.eventorium.user.mappers.RoleMapper;
 import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.repositories.RoleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class RoleService {
     private final RoleMapper mapper;
 
     public Role findById(Long id) {
-        return this.repository.getReferenceById(id);
+        return this.repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Role not found."));
     }
 
     public List<Role> findByName(String name) {

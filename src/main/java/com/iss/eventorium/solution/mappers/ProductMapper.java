@@ -5,11 +5,7 @@ import com.iss.eventorium.company.mappers.CompanyMapper;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductDetailsDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
-import com.iss.eventorium.solution.models.Memento;
+import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.models.Product;
 
 import com.iss.eventorium.user.mappers.UserMapper;
@@ -78,7 +74,17 @@ public class ProductMapper {
                 .build();
     }
 
-    public Memento toMemento(Product product) {
-        return modelMapper.map(product, Memento.class);
+    public Product fromUpdateRequest(UpdateProductRequestDto request, Product toUpdate) {
+        Product product = modelMapper.map(request, Product.class);
+        product.setIsAvailable(request.getAvailable());
+        product.setIsVisible(request.getVisible());
+        product.setId(toUpdate.getId());
+        product.setStatus(toUpdate.getStatus());
+        product.setCategory(toUpdate.getCategory());
+        product.setRatings(toUpdate.getRatings());
+        product.setImagePaths(toUpdate.getImagePaths());
+        product.setIsDeleted(toUpdate.getIsDeleted());
+        product.setProvider(toUpdate.getProvider());
+        return product;
     }
 }

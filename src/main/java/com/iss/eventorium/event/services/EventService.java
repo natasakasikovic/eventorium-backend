@@ -3,7 +3,9 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -13,6 +15,7 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -32,6 +35,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.*;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 @RequiredArgsConstructor
@@ -79,6 +84,16 @@ public class EventService {
     public List<EventSummaryResponseDto> getAll() {
         Specification<Event> specification = EventSpecification.filterByPrivacy(Privacy.OPEN, authService.getCurrentUser());
         return repository.findAll(specification).stream().map(eventMapper::toSummaryResponse).toList();
+    }
+
+    public List<EventTableOverviewDto> getPassedEvents() {
+        Specification<Event> specification;
+        User user = authService.getCurrentUser();
+        if (user.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
+            specification = EventSpecification.filterPassedEventsByOrganizer(user);
+        else
+            specification = EventSpecification.filterPassedEvents();
+        return repository.findAll(specification).stream().map(eventMapper::toTableOverviewDto).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> searchEventsPaged(String keyword, Pageable pageable) {
@@ -129,6 +144,8 @@ public class EventService {
 
     public void updateEvent(Long id, UpdateEventRequestDto request) {
         Event event = find(id);
+        assertOwnership(event);
+
         if (!hasChanges(event, request)) return;
         if (!Objects.equals(event.getDate(), request.getDate()))
             eventPublisher.publishEvent(new EventDateChangedEvent(this, id));
@@ -201,6 +218,7 @@ public class EventService {
         List<Activity> activities = request.stream()
                 .map(activityMapper::fromRequest)
                 .toList();
+        validateActivities(activities);
 
         event.getActivities().clear();
         event.getActivities().addAll(activities);
@@ -209,6 +227,20 @@ public class EventService {
             setIsDraftFalse(event);
         else
             repository.save(event);
+    }
+
+    private void validateActivities(List<Activity> activities) {
+        for (Activity a : activities) {
+            if (!a.getEndTime().isAfter(a.getStartTime())) {
+                String message = String.format(
+                        "Invalid time range for activity '%s': end time (%s) must be after start time (%s).",
+                        a.getName(),
+                        a.getEndTime(),
+                        a.getStartTime()
+                );
+                throw new InvalidTimeRangeException(message);
+            }
+        }
     }
 
     public List<ActivityResponseDto> getAgenda(Long id) {
@@ -233,6 +265,19 @@ public class EventService {
         return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
     }
 
+    public byte[] generateEventStatisticsPdf(Long id) {
+        EventRatingsStatisticsDto statistics = getEventRatingStatistics(id);
+        List<RatingCount> chartData = statistics.getRatingsCount().entrySet().stream()
+                .map(entry -> new RatingCount(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> params = generateParams(find(id));
+        params.put("totalRatings", statistics.getTotalRatings());
+        params.put("totalVisitors", statistics.getTotalVisitors());
+
+        return pdfService.generate("/templates/event-stats.jrxml", chartData, params);
+    }
+
     private Map<String, Object> generateParams(Event event) {
         Map<String, Object> params = new HashMap<>();
         params.put("eventName", event.getName());
@@ -244,4 +289,33 @@ public class EventService {
         event.getRatings().add(rating);
         repository.save(event);
     }
+
+    public EventRatingsStatisticsDto getEventRatingStatistics(Long id) {
+        Event event = find(id);
+        int totalVisitors = userService.findByEventAttendance(event.getId()).size();
+        int totalRatings = event.getRatings().size();
+
+        Map<Integer, Integer> ratingsCount = IntStream.rangeClosed(1, 5)
+                .boxed()
+                .collect(Collectors.toMap(r -> r, r -> 0));
+
+        event.getRatings().forEach(r ->
+                ratingsCount.merge(r.getRating(), 1, Integer::sum)
+        );
+
+        return EventRatingsStatisticsDto.builder()
+                .eventName(event.getName())
+                .totalVisitors(totalVisitors)
+                .totalRatings(totalRatings)
+                .ratingsCount(ratingsCount)
+                .build();
+    }
+
+    private void assertOwnership(Event event) {
+        User provider = authService.getCurrentUser();
+        if(!Objects.equals(provider.getId(), event.getOrganizer().getId())) {
+            throw new ForbiddenEditException("You are not authorized to change this event.");
+        }
+    }
+
 }

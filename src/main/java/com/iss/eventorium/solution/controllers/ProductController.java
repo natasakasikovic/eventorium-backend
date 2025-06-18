@@ -3,6 +3,7 @@ package com.iss.eventorium.solution.controllers;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
 import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.solution.api.ProductApi;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.services.ProductService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/products")
 @RequiredArgsConstructor
-public class ProductController {
+public class ProductController implements ProductApi {
 
     private final ProductService service;
 
@@ -36,12 +37,16 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto) {
-        return null;
+    public ResponseEntity<ProductResponseDto> updateProduct(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateProductRequestDto request)
+    {
+        return ResponseEntity.ok(service.updateProduct(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+        service.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -52,8 +57,8 @@ public class ProductController {
     }
 
     @GetMapping("/top-five-products")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts(){
-        return ResponseEntity.ok(service.getTopProducts());
+    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts() {
+        return ResponseEntity.ok(service.getTopFiveProducts());
     }
 
     @GetMapping("/all")
@@ -89,14 +94,6 @@ public class ProductController {
     @GetMapping("/search/all")
     public ResponseEntity<List<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword) {
         return ResponseEntity.ok(service.search(keyword));
-    }
-
-    @GetMapping("/suggestions")
-    public ResponseEntity<List<ProductSummaryResponseDto>> getBudgetSuggestions(
-            @RequestParam("categoryId") Long categoryId,
-            @RequestParam("price") Double price
-    ) {
-        return ResponseEntity.ok(service.getBudgetSuggestions(categoryId, price));
     }
 
     @GetMapping("/{id}/image")

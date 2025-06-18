@@ -3,12 +3,12 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryProposalService;
 import com.iss.eventorium.company.services.CompanyService;
-import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.Status;
@@ -21,19 +21,19 @@ import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.specifications.ServiceSpecification;
+import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -57,10 +57,9 @@ public class ServiceService {
 
     private static final String IMG_DIR_NAME = "services";
 
-    // TODO: refactor method below to use specification
-    public List<ServiceSummaryResponseDto> getTopServices(){
-        Pageable pageable = PageRequest.of(0, 5); // TODO: think about getting pageable object from frontend
-        List<Service> services = repository.findTopFiveServices(pageable);
+    public List<ServiceSummaryResponseDto> getTopFiveServices() {
+        Specification<Service> specification = ServiceSpecification.filterTopServices(authService.getCurrentUser());
+        List<Service> services = repository.findAll(specification).stream().limit(5).toList();
         return services.stream().map(mapper::toSummaryResponse).toList();
     }
 
@@ -104,15 +103,16 @@ public class ServiceService {
         handleCategoryAndStatus(service);
         service.setProvider(authService.getCurrentUser());
 
-        historyService.addServiceMemento(service);
         repository.save(service);
+        historyService.addMemento(service);
         return mapper.toResponse(service);
     }
 
     public void uploadImages(Long id, List<MultipartFile> images) {
         if (images == null || images.isEmpty()) return;
-
         Service service = find(id);
+        assertOwnership(service);
+
         List<ImagePath> paths = imageService.uploadImages(IMG_DIR_NAME, id, images);
 
         if (!paths.isEmpty()) {
@@ -123,17 +123,6 @@ public class ServiceService {
 
     public List<ImageResponseDto> getImages(Long id) {
         return imageService.getImages(IMG_DIR_NAME, find(id));
-    }
-
-    // TODO: refactor method below to use specification
-    public List<ServiceSummaryResponseDto> getBudgetSuggestions(Long id, Long eventId, Double price) {
-        Event event = eventService.find(eventId);
-        return repository
-                .getSuggestedServices(id, price)
-                .stream()
-                .filter(service -> LocalDate.now().isBefore(event.getDate().minusDays(service.getReservationDeadline())))
-                .map(mapper::toSummaryResponse)
-                .toList();
     }
 
     public Service find(Long id) {
@@ -156,6 +145,7 @@ public class ServiceService {
 
     public ServiceResponseDto updateService(Long id, UpdateServiceRequestDto request) {
         Service toUpdate = find(id);
+        assertOwnership(toUpdate);
 
         List<EventType> eventTypes = eventTypeService.findAllById(request.getEventTypesIds());
 
@@ -165,13 +155,14 @@ public class ServiceService {
         Service service = mapper.fromUpdateRequest(request, toUpdate);
         service.setEventTypes(eventTypes);
 
-        historyService.addServiceMemento(service);
+        historyService.addMemento(service);
         repository.save(service);
         return mapper.toResponse(service);
     }
 
     public void deleteService(Long id) {
         Service service = find(id);
+        assertOwnership(service);
 
         if (reservationRepository.existsByServiceId(id))
             throw new ServiceAlreadyReservedException("The service cannot be deleted because it is currently reserved.");
@@ -182,11 +173,14 @@ public class ServiceService {
 
     public void deleteImages(Long id, List<RemoveImageRequestDto> removedImages) {
         Service service = find(id);
+        assertOwnership(service);
+
         service.getImagePaths().removeIf(image ->
                 removedImages.stream().anyMatch(removed -> removed.getId().equals(image.getId()))
         );
         repository.save(service);
     }
+
 
     private void handleCategoryAndStatus(Service service) {
         if(service.getCategory().getId() == null) {
@@ -196,6 +190,13 @@ public class ServiceService {
             service.setStatus(Status.ACCEPTED);
             Category category = entityManager.getReference(Category.class, service.getCategory().getId());
             service.setCategory(category);
+        }
+    }
+
+    private void assertOwnership(Service service) {
+        User provider = authService.getCurrentUser();
+        if(!Objects.equals(provider.getId(), service.getProvider().getId())) {
+            throw new ForbiddenEditException("You are not authorized to change this service.");
         }
     }
 }

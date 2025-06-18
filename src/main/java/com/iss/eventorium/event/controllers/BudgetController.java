@@ -1,8 +1,8 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
-import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
+import com.iss.eventorium.event.api.BudgetApi;
+import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
-public class BudgetController {
+public class BudgetController implements BudgetApi {
 
     private final BudgetService budgetService;
 
@@ -39,9 +39,51 @@ public class BudgetController {
         return ResponseEntity.ok(budgetService.getBudgetItems(eventId));
     }
 
+    @GetMapping("/events/{event-id}/budget/suggestions")
+    public ResponseEntity<List<BudgetSuggestionResponseDto>> getBudgetSuggestions(
+            @PathVariable("event-id") Long eventId,
+            @RequestParam("category-id") Long categoryId,
+            @RequestParam("price") Double price
+    ) {
+        return ResponseEntity.ok(budgetService.getBudgetSuggestions(eventId, categoryId, price));
+    }
+
     @GetMapping("/budget-items")
     public ResponseEntity<List<SolutionReviewResponseDto>> getAllBudgetItems() {
         return ResponseEntity.ok(budgetService.getAllBudgetItems());
     }
 
+    @PostMapping("/events/{event-id}/budget/budget-items")
+    public ResponseEntity<BudgetItemResponseDto> createBudgetItem(
+            @PathVariable("event-id") Long eventId,
+            @Valid @RequestBody BudgetItemRequestDto request
+    ) {
+        return new ResponseEntity<>(budgetService.createBudgetItem(eventId, request), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<BudgetItemResponseDto> updateBudgetItemPlannedAmount(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId,
+            @Valid @RequestBody UpdateBudgetItemRequestDto request
+    ) {
+        return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
+    }
+
+    @PatchMapping("/events/{event-id}/budget/active-categories")
+    public ResponseEntity<BudgetResponseDto> updateActiveCategories(
+            @PathVariable("event-id") Long eventId,
+            @RequestBody List<Long> categoryIds
+    ) {
+        return ResponseEntity.ok(budgetService.updateBudgetActiveCategories(eventId, categoryIds));
+    }
+
+    @DeleteMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<Void> deleteBudgetItem(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId
+    ) {
+        budgetService.deleteBudgetItem(eventId, itemId);
+        return ResponseEntity.noContent().build();
+    }
 }

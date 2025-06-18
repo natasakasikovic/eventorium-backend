@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.models;
 
+import com.iss.eventorium.category.models.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,9 @@ public class Budget {
     @Column(nullable = false, name = "spent_amount")
     private Double spentAmount = 0.0;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    private List<Category> activeCategories = new ArrayList<>();
+
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<BudgetItem> items = new ArrayList<>();
 
@@ -34,5 +38,12 @@ public class Budget {
             this.spentAmount += item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100);
         }
         this.plannedAmount += item.getPlannedAmount();
+    }
+
+    public void removeItem(BudgetItem item) {
+        if(item.getProcessedAt() == null) {
+            this.items.remove(item);
+            this.plannedAmount -= item.getPlannedAmount();
+        }
     }
 }

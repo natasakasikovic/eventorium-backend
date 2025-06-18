@@ -2,6 +2,7 @@ package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.shared.exceptions.*;
 import com.iss.eventorium.shared.models.ExceptionResponse;
+import jakarta.annotation.Priority;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -64,6 +65,15 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(ForbiddenEditException.class)
+    public ResponseEntity<ExceptionResponse> handleForbiddenEdit(ForbiddenEditException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ExceptionResponse> handleMaxSizeException(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -94,6 +104,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handlePdfGenerationException(PdfGenerationException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ExceptionResponse.builder()
+                        .message(e.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(InvalidTimeRangeException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidTimeRangeException(InvalidTimeRangeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                         .message(e.getMessage())
                         .build());
     }

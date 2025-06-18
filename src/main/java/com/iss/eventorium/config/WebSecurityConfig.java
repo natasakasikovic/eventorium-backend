@@ -1,5 +1,6 @@
 package com.iss.eventorium.config;
 
+import com.iss.eventorium.security.auth.CustomAccessDeniedHandler;
 import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
 import com.iss.eventorium.user.services.CustomUserDetailsService;
@@ -33,12 +34,14 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
     private static final String PROVIDER = "PROVIDER";
     private static final String ORGANIZER = "EVENT_ORGANIZER";
     private static final String ADMIN = "ADMIN";
+    private static final String USER = "USER";
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -68,7 +71,10 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
-        http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(restAuthenticationEntryPoint));
+        http.exceptionHandling(e -> e
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+        );
         http.authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/ws/**").permitAll()
                         .requestMatchers("/api/v1/ws").permitAll()
@@ -106,14 +112,19 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/products/{id}/*").permitAll()
 
                         // Events
+                        .requestMatchers("/api/v1/events/{id}/budget/active-categories").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/budget/budget-items/{item-id}").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/budget/budget-items").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/budget/suggestions").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}/agenda").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST,"/api/v1/events/{id}/ratings").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/events/*/agenda").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/future").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/guest-list-pdf").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/statistics").hasAnyAuthority(ADMIN, ORGANIZER)
+                        .requestMatchers("/api/v1/events/{id}/pdf-statistics").hasAnyAuthority(ADMIN, ORGANIZER)
                         .requestMatchers("/api/v1/events/top-five-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/events").permitAll()
@@ -122,14 +133,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/events/search").permitAll()
                         .requestMatchers("/api/v1/events/filter/all").permitAll()
                         .requestMatchers("/api/v1/events/search/all").permitAll()
-                        .requestMatchers("/api/v1/events/{id}/budget").hasAuthority(ORGANIZER)
-                        .requestMatchers("/api/v1/events/{id}/budget/**").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/events/passed").hasAuthority(ADMIN)
                         .requestMatchers("/api/v1/events/{id}/*").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/events/{id}").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/events").hasAuthority(ORGANIZER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/**").hasAuthority(ORGANIZER)
 
                         // Users
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/auth/account-role").hasAuthority(USER)
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users").authenticated()
                         .requestMatchers("/api/v1/users/password").authenticated()
@@ -150,6 +161,8 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/{id}/*").permitAll()
                         .requestMatchers("/api/v1/companies/{id}/images").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/companies").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/companies/{id}/images").permitAll()
 
                         // Event types
                         .requestMatchers("/api/v1/event-types/all").permitAll()
@@ -166,6 +179,7 @@ public class WebSecurityConfig {
                         // Notifications
                         .requestMatchers("/api/v1/notifications").authenticated()
                         .requestMatchers("/api/v1/notifications/seen").authenticated()
+                        .requestMatchers("/api/v1/notifications/silence").authenticated()
 
                         // Account Events
                         .requestMatchers("/api/v1/account/events").hasAuthority(ORGANIZER)
@@ -218,8 +232,10 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/reservations/{id}").hasAuthority(PROVIDER)
                         .requestMatchers("/api/v1/price-list/**").hasAuthority(PROVIDER)
+
                         // Invitations
                         .requestMatchers("/api/v1/invitations/verification/{hash}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/invitations/{hash}").permitAll()
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
                         .requestMatchers("/api/v1/invitations/*").hasAuthority(ORGANIZER)
 

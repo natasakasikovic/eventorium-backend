@@ -18,7 +18,10 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@Tag(name = "Account Service", description = "Only users with the 'PROVIDER' authority can access this endpoints.")
+@Tag(
+        name = "Account Service",
+        description = "Handles the account service endpoints."
+)
 public interface AccountServiceApi {
 
     @Operation(
@@ -26,12 +29,14 @@ public interface AccountServiceApi {
             description =
             """
             Returns a list of all provider's services.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ServiceSummaryResponseDto>> getProfileServices();
@@ -41,12 +46,14 @@ public interface AccountServiceApi {
             description =
             """
             Returns a subset of provider's services.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> getProfileServicesPaged(Pageable pageable);
@@ -56,12 +63,14 @@ public interface AccountServiceApi {
             description =
             """
             Filters provider's services based on various criteria, including name, type, price, etc.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ServiceSummaryResponseDto>> filterAccountServices(ServiceFilterDto filter);
@@ -71,12 +80,14 @@ public interface AccountServiceApi {
             description =
             """
             Returns a subset of provider's services based on pagination parameters and filter criteria.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> filerAccountServicesPaged(
@@ -89,12 +100,14 @@ public interface AccountServiceApi {
             description =
             """
             Searches provider's services based on the provided keyword. The keyword is only used to match against service names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<List<ServiceSummaryResponseDto>> searchAccountServices(String keyword);
@@ -106,12 +119,14 @@ public interface AccountServiceApi {
             """
             Returns a subset of provider's services based on the provided keyword.
             The keyword is only used to match against service names.
+            Requires authentication and PROVIDER authority.
+            Only users with the `PROVIDER` authority can access this endpoint.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
+                    @ApiResponse(responseCode = "403", ref = "#/components/responses/ForbiddenResponse"),
             }
     )
     ResponseEntity<PagedResponse<ServiceSummaryResponseDto>> searchAccountServicesPaged(
@@ -120,31 +135,29 @@ public interface AccountServiceApi {
     );
 
     @Operation(
-            summary = "Fetches provider's favourite services.",
+            summary = "Fetches the user's favourite services.",
             description =
             """
-            Returns a list of all provider's favourite services.
+            Returns a list of all favourite services for the currently logged-in user.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
     ResponseEntity<List<ServiceSummaryResponseDto>> getFavouriteServices();
 
     @Operation(
-            summary = "Checks if the given service is one of the provider's favorite services.",
+            summary = "Checks if the given service is among the user's favourite services.",
             description =
             """
-            Returns 'true' if the given service is marked as one of the provider's favorite services.
+            Returns 'true' if the given service is marked as a favourite by the currently logged-in user.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -169,17 +182,17 @@ public interface AccountServiceApi {
     );
 
     @Operation(
-            summary = "Adds a service to the provider's list of favorites",
+            summary = "Adds a service to the user's list of favourites.",
             description =
             """
-            Adds a service to the provider's list of favorites. If the service is already a favorite, no action is taken.
-            Returns the service if the operation is successful, or if the service is already a favorite.
+            Adds a service to the currently logged-in user's list of favourite services.
+            If the service is already marked as a favourite, no action is taken.
+            Returns the service if the operation is successful or if it was already marked as a favourite.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",
@@ -197,16 +210,16 @@ public interface AccountServiceApi {
     ResponseEntity<ServiceResponseDto> addFavouriteService(Long id);
 
     @Operation(
-            summary = "Removes a service from the provider's list of favorites",
+            summary = "Removes a service from the user's list of favourites.",
             description =
             """
-            Removes a service from the provider's list of favorites. If the service is not already a favorite, no action is taken.
+            Removes a service from the currently logged-in user's list of favourite services.
+            If the service is not marked as a favourite, no action is taken.
             """,
             security = { @SecurityRequirement(name="bearerAuth") },
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing token"),
-                    @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions"),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Service not found",

@@ -1,8 +1,10 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.api.EventApi;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
+import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.utils.ResponseHeaderUtils;
@@ -20,7 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/events")
-public class EventController {
+public class EventController implements EventApi {
 
     private final EventService service;
 
@@ -42,6 +44,11 @@ public class EventController {
     @GetMapping("/all")
     public ResponseEntity<Collection<EventSummaryResponseDto>> getEvents() {
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/passed")
+    public ResponseEntity<List<EventTableOverviewDto>> getPassedEvents() {
+        return new ResponseEntity<>(service.getPassedEvents(), HttpStatus.OK);
     }
 
     @GetMapping
@@ -71,7 +78,7 @@ public class EventController {
   
     @GetMapping("/search/all")
     public ResponseEntity<List<EventSummaryResponseDto>> searchEvents(@RequestParam (required = false) String keyword) {
-        return  ResponseEntity.ok(service.searchEvents(keyword));
+        return ResponseEntity.ok(service.searchEvents(keyword));
     }
 
     @PostMapping
@@ -108,4 +115,14 @@ public class EventController {
         return new ResponseEntity<>(service.generateGuestListPdf(id), headers, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<EventRatingsStatisticsDto> getEventRatingStatistics(@PathVariable Long id) {
+        return new ResponseEntity<>(service.getEventRatingStatistics(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/pdf-statistics")
+    public ResponseEntity<byte[]> getEventStatisticsPdf(@PathVariable Long id) {
+        HttpHeaders headers = ResponseHeaderUtils.createPdfHeaders("event_statistics.pdf");
+        return new ResponseEntity<>(service.generateEventStatisticsPdf(id), headers, HttpStatus.OK);
+    }
 }

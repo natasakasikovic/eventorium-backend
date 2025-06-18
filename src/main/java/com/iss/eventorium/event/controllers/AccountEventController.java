@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.event.api.AccountEventApi;
 import com.iss.eventorium.event.dtos.event.CalendarEventDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.services.AccountEventService;
@@ -18,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/account/events")
 @RequiredArgsConstructor
-public class AccountEventController {
+public class AccountEventController implements AccountEventApi {
 
     private final AccountEventService service;
 
