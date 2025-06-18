@@ -95,6 +95,7 @@ public class CompanyService {
         company.setDescription(updateRequestDto.getDescription());
         company.setOpeningHours(updateRequestDto.getOpeningHours());
         company.setClosingHours(updateRequestDto.getClosingHours());
+        validateWorkingHours(company);
         repository.save(company);
         return mapper.toResponse(company);
     }
