@@ -24,7 +24,6 @@ public interface AuthApi {
              """
              Authenticates a user with provided credentials and returns a JWT access token.
              """,
-            security = { @SecurityRequirement(name = "bearerAuth")},
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(
@@ -65,7 +64,6 @@ public interface AuthApi {
             However, if the previous verification period has expired, a new registration request is successfully created.
             
             """,
-            security = { @SecurityRequirement(name = "bearerAuth")},
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(
@@ -111,7 +109,6 @@ public interface AuthApi {
              Returns 500 if the upload fails due to invalid file format, size, or internal error.
              Do not requires authentication.
              """,
-            security = @SecurityRequirement(name = "bearerAuth"),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -149,7 +146,6 @@ public interface AuthApi {
             After quick registration, the user can access the system with the 'USER' role.
             No additional verification is required.
             """,
-            security = { @SecurityRequirement(name = "bearerAuth")},
             responses = {
                     @ApiResponse(responseCode = "201", description = "Created", useReturnTypeSchema = true),
                     @ApiResponse(
@@ -184,7 +180,6 @@ public interface AuthApi {
                 If so, upon successful verification, the user gains access to the system 
                 with the role selected during registration.
                 """,
-            security = { @SecurityRequirement(name = "bearerAuth")},
             responses = {
                     @ApiResponse(responseCode = "303", description = "Redirect to login page", useReturnTypeSchema = true),
                     @ApiResponse(
