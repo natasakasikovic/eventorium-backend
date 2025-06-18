@@ -43,4 +43,14 @@ public class Notification {
         this.message = message;
         this.type = type;
     }
+
+    public Notification(Notification notification) {
+        id = notification.getId();
+        title = notification.getTitle();
+        type = notification.getType();
+        recipient = notification.getRecipient();
+        message = notification.getMessage();
+        timestamp = notification.getTimestamp();
+        seen = notification.getSeen();
+    }
 }

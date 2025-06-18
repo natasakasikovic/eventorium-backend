@@ -45,9 +45,7 @@ public class BudgetMapper {
 
     public BudgetResponseDto toResponse(Budget budget) {
         return BudgetResponseDto.builder()
-                .spentAmount(budget.getSpentAmount())
-                .plannedAmount(budget.getPlannedAmount())
-                .items(budget.getItems().stream().map(this::toResponse).toList())
+                .activeCategories(budget.getActiveCategories().stream().map(categoryMapper::toResponse).toList())
                 .build();
 
     }

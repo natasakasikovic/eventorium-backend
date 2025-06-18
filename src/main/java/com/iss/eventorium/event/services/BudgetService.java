@@ -1,5 +1,7 @@
 package com.iss.eventorium.event.services;
 
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
+import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
@@ -49,6 +51,7 @@ public class BudgetService {
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
     private final SolutionMapper solutionMapper;
+    private final CategoryMapper categoryMapper;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
@@ -170,10 +173,7 @@ public class BudgetService {
     public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
         Budget budget = event.getBudget();
-        BudgetItem item = budget.getItems().stream()
-                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
+        BudgetItem item = getFromBudget(budget, itemId);
 
         if(item.getProcessedAt() != null)
             throw new AlreadyProcessedException("Solution is already precessed");
@@ -184,6 +184,17 @@ public class BudgetService {
         item.setPlannedAmount(request.getPlannedAmount());
         eventRepository.save(event);
         return mapper.toResponse(item);
+    }
+
+    public void deleteBudgetItem(Long eventId, Long itemId) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        BudgetItem item = getFromBudget(budget, itemId);
+        if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
+            throw new AlreadyProcessedException("Solution is already processed");
+
+        budget.removeItem(item);
+        eventRepository.save(event);
     }
 
     private void updateBudget(Event event, BudgetItem item) {
@@ -209,13 +220,19 @@ public class BudgetService {
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
                         throw new AlreadyProcessedException("Solution is already precessed");
-
                     return bi;
                 })
                 .orElseGet(() -> {
                     budget.addItem(item);
                     return item;
                 });
+    }
+
+    private BudgetItem getFromBudget(Budget budget, Long itemId) {
+        return budget.getItems().stream()
+                .filter(existingItem -> Objects.equals(existingItem.getId(), itemId))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Budget item not found."));
     }
 
     private Optional<BudgetItem> getSolutionFromBudget(Budget budget, Solution solution) {
@@ -231,5 +248,14 @@ public class BudgetService {
 
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
+    }
+
+    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
+        budget.setActiveCategories(new ArrayList<>(categories));
+        eventRepository.save(event);
+        return mapper.toResponse(budget);
     }
 }

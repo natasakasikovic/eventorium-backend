@@ -1,5 +1,6 @@
 package com.iss.eventorium.event.controllers;
 
+import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.event.api.BudgetApi;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;
@@ -67,5 +68,22 @@ public class BudgetController implements BudgetApi {
             @Valid @RequestBody UpdateBudgetItemRequestDto request
     ) {
         return ResponseEntity.ok((budgetService.updateBudgetItem(eventId, itemId, request)));
+    }
+
+    @PatchMapping("/events/{event-id}/budget/active-categories")
+    public ResponseEntity<BudgetResponseDto> updateActiveCategories(
+            @PathVariable("event-id") Long eventId,
+            @RequestBody List<Long> categoryIds
+    ) {
+        return ResponseEntity.ok(budgetService.updateBudgetActiveCategories(eventId, categoryIds));
+    }
+
+    @DeleteMapping("/events/{event-id}/budget/budget-items/{item-id}")
+    public ResponseEntity<Void> deleteBudgetItem(
+            @PathVariable("event-id") Long eventId,
+            @PathVariable("item-id") Long itemId
+    ) {
+        budgetService.deleteBudgetItem(eventId, itemId);
+        return ResponseEntity.noContent().build();
     }
 }
