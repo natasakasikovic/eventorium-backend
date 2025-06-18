@@ -118,6 +118,7 @@ public interface UserApi {
                     """
                     Returns basic public information about a specific user account.
                     Authentication is not required.
+                    Returns 404 if the user does not exist or is blocked by the currently authenticated user.
                     """,
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
@@ -193,6 +194,7 @@ public interface UserApi {
                             responseCode = "200",
                             description = "Profile photo uploaded successfully"
                     ),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "500",
                             description = "Upload failed due to file size, format, or server error",
@@ -225,6 +227,7 @@ public interface UserApi {
                             responseCode = "204",
                             description = "Account deactivated successfully"
                     ),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
                     @ApiResponse(
                             responseCode = "409",
                             description = "Deactivation not allowed due to role-based restrictions",

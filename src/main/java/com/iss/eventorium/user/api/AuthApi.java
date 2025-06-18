@@ -118,10 +118,7 @@ public interface AuthApi {
              Do not requires authentication.
              """,
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Profile photo uploaded successfully"
-                    ),
+                    @ApiResponse(responseCode = "201", description = "Created"),
                     @ApiResponse(
                             responseCode = "500",
                             description = "Upload failed due to file size, format, or server error",
@@ -222,6 +219,7 @@ public interface AuthApi {
                     """,
             security = { @SecurityRequirement(name = "bearerAuth")},
             responses = {
+                    @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
                     @ApiResponse(responseCode = "400",
                             description = "Validation error",
                             content = @Content(
@@ -233,13 +231,14 @@ public interface AuthApi {
                                     )
                             )
                     ),
+                    @ApiResponse(responseCode = "401", ref = "#/components/responses/UnauthorizedResponse"),
             }
     )
     ResponseEntity<UserTokenState> upgradeAccount(
             @Valid @RequestBody(
                     description = "Additional user information not provided during quick registration, along with a newly selected role.",
                     required = true,
-                    content = @Content(schema = @Schema(implementation = QuickRegistrationRequestDto.class))
+                    content = @Content(schema = @Schema(implementation = UpgradeAccountRequestDto.class))
             ) UpgradeAccountRequestDto request
     );
 }
