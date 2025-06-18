@@ -16,7 +16,7 @@ public class RegisterExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleRegistrationExceptions(EmailAlreadyTakenException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
-                        .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }
@@ -25,14 +25,14 @@ public class RegisterExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleRegistrationRequestAlreadySentException(RegistrationRequestAlreadySentException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
-                        .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
                         .message(ex.getMessage())
                         .build());
     }
 
     @ExceptionHandler(ActivationTimeoutException.class)
     public ResponseEntity<ExceptionResponse> handleActivationTimeoutException(ActivationTimeoutException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.FORBIDDEN.getReasonPhrase())
                         .message(ex.getMessage())
