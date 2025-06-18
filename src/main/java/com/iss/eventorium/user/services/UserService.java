@@ -170,11 +170,27 @@ public class UserService {
     }
 
     public AccountDetailsDto getUser(Long id) {
-        return mapper.toAccountDetails(find(id));
+        Long currentUserId = authService.getCurrentUser().getId();
+        Specification<User> specification = UserSpecification.filterByIdAndNotBlockedBy(id, currentUserId);
+
+        User user = repository.findOne(specification)
+                .orElseThrow(() -> new EntityNotFoundException("User not found."));
+
+        return mapper.toAccountDetails(user);
     }
 
     public ImagePath getProfilePhotoPath(long id) {
-        User user = find(id);
+        User user;
+        if (authService.getCurrentUser() != null) {
+            Long currentUserId = authService.getCurrentUser().getId();
+            Specification<User> specification = UserSpecification.filterByIdAndNotBlockedBy(id, currentUserId);
+
+            user = repository.findOne(specification)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found."));
+        } else
+            user = find(id);
+
+
         if (user.getPerson().getProfilePhoto() == null)
             throw new ImageNotFoundException("Profile photo not found.");
 
@@ -209,7 +225,7 @@ public class UserService {
         uploadProfilePhoto(this.getCurrentUser().getId(), photo);
     }
 
-    public void changePassword(ChangePasswordRequestDto request) throws InvalidOldPasswordException {
+    public void changePassword(ChangePasswordRequestDto request) {
         User user = authService.getCurrentUser();
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword()))
             throw new InvalidOldPasswordException("Old password does not match.");
