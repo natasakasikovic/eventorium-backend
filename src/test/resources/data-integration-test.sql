@@ -43,18 +43,18 @@ INSERT INTO event_types (name, description, deleted) VALUES
 
 INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (0.0,0.0);
 
-INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type) VALUES
-    (20.0,9,CURRENT_DATE, 1, 'PRODUCT'),
-    (45.0, 10, CURRENT_DATE, 2, 'PRODUCT'),
-    (20.0,1, CURRENT_DATE, 3, 'PRODUCT'),
+INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type, status) VALUES
+    (20.0,9,CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
+    (45.0, 10, CURRENT_DATE, 2, 'PRODUCT', 'PROCESSED'),
+    (20.0,1, CURRENT_DATE, 3, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,1, CURRENT_DATE, 3, 'PRODUCT'),
+    (20.0,1, CURRENT_DATE, 3, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,9, CURRENT_DATE, 1, 'PRODUCT'),
+    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,9, CURRENT_DATE, 1, 'PRODUCT'),
+    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,9, CURRENT_DATE, 1, 'PRODUCT');
+    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED');
 
 INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (2,4), (3,5), (4,6), (5,7);
 

@@ -146,7 +146,7 @@ public class BudgetService {
                 .findFirst()
                 .map(existingItem -> {
                     if(existingItem.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
 
                     existingItem.setPlannedAmount(request.getPlannedAmount());
                     return existingItem;
@@ -173,7 +173,7 @@ public class BudgetService {
         BudgetItem item = getFromBudget(budget, itemId);
 
         if(item.getProcessedAt() != null)
-            throw new AlreadyProcessedException("Solution is already precessed");
+            throw new AlreadyProcessedException("Solution is already processed");
 
         if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
@@ -216,7 +216,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -238,7 +238,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 });
     }

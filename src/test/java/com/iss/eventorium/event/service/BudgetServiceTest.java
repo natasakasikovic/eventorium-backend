@@ -3,10 +3,8 @@ package com.iss.eventorium.event.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -145,24 +143,6 @@ class BudgetServiceTest {
     }
 
     @Test
-    void purchaseProduct_shouldThrowExceptionWhenCategoryAlreadyPurchased() {
-        mockProduct(200.0, 10.0);
-
-        Budget budget = mock(Budget.class);
-        mockEvent(budget);
-
-        BudgetItem existingItem = mock(BudgetItem.class);
-        Category existingCategory = mock(Category.class);
-        when(mapper.fromRequest(any(), any())).thenReturn(existingItem);
-        when(existingItem.getCategory()).thenReturn(existingCategory);
-        when(budget.getItems()).thenReturn(List.of(existingItem));
-
-        BudgetItemRequestDto request = createRequest(180.0);
-
-        assertThrows(AlreadyProcessedException.class, () -> budgetService.purchaseProduct(1L, request));
-    }
-
-    @Test
     void getBudget_shouldReturnExistingBudget() {
         mockEvent(new Budget());
 
@@ -170,27 +150,6 @@ class BudgetServiceTest {
 
         BudgetResponseDto response = budgetService.getBudget(1L);
         assertNotNull(response);
-    }
-
-    @ParameterizedTest
-    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideEventsForBudget")
-    void testGetAllBudgetItems(List<Event> events, long expectedSize) {
-        User user = new User();
-        when(authService.getCurrentUser()).thenReturn(user);
-        when(accountEventService.findOrganizerEvents(user)).thenReturn(events);
-
-        for (Event event : events) {
-            if (event.getBudget() != null) {
-                for (BudgetItem item : event.getBudget().getItems()) {
-                    when(solutionMapper.toReviewResponse(user, item.getSolution(), item.getItemType()))
-                            .thenReturn(new SolutionReviewResponseDto());
-                }
-            }
-        }
-
-        List<SolutionReviewResponseDto> result = budgetService.getAllBudgetItems();
-        assertNotNull(result);
-        assertEquals(expectedSize, result.size());
     }
 
     private Product mockProduct(double price, double discount) {

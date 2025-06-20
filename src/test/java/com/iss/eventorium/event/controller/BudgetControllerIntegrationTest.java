@@ -118,7 +118,7 @@ class BudgetControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Solution with the same category is already purchased!"));
+                .andExpect(jsonPath("$.message").value("Solution is already processed"));
     }
 
     @Test
