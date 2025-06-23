@@ -2,19 +2,10 @@ package com.iss.eventorium.event.provider;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
-import com.iss.eventorium.event.models.Budget;
-import com.iss.eventorium.event.models.BudgetItem;
-import com.iss.eventorium.event.models.BudgetItemStatus;
-import com.iss.eventorium.event.models.Event;
-import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import org.junit.jupiter.params.provider.Arguments;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class BudgetProvider {

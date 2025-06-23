@@ -121,7 +121,7 @@ public class AccountEventService {
         return mapper.toPagedResponse(repository.findAll(specification, pageable));
     }
 
-    public List<Event> findOrganizerEvents(User organizer) {
+    private List<Event> findOrganizerEvents(User organizer) {
         Specification<Event> specification = EventSpecification.filterByOrganizer(organizer);
         return repository.findAll(specification);
     }

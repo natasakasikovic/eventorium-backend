@@ -10,31 +10,23 @@ import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.EventRepository;
-import com.iss.eventorium.event.services.AccountEventService;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
-import com.iss.eventorium.solution.mappers.SolutionMapper;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.services.ProductService;
-import com.iss.eventorium.user.models.User;
-import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -50,19 +42,12 @@ class BudgetServiceTest {
     @MockBean
     private EventService eventService;
     @MockBean
-    private AuthService authService;
-    @MockBean
-    private AccountEventService accountEventService;
-
-    @MockBean
     private EventRepository eventRepository;
 
     @MockBean
     private BudgetMapper mapper;
     @MockBean
     private ProductMapper productMapper;
-    @MockBean
-    private SolutionMapper solutionMapper;
 
 
     @Autowired

@@ -32,10 +32,6 @@ public class UserBlockService {
         cleanUserOfBlockedContent(blocked, blocker);
     }
 
-    public List<Long> findBlockedUsers() {
-        return userBlockRepository.findBlockedUsersByBlockerId(authService.getCurrentUser().getId());
-    }
-
     private void cleanUserOfBlockedContent(User blocker, User blocked) {
         if (blocked.getRoles().stream().anyMatch(role -> "EVENT_ORGANIZER".equals(role.getName())))
             userService.cleanUserOfBlockedOrganizerContent(blocker, blocked);
