@@ -1,47 +1,64 @@
 package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.user.dtos.ActivationRequestDto;
-import com.iss.eventorium.user.dtos.GetAccountDto;
-import com.iss.eventorium.user.dtos.LoginRequestDto;
-import com.iss.eventorium.user.dtos.RegistrationRequestDto;
+import com.iss.eventorium.user.api.AuthApi;
+import com.iss.eventorium.user.dtos.auth.*;
+import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
+import com.iss.eventorium.user.services.AuthService;
+import com.iss.eventorium.user.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequiredArgsConstructor
+@CrossOrigin
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
+
+    private final UserService userService;
+    private final AuthService service;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto request) throws  Exception {
-
-        // NOTE: for testing
-        boolean isAuthenticated = request.getEmail().equals("example@example.com") && request.getPassword().equals("password");
-
-        // TODO: call service
-        // boolean isAuthenticated = authService.validateCredentials(request.getEmail(), request.getPassword());
-
-        if (isAuthenticated) {
-            return ResponseEntity.ok("Login successful");
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+    public ResponseEntity<UserTokenState> createAuthenticationToken(@RequestBody LoginRequestDto request) {
+        return ResponseEntity.ok(service.login(request));
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetAccountDto> createAccount(@RequestBody RegistrationRequestDto user) throws  Exception {
-        GetAccountDto savedUser = new GetAccountDto(); // TODO: call service
-
-        if (savedUser == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-
-        return new ResponseEntity<GetAccountDto>(savedUser, HttpStatus.CREATED);
+    @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AuthResponseDto> createAccount(@Valid @RequestBody AuthRequestDto user) {
+        return new ResponseEntity<>(userService.create(user), HttpStatus.CREATED);
     }
 
-    @PostMapping("/send-activation-link")
-    public ResponseEntity<String> sendActivationLink(@RequestBody ActivationRequestDto  request) {
-        return ResponseEntity.ok("Activation link sent successfully.");
+    @PostMapping(value = "/{userId}/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("profilePhoto") MultipartFile file) {
+        userService.uploadProfilePhoto(userId, file);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/quick-registration")
+    public ResponseEntity<Void> quickRegister(@Valid @RequestBody QuickRegistrationRequestDto request) {
+        userService.quickRegister(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("activation/{hash}")
+    public ResponseEntity<Void> activateAccount(@PathVariable String hash) {
+        userService.activateAccount(hash);
+        String redirectUrl = frontendUrl + "/login";
+        return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                .header("Location", redirectUrl)
+                .build();
+    }
+
+    @PutMapping("/account-role")
+    public ResponseEntity<UserTokenState> upgradeAccount(@Valid @RequestBody UpgradeAccountRequestDto request) {
+        return ResponseEntity.ok(service.upgradeAccount(request));
     }
 }

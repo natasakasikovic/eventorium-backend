@@ -1,11 +1,11 @@
 package com.iss.eventorium.solution.dtos.products;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,9 +21,10 @@ public class ProductResponseDto {
     private Double price;
     private Double discount;
     private Status status;
-    private LocalDateTime validFrom;
-    private Boolean isAvailable;
-    private Boolean isVisible;
+    private Boolean available;
+    private Boolean visible;
     private List<EventTypeResponseDto> eventTypes;
     private CategoryResponseDto category;
+    private Double rating;
+    private UserDetailsDto provider;
 }

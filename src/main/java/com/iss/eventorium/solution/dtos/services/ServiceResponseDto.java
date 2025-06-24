@@ -1,12 +1,11 @@
 package com.iss.eventorium.solution.dtos.services;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.event.dtos.EventTypeResponseDto;
+import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.shared.models.Status;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -23,10 +22,13 @@ public class ServiceResponseDto {
     private Double discount;
     private Status status;
     private List<EventTypeResponseDto> eventTypes;
+    private Double rating;
     private CategoryResponseDto category;
     private ReservationType type;
-    private LocalDate reservationDeadline;
-    private LocalDate cancellationDeadline;
+    private Integer reservationDeadline;
+    private Integer cancellationDeadline;
     private Integer minDuration;
     private Integer maxDuration;
+    private Boolean available;
+    private Boolean visible;
 }

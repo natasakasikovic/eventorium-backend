@@ -1,69 +1,64 @@
 package com.iss.eventorium.user.controllers;
 
-import com.iss.eventorium.user.dtos.GetAccountDto;
-import com.iss.eventorium.user.dtos.ResetPasswordRequestDto;
-import com.iss.eventorium.user.dtos.UpdateAccountDto;
-import com.iss.eventorium.user.dtos.UpdatedAccountDto;
-import com.iss.eventorium.user.models.Role;
+import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.user.api.UserApi;
+import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
+import com.iss.eventorium.user.dtos.user.ChangePasswordRequestDto;
+import com.iss.eventorium.user.dtos.user.UpdateRequestDto;
+import com.iss.eventorium.user.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
-public class UserController {
-    private final Collection<GetAccountDto> accounts;
+@RequiredArgsConstructor
+public class UserController implements UserApi {
+    private final UserService service;
 
-    public UserController() {
-        accounts = new ArrayList<>();
-        accounts.add(new GetAccountDto(1L, "user1@example.com", "John", "Doe", "123456789", "Address 1", "Belgrade", Role.AUTHENTICATED_USER));
-        accounts.add(new GetAccountDto(2L, "user2@example.com", "Jane", "Smith", "987654321", "Address 2", "Belgrade", Role.EVENT_ORGANIZER));
-        accounts.add(new GetAccountDto(3L, "admin@example.com", "Admin", "User", "555555555", "Admin Street", "Belgrade", Role.ADMIN));
-    }
-
-    @PostMapping("/reset-password/{id}")
-    public ResponseEntity<Void> resetPassword(@PathVariable Long id,
-                                              @RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
-        // TODO: Implement service to validate old password, match new and confirm passwords,
-        //  and return Bad Request if validation fails
+    @PostMapping("/password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
+        service.changePassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<Collection<GetAccountDto>> getAccounts() {
-        // TODO: call service
-        return new ResponseEntity<>(accounts, HttpStatus.OK);
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> update(@RequestBody UpdateRequestDto person) {
+        service.update(person);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetAccountDto> getAccount(@PathVariable Long id) {
-        // TODO: call service
-        GetAccountDto getAccountDto = accounts.stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-
-        if (getAccountDto == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(getAccountDto, HttpStatus.OK);
+    @GetMapping("/me")
+    public ResponseEntity<AccountDetailsDto> getCurrentUser() {
+        return ResponseEntity.ok(service.getCurrentUser());
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdatedAccountDto> updateAccount(@PathVariable Long id, @RequestBody UpdateAccountDto account) throws Exception {
-        UpdatedAccountDto updatedAccount = new UpdatedAccountDto();
-        // TODO: Call service to update the account
-
-        // NOTE: Currently returning nulls as mapping and update logic have not been implemented yet.
-        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<AccountDetailsDto> getUser(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.getUser(id));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deactivateAccount(@PathVariable("id") Long id) {
-        // TODO: call service
+    @GetMapping("/{id}/profile-photo")
+    public ResponseEntity<byte[]> getProfilePhoto(@PathVariable("id") Long id) {
+        ImagePath path = service.getProfilePhotoPath(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(path.getContentType()))
+                .body(service.getProfilePhoto(path));
+    }
+
+    @PutMapping(value = "/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> uploadProfilePhoto(@RequestParam("profilePhoto") MultipartFile file) {
+        service.updateProfilePhoto(file);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deactivateAccount() {
+        service.deactivateAccount();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

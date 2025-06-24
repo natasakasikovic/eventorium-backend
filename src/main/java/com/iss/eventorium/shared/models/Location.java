@@ -1,5 +1,6 @@
 package com.iss.eventorium.shared.models;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,10 +12,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 public class Location {
-    private Long id;
-    private String name;
+
+    @Column(nullable = false) // TODO: this is temporary, when you do maps think if this will be here or you will get city by longitude and latitude
+    private String city;
+
+    @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
     private Double latitude;
+
+    @Column(nullable = false)
     private Double longitude;
+
 }

@@ -1,162 +1,114 @@
 package com.iss.eventorium.solution.controllers;
 
-import com.iss.eventorium.category.dtos.CategoryResponseDto;
-import com.iss.eventorium.event.dtos.EventTypeResponseDto;
-import com.iss.eventorium.solution.dtos.products.CreateProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductRequestDto;
-import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
-import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
-import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.shared.utils.PagedResponse;
-import com.iss.eventorium.shared.utils.ProductFilter;
+import com.iss.eventorium.shared.dtos.ImageResponseDto;
+import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
+import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.solution.api.ProductApi;
+import com.iss.eventorium.solution.dtos.products.*;
+import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.solution.services.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/products")
-public class ProductController {
+@RequiredArgsConstructor
+public class ProductController implements ProductApi {
 
-    private final List<ProductResponseDto> products;
-
-    public ProductController() {
-        ProductResponseDto product1 = new ProductResponseDto(
-                1L,
-                "Wedding Package A",
-                "A premium wedding package with full services.",
-                "Luxury venue, gourmet catering, premium decor",
-                5000.00,
-                10.0,
-                Status.PENDING,
-                LocalDateTime.of(2024, 1, 15, 9, 0),
-                true,
-                true,
-                List.of(),
-                new CategoryResponseDto()
-        );
-
-        ProductResponseDto product2 = new ProductResponseDto(
-                2L,
-                "Corporate Conference Kit",
-                "Everything you need for a corporate event.",
-                "Custom branding, audio-visual equipment, team building",
-                1500.00,
-                15.0,
-                Status.DECLINED,
-                LocalDateTime.of(2024, 3, 10, 8, 0),
-                true,
-                true,
-                List.of(new EventTypeResponseDto()),
-                new CategoryResponseDto()
-        );
-
-        ProductResponseDto product3 = new ProductResponseDto(
-                3L,
-                "Outdoor Party Set",
-                "Outdoor event setup with furniture and lighting.",
-                "Tents, lounge seating, party lights",
-                800.00,
-                5.0,
-                Status.ACCEPTED,
-                LocalDateTime.of(2024, 6, 1, 12, 0),
-                false,
-                false,
-                List.of(new EventTypeResponseDto()),
-                new CategoryResponseDto()
-        );
-        this.products = List.of(product1, product2, product3);
-    }
+    private final ProductService service;
 
     @GetMapping("/{id}")
-    public  ResponseEntity<ProductResponseDto> getProduct(@PathVariable("id") Long id) {
-        // ProductResponseDto product = productsService.get(id);
-        // TODO: uncomment line above once service is implemented and also delete the expression below
-
-        ProductResponseDto product = products.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-
-        if (product == null) { return new ResponseEntity<>(HttpStatus.NOT_FOUND); }
-
-        return new ResponseEntity<>(product, HttpStatus.OK);
+    public  ResponseEntity<ProductDetailsDto> getProduct(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.getProduct(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody CreateProductRequestDto createProductRequestDto) {
-        ProductResponseDto responseDto = new ProductResponseDto();
-        // TODO: call service and map
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody CreateProductRequestDto createProductRequestDto) {
+        return new ResponseEntity<>(service.createProduct(createProductRequestDto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable("id") Long id, @RequestBody ProductRequestDto productRequestDto) {
-        ProductResponseDto product = products.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        if (product == null) { return new ResponseEntity<>(HttpStatus.NOT_FOUND); }
-
-        // TODO: call service and map
-        return new ResponseEntity<>(product, HttpStatus.OK);
+    public ResponseEntity<ProductResponseDto> updateProduct(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateProductRequestDto request)
+    {
+        return ResponseEntity.ok(service.updateProduct(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+        service.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}/images")
+    public ResponseEntity<Void> deleteImages(@PathVariable("id") Long id, @RequestBody List<RemoveImageRequestDto> removedImages) {
+        service.deleteImages(id, removedImages);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @GetMapping("/top-five-products")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts(){
-        //Collection<ProductSummaryResponseDto> topProducts = productsService.getTopProducts();
-        // TODO: uncomment line above once service is implemented and also delete data below
-
-        Collection<ProductSummaryResponseDto> topProducts = List.of(
-                new ProductSummaryResponseDto(1L, "Product 1", 4.5, true, true),
-                new ProductSummaryResponseDto(2L, "Product 2", 4.3, true, true),
-                new ProductSummaryResponseDto(3L, "Product 3", 4.0, true, true),
-                new ProductSummaryResponseDto(4L, "Product 4", 3.9, true, true),
-                new ProductSummaryResponseDto(5L, "Product 5", 3.8, true, true)
-        );
-
-        return new ResponseEntity<>(topProducts, HttpStatus.OK);
+    public ResponseEntity<Collection<ProductSummaryResponseDto>> getTopProducts() {
+        return ResponseEntity.ok(service.getTopFiveProducts());
     }
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductSummaryResponseDto>> getProducts() {
-        // TODO: call service -> productService.getAll();
-        Collection<ProductSummaryResponseDto> products = List.of( new ProductSummaryResponseDto(1L, "Product 1", 4.5, true, true) ,
-                new ProductSummaryResponseDto(2L, "Product 2", 5.4, true, true));
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        return ResponseEntity.ok(service.getProducts());
     }
+
     @GetMapping
     public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> getProductsPaged(Pageable pageable) {
-        // TODO: call service -> productService.get(pageable)
-        return ResponseEntity.ok().body(new PagedResponse<>(List.of(new ProductSummaryResponseDto(1L, "Product", 8.5, true, true)), 1, 3));
+        return ResponseEntity.ok(service.getProducts(pageable));
     }
+
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<ImageResponseDto>> getImages(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getImages(id));
+    }
+
     @GetMapping("/filter")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> filterProducts(
-            ProductFilter filter,
-            Pageable pageable
-    ) {
-        Collection<ProductSummaryResponseDto> filteredProducts =  // TODO: delete 2 lines below and change with -> service.filterProducts(..params)
-                List.of( new ProductSummaryResponseDto(1L, "Balloons", 85.0, true, true),
-                        new ProductSummaryResponseDto(2L, "Product", 5.7, true, true));
-        return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> filterProducts(@Valid @ModelAttribute ProductFilterDto filter, Pageable pageable) {
+        return  ResponseEntity.ok(service.filter(filter, pageable));
+    }
+
+    @GetMapping("/filter/all")
+    public ResponseEntity<List<ProductSummaryResponseDto>> filterProducts(@Valid @ModelAttribute ProductFilterDto filter) {
+        return  ResponseEntity.ok(service.filter(filter));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Collection<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword, Pageable pageable){
-        Collection<ProductSummaryResponseDto> products = List.of( // TODO: delete 2 lines below and change with -> service.searchProducts(keyword, pagable);
-                new ProductSummaryResponseDto(1L, "Product 1", 4.5, true, true),
-                new ProductSummaryResponseDto(2L, "Product 2", 4.5, true, true));
-        return ResponseEntity.ok(products);
+    public ResponseEntity<PagedResponse<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword, Pageable pageable){
+        return ResponseEntity.ok(service.search(keyword, pageable));
     }
 
+    @GetMapping("/search/all")
+    public ResponseEntity<List<ProductSummaryResponseDto>> searchProducts(@RequestParam String keyword) {
+        return ResponseEntity.ok(service.search(keyword));
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id){
+        ImagePath path = service.getImagePath(id);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.parseMediaType(path.getContentType()))
+                .body(service.getImage(id, path));
+    }
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<Void> uploadImages(@PathVariable Long id, @RequestParam("images") List<MultipartFile> images) {
+        service.uploadImages(id, images);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
 

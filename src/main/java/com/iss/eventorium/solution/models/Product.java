@@ -1,5 +1,26 @@
 package com.iss.eventorium.solution.models;
 
-import com.iss.eventorium.shared.models.Solution;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
 
-public class Product extends Solution {  }
+@Getter
+@Setter
+@SuperBuilder
+@AllArgsConstructor
+@Entity
+@Table (name = "products")
+@SQLDelete(sql = "UPDATE products SET is_deleted = true WHERE id = ?")
+public class Product extends Solution {
+
+    @Override
+    public void restore(Memento memento) {
+        setName(memento.getName());
+        setPrice(memento.getPrice());
+        setDiscount(memento.getDiscount());
+    }
+}

@@ -1,8 +1,10 @@
 package com.iss.eventorium.solution.dtos.services;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.sql.Time;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -10,8 +12,15 @@ import java.sql.Time;
 @AllArgsConstructor
 @Builder
 public class ReservationRequestDto {
-    private Long eventId;
-    private Long serviceId;
-    private Time from;
-    private Time to;
+
+    @NotNull(message = "Starting time is required!")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
+    private LocalTime startingTime;
+
+    @NotNull(message = "Ending time is required!")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "h:mm a")
+    private LocalTime endingTime;
+
+    @NotNull(message = "Planned amount is mandatory!")
+    private Double plannedAmount;
 }
