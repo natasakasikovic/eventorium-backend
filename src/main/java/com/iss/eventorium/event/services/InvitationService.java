@@ -3,6 +3,7 @@ package com.iss.eventorium.event.services;
 import com.iss.eventorium.event.dtos.invitation.InvitationDetailsDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationRequestDto;
 import com.iss.eventorium.event.dtos.invitation.InvitationResponseDto;
+import com.iss.eventorium.event.exceptions.InvitationLimitExceededException;
 import com.iss.eventorium.event.mappers.InvitationMapper;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Invitation;
@@ -49,22 +50,37 @@ public class InvitationService {
     public void sendInvitations(List<InvitationRequestDto> invitationsDto, Long id) {
         Event event = eventService.find(id);
 
-        List<Invitation> invitations = invitationsDto.stream()
-                .map(dto -> {
+        validateInvitationCount(invitationsDto.size(), event.getMaxParticipants());
+
+        List<Invitation> invitations = prepareInvitations(invitationsDto, event);
+        sendEmailsForInvitations(invitations);
+
+        eventService.setIsDraftFalse(event);
+        repository.saveAll(invitations);
+    }
+
+    private void validateInvitationCount(int requested, int maxAllowed) {
+        if (requested > maxAllowed)
+            throw new InvitationLimitExceededException(String.format("Cannot send %d invitations: event allows a maximum of %d participants.", requested, maxAllowed));
+    }
+
+    private List<Invitation> prepareInvitations(List<InvitationRequestDto> dtos, Event event) {
+        return dtos.stream().map(dto -> {
                     Invitation invitation = mapper.fromRequest(dto);
                     invitation.setEvent(event);
+
+                    if (!userService.existsByEmail(invitation.getEmail()))
+                        invitation.setHash(HashUtils.generateHash());
+
                     return invitation;
-                }).toList();
+        }).toList();
+    }
 
+    private void sendEmailsForInvitations(List<Invitation> invitations) {
         for (Invitation invitation : invitations) {
-            if (!userService.existsByEmail(invitation.getEmail()))
-                invitation.setHash(HashUtils.generateHash());
-
             EmailDetails emailDetails = createEmailDetails(invitation);
             emailService.sendSimpleMail(emailDetails);
         }
-        eventService.setIsDraftFalse(event);
-        repository.saveAll(invitations);
     }
 
     private EmailDetails createEmailDetails(Invitation invitation) {
