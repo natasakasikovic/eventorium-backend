@@ -174,5 +174,5 @@ The system supports the following roles with corresponding credentials:
 
 [contributors-shield]: https://img.shields.io/github/contributors/kzi-nastava/iss-project-event-planner-siit-2024-team-13.svg?style=for-the-badge
 [contributors-url]: https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/graphs/contributors
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/kzi-nastava/iss-project-event-planner-siit-2024-team-13.svg?style=for-the-badge
 [license-url]: https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/blob/master/LICENSE.txt
