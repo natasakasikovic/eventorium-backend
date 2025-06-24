@@ -112,7 +112,8 @@ SonarQube is available for static code analysis.
 ▶️ Start Sonar locally:
   
   ```sh
-  start sonar
+  mvn clean verify
+  mvn sonar:sonar -Dsonar.token=<token>
   ```
 
 Make sure your SonarQube server is running locally (default: http://localhost:9000).
