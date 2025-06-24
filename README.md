@@ -158,6 +158,10 @@ The system supports the following roles with corresponding credentials:
   - Email: `admin@gmail.com`
   - Password: `pera`
 
+- **User (registered via quick registration)**
+  - Email: `user@gmail.com`
+  - Password: `pera`
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 [Java-img]: https://img.shields.io/badge/Java-17+-red?logo=java&logoColor=white
