@@ -9,9 +9,9 @@ public class AccountEventProvider {
 
     public static Stream<Arguments> provideOrganizerEvents() {
         return Stream.of(
-                Arguments.of(new LoginRequestDto("organizer@gmail.com", "pera"), 2),
-                Arguments.of(new LoginRequestDto("organizer2@gmail.com", "pera"), 2),
-                Arguments.of(new LoginRequestDto("organizernoevents@gmail.com", "pera"), 0)
+                Arguments.of("organizer@gmail.com", 2),
+                Arguments.of("organizer2@gmail.com", 2),
+                Arguments.of("organizernoevents@gmail.com", 0)
         );
     }
 }

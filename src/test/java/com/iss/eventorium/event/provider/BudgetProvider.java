@@ -3,7 +3,6 @@ package com.iss.eventorium.event.provider;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.solution.models.SolutionType;
-import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
@@ -14,9 +13,9 @@ public class BudgetProvider {
 
     public static Stream<Arguments> provideBudgetItems() {
         return Stream.of(
-                Arguments.of(new LoginRequestDto("organizer@gmail.com", "pera"), 3),
-                Arguments.of(new LoginRequestDto("organizer2@gmail.com", "pera"), 2),
-                Arguments.of(new LoginRequestDto("organizer3@gmail.com", "pera"), 1)
+                Arguments.of("organizer@gmail.com", 3),
+                Arguments.of("organizer2@gmail.com", 2),
+                Arguments.of("organizer3@gmail.com", 1)
         );
     }
 

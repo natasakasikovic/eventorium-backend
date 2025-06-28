@@ -16,7 +16,6 @@ public class UserBlockService {
     private final UserBlockRepository repository;
     private final UserService userService;
     private final AuthService authService;
-    private final UserBlockRepository userBlockRepository;
 
     public void blockUser(Long id) {
         User blocker = authService.getCurrentUser();

@@ -5,10 +5,13 @@ import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
+import com.iss.eventorium.util.MockMvcAuthHelper;
 import jakarta.servlet.Filter;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("integration-test")
 class BudgetControllerIntegrationTest {
 
@@ -44,19 +48,20 @@ class BudgetControllerIntegrationTest {
     @Autowired
     private Filter springSecurityFilterChain;
 
-    @BeforeEach
-    void setUp() {
+    private MockMvcAuthHelper authHelper;
+
+    @BeforeAll
+    void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .addFilters(springSecurityFilterChain)
                 .build();
+        authHelper = new MockMvcAuthHelper(mockMvc, objectMapper);
     }
 
     @Test
     void testGetBudget() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        mockMvc.perform(get("/api/v1/events/{event-id}/budget", EVENT_WITH_BUDGET)
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(authHelper.authorizedGet(ORGANIZER_EMAIL, "/api/v1/events/{event-id}/budget", EVENT_WITH_BUDGET))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.plannedAmount").value(85.0))
                 .andExpect(jsonPath("$.spentAmount").value(80.0));
@@ -64,9 +69,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void testGetBudget_eventDoesNotExist() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        mockMvc.perform(get("/api/v1/events/{event-id}/budget", INVALID_EVENT)
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(authHelper.authorizedGet(ORGANIZER_EMAIL, "/api/v1/events/{event-id}/budget", INVALID_EVENT))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Event not found"));
     }
@@ -74,13 +77,14 @@ class BudgetControllerIntegrationTest {
     @Test
     @Transactional
     void testPurchaseProduct() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = createBudgetItemRequest(10.0);
-
-        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                authHelper.authorizedPost(
+                        ORGANIZER_EMAIL,
+                        "/api/v1/events/{event-id}/budget/purchase",
+                        request,
+                        EVENT_WITH_BUDGET
+                    ))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(4L))
                 .andExpect(jsonPath("$.name").value("Decorative Balloons"))
@@ -91,21 +95,20 @@ class BudgetControllerIntegrationTest {
     @Test
     @Transactional
     void testPurchaseProduct_insufficientFunds() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = createBudgetItemRequest(9.0);
-
-        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.message").value("You do not have enough funds for this purchase!"));
+        mockMvc.perform(
+                authHelper.authorizedPost(
+                        ORGANIZER_EMAIL,
+                        "/api/v1/events/{event-id}/budget/purchase",
+                        request,
+                        EVENT_WITH_BUDGET
+                ))
+            .andExpect(jsonPath("$.message").value("You do not have enough funds for this purchase!"));
     }
 
     @Test
     @Transactional
     void testPurchaseProduct_alreadyPurchased() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = BudgetItemRequestDto.builder()
                 .plannedAmount(1000.0)
                 .itemId(1L)
@@ -113,10 +116,13 @@ class BudgetControllerIntegrationTest {
                 .category(CategoryResponseDto.builder().id(9L).build())
                 .build();
 
-        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                authHelper.authorizedPost(
+                        ORGANIZER_EMAIL,
+                        "/api/v1/events/{event-id}/budget/purchase",
+                        request,
+                        EVENT_WITH_BUDGET
+                ))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("Solution is already processed"));
     }
@@ -124,7 +130,6 @@ class BudgetControllerIntegrationTest {
     @Test
     @Transactional
     void testPurchaseProduct_productDoesNotExist() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = BudgetItemRequestDto.builder()
                 .plannedAmount(1000.0)
                 .itemId(INVALID_PRODUCT)
@@ -132,10 +137,13 @@ class BudgetControllerIntegrationTest {
                 .category(CategoryResponseDto.builder().id(9L).build())
                 .build();
 
-        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                authHelper.authorizedPost(
+                        ORGANIZER_EMAIL,
+                        "/api/v1/events/{event-id}/budget/purchase",
+                        request,
+                        EVENT_WITH_BUDGET
+                ))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Product not found"));
     }
@@ -144,11 +152,13 @@ class BudgetControllerIntegrationTest {
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
     @Transactional
     void testPurchaseProduct_invalidRequest_shouldThrowValidationError(BudgetItemRequestDto request) throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
-        mockMvc.perform(post("/api/v1/events/{event-id}/budget/purchase", EVENT_WITH_BUDGET)
-                .header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                authHelper.authorizedPost(
+                    ORGANIZER_EMAIL,
+                    "/api/v1/events/{event-id}/budget/purchase",
+                    request,
+                    EVENT_WITH_BUDGET
+                    ))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", anyOf(
                         matchesPattern(".* is mandatory"),
@@ -158,23 +168,22 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void testPurchaseProduct_eventDoesNotExist() throws Exception {
-        String token = login(mockMvc, objectMapper, ORGANIZER_LOGIN);
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0);
-        mockMvc.perform(get("/api/v1/events/{event-id}/budget", INVALID_EVENT)
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+
+        mockMvc.perform(authHelper.authorizedPost(
+                    ORGANIZER_EMAIL,
+                    "/api/v1/events/{event-id}/budget/purchase",
+                    request,
+                    INVALID_EVENT
+                ))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Event not found"));
     }
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideBudgetItems")
-    void getAllBudgetItems(LoginRequestDto loginRequest, int expectedSize) throws Exception {
-        String token = login(mockMvc, objectMapper, loginRequest);
-        mockMvc.perform(get("/api/v1/budget-items")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
+    void getAllBudgetItems(String email, int expectedSize) throws Exception {
+        mockMvc.perform(authHelper.authorizedGet(email, "/api/v1/budget-items"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(expectedSize));
     }
