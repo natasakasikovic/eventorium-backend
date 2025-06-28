@@ -44,9 +44,9 @@ public class MockMvcAuthHelper {
                 .content(objectMapper.writeValueAsString(body));
     }
 
-    public RequestBuilder authorizedDelete(String username, String urlTemplate, Object... uriVars) {
+    public RequestBuilder authorizedDelete(String email, String urlTemplate, Object... uriVars) {
         return delete(urlTemplate, uriVars)
-                .header("Authorization", "Bearer " + getToken(username));
+                .header("Authorization", "Bearer " + getToken(email));
     }
 
     private String getToken(String email) {

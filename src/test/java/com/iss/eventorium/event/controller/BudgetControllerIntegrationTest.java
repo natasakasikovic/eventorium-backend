@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.solution.models.SolutionType;
-import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.util.MockMvcAuthHelper;
 import jakarta.servlet.Filter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,7 +25,6 @@ import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,7 +56,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
-    void testGetBudget() throws Exception {
+    void givenExistingEventWithBudget_whenGetBudget_thenReturnBudgetDetails() throws Exception {
         mockMvc.perform(authHelper.authorizedGet(ORGANIZER_EMAIL, "/api/v1/events/{event-id}/budget", EVENT_WITH_BUDGET))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.plannedAmount").value(85.0))
@@ -68,7 +64,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
-    void testGetBudget_eventDoesNotExist() throws Exception {
+    void givenNonExistentEvent_whenGetBudget_thenReturnNotFoundWithMessage() throws Exception {
         mockMvc.perform(authHelper.authorizedGet(ORGANIZER_EMAIL, "/api/v1/events/{event-id}/budget", INVALID_EVENT))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Event not found"));
@@ -76,7 +72,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testPurchaseProduct() throws Exception {
+    void givenValidBudgetItemRequest_whenPurchaseProduct_thenReturnCreatedBudgetItemDetails() throws Exception {
         BudgetItemRequestDto request = createBudgetItemRequest(10.0);
         mockMvc.perform(
                 authHelper.authorizedPost(
@@ -94,7 +90,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testPurchaseProduct_insufficientFunds() throws Exception {
+    void givenInsufficientFunds_whenPurchaseProduct_thenReturnErrorMessage() throws Exception {
         BudgetItemRequestDto request = createBudgetItemRequest(9.0);
         mockMvc.perform(
                 authHelper.authorizedPost(
@@ -108,7 +104,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testPurchaseProduct_alreadyPurchased() throws Exception {
+    void givenAlreadyPurchasedProduct_whenPurchaseProduct_thenReturnConflictWithMessage() throws Exception {
         BudgetItemRequestDto request = BudgetItemRequestDto.builder()
                 .plannedAmount(1000.0)
                 .itemId(1L)
@@ -129,7 +125,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testPurchaseProduct_productDoesNotExist() throws Exception {
+    void givenNonExistentProduct_whenPurchaseProduct_thenReturnNotFoundWithMessage() throws Exception {
         BudgetItemRequestDto request = BudgetItemRequestDto.builder()
                 .plannedAmount(1000.0)
                 .itemId(INVALID_PRODUCT)
@@ -151,7 +147,7 @@ class BudgetControllerIntegrationTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
     @Transactional
-    void testPurchaseProduct_invalidRequest_shouldThrowValidationError(BudgetItemRequestDto request) throws Exception {
+    void givenInvalidBudgetItemRequest_whenPurchaseProduct_thenThrowValidationError(BudgetItemRequestDto request) throws Exception {
         mockMvc.perform(
                 authHelper.authorizedPost(
                     ORGANIZER_EMAIL,
@@ -167,9 +163,8 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
-    void testPurchaseProduct_eventDoesNotExist() throws Exception {
+    void givenNonExistentEvent_whenPurchaseProduct_thenReturnNotFoundWithMessage() throws Exception {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0);
-
         mockMvc.perform(authHelper.authorizedPost(
                     ORGANIZER_EMAIL,
                     "/api/v1/events/{event-id}/budget/purchase",
@@ -182,7 +177,7 @@ class BudgetControllerIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideBudgetItems")
-    void getAllBudgetItems(String email, int expectedSize) throws Exception {
+    void givenUserEmail_whenGetAllBudgetItems_thenReturnExpectedSize(String email, int expectedSize) throws Exception {
         mockMvc.perform(authHelper.authorizedGet(email, "/api/v1/budget-items"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(expectedSize));
@@ -195,7 +190,7 @@ class BudgetControllerIntegrationTest {
             "/api/v1/events/{event-id}/budget/budget-items",
             "/api/v1/budget-items"
     })
-    void testUnauthorizedAccess(String urlTemplate) throws Exception {
+    void givenNoAuthentication_whenAccessingProtectedUrls_thenReturnUnauthorized(String urlTemplate) throws Exception {
         mockMvc.perform(get(urlTemplate, EVENT_WITH_BUDGET))
                 .andExpect(status().isUnauthorized());
     }

@@ -69,7 +69,7 @@ class BudgetServiceTest {
             "200, 0, 150",
             "900, 99, 0"
     })
-    void purchaseProduct_shouldThrowExceptionWhenInsufficientFunds(double price, double discount, double plannedAmount) {
+    void givenInsufficientFunds_whenPurchaseProduct_thenThrowInsufficientFundsException(double price, double discount, double plannedAmount) {
         mockProduct(price, discount);
         BudgetItemRequestDto request = createRequest(plannedAmount);
 
@@ -85,7 +85,7 @@ class BudgetServiceTest {
             "50.0, 50.0, 25.0",
             "0.0, 0.0, 100.0"
     })
-    void purchaseProduct_shouldUpdateBudgetWhenSufficientFunds(double price, double discount, double plannedAmount) {
+    void givenSufficientBudget_whenPurchasingProduct_thenEventIsSaved(double price, double discount, double plannedAmount) {
         Product product = mockProduct(price, discount);
         Event event = mockEvent(new Budget());
 
@@ -103,7 +103,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void purchaseProduct_productNotFound_shouldThrowEntityNotFoundException() {
+    void givenProductDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         BudgetItemRequestDto request = createRequest(100.0);
 
         when(productService.find(anyLong())).thenThrow(new EntityNotFoundException());
@@ -112,7 +112,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void purchaseProduct_eventNotFound_shouldThrowEntityNotFoundException() {
+    void givenEventDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         mockProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(100.0);
 
@@ -122,13 +122,13 @@ class BudgetServiceTest {
     }
 
     @Test
-    void getBudget_eventNotFound_shouldThrowEntityNotFoundException() {
+    void givenEventDoesNotExist_whenGetBudget_thenThrowEntityNotFoundException() {
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException());
         assertThrows(EntityNotFoundException.class, () -> budgetService.getBudget(1L));
     }
 
     @Test
-    void getBudget_shouldReturnExistingBudget() {
+    void givenExistingBudget_whenGetBudget_thenReturnBudgetResponse() {
         mockEvent(new Budget());
 
         when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());

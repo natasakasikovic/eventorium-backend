@@ -1,7 +1,6 @@
 package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.util.MockMvcAuthHelper;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,7 +48,7 @@ class AccountEventControllerIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.AccountEventProvider#provideOrganizerEvents")
-    void testGetAllEvents(String email, int expected) throws Exception {
+    void givenUserEmail_whenGetAllEvents_thenReturnExpectedEventCount(String email, int expected) throws Exception {
         mockMvc.perform(authHelper.authorizedGet(email,  "/api/v1/account/events/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(expected));
@@ -60,7 +59,7 @@ class AccountEventControllerIntegrationTest {
             "/api/v1/account/events/all",
             "/api/v1/account/events"
     })
-    void testUnauthorizedAccess(String url) throws Exception {
+    void givenNoAuthentication_whenAccessingProtectedUrls_thenReturnUnauthorized(String url) throws Exception {
         mockMvc.perform(get(url)).andExpect(status().isUnauthorized());
     }
 }

@@ -76,7 +76,7 @@ class EventRepositoryTest {
          "2,2",
          "3,0"
     })
-    void testFilterByOrganizer(Long organizerId, int expected) {
+    void givenOrganizerId_whenFilterByOrganizer_thenReturnExpectedEventCount(Long organizerId, int expected) {
         User organizer = entityManager.find(User.class, organizerId);
         List<Event> events = eventRepository.findAll(EventSpecification.filterByOrganizer(organizer));
         assertNotNull(events);
