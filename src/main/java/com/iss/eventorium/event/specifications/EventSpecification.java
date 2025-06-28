@@ -1,11 +1,12 @@
 package com.iss.eventorium.event.specifications;
 
-import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.dtos.event.EventFilterDto;
+import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserBlock;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;

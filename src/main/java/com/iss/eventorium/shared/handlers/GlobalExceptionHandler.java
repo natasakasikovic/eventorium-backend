@@ -2,7 +2,6 @@ package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.shared.exceptions.*;
 import com.iss.eventorium.shared.models.ExceptionResponse;
-import jakarta.annotation.Priority;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;

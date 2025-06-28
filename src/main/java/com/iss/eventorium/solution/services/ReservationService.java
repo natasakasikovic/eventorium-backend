@@ -3,13 +3,13 @@ package com.iss.eventorium.solution.services;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.repositories.CompanyRepository;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
-import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.shared.services.EmailService;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
@@ -22,15 +22,13 @@ import com.iss.eventorium.solution.specifications.ServiceReservationSpecificatio
 import com.iss.eventorium.solution.validators.reservation.*;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDate;
 import java.util.HashMap;

@@ -1,11 +1,11 @@
 package com.iss.eventorium.user.mappers;
 
-import com.iss.eventorium.user.dtos.user.UserDetailsDto;
-import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
+import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
-import com.iss.eventorium.shared.mappers.CityMapper;
+import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
 import com.iss.eventorium.user.dtos.user.AccountDetailsDto;
+import com.iss.eventorium.user.dtos.user.UserDetailsDto;
 import com.iss.eventorium.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

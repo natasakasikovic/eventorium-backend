@@ -2,9 +2,9 @@ package com.iss.eventorium.interaction.services;
 
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.EventService;
-import com.iss.eventorium.interaction.exceptions.AlreadyRatedException;
 import com.iss.eventorium.interaction.dtos.ratings.CreateRatingRequestDto;
 import com.iss.eventorium.interaction.dtos.ratings.RatingResponseDto;
+import com.iss.eventorium.interaction.exceptions.AlreadyRatedException;
 import com.iss.eventorium.interaction.mappers.RatingMapper;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.notifications.models.Notification;

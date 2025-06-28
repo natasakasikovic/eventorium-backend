@@ -1,6 +1,5 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.event.api.BudgetApi;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;

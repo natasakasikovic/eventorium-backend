@@ -1,6 +1,5 @@
 package com.iss.eventorium.event.provider;
 
-import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;

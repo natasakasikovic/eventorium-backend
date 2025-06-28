@@ -2,9 +2,7 @@ package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
 import com.iss.eventorium.solution.models.Service;
-
 import com.iss.eventorium.user.models.User;
-
 import org.springframework.data.jpa.domain.Specification;
 
 import static com.iss.eventorium.solution.specifications.SolutionSpecification.*;
