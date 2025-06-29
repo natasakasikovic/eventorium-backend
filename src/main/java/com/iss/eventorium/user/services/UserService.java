@@ -170,7 +170,10 @@ public class UserService {
     }
 
     public AccountDetailsDto getUser(Long id) {
-        Long currentUserId = authService.getCurrentUser().getId();
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null) return mapper.toAccountDetails(find(id));
+
+        Long currentUserId = currentUser.getId();
         Specification<User> specification = UserSpecification.filterByIdAndNotBlockedBy(id, currentUserId);
 
         User user = repository.findOne(specification)
