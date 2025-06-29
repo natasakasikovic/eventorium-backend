@@ -23,6 +23,7 @@ public class BudgetMapper {
 
     public BudgetItem fromRequest(BudgetItemRequestDto dto, Solution solution) {
         BudgetItem item = modelMapper.map(dto, BudgetItem.class);
+        item.setId(null);
         item.setCategory(solution.getCategory());
         item.setSolution(solution);
         return item;
