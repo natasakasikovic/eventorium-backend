@@ -41,6 +41,8 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Solution solution = getSolutionProposal(category);
 
+        sendStatusUpdateNotification(category, status, solution.getProvider());
+
         if(status == Status.DECLINED) {
             category.setDeleted(true);
             category.setName(Instant.now().toEpochMilli() + "_" + category.getName());
@@ -51,7 +53,6 @@ public class CategoryProposalService {
         }
 
         solutionService.saveStatus(solution, status);
-        sendStatusUpdateNotification(category, status, solution.getProvider());
         return mapper.toResponse(categoryRepository.save(category));
     }
 
@@ -61,12 +62,12 @@ public class CategoryProposalService {
         categoryService.ensureCategoryNameAvailability(category, request.getName());
 
         Solution solution = getSolutionProposal(category);
-        updateCategoryProposal(category, request);
-        Category response = categoryRepository.save(category);
-
-        solutionService.saveStatus(solution, Status.ACCEPTED);
 
         sendUpdateNotification(category, solution.getProvider());
+        updateCategoryProposal(category, request);
+        Category response = categoryRepository.save(category);
+        solutionService.saveStatus(solution, Status.ACCEPTED);
+
         return mapper.toResponse(response);
     }
 
@@ -74,11 +75,12 @@ public class CategoryProposalService {
         Category category = getCategoryProposal(categoryId);
         Solution solution = getSolutionProposal(category);
 
+        sendChangeNotification(category, solution, request);
+
         changeProposal(category);
         categoryRepository.save(category);
         solutionService.setCategory(solution, categoryService.findByName(request.getName()));
 
-        sendChangeNotification(category, solution, request);
         return mapper.toResponse(solution.getCategory());
     }
 
@@ -136,17 +138,15 @@ public class CategoryProposalService {
 
     private Category getCategoryProposal(Long categoryId) {
         Category category = categoryService.find(categoryId);
-        if(!category.isSuggested()) {
+        if(!category.isSuggested())
             throw new EntityNotFoundException("Category is not suggested");
-        }
         return category;
     }
 
     private Solution getSolutionProposal(Category category) {
         Solution solution = solutionService.findSolutionByCategory(category);
-        if(!solution.getStatus().equals(Status.PENDING)) {
+        if(!solution.getStatus().equals(Status.PENDING))
             throw new EntityNotFoundException("Solution with category '" + category.getName() + "' is not pending");
-        }
         return solution;
     }
 
