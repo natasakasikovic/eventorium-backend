@@ -186,6 +186,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/account/events/all").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/account/events/search/all").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/account/events/search").hasAuthority(ORGANIZER)
+                        .requestMatchers("/api/v1/account/events/calendar").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/account/events/{id}/attendance").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites").authenticated()
                         .requestMatchers("/api/v1/account/events/favourites/{id}").authenticated()
