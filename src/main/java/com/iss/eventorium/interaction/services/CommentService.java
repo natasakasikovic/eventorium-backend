@@ -47,6 +47,7 @@ public class CommentService {
 
     public CommentResponseDto createComment(CreateCommentRequestDto request) {
         Comment comment = mapper.fromRequest(request);
+        comment.setId(null);
         comment.setAuthor(authService.getCurrentUser());
         repository.save(comment);
         return mapper.toResponse(comment, getCommentInfo(comment).getDisplayName());
