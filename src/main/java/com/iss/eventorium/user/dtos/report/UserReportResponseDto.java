@@ -15,6 +15,6 @@ public class UserReportResponseDto {
     private Long id;
     private LocalDateTime timestamp;
     private String reason;
-    private String offender;
     private String reporter;
+    private String offender;
 }
