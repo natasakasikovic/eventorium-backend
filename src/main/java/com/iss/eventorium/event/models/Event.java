@@ -37,6 +37,7 @@ public class Event {
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Privacy privacy;
 
     @Column(name = "max_participants", nullable = false)

@@ -1,20 +1,19 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
-import com.iss.eventorium.event.models.BudgetItemStatus;
-import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
@@ -27,7 +26,6 @@ import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -35,7 +33,6 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-@Slf4j
 public class BudgetService {
 
     private final SolutionService solutionService;
@@ -149,7 +146,7 @@ public class BudgetService {
                 .findFirst()
                 .map(existingItem -> {
                     if(existingItem.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
 
                     existingItem.setPlannedAmount(request.getPlannedAmount());
                     return existingItem;
@@ -176,7 +173,7 @@ public class BudgetService {
         BudgetItem item = getFromBudget(budget, itemId);
 
         if(item.getProcessedAt() != null)
-            throw new AlreadyProcessedException("Solution is already precessed");
+            throw new AlreadyProcessedException("Solution is already processed");
 
         if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
@@ -219,7 +216,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -241,7 +238,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 });
     }

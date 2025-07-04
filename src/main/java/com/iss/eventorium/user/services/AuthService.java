@@ -1,5 +1,6 @@
 package com.iss.eventorium.user.services;
 
+import com.iss.eventorium.security.utils.JwtTokenUtil;
 import com.iss.eventorium.user.dtos.auth.LoginRequestDto;
 import com.iss.eventorium.user.dtos.auth.UserTokenState;
 import com.iss.eventorium.user.dtos.user.UpgradeAccountRequestDto;
@@ -7,7 +8,6 @@ import com.iss.eventorium.user.exceptions.AccountAccessDeniedException;
 import com.iss.eventorium.user.exceptions.UserSuspendedException;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
-import com.iss.eventorium.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

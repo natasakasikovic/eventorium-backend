@@ -1,7 +1,7 @@
 package com.iss.eventorium.solution.validators.reservation;
 
-import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.exceptions.InvalidServiceDurationException;
+import com.iss.eventorium.solution.models.Reservation;
 
 import java.time.Duration;
 

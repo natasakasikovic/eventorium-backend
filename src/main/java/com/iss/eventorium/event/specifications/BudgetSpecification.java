@@ -18,7 +18,7 @@ public class BudgetSpecification {
     private BudgetSpecification() {}
 
     public static Specification<BudgetItem> filterForOrganizer(User organizer) {
-        return filterBudgetItems(organizer.getId()).and(filterOutBlockedContent(organizer));
+        return filterBudgetItems(organizer.getId());
     }
 
     public static Specification<BudgetItem> filterAllBudgetItems(User organizer) {
@@ -29,7 +29,6 @@ public class BudgetSpecification {
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
         return (root, query, cb) -> {
             assert query != null;
-            query.distinct(true);
 
             Root<Event> eventRoot = query.from(Event.class);
 

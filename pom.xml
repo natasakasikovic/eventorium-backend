@@ -49,6 +49,27 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<version>1.11.0-M1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
@@ -115,7 +136,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

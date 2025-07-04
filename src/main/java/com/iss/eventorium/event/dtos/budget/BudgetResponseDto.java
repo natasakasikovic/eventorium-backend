@@ -11,5 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BudgetResponseDto {
+    private Double plannedAmount;
+    private Double spentAmount;
     private List<CategoryResponseDto> activeCategories;
 }

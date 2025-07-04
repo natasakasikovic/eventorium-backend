@@ -3,7 +3,6 @@ package com.iss.eventorium.interaction.mappers;
 import com.iss.eventorium.interaction.dtos.comment.CommentResponseDto;
 import com.iss.eventorium.interaction.dtos.comment.CreateCommentRequestDto;
 import com.iss.eventorium.interaction.models.Comment;
-import com.iss.eventorium.interaction.models.CommentType;
 import com.iss.eventorium.user.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

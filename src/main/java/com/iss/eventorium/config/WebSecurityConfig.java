@@ -3,8 +3,8 @@ package com.iss.eventorium.config;
 import com.iss.eventorium.security.auth.CustomAccessDeniedHandler;
 import com.iss.eventorium.security.auth.JwtRequestFilter;
 import com.iss.eventorium.security.auth.RestAuthenticationEntryPoint;
-import com.iss.eventorium.user.services.CustomUserDetailsService;
 import com.iss.eventorium.security.utils.JwtTokenUtil;
+import com.iss.eventorium.user.services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -112,6 +112,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/products/{id}/*").permitAll()
 
                         // Events
+                        .requestMatchers("/api/v1/events/{event-id}/budget").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/budget/active-categories").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/budget/budget-items/{item-id}").hasAuthority(ORGANIZER)
                         .requestMatchers("/api/v1/events/{id}/budget/budget-items").hasAuthority(ORGANIZER)
@@ -239,7 +240,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/invitations/{hash}").permitAll()
                         .requestMatchers("/api/v1/invitations/my-invitations").authenticated()
                         .requestMatchers("/api/v1/invitations/*").hasAuthority(ORGANIZER)
-
+                        .requestMatchers("/error").permitAll()
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new JwtRequestFilter(jwtTokenUtil, userDetailsService()), UsernamePasswordAuthenticationFilter.class);

@@ -9,7 +9,9 @@ import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 

@@ -1,10 +1,8 @@
 package com.iss.eventorium.solution.specifications;
 
-import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.user.models.User;
-import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import static com.iss.eventorium.solution.specifications.SolutionSpecification.*;

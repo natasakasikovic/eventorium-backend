@@ -5,7 +5,6 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
-import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -16,6 +15,7 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
+import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.util.*;
 import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
