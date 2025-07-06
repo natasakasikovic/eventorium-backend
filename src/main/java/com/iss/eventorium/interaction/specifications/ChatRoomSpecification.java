@@ -33,20 +33,30 @@ public class ChatRoomSpecification {
         };
     }
 
-    private static Specification<ChatRoom> filterOutBlockedContent(User blocker) {
+    private static Specification<ChatRoom> filterOutBlockedContent(User currentUser) {
         return (root, query, cb) -> {
-            if (blocker == null) return cb.conjunction();
+            if (currentUser == null) return cb.conjunction();
 
-            Long blockerId = blocker.getId();
+            Long currentUserId = currentUser.getId();
 
             assert query != null;
-            Subquery<Long> subquery = query.subquery(Long.class);
-            Root<UserBlock> userBlockRoot = subquery.from(UserBlock.class);
+            Subquery<Long> blockedByMeSubquery = query.subquery(Long.class);
+            Root<UserBlock> blockedByMeRoot = blockedByMeSubquery.from(UserBlock.class);
+            blockedByMeSubquery.select(blockedByMeRoot.get("blocked").get("id"))
+                    .where(cb.equal(blockedByMeRoot.get("blocker").get("id"), currentUserId));
 
-            subquery.select(userBlockRoot.get("blocked").get("id"))
-                    .where(cb.equal(userBlockRoot.get("blocker").get("id"), blockerId));
+            Subquery<Long> blockedMeSubquery = query.subquery(Long.class);
+            Root<UserBlock> blockedMeRoot = blockedMeSubquery.from(UserBlock.class);
+            blockedMeSubquery.select(blockedMeRoot.get("blocker").get("id"))
+                    .where(cb.equal(blockedMeRoot.get("blocked").get("id"), currentUserId));
 
-            return cb.not(root.get("lastMessage").get("recipient").get("id").in(subquery));
+            return cb.and(
+                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedByMeSubquery)),
+                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedByMeSubquery)),
+                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedMeSubquery)),
+                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedMeSubquery))
+            );
         };
     }
+
 }
