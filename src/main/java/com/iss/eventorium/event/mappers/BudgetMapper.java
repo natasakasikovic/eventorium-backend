@@ -31,11 +31,17 @@ public class BudgetMapper {
 
     public BudgetItemResponseDto toResponse(BudgetItem item) {
         BudgetItemResponseDto dto = modelMapper.map(item, BudgetItemResponseDto.class);
+        Solution solution = item.getSolution();
+        if(solution == null) {
+            dto.setSolutionName("[DELETED]");
+        } else {
+            dto.setSolutionId(item.getSolution().getId());
+            dto.setSolutionName(item.getSolution().getName());
+        }
+
         dto.setCategory(categoryMapper.toResponse(item.getCategory()));
         dto.setPlannedAmount(item.getPlannedAmount());
         dto.setType(item.getItemType());
-        dto.setSolutionId(item.getSolution().getId());
-        dto.setSolutionName(item.getSolution().getName());
         if(item.getProcessedAt() != null) {
             dto.setSpentAmount(item.getSolution().getPrice() * (1 - item.getSolution().getDiscount() / 100));
         } else {

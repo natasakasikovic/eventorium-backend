@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -126,8 +127,13 @@ public class ServiceService {
     }
 
     public Service find(Long id) {
-        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser(), false);
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Service not found"));
+    }
+
+    public Optional<Service> findEvenIfDeleted(Long id) {
+        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser(), true);
+        return repository.findOne(specification);
     }
 
     public ImagePath getImagePath(Long serviceId) {

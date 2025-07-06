@@ -47,10 +47,16 @@ public class ProductSpecification {
                 .and(applyUserRoleFilter(user)));
     }
 
-    public static Specification<Product> filterById(Long id, User user) {
-        return Specification.where(SolutionSpecification.<Product>hasId(id)
-                .and(filterOutBlockedContent(user)))
+    public static Specification<Product> filterById(Long id, User user, boolean includeDeleted) {
+        Specification<Product> spec = SolutionSpecification.<Product>hasId(id)
+                .and(filterOutBlockedContent(user))
                 .and(applyUserRoleFilter(user));
+
+        if (!includeDeleted) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("isDeleted")));
+        }
+
+        return spec;
     }
 
     public static Specification<Product> filterTopProducts(User user) {
