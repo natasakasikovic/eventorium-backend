@@ -40,21 +40,15 @@ public class ChatRoomSpecification {
             Long currentUserId = currentUser.getId();
 
             assert query != null;
-            Subquery<Long> blockedByMeSubquery = query.subquery(Long.class);
-            Root<UserBlock> blockedByMeRoot = blockedByMeSubquery.from(UserBlock.class);
-            blockedByMeSubquery.select(blockedByMeRoot.get("blocked").get("id"))
-                    .where(cb.equal(blockedByMeRoot.get("blocker").get("id"), currentUserId));
 
-            Subquery<Long> blockedMeSubquery = query.subquery(Long.class);
-            Root<UserBlock> blockedMeRoot = blockedMeSubquery.from(UserBlock.class);
-            blockedMeSubquery.select(blockedMeRoot.get("blocker").get("id"))
-                    .where(cb.equal(blockedMeRoot.get("blocked").get("id"), currentUserId));
+            Subquery<Long> blockedSubquery = query.subquery(Long.class);
+            Root<UserBlock> blockedRoot = blockedSubquery.from(UserBlock.class);
+            blockedSubquery.select(blockedRoot.get("blocked").get("id"))
+                    .where(cb.equal(blockedRoot.get("blocker").get("id"), currentUserId));
 
             return cb.and(
-                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedByMeSubquery)),
-                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedByMeSubquery)),
-                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedMeSubquery)),
-                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedMeSubquery))
+                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedSubquery)),
+                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedSubquery))
             );
         };
     }
