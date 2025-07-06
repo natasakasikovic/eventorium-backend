@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeRequestDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
+import com.iss.eventorium.event.exceptions.EventTypeAlreadyExistsException;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.repositories.EventTypeRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class EventTypeService {
     }
 
     public EventTypeResponseDto createEventType(EventTypeRequestDto request) {
+        if (repository.existsByName(request.getName())) throw new EventTypeAlreadyExistsException(request.getName());
         return mapper.toResponse(repository.save(mapper.fromRequest(request)));
     }
 
@@ -96,6 +99,7 @@ public class EventTypeService {
 
     public void deleteEventType(Long id) {
         EventType eventType = find(id);
+        eventType.setName(Instant.now().toEpochMilli() + "_" + eventType.getName());
         eventType.setDeleted(true);
         repository.save(eventType);
     }

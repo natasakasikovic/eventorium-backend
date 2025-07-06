@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface EventTypeRepository extends JpaRepository<EventType, Long> {
     List<EventType> findByDeletedFalse();
+    boolean existsByName(String name);
 }
