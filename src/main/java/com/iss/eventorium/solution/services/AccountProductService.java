@@ -1,7 +1,6 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.shared.models.PagedResponse;
-import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
@@ -50,9 +49,9 @@ public class AccountProductService {
     public void removeFavouriteProduct(Long id) {
         Product product = find(id);
 
-        List<Product> favouriteProduct = authService.getCurrentUser().getPerson().getFavouriteProducts();
-        if(favouriteProduct.contains(product)) {
-            favouriteProduct.remove(product);
+        List<Product> favouriteProducts = authService.getCurrentUser().getPerson().getFavouriteProducts();
+        if(favouriteProducts.contains(product)) {
+            favouriteProducts.remove(product);
             userRepository.save(authService.getCurrentUser());
         }
     }
