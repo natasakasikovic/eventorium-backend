@@ -35,7 +35,7 @@ public class BudgetMapper {
 
         dto.setSolutionId(solution.getId());
         if(Boolean.TRUE.equals(solution.getIsDeleted())) {
-            dto.setSolutionName("[DELETED]");
+            dto.setSolutionName("[DELETED] " + solution.getName());
         } else {
             dto.setSolutionName(item.getSolution().getName());
         }
