@@ -82,9 +82,9 @@ public class AccountServiceService {
     public void removeFavouriteService(Long id) {
         Service service = find(id);
 
-        List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
-        if(favouriteService.contains(service)) {
-            favouriteService.remove(service);
+        List<Service> favouriteServices = authService.getCurrentUser().getPerson().getFavouriteServices();
+        if(favouriteServices.contains(service)) {
+            favouriteServices.remove(service);
             userRepository.save(authService.getCurrentUser());
         }
     }
