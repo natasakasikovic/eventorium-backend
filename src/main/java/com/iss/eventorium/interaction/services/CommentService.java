@@ -28,6 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -98,21 +99,37 @@ public class CommentService {
     }
 
 
-    private CommentInfoDto getCommentInfo(Comment comment) { // display name is name of obj that needs to be shown in table
+    private CommentInfoDto getCommentInfo(Comment comment) {
         Long objectId = comment.getObjectId();
         CommentType type = comment.getCommentType();
 
         return switch (type) {
             case PRODUCT -> {
-                Product product = productService.find(objectId);
-                yield new CommentInfoDto(product.getName(), product.getProvider());
+                Optional<Product> optionalProduct = productService.findEvenIfDeleted(objectId);
+                if (optionalProduct.isPresent()) {
+                    Product product = optionalProduct.get();
+                    String name = Boolean.TRUE.equals(product.getIsDeleted())
+                            ? "[Deleted Product]"
+                            : product.getName();
+                    yield new CommentInfoDto(name, product.getProvider());
+                } else {
+                    yield new CommentInfoDto("[Unknown Product]", null);
+                }
             }
             case SERVICE -> {
-                Service service = serviceService.find(objectId);
-                yield new CommentInfoDto(service.getName(), service.getProvider());
+                Optional<Service> optionalService = serviceService.findEvenIfDeleted(objectId);
+                if (optionalService.isPresent()) {
+                    Service service = optionalService.get();
+                    String name = Boolean.TRUE.equals(service.getIsDeleted())
+                            ? "[Deleted Service]"
+                            : service.getName();
+                    yield new CommentInfoDto(name, service.getProvider());
+                } else {
+                    yield new CommentInfoDto("[Unknown Service]", null);
+                }
             }
             case EVENT -> {
-                Event event = eventService.find(objectId);
+                Event event = eventService.find(objectId); // can't be deleted
                 yield new CommentInfoDto(event.getName(), event.getOrganizer());
             }
         };

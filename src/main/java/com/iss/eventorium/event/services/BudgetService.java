@@ -1,6 +1,5 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
@@ -14,6 +13,7 @@ import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
@@ -24,8 +24,10 @@ import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -48,7 +50,8 @@ public class BudgetService {
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
     private final SolutionMapper solutionMapper;
-    private final CategoryMapper categoryMapper;
+
+    private final EntityManager entityManager;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
@@ -125,7 +128,10 @@ public class BudgetService {
         budgetItemRepository.save(budgetItem);
     }
 
+    @SkipFilter
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
+        Session session = entityManager.unwrap(Session.class);
+        session.disableFilter("activeFilter");
         Event event = eventService.find(eventId);
         List<BudgetItem> items = event.getBudget().getItems();
         for(BudgetItem item : items) {
@@ -134,6 +140,7 @@ public class BudgetService {
                 item.getSolution().restore(memento);
             }
         }
+        session.enableFilter("activeFilter").setParameter("isDeleted", false);
         return items.stream().map(mapper::toResponse).toList();
     }
 

@@ -30,7 +30,9 @@ public class AccountProductService {
 
     public List<ProductSummaryResponseDto> getFavouriteProducts() {
         return authService.getCurrentUser().getPerson().getFavouriteProducts()
-                .stream().map(mapper::toSummaryResponse).toList();
+                .stream()
+                .filter(product -> !product.getIsDeleted())
+                .map(mapper::toSummaryResponse).toList();
     }
 
     public ProductResponseDto addFavouriteProduct(Long id) {
@@ -47,9 +49,9 @@ public class AccountProductService {
     public void removeFavouriteProduct(Long id) {
         Product product = find(id);
 
-        List<Product> favouriteProduct = authService.getCurrentUser().getPerson().getFavouriteProducts();
-        if(favouriteProduct.contains(product)) {
-            favouriteProduct.remove(product);
+        List<Product> favouriteProducts = authService.getCurrentUser().getPerson().getFavouriteProducts();
+        if(favouriteProducts.contains(product)) {
+            favouriteProducts.remove(product);
             userRepository.save(authService.getCurrentUser());
         }
     }

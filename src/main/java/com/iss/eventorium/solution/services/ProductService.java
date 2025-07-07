@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -110,8 +111,13 @@ public class ProductService {
     }
 
     public Product find(Long id) {
-        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser());
+        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser(), false);
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    }
+
+    public Optional<Product> findEvenIfDeleted(Long id) {
+        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser(), true);
+        return repository.findOne(specification);
     }
 
     public ProductResponseDto createProduct(CreateProductRequestDto request) {

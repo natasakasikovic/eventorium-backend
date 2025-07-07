@@ -30,6 +30,7 @@ public class NotificationService {
     private final NotificationMapper mapper;
 
     public void sendNotification(User user, Notification notification) {
+        if(user == null) return;
         if(Boolean.FALSE.equals(user.getNotificationsSilenced())) {
             log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
             messagingTemplate.convertAndSendToUser(

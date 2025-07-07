@@ -25,10 +25,13 @@ import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -41,6 +44,7 @@ import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EventService {
 
     private final EventRepository repository;
@@ -318,4 +322,10 @@ public class EventService {
         }
     }
 
+    @Scheduled(cron = "0 0 2 * * ?") // runs daily at 2am
+    @Transactional
+    public void deleteAllDrafts() {
+        int deleted = repository.deleteByIsDraftTrue();
+        log.info("Deleted {} drafts", deleted);
+    }
 }

@@ -17,6 +17,7 @@ public class EventSpecification {
 
     public static Specification<Event> filterFutureEvents(User organizer) {
         return Specification.where(filterByOrganizer(organizer))
+                .and(isNotDrafted())
                 .and(hasDateAfter(LocalDate.now()));
     }
 
@@ -30,55 +31,66 @@ public class EventSpecification {
                 .and(hasDateAfter(filter.getFrom()))
                 .and(hasDateBefore(filter.getTo()))
                 .and(hasPrivacy(Privacy.OPEN))
+                .and(isNotDrafted())
                 .and(filterOutBlockedContent(user));
     }
 
     public static Specification<Event> filterByPrivacy(Privacy privacy, User user) {
         return Specification.where(hasPrivacy(privacy)
+                .and(isNotDrafted())
                 .and(filterOutBlockedContent(user)));
     }
 
     public static Specification<Event> filterByName(String keyword, User user) {
         return Specification.where(hasName(keyword))
                             .and(hasPrivacy(Privacy.OPEN)
+                            .and(isNotDrafted())
                             .and(filterOutBlockedContent(user)));
     }
 
     public static Specification<Event> filterTopEvents(String city, User user){
         return Specification.where(hasPrivacy(Privacy.OPEN)
                             .and(hasCity(city))
+                            .and(isNotDrafted())
                             .and(hasDateAfter(LocalDate.now())) // only events in future
                             .and(filterOutBlockedContent(user)));
     }
 
     public static Specification<Event> filterByOrganizer(User organizer) {
-        return Specification.where(hasOrganizer(organizer));
+        return Specification.where(hasOrganizer(organizer))
+                .and(isNotDrafted());
     }
 
     public static Specification<Event> filterUpcomingEventsByOrganizer(User organizer) {
-        return Specification.where(hasOrganizer(organizer)).and(hasDateAfter(LocalDate.now()));
+        return Specification.where(hasOrganizer(organizer))
+                .and(isNotDrafted())
+                .and(hasDateAfter(LocalDate.now()));
     }
 
     public static Specification<Event> filterPassedEvents() {
-        return Specification.where(hasDateBefore(LocalDate.now()));
+        return Specification.where(hasDateBefore(LocalDate.now()))
+                .and(isNotDrafted());
     }
 
     public static Specification<Event> filterPassedEventsByOrganizer(User organizer) {
-        return Specification.where(hasDateBefore(LocalDate.now())).and(hasOrganizer(organizer));
+        return Specification.where(hasDateBefore(LocalDate.now()))
+                .and(isNotDrafted())
+                .and(hasOrganizer(organizer));
     }
 
     public static Specification<Event> filterByNameForOrganizer(String keyword, User user) {
         return Specification.where(hasName(keyword))
+                .and(isNotDrafted())
                 .and(hasOrganizer(user));
-    }
-
-    private static Specification<Event> hasOrganizer(User organizer) {
-        return (root, query, cb) -> cb.equal(root.get("organizer").get("id"), organizer.getId());
     }
 
     public static Specification<Event> filterById(Long id, User user) {
         return Specification.where(hasId(id)
                 .and(filterOutBlockedContent(user)));
+    }
+
+    private static Specification<Event> hasOrganizer(User organizer) {
+        return (root, query, cb) -> cb.equal(root.get("organizer").get("id"), organizer.getId());
     }
 
     private static Specification<Event> hasId(Long id){
@@ -90,6 +102,10 @@ public class EventSpecification {
                 name == null || name.isEmpty()
                         ? cb.conjunction()
                         : cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+    }
+
+    private static Specification<Event> isNotDrafted() {
+       return (root, query, cb) -> cb.isFalse(root.get("isDraft"));
     }
 
     private static Specification<Event> hasDescription(String description) {

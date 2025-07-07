@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.specifications;
 
 import com.iss.eventorium.solution.dtos.services.ServiceFilterDto;
+import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.user.models.User;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,10 +50,16 @@ public class ServiceSpecification {
                             .and(applyUserRoleFilter(user)));
     }
 
-    public static Specification<Service> filterById(Long id, User user) {
-        return Specification.where(SolutionSpecification.<Service>hasId(id)
-                .and(filterOutBlockedContent(user)))
+    public static Specification<Service> filterById(Long id, User user, boolean includeDeleted) {
+        Specification<Service> spec = SolutionSpecification.<Service>hasId(id)
+                .and(filterOutBlockedContent(user))
                 .and(applyUserRoleFilter(user));
+
+        if (!includeDeleted) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("isDeleted")));
+        }
+
+        return spec;
     }
 
     public static Specification<Service> filterTopServices(User user) {
