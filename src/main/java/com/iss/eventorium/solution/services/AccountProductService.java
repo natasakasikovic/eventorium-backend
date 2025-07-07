@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.shared.models.PagedResponse;
+import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.ProductSummaryResponseDto;
@@ -30,7 +31,9 @@ public class AccountProductService {
 
     public List<ProductSummaryResponseDto> getFavouriteProducts() {
         return authService.getCurrentUser().getPerson().getFavouriteProducts()
-                .stream().map(mapper::toSummaryResponse).toList();
+                .stream()
+                .filter(product -> !product.getIsDeleted())
+                .map(mapper::toSummaryResponse).toList();
     }
 
     public ProductResponseDto addFavouriteProduct(Long id) {

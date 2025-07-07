@@ -86,7 +86,6 @@ public class EventSpecification {
 
     public static Specification<Event> filterById(Long id, User user) {
         return Specification.where(hasId(id)
-                .and(isNotDrafted())
                 .and(filterOutBlockedContent(user)));
     }
 

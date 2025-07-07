@@ -8,8 +8,10 @@ import com.iss.eventorium.solution.mappers.ServiceMapper;
 import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
 import com.iss.eventorium.solution.specifications.ServiceSpecification;
+import com.iss.eventorium.user.models.Person;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,8 @@ public class AccountServiceService {
     private final UserRepository userRepository;
 
     private final ServiceMapper mapper;
+
+    private final EntityManager entityManager;
 
     public List<ServiceSummaryResponseDto> getServices() {
         Specification<Service> specification = ServiceSpecification.filterForProvider(authService.getCurrentUser());
@@ -62,15 +66,17 @@ public class AccountServiceService {
                 .getPerson()
                 .getFavouriteServices()
                 .stream()
+                .filter(service -> !service.getIsDeleted())
                 .map(mapper::toSummaryResponse)
                 .toList();
     }
 
     public void addFavouriteService(Long id) {
         Service service = find(id);
+        Person person = authService.getCurrentUser().getPerson();
+        List<Service> favouriteService = person.getFavouriteServices();
 
-        List<Service> favouriteService = authService.getCurrentUser().getPerson().getFavouriteServices();
-        if(!favouriteService.contains(service)) {
+        if (!favouriteService.contains(service)) {
             favouriteService.add(service);
             userRepository.save(authService.getCurrentUser());
         }
