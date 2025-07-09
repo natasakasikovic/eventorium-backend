@@ -7,6 +7,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.services.EmailService;
@@ -54,6 +55,7 @@ public class ReservationService {
 
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId);
+        assertEventOwnership(event);
         Service service = serviceService.find(serviceId);
         Reservation reservation = mapper.fromRequest(request, event, service);
 
@@ -62,6 +64,13 @@ public class ReservationService {
         budgetService.addReservationAsBudgetItem(reservation, request.getPlannedAmount());
 
         sendEmails(reservation, false);
+    }
+
+    private void assertEventOwnership(Event event) {
+        User user = authService.getCurrentUser();
+
+        if (!event.getOrganizer().getId().equals(user.getId()))
+            throw new OwnershipRequiredException("You cannot make a reservation for an event you are not the organizer of!");
     }
 
     private void validateReservation(Reservation reservation, double plannedAmount) {
@@ -95,7 +104,6 @@ public class ReservationService {
         User provider = authService.getCurrentUser();
         return repository.findAll(ServiceReservationSpecification.getProviderReservations(provider)).stream().map(mapper::toCalendarReservation).toList();
     }
-
 
     public List<ReservationResponseDto> getPendingReservations() {
         User user = authService.getCurrentUser();

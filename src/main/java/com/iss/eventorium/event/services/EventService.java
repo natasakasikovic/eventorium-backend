@@ -14,7 +14,7 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
@@ -318,7 +318,7 @@ public class EventService {
     private void assertOwnership(Event event) {
         User provider = authService.getCurrentUser();
         if(!Objects.equals(provider.getId(), event.getOrganizer().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this event.");
+            throw new OwnershipRequiredException("You are not authorized to change this event.");
         }
     }
 
