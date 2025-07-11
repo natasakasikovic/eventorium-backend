@@ -63,4 +63,13 @@ public class ServiceExceptionHandler {
                         .message(ex.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(ServiceNotAvailableException.class)
+    public ResponseEntity<ExceptionResponse> handleServiceNotAvailable(ServiceNotAvailableException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ExceptionResponse.builder()
+                        .error(HttpStatus.CONFLICT.getReasonPhrase())
+                        .message(ex.getMessage())
+                        .build());
+    }
 }

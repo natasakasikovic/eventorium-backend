@@ -14,6 +14,7 @@ import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.solution.dtos.services.CalendarReservationDto;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.dtos.services.ReservationResponseDto;
+import com.iss.eventorium.solution.exceptions.ServiceNotAvailableException;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.ReservationType;
@@ -56,14 +57,14 @@ public class ReservationService {
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId);
         assertEventOwnership(event);
+
         Service service = serviceService.find(serviceId);
+        assertServiceIsReservable(service);
+
         Reservation reservation = mapper.fromRequest(request, event, service);
-
         validateReservation(reservation, request.getPlannedAmount());
-        saveEntity(reservation);
-        budgetService.addReservationAsBudgetItem(reservation, request.getPlannedAmount());
 
-        sendEmails(reservation, false);
+        persistAndSendMails(reservation, request.getPlannedAmount());
     }
 
     private void assertEventOwnership(Event event) {
@@ -71,6 +72,14 @@ public class ReservationService {
 
         if (!event.getOrganizer().getId().equals(user.getId()))
             throw new OwnershipRequiredException("You cannot make a reservation for an event you are not the organizer of!");
+    }
+
+    // NOTE: Repository filters accepted, visible, and logically undeleted services using SQLRestriction and specifications (on repo level).
+    private void assertServiceIsReservable(Service service) {
+        // Availability (unavailable) is not checked in the repository because such services can still be generally fetched.
+        if (!service.getIsAvailable())
+            // Therefore, this method throws an exception if the service is marked as unavailable to prevent reservations on it.
+            throw new ServiceNotAvailableException("You cannot make a reservation for service marked as unavailable!");
     }
 
     private void validateReservation(Reservation reservation, double plannedAmount) {
@@ -85,8 +94,14 @@ public class ReservationService {
 
         Service service = reservation.getService();
 
-        if(plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100))
+        if (plannedAmount < service.getPrice() * (1 - service.getDiscount() / 100))
             throw new InsufficientFundsException("You do not have enough funds for this reservation!");
+    }
+
+    private void persistAndSendMails(Reservation reservation, double plannedAmount) {
+        saveEntity(reservation);
+        budgetService.addReservationAsBudgetItem(reservation, plannedAmount);
+        sendEmails(reservation, false);
     }
 
     private void saveEntity(Reservation reservation) {
