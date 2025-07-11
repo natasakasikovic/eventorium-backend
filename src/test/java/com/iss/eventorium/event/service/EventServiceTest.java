@@ -15,9 +15,11 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.dtos.CityDto;
 import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
 import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
-import org.assertj.core.api.Assertions;
+import com.iss.eventorium.user.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -32,23 +34,28 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
 
+    @InjectMocks
+    private EventService eventService;
+
     @Mock
     private AuthService authService;
 
-    @InjectMocks
-    private EventService eventService;
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private PdfService pdfService;
 
     @Mock
     private EventRepository eventRepository;
@@ -143,8 +150,6 @@ class EventServiceTest {
                 .containsExactly(category);
     }
 
-    // TODO: Add test to verify that public events appear in user-visible event lists
-
     @Test
     @Tag("create-agenda")
     @DisplayName("Should update and save event with given valid agenda data")
@@ -201,6 +206,48 @@ class EventServiceTest {
 
         InvalidTimeRangeException exception = assertThrows(InvalidTimeRangeException.class, () -> eventService.createAgenda(123L, requests));
         assertEquals("Invalid time range for activity 'Activity1': end time (10:00) must be after start time (10:00).", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should generate guest list PDF for valid event")
+    void givenValidEventId_whenGenerateGuestListPdf_thenReturnPdfBytes() {
+
+        List<User> guests = List.of(new User(), new User());
+        byte[] pdfBytes = new byte[]{1, 2, 3};
+
+        when(userService.findByEventAttendance(123L)).thenReturn(guests);
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
+        when(pdfService.generate(anyString(), eq(guests), anyMap())).thenReturn(pdfBytes);
+
+        byte[] result = eventService.generateGuestListPdf(123L);
+
+        assertNotNull(result);
+        assertArrayEquals(pdfBytes, result);
+        verify(userService).findByEventAttendance(123L);
+        verify(pdfService).generate(eq("/templates/guest-list-pdf.jrxml"), eq(guests), anyMap());
+    }
+
+    @Test
+    @DisplayName("Should throw exception while generating guest list for event that does not exist")
+    void givenInvalidEventId_whenGenerateGuestListPdf_thenThrowsEntityNotFoundException() {
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> eventService.generateGuestListPdf(123L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Event not found");
+    }
+
+    @Test
+    @DisplayName("Should generate empty guest list PDF when no attendees are found")
+    void shouldGeneratePdfWithNoGuestsWhenAttendanceIsEmpty() {
+
+        when(userService.findByEventAttendance(123L)).thenReturn(Collections.emptyList());
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
+        when(pdfService.generate(anyString(), eq(Collections.emptyList()), anyMap())).thenReturn(new byte[]{0, 1, 2});
+
+        byte[] result = eventService.generateGuestListPdf(123L);
+
+        assertNotNull(result);
+        verify(pdfService).generate(eq("/templates/guest-list-pdf.jrxml"), eq(Collections.emptyList()), anyMap());
     }
 
 }
