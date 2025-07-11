@@ -1,7 +1,7 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.company.models.Company;
-import com.iss.eventorium.company.repositories.CompanyRepository;
+import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.services.BudgetService;
@@ -42,7 +42,7 @@ import java.util.Objects;
 public class ReservationService {
 
     private final ReservationRepository repository;
-    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
     private final EventService eventService;
     private final ServiceService serviceService;
     private final EmailService emailService;
@@ -95,9 +95,9 @@ public class ReservationService {
         repository.save(reservation);
     }
 
-    private Company getCompany(Service service) {
+    public Company getCompany(Service service) {
         User provider = service.getProvider();
-        return companyRepository.getCompanyByProviderId(provider.getId());
+        return companyService.getByProviderId(provider.getId());
     }
 
     public List<CalendarReservationDto> getProviderReservations() {
