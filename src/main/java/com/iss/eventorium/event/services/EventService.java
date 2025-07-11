@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -14,8 +15,8 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -218,13 +219,15 @@ public class EventService {
 
     public void createAgenda(Long id, List<ActivityRequestDto> request) {
         Event event = find(id);
+        assertOwnership(event);
+        ensureEventIsDraft(event);
 
         List<Activity> activities = request.stream()
                 .map(activityMapper::fromRequest)
                 .toList();
         validateActivities(activities);
 
-        event.getActivities().clear();
+        event.setActivities(new ArrayList<>());
         event.getActivities().addAll(activities);
 
         if (event.getPrivacy().equals(Privacy.OPEN))
@@ -317,9 +320,13 @@ public class EventService {
 
     private void assertOwnership(Event event) {
         User provider = authService.getCurrentUser();
-        if(!Objects.equals(provider.getId(), event.getOrganizer().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this event.");
-        }
+        if(!Objects.equals(provider.getId(), event.getOrganizer().getId()))
+            throw new OwnershipRequiredException("You are not authorized to manage this event.");
+    }
+
+    private void ensureEventIsDraft(Event event) {
+        if (!event.isDraft())
+            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
     }
 
     @Scheduled(cron = "0 0 2 * * ?") // runs daily at 2am
