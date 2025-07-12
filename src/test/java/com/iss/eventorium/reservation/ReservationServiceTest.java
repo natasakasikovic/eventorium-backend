@@ -227,7 +227,7 @@ public class ReservationServiceTest {
     @MethodSource("provideReservationsOutsideWorkingHours")
     @Tag("exception-handling")
     @Tag("working-hours")
-    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing, String expectedMessage) {
+    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -243,20 +243,20 @@ public class ReservationServiceTest {
                 () -> this.service.createReservation(request, 1L, 1L)
         );
 
-        assertEquals(expectedMessage, exception.getMessage());
+        assertEquals(String.format("Reservations can only be made between %s and %s", company.getOpeningHours(), company.getClosingHours()), exception.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideValidWorkingHours")
     @Tag("working-hours")
-    void testReservationWithinWorkingHours(LocalTime opening, LocalTime closing) {
+    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).address("test-address").city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service); // request 11:00 - 15:00
+        mockMapper(request, event, service);
 
         Company company = Company.builder().openingHours(opening).closingHours(closing).build();
         when(companyService.getByProviderId(anyLong())).thenReturn(company);
@@ -279,18 +279,21 @@ public class ReservationServiceTest {
         assertThat(savedReservation.getService()).isEqualTo(service);
     }
 
+    // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00. Each case defines different company working hours to verify correct behavior around working hours boundaries.
     private static Stream<Arguments> provideValidWorkingHours() {
         return Stream.of(
-                Arguments.of(LocalTime.of(11, 0), LocalTime.of(15, 0)),
-                Arguments.of(LocalTime.of(8, 0), LocalTime.of(17, 0))
+                Arguments.of(LocalTime.of(11, 0), LocalTime.of(15, 0)), // Company working hours exactly match the reservation (11:00 - 15:00)
+                Arguments.of(LocalTime.of(8, 0), LocalTime.of(17, 0)), // Company working hours fully include the reservation (8:00 - 17:00)
+                Arguments.of(LocalTime.of(11, 0), LocalTime.of(16, 0)), // Reservation starts exactly at opening time, ends before closing (11:00 - 16:00)
+                Arguments.of(LocalTime.of(10, 0), LocalTime.of(15, 0)) // Reservation starts after opening, ends exactly at closing time (10:00 - 15:00)
         );
     }
 
     private static Stream<Arguments> provideReservationsOutsideWorkingHours() {
         return Stream.of(
-                Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59), "Reservations can only be made between 07:00 and 14:59"),
-                Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0), "Reservations can only be made between 11:01 and 16:00"),
-                Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30), "Reservations can only be made between 06:00 and 10:30")
+                Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59)), // Company closes one minute before reservation ends (closing at 14:59, reservation ends at 15:00)
+                Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0)), // Company opens one minute after reservation starts (opening at 11:01, reservation starts at 11:00)
+                Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30))  // Company working hours completely outside the reservation request (company 6:00 - 10:30, reservation 11:00 - 15:00)
         );
     }
 
