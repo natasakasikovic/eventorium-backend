@@ -25,6 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -132,52 +134,28 @@ class EventServiceTest {
         assertThat(savedEvent.getActivities()).containsExactlyElementsOf(activities);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.EventProvider#provideInvalidTimeRanges")
     @Tag("create-agenda")
-    @DisplayName("Should throw exception for activity with end time before start time")
-    void givenActivityWithEndTimeBeforeStartTime_whenCreateAgenda_thenThrowsInvalidTimeRangeException() {
-
+    @DisplayName("Should throw exception for invalid activity time range")
+    void givenInvalidActivityTimeRange_whenCreateAgenda_thenThrowsInvalidTimeRangeException(LocalTime startTime,
+                                                                                            LocalTime endTime,
+                                                                                            String expectedMessage) {
         List<ActivityRequestDto> requests = List.of(new ActivityRequestDto());
-        List<Activity> activities = List.of(
-                Activity.builder()
-                        .name("Activity1")
-                        .startTime(LocalTime.of(10, 0))
-                        .endTime(LocalTime.of(9, 0))
-                        .build()
-        );
+        Activity activity = Activity.builder()
+                .name("Activity1")
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
 
         when(authService.getCurrentUser()).thenReturn(currentUser);
-        when(activityMapper.fromRequest(requests.get(0))).thenReturn(activities.get(0));
+        when(activityMapper.fromRequest(requests.get(0))).thenReturn(activity);
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
         InvalidTimeRangeException exception = assertThrows(InvalidTimeRangeException.class,
                 () -> eventService.createAgenda(EVENT_ID, requests));
 
-        assertEquals("Invalid time range for activity 'Activity1': end time (09:00) must be after start time (10:00).", exception.getMessage());
-    }
-
-    @Test
-    @Tag("create-agenda")
-    @DisplayName("Should throw exception for activity with end time equals to start time")
-    void givenActivityWithEndTimeEqualsToStartTime_whenCreateAgenda_thenThrowsInvalidTimeRangeException() {
-
-        List<ActivityRequestDto> requests = List.of(new ActivityRequestDto());
-        List<Activity> activities = List.of(
-                Activity.builder()
-                        .name("Activity1")
-                        .startTime(LocalTime.of(10, 0))
-                        .endTime(LocalTime.of(10, 0))
-                        .build()
-        );
-
-        when(authService.getCurrentUser()).thenReturn(currentUser);
-        when(activityMapper.fromRequest(requests.get(0))).thenReturn(activities.get(0));
-        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
-
-        InvalidTimeRangeException exception = assertThrows(InvalidTimeRangeException.class,
-                () -> eventService.createAgenda(EVENT_ID, requests));
-
-        assertEquals("Invalid time range for activity 'Activity1': end time (10:00) must be after start time (10:00).", exception.getMessage());
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
