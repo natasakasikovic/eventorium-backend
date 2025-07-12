@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -218,6 +219,9 @@ public class EventService {
     }
 
     public void createAgenda(Long id, List<ActivityRequestDto> request) {
+        if (request.isEmpty())
+            throw new EmptyAgendaException("Agenda must contain at least one activity.");
+
         Event event = find(id);
         assertOwnership(event);
         ensureEventIsDraft(event);
