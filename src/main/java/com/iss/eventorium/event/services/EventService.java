@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
+import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
 import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
@@ -225,6 +226,9 @@ public class EventService {
         Event event = find(id);
         assertOwnership(event);
         ensureEventIsDraft(event);
+
+        if (!event.getActivities().isEmpty())
+            throw new AgendaAlreadyDefinedException("Agenda already defined for event with name " + event.getName());
 
         List<Activity> activities = request.stream()
                 .map(activityMapper::fromRequest)
