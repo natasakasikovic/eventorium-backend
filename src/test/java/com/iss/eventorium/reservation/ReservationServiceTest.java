@@ -3,13 +3,19 @@ package com.iss.eventorium.reservation;
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.services.CompanyService;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
+import com.iss.eventorium.shared.models.City;
+import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
+import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import com.iss.eventorium.solution.exceptions.ReservationDeadlineExceededException;
 import com.iss.eventorium.solution.exceptions.ReservationForPastEventException;
+import com.iss.eventorium.solution.exceptions.ReservationOutsideWorkingHoursException;
+import com.iss.eventorium.solution.exceptions.ServiceNotAvailableException;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.Service;
@@ -21,14 +27,21 @@ import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
+import org.thymeleaf.context.IContext;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -42,6 +55,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
+
+    @InjectMocks
+    ReservationService service;
 
     @Mock
     ReservationRepository repository;
@@ -59,20 +75,31 @@ public class ReservationServiceTest {
     CompanyService companyService;
 
     @Mock
+    BudgetService budgetService;
+
+    @Mock
+    EmailService emailService;
+
+    @Mock
+    SpringTemplateEngine templateEngine;
+
+    @Mock
     ReservationMapper mapper;
 
-    @InjectMocks
-    ReservationService service;
+    @Captor
+    private ArgumentCaptor<Reservation> reservationCaptor;
 
     private User currentUser;
     private User provider;
+    private City city;
     private ReservationRequestDto request;
 
     @BeforeEach
     public void setUp() {
         currentUser = User.builder().id(1L).build();
         provider = User.builder().id(2L).build();
-        request = new ReservationRequestDto(LocalTime.of(11, 0), LocalTime.of(13, 0), 100.0);
+        city = City.builder().name("Trebinje").build();
+        request = new ReservationRequestDto(LocalTime.of(11, 0), LocalTime.of(15, 0), 100.0);
         lenient().when(authService.getCurrentUser()).thenReturn(currentUser);
     }
 
@@ -114,6 +141,22 @@ public class ReservationServiceTest {
                 () -> service.createReservation(request, 1L, 1L));
 
         assertEquals("Service not found", exception.getMessage());
+    }
+
+    @Test
+    @Tag("exception-handling")
+    @DisplayName("Should throw ServiceNotAvailableException if trying to reserve for service marked as unavailable")
+    void givenUnavailableService_whenCreateReservation_thenThrowServiceNotAvailableException() {
+        Event event = Event.builder().organizer(currentUser).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().id(1L).provider(provider).isAvailable(false).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        ServiceNotAvailableException exception = assertThrows(ServiceNotAvailableException.class,
+                () -> this.service.createReservation(request, 1L, 1L));
+
+        assertEquals("You cannot make a reservation for service marked as unavailable!" , exception.getMessage());
     }
 
     @Test
@@ -178,6 +221,77 @@ public class ReservationServiceTest {
                 () -> this.service.createReservation(request, 1L, 1L));
 
         assertEquals("Reservation deadline has passed for this service!", exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideReservationsOutsideWorkingHours")
+    @Tag("exception-handling")
+    @Tag("working-hours")
+    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing, String expectedMessage) {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+
+        Company company = Company.builder().openingHours(opening).closingHours(closing).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+
+        ReservationOutsideWorkingHoursException exception = assertThrows(ReservationOutsideWorkingHoursException.class,
+                () -> this.service.createReservation(request, 1L, 1L)
+        );
+
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideValidWorkingHours")
+    @Tag("working-hours")
+    void testReservationWithinWorkingHours(LocalTime opening, LocalTime closing) {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).address("test-address").city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service); // request 11:00 - 15:00
+
+        Company company = Company.builder().openingHours(opening).closingHours(closing).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
+
+        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
+        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
+
+        this.service.createReservation(request, 1L, 1L);
+
+        verify(repository, times(1)).save(reservationCaptor.capture());
+        verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
+
+        Reservation savedReservation = reservationCaptor.getValue();
+        assertThat(savedReservation.getStartingTime()).isEqualTo(LocalTime.of(11, 0));
+        assertThat(savedReservation.getEndingTime()).isEqualTo(LocalTime.of(15, 0));
+        assertThat(savedReservation.getEvent()).isEqualTo(event);
+        assertThat(savedReservation.getService()).isEqualTo(service);
+    }
+
+    private static Stream<Arguments> provideValidWorkingHours() {
+        return Stream.of(
+                Arguments.of(LocalTime.of(11, 0), LocalTime.of(15, 0)),
+                Arguments.of(LocalTime.of(8, 0), LocalTime.of(17, 0))
+        );
+    }
+
+    private static Stream<Arguments> provideReservationsOutsideWorkingHours() {
+        return Stream.of(
+                Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59), "Reservations can only be made between 07:00 and 14:59"),
+                Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0), "Reservations can only be made between 11:01 and 16:00"),
+                Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30), "Reservations can only be made between 06:00 and 10:30")
+        );
     }
 
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {
