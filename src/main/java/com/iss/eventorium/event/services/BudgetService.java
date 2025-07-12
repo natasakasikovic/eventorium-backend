@@ -201,6 +201,15 @@ public class BudgetService {
         eventRepository.save(event);
     }
 
+    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
+        Event event = eventService.find(eventId);
+        Budget budget = event.getBudget();
+        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
+        budget.setActiveCategories(new ArrayList<>(categories));
+        eventRepository.save(event);
+        return mapper.toResponse(budget);
+    }
+
     private void updateBudget(Event event, BudgetItem item) {
         Budget budget = event.getBudget();
         BudgetItem budgetItem = getFromBudget(budget, item);
@@ -252,14 +261,5 @@ public class BudgetService {
 
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
-    }
-
-    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
-        Event event = eventService.find(eventId);
-        Budget budget = event.getBudget();
-        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
-        budget.setActiveCategories(new ArrayList<>(categories));
-        eventRepository.save(event);
-        return mapper.toResponse(budget);
     }
 }
