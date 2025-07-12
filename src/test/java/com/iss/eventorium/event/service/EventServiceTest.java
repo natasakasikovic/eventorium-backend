@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
+import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Activity;
@@ -34,6 +35,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,11 +74,11 @@ class EventServiceTest {
     private City city;
     private EventRequestDto request;
     private Event event;
+    private User currentUser;
 
     @BeforeEach
     void setUp() {
-        User currentUser = new User();
-        currentUser.setId(123L);
+        currentUser = User.builder().id(123L).build();
 
         CityDto cityDto = new CityDto(123L, "Belgrade");
         city = new City(123L, "Belgrade");
@@ -84,8 +86,6 @@ class EventServiceTest {
         request = new EventRequestDto("First Event", "Test", LocalDate.now().plusDays(3), Privacy.OPEN, 10, null, cityDto, "Street 7");
 
         event = new Event(123L, "First Event", "Test", LocalDate.now().plusDays(3), Privacy.OPEN, 10, null, city, "Street 7", currentUser, null, true, null, null);
-
-        when(authService.getCurrentUser()).thenReturn(currentUser);
     }
 
     @Test
@@ -106,6 +106,7 @@ class EventServiceTest {
     @DisplayName("Should assign current user as organizer")
     void givenCurrentUser_whenCreateEvent_thenOrganizerIsAssignedAndEventSaved() {
         when(eventMapper.fromRequest(request)).thenReturn(event);
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         eventService.createEvent(request);
         verify(eventRepository, times(1)).save(eventCaptor.capture());
 
@@ -162,6 +163,7 @@ class EventServiceTest {
             Activity.builder().startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).build()
         );
 
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         when(activityMapper.fromRequest(requests.get(0))).thenReturn(activities.get(0));
         when(activityMapper.fromRequest(requests.get(1))).thenReturn(activities.get(1));
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
@@ -184,6 +186,7 @@ class EventServiceTest {
                 Activity.builder().name("Activity1").startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(9, 0)).build()
         );
 
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         when(activityMapper.fromRequest(requests.get(0))).thenReturn(activities.get(0));
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
@@ -201,11 +204,22 @@ class EventServiceTest {
                 Activity.builder().name("Activity1").startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(10, 0)).build()
         );
 
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         when(activityMapper.fromRequest(requests.get(0))).thenReturn(activities.get(0));
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
         InvalidTimeRangeException exception = assertThrows(InvalidTimeRangeException.class, () -> eventService.createAgenda(123L, requests));
         assertEquals("Invalid time range for activity 'Activity1': end time (10:00) must be after start time (10:00).", exception.getMessage());
+    }
+
+    @Test
+    @Tag("create-agenda")
+    @DisplayName("Should throw EmptyAgendaException when agenda has no activities")
+    void givenNoActivities_whenCreateAgenda_shouldThrowEmptyAgendaException() {
+        List<ActivityRequestDto> requests = new ArrayList<>();
+
+        EmptyAgendaException exception = assertThrows(EmptyAgendaException.class, () -> eventService.createAgenda(123L, requests));
+        assertEquals("Agenda must contain at least one activity.", exception.getMessage());
     }
 
     @Test
