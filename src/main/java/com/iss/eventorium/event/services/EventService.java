@@ -327,8 +327,8 @@ public class EventService {
     }
 
     private void assertOwnership(Event event) {
-        User provider = authService.getCurrentUser();
-        if(!Objects.equals(provider.getId(), event.getOrganizer().getId()))
+        User organizer = authService.getCurrentUser();
+        if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
             throw new OwnershipRequiredException("You are not authorized to manage this event.");
     }
 
