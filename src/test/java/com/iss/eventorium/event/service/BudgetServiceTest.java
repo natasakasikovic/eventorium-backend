@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +39,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BudgetServiceTest {
+
+    private static final Long DEFAULT_EVENT_ID = 1L;
+    private static final Long DEFAULT_BUDGET_ITEM_ID = 1L;
 
     @Mock
     private ProductService productService;
@@ -70,7 +74,7 @@ class BudgetServiceTest {
         mockProduct(price, discount);
         BudgetItemRequestDto request = createRequest(plannedAmount);
 
-        assertThrows(InsufficientFundsException.class, () -> budgetService.purchaseProduct(1L, request));
+        assertThrows(InsufficientFundsException.class, () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request));
     }
 
     @ParameterizedTest
@@ -95,7 +99,7 @@ class BudgetServiceTest {
         when(productMapper.toResponse(any())).thenReturn(dto);
         BudgetItemRequestDto request = createRequest(plannedAmount);
 
-        budgetService.purchaseProduct(1L, request);
+        budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
 
         verify(eventRepository, times(1)).save(event);
     }
@@ -109,7 +113,7 @@ class BudgetServiceTest {
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> budgetService.purchaseProduct(1L, request),
+                () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request),
                 "Product not found"
         );
     }
@@ -131,8 +135,6 @@ class BudgetServiceTest {
     @Test
     @Tag("purchase-product")
     void givenProcessedProduct_whenPurchaseProduct_thenThrowAlreadyProcessedException() {
-        Long eventId = 1L;
-
         BudgetItemRequestDto request = createRequest(100.0);
 
         Product product = new Product();
@@ -153,7 +155,7 @@ class BudgetServiceTest {
 
         assertThrows(
                 AlreadyProcessedException.class,
-                () -> budgetService.purchaseProduct(eventId, request),
+                () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request),
                 "Solution is already processed"
         );
     }
@@ -161,8 +163,6 @@ class BudgetServiceTest {
     @Test
     @Tag("purchase-product")
     void givenNotProcessedProduct_whenPurchaseProduct_thenReturnPurchasedProduct() {
-        Long eventId = 1L;
-
         BudgetItemRequestDto request = createRequest(200.0);
 
         Product product = new Product();
@@ -182,7 +182,7 @@ class BudgetServiceTest {
         budget.setItems(List.of(item));
         mockEvent(budget);
 
-        ProductResponseDto response = budgetService.purchaseProduct(eventId, request);
+        ProductResponseDto response = budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
         assertNotNull(response);
         assertEquals(1L, response.getId());
         verify(eventRepository, times(1)).save(any(Event.class));
@@ -192,7 +192,7 @@ class BudgetServiceTest {
     @Tag("get-budget")
     void givenEventDoesNotExist_whenGetBudget_thenThrowEntityNotFoundException() {
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException());
-        assertThrows(EntityNotFoundException.class, () -> budgetService.getBudget(1L));
+        assertThrows(EntityNotFoundException.class, () -> budgetService.getBudget(DEFAULT_EVENT_ID));
     }
 
     @Test
@@ -202,7 +202,7 @@ class BudgetServiceTest {
 
         when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
 
-        BudgetResponseDto response = budgetService.getBudget(1L);
+        BudgetResponseDto response = budgetService.getBudget(DEFAULT_EVENT_ID);
         assertNotNull(response);
     }
 
@@ -210,14 +210,14 @@ class BudgetServiceTest {
     @Tag("update-budget-item")
     void givenValidBudgetItem_whenUpdateBudgetItem_thenSaveBudgetWithUpdatedItem() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
-        BudgetItem item = mockBudgetItem(BudgetItemStatus.PLANNED);
+        BudgetItem item = mockBudgetItemProcessedAt(null);
         Budget budget = new Budget();
         budget.addItem(item);
 
         mockEvent(budget);
         when(mapper.toResponse(item)).thenReturn(new BudgetItemResponseDto());
 
-        budgetService.updateBudgetItem(1L, 1L, request);
+        budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(item).setPlannedAmount(200.0);
         verify(eventRepository, times(1)).save(any(Event.class));
@@ -227,7 +227,7 @@ class BudgetServiceTest {
     @Tag("update-budget-item")
     void givenProcessedBudgetItem_whenUpdateBudgetItem_thenThrowAlreadyProcessedException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
-        BudgetItem item = mockBudgetItem(BudgetItemStatus.PROCESSED);
+        BudgetItem item = mockBudgetItemProcessedAt(LocalDateTime.now());
         Budget budget = new Budget();
         budget.addItem(item);
 
@@ -235,7 +235,7 @@ class BudgetServiceTest {
 
         assertThrows(
                 AlreadyProcessedException.class,
-                () -> budgetService.updateBudgetItem(1L, 1L, request),
+                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request),
                 "Solution is already processed"
         );
     }
@@ -244,14 +244,14 @@ class BudgetServiceTest {
     @Tag("update-budget-item")
     void givenInsufficientBudgetItem_whenUpdateBudgetItem_thenThrowInsufficientBudgetException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(0.0);
-        BudgetItem item = mockBudgetItem(BudgetItemStatus.PLANNED);
+        BudgetItem item = mockBudgetItemProcessedAt(null);
         Budget budget = new Budget();
         budget.addItem(item);
         mockEvent(budget);
 
         assertThrows(
                 InsufficientFundsException.class,
-                () -> budgetService.updateBudgetItem(1L, 1L, request),
+                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request),
                 "You do not have enough funds for this purchase/reservation!"
         );
     }
@@ -264,7 +264,7 @@ class BudgetServiceTest {
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> budgetService.updateBudgetItem(1L, 1L, request),
+                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request),
                 "Event not found"
         );
     }
@@ -277,7 +277,66 @@ class BudgetServiceTest {
 
         assertThrows(
                 EntityNotFoundException.class,
-                () -> budgetService.updateBudgetItem(1L, 1L, request),
+                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request),
+                "Budget item not found."
+        );
+    }
+
+    @Test
+    @Tag("delete-budget-item")
+    void givenPlannedBudgetItem_whenDeleteBudgetItem_thenItemIsRemovedAndEventSaved() {
+        BudgetItem item = mock(BudgetItem.class);
+        when(item.getId()).thenReturn(DEFAULT_BUDGET_ITEM_ID);
+        when(item.getStatus()).thenReturn(BudgetItemStatus.PLANNED);
+        Budget budget = mock(Budget.class);
+        when(budget.getItems()).thenReturn(List.of(item));
+        budget.addItem(item);
+        Event event = mockEvent(budget);
+
+        budgetService.deleteBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID);
+
+        verify(budget).removeItem(item);
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @ParameterizedTest
+    @Tag("delete-budget-item")
+    @EnumSource(value = BudgetItemStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "PLANNED")
+    void givenNonPlannedBudgetItem_whenDeleteBudgetItem_thenThrowAlreadyProcessedException(BudgetItemStatus status) {
+        BudgetItem item = mock(BudgetItem.class);
+        when(item.getId()).thenReturn(DEFAULT_BUDGET_ITEM_ID);
+        when(item.getStatus()).thenReturn(status);
+        Budget budget = mock(Budget.class);
+        when(budget.getItems()).thenReturn(List.of(item));
+        budget.addItem(item);
+        mockEvent(budget);
+
+        assertThrows(
+                AlreadyProcessedException.class,
+                () -> budgetService.deleteBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID),
+                "Solution is already processed"
+        );
+    }
+
+    @Test
+    @Tag("delete-budget-item")
+    void givenNonExistentBudgetItem_whenDeleteBudgetItem_thenThrowEntityNotFoundException() {
+        mockEvent(new Budget());
+
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> budgetService.deleteBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID),
+                "Budget item not found."
+        );
+    }
+
+    @Test
+    void givenNonExistentEvent_whenDeleteBudgetItem_thenThrowEntityNotFoundException() {
+        when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
+
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> budgetService.deleteBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID),
                 "Budget item not found."
         );
     }
@@ -290,16 +349,14 @@ class BudgetServiceTest {
         return product;
     }
 
-    private BudgetItem mockBudgetItem(BudgetItemStatus status) {
+    private BudgetItem mockBudgetItemProcessedAt(LocalDateTime processedAt) {
         Product product = new Product();
         product.setId(1L);
         product.setPrice(100.0);
         product.setDiscount(50.0);
 
         BudgetItem item = mock(BudgetItem.class);
-        when(item.getProcessedAt()).thenReturn(status == BudgetItemStatus.PROCESSED
-                ? LocalDateTime.now()
-                : null);
+        when(item.getProcessedAt()).thenReturn(processedAt);
         when(item.getId()).thenReturn(1L);
         when(item.getPlannedAmount()).thenReturn(100.0);
         when(item.getSolution()).thenReturn(product);
