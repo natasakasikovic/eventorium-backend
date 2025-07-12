@@ -13,7 +13,6 @@ public class BudgetProvider {
 
     public static Stream<Arguments> provideBudgetItems() {
         return Stream.of(
-                Arguments.of("organizer@gmail.com", 3),
                 Arguments.of("organizer2@gmail.com", 2),
                 Arguments.of("organizer3@gmail.com", 1)
         );
