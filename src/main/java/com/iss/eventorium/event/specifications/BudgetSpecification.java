@@ -29,7 +29,6 @@ public class BudgetSpecification {
         return (root, query, cb) -> cb.isFalse(root.get("solution").get("isDeleted"));
     }
 
-
     private static Specification<BudgetItem> filterBudgetItems(Long organizerId) {
         return (root, query, cb) -> {
             assert query != null;
