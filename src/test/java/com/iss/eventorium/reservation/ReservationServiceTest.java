@@ -33,6 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+/*
+ NOTE: Certain test cases—such as attempting to reserve a logically deleted service,
+ an invisible service, or a service that has not been accepted—are not written here,
+ because such services are filtered out at the serviceRepository level.
+ Therefore, these cases are considered part of the serviceRepository's test coverage
+*/
+
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
 
@@ -57,22 +64,23 @@ public class ReservationServiceTest {
     @InjectMocks
     ReservationService service;
 
-    private static User currentLoggedIn;
-    private static User provider;
+    private User currentUser;
+    private User provider;
+    private ReservationRequestDto request;
 
-    @BeforeAll
-    public static void setUp() {
-        currentLoggedIn = User.builder().id(1L).build();
+    @BeforeEach
+    public void setUp() {
+        currentUser = User.builder().id(1L).build();
         provider = User.builder().id(2L).build();
+        request = new ReservationRequestDto(LocalTime.of(11, 0), LocalTime.of(13, 0), 100.0);
+        lenient().when(authService.getCurrentUser()).thenReturn(currentUser);
     }
 
     @Test 
     @Tag("exception-handling")
     @DisplayName("Should throw EntityNotFoundException when trying to create reservation for non-existing event")
-    void testCreateReservationForNonExistingEvent() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(11, 0, 0), LocalTime.of(13, 0, 0), 100.0);
-
-        when(eventService.find(1L)).thenThrow(new EntityNotFoundException("Event not found"));
+    void givenNonExistingEvent_whenCreateReservation_thenThrowEntityNotFoundException() {
+        when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> service.createReservation(request, 1L, 1L));
@@ -82,14 +90,10 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
-    @DisplayName("Throws OwnershipRequiredException if user is not organizer of the event during reservation creation")
-    void testCreateReservationForEventWithoutOwnership() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(11, 0, 0), LocalTime.of(13, 0, 0), 100.0);
-
+    @DisplayName("Should throw OwnershipRequiredException if user is not organizer of the event during reservation creation")
+    void givenEventWithoutOwnership_whenCreateReservation_thenThrowsOwnershipRequiredException() {
         Event event = Event.builder().organizer(provider).build();
-        when(eventService.find(1L)).thenReturn(event);
-
-        when(authService.getCurrentUser()).thenReturn(currentLoggedIn);
+        when(eventService.find(anyLong())).thenReturn(event);
 
         OwnershipRequiredException exception = assertThrows(OwnershipRequiredException.class,
                 () -> service.createReservation(request, 1L, 1L));
@@ -99,15 +103,12 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
-    @DisplayName("Should Throw EntityNotFoundException if service does not exist during reservation creation")
-    void testCreateReservationForNonExistingService() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(1, 0, 0), LocalTime.of(3, 0, 0), 100.0);
+    @DisplayName("Should throw EntityNotFoundException if service does not exist during reservation creation")
+    void givenNonExistingService_whenCreateReservation_thenThrowEntityNotFoundException() {
+        Event event = Event.builder().organizer(currentUser).build();
 
-        Event event = Event.builder().organizer(currentLoggedIn).build();
-
-        when(eventService.find(1L)).thenReturn(event);
-        when(serviceService.find(1L)).thenThrow(new EntityNotFoundException("Service not found"));
-        when(authService.getCurrentUser()).thenReturn(currentLoggedIn);
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(serviceService.find(anyLong())).thenThrow(new EntityNotFoundException("Service not found"));
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> service.createReservation(request, 1L, 1L));
@@ -118,22 +119,16 @@ public class ReservationServiceTest {
     @Test
     @Tag("exception-handling")
     @DisplayName("Should throw ReservationForPastEventException when trying to create a reservation for a past event")
-    void testCreateReservationForPastEvent() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(1, 0, 0), LocalTime.of(3, 0, 0), 100.0);
+    void givenPastEvent_whenCreateReservation_thenThrowEventInPastException() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().minusDays(3)).build();
+        when(eventService.find(anyLong())).thenReturn(event);
 
-        Event event = Event.builder().organizer(currentLoggedIn).date(LocalDate.now().minusDays(3)).build();
-        when(eventService.find(1L)).thenReturn(event);
+        Service service = Service.builder().provider(provider).isAvailable(true).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
 
-        Service service = Service.builder().provider(provider).build();
-        when(serviceService.find(1L)).thenReturn(service);
+        mockMapper(request, event, service);
 
-        Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
-        when(mapper.fromRequest(any(ReservationRequestDto.class), any(Event.class), any(Service.class))).thenReturn(reservation);
-
-        Company company = new Company();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
-
-        when(authService.getCurrentUser()).thenReturn(currentLoggedIn);
+        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
 
         ReservationForPastEventException exception = assertThrows(ReservationForPastEventException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -143,24 +138,21 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
-    @DisplayName("Should Throw InsufficientFundsException if planned amount is insufficient for service reservation")
-    void testCreateReservationForServiceWithInsufficientFunds() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(13, 0), LocalTime.of(14, 30), 100.0);
+    @DisplayName("Should throw InsufficientFundsException if planned amount is insufficient for service reservation")
+    void givenInsufficientFunds_whenCreateReservation_thenThrowInsufficientFundsException() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(15)).build();
+        when(eventService.find(anyLong())).thenReturn(event);
 
-        Event event = Event.builder().organizer(currentLoggedIn).date(LocalDate.now().plusDays(15)).build();
-        when(eventService.find(1L)).thenReturn(event);
+        Service service = Service.builder().provider(provider).reservationDeadline(10).price(150.0).minDuration(1).maxDuration(5).discount(0.0).isAvailable(true).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
 
-        Service service = Service.builder().provider(provider).reservationDeadline(10).price(150.0).minDuration(1).maxDuration(5).discount(0.0).build();
-        when(serviceService.find(1L)).thenReturn(service);
+        Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
+        when(mapper.fromRequest(request, event, service)).thenReturn(reservation);
 
-        when(mapper.fromRequest(request, event, service)).thenReturn(new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING));
-
-        Company company = Company.builder().id(1L).openingHours(LocalTime.of(12, 0)).closingHours(LocalTime.of(15, 0)).build();
+        Company company = Company.builder().id(1L).openingHours(LocalTime.of(11, 0)).closingHours(LocalTime.of(15, 0)).build();
         when(companyService.getByProviderId(anyLong())).thenReturn(company);
 
-        when(repository.exists((Specification<Reservation>) any())).thenReturn(false);
-
-        when(authService.getCurrentUser()).thenReturn(currentLoggedIn);
+        when(repository.exists(any(Specification.class))).thenReturn(false);
 
         InsufficientFundsException exception = assertThrows(InsufficientFundsException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -171,25 +163,25 @@ public class ReservationServiceTest {
     @Test
     @Tag("exception-handling")
     @DisplayName("Should throw ReservationDeadlineExceededException when reservation deadline has passed")
-    void testCreateReservationForExceededReservationDeadline() {
-        ReservationRequestDto request = new ReservationRequestDto(LocalTime.of(1, 0, 0), LocalTime.of(3, 0, 0), 1.0);
-
-        Event event = Event.builder().organizer(currentLoggedIn).date(LocalDate.now().plusDays(3)).build();
+    void givenExceededReservationDeadline_whenCreateReservation_thenThrowReservationDeadlineExceededException() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(3)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
-        Service service = Service.builder().provider(provider).reservationDeadline(5).build();
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        when(mapper.fromRequest(request, event, service)).thenReturn(new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING));
+        mockMapper(request, event, service);
 
-        Company company = new Company();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
-
-        when(authService.getCurrentUser()).thenReturn(currentLoggedIn);
+        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
 
         ReservationDeadlineExceededException exception = assertThrows(ReservationDeadlineExceededException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
 
         assertEquals("Reservation deadline has passed for this service!", exception.getMessage());
+    }
+
+    private void mockMapper(ReservationRequestDto request, Event event, Service service) {
+        Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
+        when(mapper.fromRequest(request, event, service)).thenReturn(reservation);
     }
 }
