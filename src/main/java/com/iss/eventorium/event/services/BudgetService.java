@@ -123,6 +123,9 @@ public class BudgetService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
 
+        if(budgetItem.getProcessedAt() != null)
+            throw new AlreadyProcessedException("Service is already reserved");
+
         budgetItem.setStatus(BudgetItemStatus.PROCESSED);
         budgetItem.setProcessedAt(LocalDateTime.now());
         budgetItemRepository.save(budgetItem);
