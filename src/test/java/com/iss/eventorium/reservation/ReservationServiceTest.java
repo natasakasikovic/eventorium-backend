@@ -22,13 +22,18 @@ import com.iss.eventorium.solution.services.ServiceService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.thymeleaf.context.IContext;
@@ -202,6 +207,7 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
+    @Tag("reservation-deadline")
     @DisplayName("Should throw ReservationDeadlineExceededException when reservation deadline has passed")
     void givenExceededReservationDeadline_whenCreateReservation_thenThrowReservationDeadlineExceededException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(3)).build();
@@ -218,6 +224,34 @@ public class ReservationServiceTest {
                 () -> this.service.createReservation(request, 1L, 1L));
 
         assertEquals("Reservation deadline has passed for this service!", exception.getMessage());
+    }
+
+    @Test
+    @Tag("reservation-deadline")
+    @DisplayName("Should allow reservation exactly on the reservation deadline")
+    public void givenReservationExactlyOnDeadline_whenValidateReservationDeadline_thenSuccess() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(10).isAvailable(true).minDuration(4).maxDuration(4).price(100.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+        mockDependenciesForSuccessfulReservation();
+
+        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+
+        this.service.createReservation(request, 1L, 1L);
+
+        verify(repository, times(1)).save(reservationCaptor.capture());
+        verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
+
+        Reservation savedReservation = reservationCaptor.getValue();
+        assertThat(savedReservation.getStartingTime()).isEqualTo(LocalTime.of(11, 0));
+        assertThat(savedReservation.getEndingTime()).isEqualTo(LocalTime.of(15, 0));
+        assertThat(savedReservation.getEvent()).isEqualTo(event);
+        assertThat(savedReservation.getService()).isEqualTo(service);
     }
 
     @ParameterizedTest
@@ -254,15 +288,10 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
+        mockDependenciesForSuccessfulReservation();
 
         Company company = Company.builder().openingHours(opening).closingHours(closing).build();
         when(companyService.getByProviderId(anyLong())).thenReturn(company);
-
-        when(repository.exists(any(Specification.class))).thenReturn(false);
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
-
-        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
-        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
 
         this.service.createReservation(request, 1L, 1L);
 
@@ -328,12 +357,7 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-
-        when(repository.exists(any(Specification.class))).thenReturn(false);
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
-
-        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
-        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
+        mockDependenciesForSuccessfulReservation();
 
         Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
         when(companyService.getByProviderId(anyLong())).thenReturn(company);
@@ -360,12 +384,7 @@ public class ReservationServiceTest {
 
         ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
         mockMapper(requestDto, event, service);
-
-        when(repository.exists(any(Specification.class))).thenReturn(false);
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
-
-        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
-        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
+        mockDependenciesForSuccessfulReservation();
 
         Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
         when(companyService.getByProviderId(anyLong())).thenReturn(company);
@@ -422,5 +441,13 @@ public class ReservationServiceTest {
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {
         Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
         when(mapper.fromRequest(request, event, service)).thenReturn(reservation);
+    }
+
+    private void mockDependenciesForSuccessfulReservation() {
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
+
+        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
+        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
     }
 }
