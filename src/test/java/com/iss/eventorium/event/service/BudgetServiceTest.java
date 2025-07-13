@@ -18,10 +18,7 @@ import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
-import com.iss.eventorium.solution.models.Product;
-import com.iss.eventorium.solution.models.Reservation;
-import com.iss.eventorium.solution.models.Service;
-import com.iss.eventorium.solution.models.SolutionType;
+import com.iss.eventorium.solution.models.*;
 import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
@@ -33,6 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -71,6 +71,9 @@ class BudgetServiceTest {
 
     @InjectMocks
     private BudgetService budgetService;
+
+    @Captor
+    private ArgumentCaptor<BudgetItem> budgetItemCaptor;
 
 
     @ParameterizedTest
@@ -452,17 +455,11 @@ class BudgetServiceTest {
         service.setPrice(100.0);
         service.setDiscount(0.0);
 
-        User oranizer = User.builder().id(1L).build();
-        Event event = new Event();
-        event.setId(DEFAULT_EVENT_ID);
-        event.setBudget(new Budget());
-        event.setOrganizer(oranizer);
+        Event event = createEvent(new Budget());
 
         Reservation reservation = new Reservation();
         reservation.setService(service);
         reservation.setEvent(event);
-
-        when(authService.getCurrentUser()).thenReturn(oranizer);
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -579,6 +576,80 @@ class BudgetServiceTest {
         assertEquals("Solution is already processed", exception.getMessage());
     }
 
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideReservationTypeAndExpectedStatus")
+    @Tag("add-reservation")
+    void givenReservation_whenAddToReservationAsBudgetItem_thenEventIsSaved(
+            ReservationType type,
+            BudgetItemStatus expectedStatus
+    ) {
+        Service service = createService(type);
+        Budget budget = mock(Budget.class);
+        Event event = createEvent(budget);
+
+        Reservation reservation = new Reservation();
+        reservation.setEvent(event);
+        reservation.setService(service);
+
+        budgetService.addReservationAsBudgetItem(reservation, 200.0);
+
+        verify(budget).addItem(budgetItemCaptor.capture());
+        BudgetItem item = budgetItemCaptor.getValue();
+
+        assertReservationStatus(item, expectedStatus);
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideReservationTypeAndExpectedStatus")
+    @Tag("add-reservation")
+    void givenExistingReservation_whenAddToReservationAsBudgetItem_thenEventIsSaved(
+            ReservationType type,
+            BudgetItemStatus expectedStatus
+    ) {
+        Service service = createService(type);
+        BudgetItem budgetItem = mock(BudgetItem.class);
+        when(budgetItem.getSolution()).thenReturn(service);
+
+        Budget budget = new Budget();
+        budget.addItem(budgetItem);
+        Event event = createEvent(budget);
+
+        Reservation reservation = new Reservation();
+        reservation.setEvent(event);
+        reservation.setService(service);
+
+        budgetService.addReservationAsBudgetItem(reservation, 200.0);
+
+        verify(budgetItem).setStatus(expectedStatus);
+        verify(eventRepository, times(1)).save(event);
+    }
+
+    @Test
+    @Tag("add-reservation")
+    void givenProcessedItem_whenAddReservationAsBudgetItem_thenThrowAlreadyProcessedException() {
+        Service service = createService(ReservationType.AUTOMATIC);
+
+        BudgetItem budgetItem = mock(BudgetItem.class);
+        when(budgetItem.getSolution()).thenReturn(service);
+        when(budgetItem.getProcessedAt()).thenReturn(LocalDateTime.now());
+        when(budgetItem.getSolution()).thenReturn(service);
+
+        Budget budget = new Budget();
+        budget.addItem(budgetItem);
+        Event event = createEvent(budget);
+
+        Reservation reservation = new Reservation();
+        reservation.setEvent(event);
+        reservation.setService(service);
+
+        AlreadyProcessedException exception = assertThrows(
+                AlreadyProcessedException.class,
+                () -> budgetService.addReservationAsBudgetItem(reservation, 200.0)
+        );
+        assertEquals("Solution is already processed", exception.getMessage());
+    }
+
 
     private Product mockProduct(double price, double discount) {
         Product product = mock(Product.class);
@@ -586,6 +657,24 @@ class BudgetServiceTest {
         when(product.getDiscount()).thenReturn(discount);
         when(productService.find(anyLong())).thenReturn(product);
         return product;
+    }
+
+    private Event createEvent(Budget budget) {
+        Event event = new Event();
+        event.setId(DEFAULT_EVENT_ID);
+        event.setOrganizer(User.builder().id(1L).build());
+        event.setBudget(budget);
+        when(authService.getCurrentUser()).thenReturn(User.builder().id(1L).build());
+        return event;
+    }
+
+    private Service createService(ReservationType type) {
+        Service service = new Service();
+        service.setId(DEFAULT_BUDGET_ITEM_ID);
+        service.setPrice(100.0);
+        service.setType(type);
+        service.setDiscount(0.0);
+        return service;
     }
 
     private BudgetItem mockProductBudgetItemProcessedAt(LocalDateTime processedAt) {
@@ -604,6 +693,13 @@ class BudgetServiceTest {
 
     private BudgetItemRequestDto createRequest(double plannedAmount) {
         return BudgetItemRequestDto.builder().itemId(1L).plannedAmount(plannedAmount).build();
+    }
+
+    private void assertReservationStatus(BudgetItem item, BudgetItemStatus expectedStatus) {
+        if (expectedStatus == BudgetItemStatus.PROCESSED)
+            assertNotNull(item.getProcessedAt());
+        else
+            assertNull(item.getProcessedAt());
     }
 
     private Event mockEvent(Budget budget) {
