@@ -102,9 +102,7 @@ class BudgetServiceTest {
     @Test
     @Tag("purchase-product")
     void givenUserIsNotEventOwner_thenThrowsOwnershipRequiredException() {
-        Product product = new Product();
-        product.setPrice(100.0);
-        product.setDiscount(0.0);
+        Product product = createProduct(100.0, 0.0);
         when(productService.find(anyLong())).thenReturn(product);
 
         BudgetItem item = new BudgetItem();
@@ -160,14 +158,12 @@ class BudgetServiceTest {
     @Tag("purchase-product")
     void givenProductDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         BudgetItemRequestDto request = createRequest(100.0);
-
         when(productService.find(anyLong())).thenThrow(new EntityNotFoundException("Product not found"));
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
                 () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request)
         );
-
         assertEquals("Product not found", exception.getMessage());
     }
 
@@ -190,11 +186,7 @@ class BudgetServiceTest {
     @Tag("purchase-product")
     void givenProcessedProduct_whenPurchaseProduct_thenThrowAlreadyProcessedException() {
         BudgetItemRequestDto request = createRequest(100.0);
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setPrice(100.0);
-        product.setDiscount(50.0);
+        Product product = createProduct(100.0, 50.0);
         when(productService.find(anyLong())).thenReturn(product);
 
         BudgetItem processedItem = new BudgetItem();
@@ -219,11 +211,7 @@ class BudgetServiceTest {
     @Tag("purchase-product")
     void givenNotProcessedProduct_whenPurchaseProduct_thenReturnPurchasedProduct() {
         BudgetItemRequestDto request = createRequest(200.0);
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setPrice(100.0);
-        product.setDiscount(50.0);
+        Product product = createProduct(120.0, 50.0);
         when(productService.find(anyLong())).thenReturn(product);
         when(productMapper.toResponse(product)).thenReturn(ProductResponseDto.builder().id(1L).build());
 
@@ -299,7 +287,6 @@ class BudgetServiceTest {
                 AlreadyProcessedException.class,
                 () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request)
         );
-
         assertEquals("Solution is already processed", exception.getMessage());
     }
 
@@ -316,7 +303,6 @@ class BudgetServiceTest {
                 InsufficientFundsException.class,
                 () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request)
         );
-
         assertEquals("You do not have enough funds for this purchase/reservation!", exception.getMessage());
     }
 
@@ -330,7 +316,6 @@ class BudgetServiceTest {
                 EntityNotFoundException.class,
                 () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request)
         );
-
         assertEquals("Event not found", exception.getMessage());
     }
 
@@ -413,11 +398,7 @@ class BudgetServiceTest {
     @Test
     @Tag("mark-reservation")
     void givenValidReservationWithMatchingServiceBudgetItem_whenMarkAsReserved_thenSetStatusAsProcessed() {
-        Service service = new Service();
-        service.setId(DEFAULT_BUDGET_ITEM_ID);
-        service.setPrice(100.0);
-        service.setDiscount(0.0);
-
+        Service service = createService(ReservationType.AUTOMATIC);
         BudgetItem item = mock(BudgetItem.class);
         Reservation reservation = createReservationProcessedAt(null, item, service);
 
@@ -432,11 +413,7 @@ class BudgetServiceTest {
     @Test
     @Tag("mark-reservation")
     void givenAlreadyProcessedBudgetItem_whenMarkAsReserved_thenThrowAlreadyProcessedException() {
-        Service service = new Service();
-        service.setId(DEFAULT_BUDGET_ITEM_ID);
-        service.setPrice(100.0);
-        service.setDiscount(0.0);
-
+        Service service = createService(ReservationType.AUTOMATIC);
         BudgetItem item = mock(BudgetItem.class);
         Reservation reservation = createReservationProcessedAt(LocalDateTime.now(), item, service);
 
@@ -450,11 +427,7 @@ class BudgetServiceTest {
     @Test
     @Tag("mark-reservation")
     void givenMissingServiceBudgetItem_whenMarkAsReserved_thenThrowEntityNotFoundException() {
-        Service service = new Service();
-        service.setId(DEFAULT_BUDGET_ITEM_ID);
-        service.setPrice(100.0);
-        service.setDiscount(0.0);
-
+        Service service = createService(ReservationType.AUTOMATIC);
         Event event = createEvent(new Budget());
 
         Reservation reservation = new Reservation();
@@ -471,9 +444,7 @@ class BudgetServiceTest {
     @Test
     @Tag("create-budget-item")
     void givenValidItem_whenCreateBudgetItem_thenReturnCreatedBudgetItem() {
-        Product product = new Product();
-        product.setPrice(100.0);
-        product.setDiscount(0.0);
+        Product product = createProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(120.0);
         BudgetItem item = new BudgetItem();
         Budget budget = mock(Budget.class);
@@ -509,15 +480,12 @@ class BudgetServiceTest {
     @Test
     @Tag("create-budget-item")
     void givenInsufficientFunds_whenCreateBudgetItem_thenThrowInsufficientFundsException() {
-        Product product = new Product();
-        product.setPrice(120.0);
-        product.setDiscount(0.0);
+        Product product = createProduct(120.0, 0.0);
         BudgetItemRequestDto request = createRequest(0.0);
         Budget budget = new Budget();
         budget.setItems(Collections.emptyList());
         mockEvent(budget);
         when(solutionService.find(anyLong())).thenReturn(product);
-
 
         InsufficientFundsException exception = assertThrows(
                 InsufficientFundsException.class,
@@ -530,10 +498,7 @@ class BudgetServiceTest {
     @Tag("create-budget-item")
     void givenPlannedBudgetItem_whenCreateBudgetItem_thenUpdatePlannedAmount() {
         double plannedAmount = 200.0;
-        Product product = new Product();
-        product.setId(DEFAULT_BUDGET_ITEM_ID);
-        product.setPrice(120.0);
-        product.setDiscount(0.0);
+        Product product = createProduct(120.0, 0.0);
         BudgetItem item = mock(BudgetItem.class);
         when(item.getSolution()).thenReturn(product);
 
@@ -553,11 +518,7 @@ class BudgetServiceTest {
     @Test
     @Tag("create-budget-item")
     void givenProcessedBudgetItem_whenCreateBudgetItem_thenThrowAlreadyProcessedException() {
-        Product product = new Product();
-        product.setId(DEFAULT_BUDGET_ITEM_ID);
-        product.setPrice(120.0);
-        product.setDiscount(0.0);
-
+        Product product = createProduct(120.0, 0.0);
         BudgetItem item = new BudgetItem();
         item.setPlannedAmount(200.0);
         item.setSolution(product);
@@ -677,11 +638,16 @@ class BudgetServiceTest {
         return service;
     }
 
-    private BudgetItem mockProductBudgetItemProcessedAt(LocalDateTime processedAt) {
+    private Product createProduct(double price, double discount) {
         Product product = new Product();
-        product.setId(1L);
-        product.setPrice(100.0);
-        product.setDiscount(50.0);
+        product.setId(DEFAULT_BUDGET_ITEM_ID);
+        product.setPrice(price);
+        product.setDiscount(discount);
+        return product;
+    }
+
+    private BudgetItem mockProductBudgetItemProcessedAt(LocalDateTime processedAt) {
+        Product product = createProduct(100.0, 0.0);
 
         BudgetItem item = mock(BudgetItem.class);
         when(item.getProcessedAt()).thenReturn(processedAt);
