@@ -7,6 +7,7 @@ import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
 import com.iss.eventorium.event.exceptions.EmptyAgendaException;
+import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.models.Activity;
@@ -15,6 +16,7 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.services.PdfService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
@@ -22,7 +24,6 @@ import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -110,7 +111,6 @@ class EventServiceTest {
     }
 
     @Test
-    @Tag("create-agenda")
     @DisplayName("Should update and save event with given valid agenda data")
     void givenValidActivities_whenCreateAgenda_thenEventIsUpdatedAndSavedCorrectly() {
 
@@ -136,7 +136,6 @@ class EventServiceTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.EventProvider#provideInvalidTimeRanges")
-    @Tag("create-agenda")
     @DisplayName("Should throw exception for invalid activity time range")
     void givenInvalidActivityTimeRange_whenCreateAgenda_thenThrowsInvalidTimeRangeException(LocalTime startTime,
                                                                                             LocalTime endTime,
@@ -159,7 +158,6 @@ class EventServiceTest {
     }
 
     @Test
-    @Tag("create-agenda")
     @DisplayName("Should throw exception when agenda has no activities")
     void givenNoActivities_whenCreateAgenda_shouldThrowEmptyAgendaException() {
         List<ActivityRequestDto> requests = new ArrayList<>();
@@ -171,7 +169,6 @@ class EventServiceTest {
     }
 
     @Test
-    @Tag("create-agenda")
     @DisplayName("Should throw exception when agenda is already defined")
     void givenEventWithAgenda_whenCreateAgenda_shouldThrowAgendaAlreadyDefinedException() {
         event.setActivities(List.of(new Activity()));
@@ -186,12 +183,39 @@ class EventServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw OwnershipRequiredException when user tries to add agenda to an event they do not own")
+    void givenUserIsNotEventOwner_whenCreateAgenda_thenThrowsOwnershipRequiredException() {
+        event.setOrganizer(User.builder().id(999L).build());
+        when(authService.getCurrentUser()).thenReturn(currentUser);
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
+
+        OwnershipRequiredException exception = assertThrows(OwnershipRequiredException.class,
+                () -> eventService.createAgenda(EVENT_ID, List.of(new ActivityRequestDto())));
+
+        assertEquals("You are not authorized to manage this event.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when event's state is not valid - draft is false")
+    void givenEventIsNotDraft_whenCreateAgenda_thenThrowsInvalidEventStateException() {
+        event.setDraft(false);
+        when(authService.getCurrentUser()).thenReturn(currentUser);
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
+
+        InvalidEventStateException exception = assertThrows(InvalidEventStateException.class,
+                () -> eventService.createAgenda(EVENT_ID, List.of(new ActivityRequestDto())));
+
+        assertEquals("Cannot add agenda to event with name First Event", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("Should generate guest list PDF for valid event")
     void givenValidEventId_whenGenerateGuestListPdf_thenReturnPdfBytes() {
 
         List<User> guests = List.of(new User(), new User());
         byte[] pdfBytes = new byte[]{1, 2, 3};
 
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         when(userService.findByEventAttendance(EVENT_ID)).thenReturn(guests);
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
         when(pdfService.generate(anyString(), eq(guests), anyMap())).thenReturn(pdfBytes);
@@ -205,18 +229,10 @@ class EventServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw exception while generating guest list for event that does not exist")
-    void givenInvalidEventId_whenGenerateGuestListPdf_thenThrowsEntityNotFoundException() {
-        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> eventService.generateGuestListPdf(EVENT_ID))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Event not found");
-    }
-
-    @Test
     @DisplayName("Should generate empty guest list PDF when no attendees are found - there is no exception as expected")
     void shouldGeneratePdfWithNoGuestsWhenAttendanceIsEmpty() {
 
+        when(authService.getCurrentUser()).thenReturn(currentUser);
         when(userService.findByEventAttendance(EVENT_ID)).thenReturn(Collections.emptyList());
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
         when(pdfService.generate(anyString(), eq(Collections.emptyList()), anyMap())).thenReturn(new byte[]{0, 1, 2});
@@ -225,6 +241,29 @@ class EventServiceTest {
 
         assertNotNull(result);
         verify(pdfService).generate(eq("/templates/guest-list-pdf.jrxml"), eq(Collections.emptyList()), anyMap());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when user tries to generate guest list PDF for event they don't own")
+    void givenUserIsNotEventOwner_whenGeneratingGuestList_thenThrowsOwnershipRequiredException() {
+        event.setOrganizer(User.builder().id(999L).build());
+        when(authService.getCurrentUser()).thenReturn(currentUser);
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
+
+        OwnershipRequiredException exception = assertThrows(OwnershipRequiredException.class,
+                () -> eventService.generateGuestListPdf(EVENT_ID));
+
+        assertEquals("You are not authorized to manage this event.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw exception when event does not exist")
+    void givenEventDoesNotExist_thenThrowsEntityNotFoundException() {
+        when(authService.getCurrentUser()).thenReturn(currentUser);
+        when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> eventService.generateGuestListPdf(EVENT_ID));
+        assertEquals("Event not found", exception.getMessage());
     }
 
 }

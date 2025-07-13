@@ -276,6 +276,7 @@ public class EventService {
     }
 
     public byte[] generateGuestListPdf(Long id) {
+        assertOwnership(find(id));
         List<User> guests = userService.findByEventAttendance(id);
         return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
     }
