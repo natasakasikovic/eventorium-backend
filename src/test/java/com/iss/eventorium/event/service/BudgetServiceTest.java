@@ -23,7 +23,10 @@ import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.solution.services.SolutionService;
+import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +62,8 @@ class BudgetServiceTest {
     private EventRepository eventRepository;
     @Mock
     private BudgetItemRepository budgetItemRepository;
-
+    @Mock
+    private AuthService authService;
     @Mock
     private BudgetMapper mapper;
     @Mock
@@ -67,6 +71,13 @@ class BudgetServiceTest {
 
     @InjectMocks
     private BudgetService budgetService;
+
+    private User organizer;
+
+    @BeforeEach
+    void setup() {
+        organizer = User.builder().id(1L).build();
+    }
 
     @ParameterizedTest
     @CsvSource({
@@ -89,6 +100,17 @@ class BudgetServiceTest {
                 () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request)
         );
         assertEquals("You do not have enough funds for this purchase!", exception.getMessage());
+    }
+
+    @Test
+    @Tag("purchase-product")
+    void givenUserIsNotEventOwner_whenPurchaseProduct_thenThrowsOwnershipRequiredException() {
+        User user = User.builder().id(999L).build();
+        Event event = mock(Event.class);
+        when(event.getOrganizer()).thenReturn(user);
+        when(authService.getCurrentUser()).thenReturn(organizer);
+
+        budgetService.purchaseProduct(DEFAULT_EVENT_ID, createRequest(100.0));
     }
 
     @ParameterizedTest
@@ -564,6 +586,8 @@ class BudgetServiceTest {
         Event event = mock(Event.class);
         when(eventService.find(anyLong())).thenReturn(event);
         when(event.getBudget()).thenReturn(budget);
+        when(event.getOrganizer()).thenReturn(organizer);
+        when(authService.getCurrentUser()).thenReturn(organizer);
         return event;
     }
 

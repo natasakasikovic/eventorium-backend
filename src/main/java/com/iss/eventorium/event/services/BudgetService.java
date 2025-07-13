@@ -12,6 +12,7 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
+import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
 import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
@@ -54,13 +55,15 @@ public class BudgetService {
     private final EntityManager entityManager;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
+        Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         Product product = productService.find(request.getItemId());
         double netPrice = calculateNetPrice(product);
         if(netPrice > request.getPlannedAmount()) {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
         }
 
-        Event event = eventService.find(eventId);
         updateBudget(event, mapper.fromRequest(request, product));
         return productMapper.toResponse(product);
     }
@@ -68,12 +71,14 @@ public class BudgetService {
     public List<BudgetSuggestionResponseDto> getBudgetSuggestions(Long eventId, Long categoryId, double price) {
         Category category = categoryService.find(categoryId);
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         List<Solution> solutions = solutionService.findSuggestions(category, price, event.getDate());
         return solutions.stream().map(mapper::toSuggestionResponse).toList();
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
         return mapper.toResponse(budget);
     }
@@ -136,6 +141,8 @@ public class BudgetService {
         Session session = entityManager.unwrap(Session.class);
         session.disableFilter("activeFilter");
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         List<BudgetItem> items = event.getBudget().getItems();
         for(BudgetItem item : items) {
             if(item.getProcessedAt() != null) {
@@ -149,6 +156,7 @@ public class BudgetService {
 
     public BudgetItemResponseDto createBudgetItem(Long eventId, BudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
 
         BudgetItem item = budget.getItems().stream()
@@ -179,6 +187,7 @@ public class BudgetService {
 
     public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
 
@@ -195,6 +204,8 @@ public class BudgetService {
 
     public void deleteBudgetItem(Long eventId, Long itemId) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
         if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
@@ -206,6 +217,8 @@ public class BudgetService {
 
     public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         Budget budget = event.getBudget();
         List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
         budget.setActiveCategories(new ArrayList<>(categories));
@@ -264,5 +277,11 @@ public class BudgetService {
 
     private double calculateNetPrice(Solution solution) {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
+    }
+
+    private void assertOwnership(Event event) {
+        User organizer = authService.getCurrentUser();
+        if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
+            throw new ForbiddenEditException("You are not authorized to change this event.");
     }
 }
