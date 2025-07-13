@@ -12,10 +12,7 @@ import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.services.EmailService;
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
-import com.iss.eventorium.solution.exceptions.ReservationDeadlineExceededException;
-import com.iss.eventorium.solution.exceptions.ReservationForPastEventException;
-import com.iss.eventorium.solution.exceptions.ReservationOutsideWorkingHoursException;
-import com.iss.eventorium.solution.exceptions.ServiceNotAvailableException;
+import com.iss.eventorium.solution.exceptions.*;
 import com.iss.eventorium.solution.mappers.ReservationMapper;
 import com.iss.eventorium.solution.models.Reservation;
 import com.iss.eventorium.solution.models.Service;
@@ -279,6 +276,110 @@ public class ReservationServiceTest {
         assertThat(savedReservation.getService()).isEqualTo(service);
     }
 
+    @ParameterizedTest
+    @MethodSource("provideInvalidReservations")
+    @Tag("exception-handling")
+    @Tag("service-duration")
+    public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(LocalTime startingTime, LocalTime endingTime) {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
+        mockMapper(requestDto, event, service);
+
+        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+
+        InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
+                () -> this.service.createReservation(requestDto, 1L, 1L));
+
+        assertEquals(String.format("The service duration must be between %d and %d hours.", service.getMinDuration(), service.getMaxDuration()), exception.getMessage());
+    }
+
+    @Test
+    @Tag("exception-handling")
+    @Tag("service-duration")
+    public void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(6).maxDuration(6).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+
+        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+
+        InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
+                () -> this.service.createReservation(request, 1L, 1L));
+
+        assertEquals(String.format("The service duration must be exactly %d hours.", service.getMinDuration()) , exception.getMessage());
+    }
+
+    @Test
+    @Tag("service-duration")
+    public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(4).maxDuration(4).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
+
+        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
+        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
+
+        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+
+        this.service.createReservation(request, 1L, 1L);
+
+        verify(repository, times(1)).save(reservationCaptor.capture());
+        verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
+
+        Reservation saved = reservationCaptor.getValue();
+        assertEquals(request.getStartingTime(), saved.getStartingTime());
+        assertEquals(request.getEndingTime(), saved.getEndingTime());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideValidReservations")
+    @Tag("service-duration")
+    public void givenDurationBetweenMinimumAndMaximum_whenValidateServiceDuration_thenSuccess(LocalTime startingTime, LocalTime endingTime) {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
+        mockMapper(requestDto, event, service);
+
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("dummy-content");
+
+        doNothing().when(emailService).sendSimpleMail(any(EmailDetails.class));
+        doNothing().when(budgetService).addReservationAsBudgetItem(any(Reservation.class), anyDouble());
+
+        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+
+        this.service.createReservation(requestDto, 1L, 1L);
+
+        verify(repository, times(1)).save(reservationCaptor.capture());
+        verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
+
+        Reservation saved = reservationCaptor.getValue();
+        assertEquals(startingTime, saved.getStartingTime());
+        assertEquals(endingTime, saved.getEndingTime());
+    }
+
     // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00. Each case defines different company working hours to verify correct behavior around working hours boundaries.
     private static Stream<Arguments> provideValidWorkingHours() {
         return Stream.of(
@@ -289,11 +390,32 @@ public class ReservationServiceTest {
         );
     }
 
+    // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00.
     private static Stream<Arguments> provideReservationsOutsideWorkingHours() {
         return Stream.of(
                 Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59)), // Company closes one minute before reservation ends (closing at 14:59, reservation ends at 15:00)
                 Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0)), // Company opens one minute after reservation starts (opening at 11:01, reservation starts at 11:00)
                 Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30))  // Company working hours completely outside the reservation request (company 6:00 - 10:30, reservation 11:00 - 15:00)
+        );
+    }
+
+    // NOTE:  This method is used to test reservation durations against a service that allows durations between 2 and 6 hours (inclusive).
+    private static Stream<Arguments> provideValidReservations() {
+        return Stream.of(
+                Arguments.of(LocalTime.of(10, 0), LocalTime.of(12, 0)), // Exactly 2 hours (minimum valid duration)
+                Arguments.of(LocalTime.of(13, 0), LocalTime.of(17, 0)), // Exactly 4 hours (within range)
+                Arguments.of(LocalTime.of(10, 0), LocalTime.of(16, 0)) // Exactly 6 hours (maximum valid duration)
+        );
+    }
+
+    // NOTE: Provides invalid reservation time ranges for testing the validation of service duration.
+    // This method is used to test reservation durations against a service  that allows durations between 2 and 6 hours.
+    private static Stream<Arguments> provideInvalidReservations() {
+        return Stream.of(
+                Arguments.of(LocalTime.of(10, 0), LocalTime.of(11, 59)), // One minute shorter than the minimum allowed duration (1h 59min)
+                Arguments.of(LocalTime.of(9, 0), LocalTime.of(15, 1)),   // one minute longer than the maximum allowed duration (6h 1min)
+                Arguments.of(LocalTime.of(12, 0), LocalTime.of(12, 0)),  // Duration of exactly zero hours (start and end time are the same)
+                Arguments.of(LocalTime.of(14, 0), LocalTime.of(13, 0))   // Negative duration
         );
     }
 
