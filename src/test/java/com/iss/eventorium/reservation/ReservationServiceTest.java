@@ -172,8 +172,7 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-
-        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+        mockCompanyWorkingHours(null, null);
 
         ReservationForPastEventException exception = assertThrows(ReservationForPastEventException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -183,6 +182,7 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
+    @Tag("service-funds")
     @DisplayName("Should throw InsufficientFundsException if planned amount is insufficient for service reservation")
     void givenInsufficientFunds_whenCreateReservation_thenThrowInsufficientFundsException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(15)).build();
@@ -191,11 +191,8 @@ public class ReservationServiceTest {
         Service service = Service.builder().provider(provider).reservationDeadline(10).price(150.0).minDuration(1).maxDuration(5).discount(0.0).isAvailable(true).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
-        when(mapper.fromRequest(request, event, service)).thenReturn(reservation);
-
-        Company company = Company.builder().id(1L).openingHours(LocalTime.of(11, 0)).closingHours(LocalTime.of(15, 0)).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+        mockMapper(request, event, service);
+        mockCompanyWorkingHours(LocalTime.of(11, 0), LocalTime.of(15, 0));
 
         when(repository.exists(any(Specification.class))).thenReturn(false);
 
@@ -203,6 +200,32 @@ public class ReservationServiceTest {
                 () -> this.service.createReservation(request, 1L, 1L));
 
         assertEquals("You do not have enough funds for this reservation!", exception.getMessage());
+    }
+
+    @Test
+    @Tag("service-funds")
+    @DisplayName("Should allow reservation when planned amount is exactly equal to service price")
+    public void givenPlannedAmountEqualsServicePrice_whenCreateReservation_thenSuccess() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(4).maxDuration(4).price(100.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+        mockDependenciesForSuccessfulReservation();
+
+        this.service.createReservation(request, 1L, 1L);
+
+        verify(repository, times(1)).save(reservationCaptor.capture());
+        verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
+
+        Reservation savedReservation = reservationCaptor.getValue();
+        assertThat(savedReservation.getStartingTime()).isEqualTo(LocalTime.of(11, 0));
+        assertThat(savedReservation.getEndingTime()).isEqualTo(LocalTime.of(15, 0));
+        assertThat(savedReservation.getEvent()).isEqualTo(event);
+        assertThat(savedReservation.getService()).isEqualTo(service);
     }
 
     @Test
@@ -217,8 +240,7 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-
-        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+        mockCompanyWorkingHours(null, null);
 
         ReservationDeadlineExceededException exception = assertThrows(ReservationDeadlineExceededException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -238,9 +260,7 @@ public class ReservationServiceTest {
 
         mockMapper(request, event, service);
         mockDependenciesForSuccessfulReservation();
-
-        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
 
         this.service.createReservation(request, 1L, 1L);
 
@@ -266,22 +286,20 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-
-        Company company = Company.builder().openingHours(opening).closingHours(closing).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+        mockCompanyWorkingHours(opening, closing);
 
         ReservationOutsideWorkingHoursException exception = assertThrows(ReservationOutsideWorkingHoursException.class,
                 () -> this.service.createReservation(request, 1L, 1L)
         );
 
-        assertEquals(String.format("Reservations can only be made between %s and %s", company.getOpeningHours(), company.getClosingHours()), exception.getMessage());
+        assertEquals(String.format("Reservations can only be made between %s and %s", opening, closing), exception.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("provideValidWorkingHours")
     @Tag("working-hours")
     void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
-        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).address("test-address").city(city).build();
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).price(10.0).discount(0.0).build();
@@ -289,9 +307,7 @@ public class ReservationServiceTest {
 
         mockMapper(request, event, service);
         mockDependenciesForSuccessfulReservation();
-
-        Company company = Company.builder().openingHours(opening).closingHours(closing).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
+        mockCompanyWorkingHours(opening, closing);
 
         this.service.createReservation(request, 1L, 1L);
 
@@ -318,8 +334,7 @@ public class ReservationServiceTest {
 
         ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
         mockMapper(requestDto, event, service);
-
-        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+        mockCompanyWorkingHours(null, null);
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
                 () -> this.service.createReservation(requestDto, 1L, 1L));
@@ -338,8 +353,7 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-
-        when(companyService.getByProviderId(anyLong())).thenReturn(new Company());
+        mockCompanyWorkingHours(null, null); // working hours are not that important, because exception will occur before this validation
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -357,10 +371,8 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
         mockDependenciesForSuccessfulReservation();
-
-        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
 
         this.service.createReservation(request, 1L, 1L);
 
@@ -384,10 +396,8 @@ public class ReservationServiceTest {
 
         ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
         mockMapper(requestDto, event, service);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
         mockDependenciesForSuccessfulReservation();
-
-        Company company = Company.builder().openingHours(LocalTime.of(7, 0)).closingHours(LocalTime.of(17, 0)).build();
-        when(companyService.getByProviderId(anyLong())).thenReturn(company);
 
         this.service.createReservation(requestDto, 1L, 1L);
 
@@ -441,6 +451,11 @@ public class ReservationServiceTest {
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {
         Reservation reservation = new Reservation(1L, event, service, request.getStartingTime(), request.getEndingTime(), false, Status.PENDING);
         when(mapper.fromRequest(request, event, service)).thenReturn(reservation);
+    }
+
+    private void mockCompanyWorkingHours(LocalTime opening, LocalTime closing) {
+        Company company = Company.builder().openingHours(opening).closingHours(closing).build();
+        when(companyService.getByProviderId(anyLong())).thenReturn(company);
     }
 
     private void mockDependenciesForSuccessfulReservation() {
