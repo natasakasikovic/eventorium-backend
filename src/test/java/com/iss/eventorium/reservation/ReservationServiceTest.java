@@ -409,6 +409,27 @@ public class ReservationServiceTest {
         assertEquals(endingTime, saved.getEndingTime());
     }
 
+    @Test
+    @Tag("exception-handling")
+    @DisplayName("Should throw ReservationConflictException when reservation overlaps with an existing one")
+    public void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockMapper(request, event, service);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+
+        when(repository.exists(any(Specification.class))).thenReturn(true);
+
+        ReservationConflictException exception = assertThrows(ReservationConflictException.class,
+                () -> this.service.createReservation(request, 1L, 1L));
+
+        assertEquals("The selected time slot for this service is already occupied. Please choose a different time.", exception.getMessage());
+    }
+
     // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00. Each case defines different company working hours to verify correct behavior around working hours boundaries.
     private static Stream<Arguments> provideValidWorkingHours() {
         return Stream.of(
