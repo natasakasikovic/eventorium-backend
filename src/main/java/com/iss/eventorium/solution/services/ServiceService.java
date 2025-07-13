@@ -8,8 +8,8 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
@@ -202,7 +202,7 @@ public class ServiceService {
     private void assertOwnership(Service service) {
         User provider = authService.getCurrentUser();
         if(!Objects.equals(provider.getId(), service.getProvider().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this service.");
+            throw new OwnershipRequiredException("You are not authorized to change this service.");
         }
     }
 }
