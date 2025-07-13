@@ -15,6 +15,7 @@ import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.services.BudgetService;
 import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
 import com.iss.eventorium.solution.models.Product;
@@ -26,7 +27,6 @@ import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,12 +72,6 @@ class BudgetServiceTest {
     @InjectMocks
     private BudgetService budgetService;
 
-    private User organizer;
-
-    @BeforeEach
-    void setup() {
-        organizer = User.builder().id(1L).build();
-    }
 
     @ParameterizedTest
     @CsvSource({
@@ -104,13 +98,31 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
-    void givenUserIsNotEventOwner_whenPurchaseProduct_thenThrowsOwnershipRequiredException() {
-        User user = User.builder().id(999L).build();
-        Event event = mock(Event.class);
-        when(event.getOrganizer()).thenReturn(user);
-        when(authService.getCurrentUser()).thenReturn(organizer);
+    void givenUserIsNotEventOwner_thenThrowsOwnershipRequiredException() {
+        Product product = new Product();
+        product.setPrice(100.0);
+        product.setDiscount(0.0);
+        when(productService.find(anyLong())).thenReturn(product);
 
-        budgetService.purchaseProduct(DEFAULT_EVENT_ID, createRequest(100.0));
+        BudgetItem item = new BudgetItem();
+        item.setSolution(product);
+        item.setPlannedAmount(200.0);
+
+        Budget budget = new Budget();
+        budget.addItem(item);
+
+        Event event = mock(Event.class);
+        User user = User.builder().id(999L).build();
+        when(event.getOrganizer()).thenReturn(user);
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(authService.getCurrentUser()).thenReturn(User.builder().id(1L).build());
+
+        BudgetItemRequestDto request = createRequest(100.0);
+        OwnershipRequiredException exception = assertThrows(
+                OwnershipRequiredException.class,
+                () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request)
+        );
+        assertEquals("You are not authorized to change this event.", exception.getMessage());
     }
 
     @ParameterizedTest
@@ -137,6 +149,7 @@ class BudgetServiceTest {
 
         budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
 
+        verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(event);
     }
 
@@ -224,6 +237,7 @@ class BudgetServiceTest {
         ProductResponseDto response = budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
         assertNotNull(response);
         assertEquals(1L, response.getId());
+        verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(any(Event.class));
     }
 
@@ -246,6 +260,7 @@ class BudgetServiceTest {
         when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
 
         BudgetResponseDto response = budgetService.getBudget(DEFAULT_EVENT_ID);
+        verify(authService, times(1)).getCurrentUser();
         assertNotNull(response);
     }
 
@@ -263,6 +278,7 @@ class BudgetServiceTest {
         budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(item).setPlannedAmount(200.0);
+        verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(any(Event.class));
     }
 
@@ -342,7 +358,8 @@ class BudgetServiceTest {
 
         budgetService.deleteBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID);
 
-        verify(budget).removeItem(item);
+        verify(budget, times(1)).removeItem(item);
+        verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(event);
     }
 
@@ -403,8 +420,9 @@ class BudgetServiceTest {
 
         budgetService.markAsReserved(reservation);
 
-        verify(item).setStatus(BudgetItemStatus.PROCESSED);
+        verify(item, times(1)).setStatus(BudgetItemStatus.PROCESSED);
         verify(item, times(1)).setProcessedAt(any(LocalDateTime.class));
+        verify(authService, times(1)).getCurrentUser();
         verify(budgetItemRepository, times(1)).save(item);
     }
 
@@ -434,13 +452,17 @@ class BudgetServiceTest {
         service.setPrice(100.0);
         service.setDiscount(0.0);
 
+        User oranizer = User.builder().id(1L).build();
         Event event = new Event();
         event.setId(DEFAULT_EVENT_ID);
         event.setBudget(new Budget());
+        event.setOrganizer(oranizer);
 
         Reservation reservation = new Reservation();
         reservation.setService(service);
         reservation.setEvent(event);
+
+        when(authService.getCurrentUser()).thenReturn(oranizer);
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
@@ -468,7 +490,8 @@ class BudgetServiceTest {
         budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(eventRepository, times(1)).save(event);
-        verify(budget).addItem(item);
+        verify(budget, times(1)).addItem(item);
+        verify(authService, times(1)).getCurrentUser();
         verify(mapper).toResponse(item);
     }
 
@@ -525,7 +548,8 @@ class BudgetServiceTest {
 
         budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
 
-        verify(item).setPlannedAmount(plannedAmount);
+        verify(item, times(1)).setPlannedAmount(plannedAmount);
+        verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(event);
     }
 
@@ -583,6 +607,7 @@ class BudgetServiceTest {
     }
 
     private Event mockEvent(Budget budget) {
+        User organizer = User.builder().id(1L).build();
         Event event = mock(Event.class);
         when(eventService.find(anyLong())).thenReturn(event);
         when(event.getBudget()).thenReturn(budget);
@@ -592,9 +617,12 @@ class BudgetServiceTest {
     }
 
     private Reservation createReservationProcessedAt(LocalDateTime processedAt, BudgetItem item, Service service) {
+        User organizer = User.builder().id(1L).build();
+
         when(item.getProcessedAt()).thenReturn(processedAt);
         when(item.getItemType()).thenReturn(SolutionType.SERVICE);
         when(item.getSolution()).thenReturn(service);
+        when(authService.getCurrentUser()).thenReturn(organizer);
 
         Budget budget = new Budget();
         budget.addItem(item);
@@ -602,6 +630,7 @@ class BudgetServiceTest {
         Event event = new Event();
         event.setId(DEFAULT_EVENT_ID);
         event.setBudget(budget);
+        event.setOrganizer(organizer);
 
         Reservation reservation = new Reservation();
         reservation.setService(service);

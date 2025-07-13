@@ -12,8 +12,8 @@ import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
 import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
@@ -55,14 +55,14 @@ public class BudgetService {
     private final EntityManager entityManager;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
-        Event event = eventService.find(eventId);
-        assertOwnership(event);
-
         Product product = productService.find(request.getItemId());
         double netPrice = calculateNetPrice(product);
         if(netPrice > request.getPlannedAmount()) {
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
         }
+
+        Event event = eventService.find(eventId);
+        assertOwnership(event);
 
         updateBudget(event, mapper.fromRequest(request, product));
         return productMapper.toResponse(product);
@@ -94,6 +94,7 @@ public class BudgetService {
 
     public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
+        assertOwnership(reservation.getEvent());
         Service service = reservation.getService();
         boolean isAutomatic = service.getType() == ReservationType.AUTOMATIC;
 
@@ -119,6 +120,7 @@ public class BudgetService {
 
     public void markAsReserved(Reservation reservation) {
         Event event = reservation.getEvent();
+        assertOwnership(event);
         Budget budget = event.getBudget();
         Long serviceId = reservation.getService().getId();
 
@@ -282,6 +284,6 @@ public class BudgetService {
     private void assertOwnership(Event event) {
         User organizer = authService.getCurrentUser();
         if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
-            throw new ForbiddenEditException("You are not authorized to change this event.");
+            throw new OwnershipRequiredException("You are not authorized to change this event.");
     }
 }
