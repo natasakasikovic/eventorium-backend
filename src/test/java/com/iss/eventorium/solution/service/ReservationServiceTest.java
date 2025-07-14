@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -41,7 +40,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -275,7 +273,7 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideReservationsOutsideWorkingHours")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideInvalidWorkingHoursForCompany")
     @Tag("exception-handling")
     @Tag("working-hours")
     void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing) {
@@ -296,7 +294,7 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideValidWorkingHours")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideValidWorkingHoursForCompany")
     @Tag("working-hours")
     void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
@@ -322,7 +320,7 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideInvalidReservations")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithInvalidDurations")
     @Tag("exception-handling")
     @Tag("service-duration")
     public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(LocalTime startingTime, LocalTime endingTime) {
@@ -385,7 +383,7 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideValidReservations")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
     public void givenDurationBetweenMinimumAndMaximum_whenValidateServiceDuration_thenSuccess(LocalTime startingTime, LocalTime endingTime) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
@@ -428,45 +426,6 @@ public class ReservationServiceTest {
                 () -> this.service.createReservation(request, 1L, 1L));
 
         assertEquals("The selected time slot for this service is already occupied. Please choose a different time.", exception.getMessage());
-    }
-
-    // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00. Each case defines different company working hours to verify correct behavior around working hours boundaries.
-    private static Stream<Arguments> provideValidWorkingHours() {
-        return Stream.of(
-                Arguments.of(LocalTime.of(11, 0), LocalTime.of(15, 0)), // Company working hours exactly match the reservation (11:00 - 15:00)
-                Arguments.of(LocalTime.of(8, 0), LocalTime.of(17, 0)), // Company working hours fully include the reservation (8:00 - 17:00)
-                Arguments.of(LocalTime.of(11, 0), LocalTime.of(16, 0)), // Reservation starts exactly at opening time, ends before closing (11:00 - 16:00)
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(15, 0)) // Reservation starts after opening, ends exactly at closing time (10:00 - 15:00)
-        );
-    }
-
-    // NOTE: These arguments are used to test reservation creation when the reservation spans from 11:00 to 15:00.
-    private static Stream<Arguments> provideReservationsOutsideWorkingHours() {
-        return Stream.of(
-                Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59)), // Company closes one minute before reservation ends (closing at 14:59, reservation ends at 15:00)
-                Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0)), // Company opens one minute after reservation starts (opening at 11:01, reservation starts at 11:00)
-                Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30))  // Company working hours completely outside the reservation request (company 6:00 - 10:30, reservation 11:00 - 15:00)
-        );
-    }
-
-    // NOTE:  This method is used to test reservation durations against a service that allows durations between 2 and 6 hours (inclusive).
-    private static Stream<Arguments> provideValidReservations() {
-        return Stream.of(
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(12, 0)), // Exactly 2 hours (minimum valid duration)
-                Arguments.of(LocalTime.of(13, 0), LocalTime.of(17, 0)), // Exactly 4 hours (within range)
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(16, 0)) // Exactly 6 hours (maximum valid duration)
-        );
-    }
-
-    // NOTE: Provides invalid reservation time ranges for testing the validation of service duration.
-    // This method is used to test reservation durations against a service  that allows durations between 2 and 6 hours.
-    private static Stream<Arguments> provideInvalidReservations() {
-        return Stream.of(
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(11, 59)), // One minute shorter than the minimum allowed duration (1h 59min)
-                Arguments.of(LocalTime.of(9, 0), LocalTime.of(15, 1)),   // one minute longer than the maximum allowed duration (6h 1min)
-                Arguments.of(LocalTime.of(12, 0), LocalTime.of(12, 0)),  // Duration of exactly zero hours (start and end time are the same)
-                Arguments.of(LocalTime.of(14, 0), LocalTime.of(13, 0))   // Negative duration
-        );
     }
 
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {
