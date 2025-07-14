@@ -10,6 +10,8 @@ public class TestUtil {
     public static final Long EVENT_WITHOUT_AGENDA_1 = 1L;
     public static final Long EVENT_WITHOUT_AGENDA_2 = 7L;
     public static final Long EVENT_WITH_AGENDA = 6L;
+    public static final Long EVENT_WITH_GUESTS = 6L;
+    public static final Long EVENT_WITHOUT_GUESTS = 1L;
     public static final Long EVENT_NOT_IN_DRAFT_STATE = 5L;
     public static final Long FORBIDDEN_EVENT_ID = 2L;
     public static final Long INVALID_EVENT = 500L;

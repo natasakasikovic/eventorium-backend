@@ -17,10 +17,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -203,5 +209,90 @@ class EventControllerIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 Bad Request");
         assertNotNull(response.getBody());
         assertEquals(expectedMessage, response.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return OK and byte[] which represents pdf file with guests")
+    void givenValidEventId_whenGettingGuestList_thenGenerateGuestListPdf() {
+        ResponseEntity<byte[]> response = authHelper.authorizedGet(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{id}/guest-list-pdf",
+                byte[].class,
+                EVENT_WITH_GUESTS
+        );
+        byte[] pdfBytes = response.getBody();
+
+        assertNotNull(pdfBytes, "PDF body should not be null");
+        assertTrue(pdfBytes.length > 0, "PDF body should not be empty");
+
+        assertEquals("attachment; filename=guest_list.pdf",
+                response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
+                "Expected Content-Disposition header with correct filename");
+
+        assertEquals("application/pdf",
+                response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE),
+                "Expected Content-Type to be application/pdf");
+
+        assertTrue(new String(pdfBytes, 0, 5).startsWith("%PDF-"), "PDF should start with '%PDF-'");
+
+        String pdfText = getPdfText(pdfBytes);
+        assertTrue(pdfText.contains("Birthday Celebration in Beograd"), "PDF should contain event name");
+        assertTrue(pdfText.contains("Emily Johnson"), "PDF should contain guest name");
+        assertTrue(pdfText.contains("provider@gmail.com"), "PDF should contain guest's email");
+    }
+
+    @Test
+    @DisplayName("Should return OK and byte[] which represents pdf file without guests")
+    void givenEventWithNoGuests_whenGettingGuestList_thenGeneratePdfWithTextAboutNoGuests() {
+        ResponseEntity<byte[]> response = authHelper.authorizedGet(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{id}/guest-list-pdf",
+                byte[].class,
+                EVENT_WITHOUT_GUESTS
+        );
+        byte[] pdfBytes = response.getBody();
+        assertNotNull(pdfBytes, "PDF body should not be null");
+        assertTrue(pdfBytes.length > 0, "PDF body should not be empty");
+        String pdfText = getPdfText(pdfBytes).trim();
+        assertEquals("No guests for event with name 'Wedding in Novi Sad'",
+                    pdfText,
+                    "The PDF should contain the message that there are no guests.");
+    }
+
+    private String getPdfText(byte[] pdfBytes) {
+        try (PDDocument document = PDDocument.load(pdfBytes)) {
+            return new PDFTextStripper().getText(document);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read PDF content", e);
+        }
+    }
+
+
+    @Test
+    @DisplayName("Should return FORBIDDEN when organizer generates guest list pdf event they do not own")
+    void givenInvalidEventId_whenGettingGuestList_thenReturnForbidden() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{id}/guest-list-pdf",
+                ExceptionResponse.class,
+                FORBIDDEN_EVENT_ID
+        );
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Expected 403 Forbidden");
+        assertNotNull(response.getBody());
+        assertEquals("You are not authorized to manage this event.", response.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return NOT_FOUND when organizer tries to generate guest list pdf for event that does not exist")
+    void givenNonExistingEvent_whenGeneratingGuestListPdf_thenReturnNotFound() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{id}/guest-list-pdf",
+                ExceptionResponse.class,
+                0
+        );
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Expected 404 Not Found");
+        assertNotNull(response.getBody());
+        assertEquals("Event not found", response.getBody().getMessage());
     }
 }
