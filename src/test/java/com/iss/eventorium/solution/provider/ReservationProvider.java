@@ -54,4 +54,13 @@ public class ReservationProvider {
                 Arguments.of(105.0, 10.0) // price 105(higer than planned) but with 10% off → 94.5 (<100)
         );
     }
+
+    // NOTE: Supplies service price & discount pairs to test cases where final price exceeds planned amount of 100.0
+    private static Stream<Arguments> providePricesAndDiscountsThatDoNotFitPlannedAmount() {
+        return Stream.of(
+                Arguments.of(100.01, 0.0),      // just above planned amount, no discount
+                Arguments.of(150.0, 5.0),       // significantly above planned amount, small discount insufficient
+                Arguments.of(100.01, 0.005)     // minimal discount, but final price still slightly above 100.0 (100.01 - 0.005 = 100.005)
+        );
+    }
 }

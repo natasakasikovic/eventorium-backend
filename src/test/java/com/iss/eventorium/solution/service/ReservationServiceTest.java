@@ -178,15 +178,16 @@ public class ReservationServiceTest {
         assertEquals("You cannot make a reservation for an event that has already passed." , exception.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#providePricesAndDiscountsThatDoNotFitPlannedAmount")
     @Tag("exception-handling")
     @Tag("service-funds")
     @DisplayName("Should throw InsufficientFundsException if planned amount is insufficient for service reservation")
-    void givenInsufficientFunds_whenCreateReservation_thenThrowInsufficientFundsException() {
+    void givenInsufficientFunds_whenCreateReservation_thenThrowInsufficientFundsException(Double price, Double discount) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(15)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
-        Service service = Service.builder().provider(provider).reservationDeadline(10).price(150.0).minDuration(1).maxDuration(5).discount(0.0).isAvailable(true).build();
+        Service service = Service.builder().provider(provider).reservationDeadline(10).price(price).minDuration(1).maxDuration(5).discount(discount).isAvailable(true).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
