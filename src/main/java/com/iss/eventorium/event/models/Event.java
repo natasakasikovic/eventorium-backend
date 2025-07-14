@@ -43,9 +43,8 @@ public class Event {
     @Column(name = "max_participants", nullable = false)
     private Integer maxParticipants;
 
-    // NOTE: If type is null, it indicates that the user selected "all"
     @ManyToOne
-    private EventType type;
+    private EventType type; // NOTE: If type is null, it indicates that the user selected "all"
 
     @ManyToOne
     private City city;
@@ -53,22 +52,22 @@ public class Event {
     @Column
     private String address;
 
+    @ManyToOne
+    private User organizer;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
     private List<Activity> activities = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "event_id")
-    private List<Rating> ratings;
-
-    @ManyToOne
-    private User organizer;
+    @Column(name = "is_draft")
+    private boolean isDraft = true;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Budget budget = new Budget();
 
-    @Column(name = "is_draft")
-    private boolean isDraft = true;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
+    private List<Rating> ratings;
 
     public Double calculateAvgRating() {
         try {
