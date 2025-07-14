@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.dtos.agenda;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -12,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AgendaRequestDto {
-
-    @Valid @NotNull(message = "Activities are required")
+    @Valid
+    @NotEmpty(message = "Agenda must contain at least one activity.")
+    @NotNull(message = "Activities are required")
     List<ActivityRequestDto> activities;
 }

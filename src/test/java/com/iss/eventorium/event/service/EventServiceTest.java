@@ -7,7 +7,6 @@ import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
-import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -156,15 +155,6 @@ class EventServiceTest {
                 () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(requests)));
 
         assertEquals(expectedMessage, exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when agenda has no activities")
-    void givenNoActivities_whenCreateAgenda_shouldThrowEmptyAgendaException() {
-        EmptyAgendaException exception = assertThrows(EmptyAgendaException.class,
-                () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(new ArrayList<>())));
-
-        assertEquals("Agenda must contain at least one activity.", exception.getMessage());
     }
 
     @Test

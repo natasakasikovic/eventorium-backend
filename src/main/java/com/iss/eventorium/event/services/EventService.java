@@ -1,13 +1,11 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
-import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -221,10 +219,6 @@ public class EventService {
     }
 
     public void createAgenda(Long id, AgendaRequestDto agenda) {
-        List<ActivityRequestDto> request = agenda.getActivities();
-        if (request.isEmpty())
-            throw new EmptyAgendaException("Agenda must contain at least one activity.");
-
         Event event = find(id);
         assertOwnership(event);
         if (!event.isDraft())
@@ -232,7 +226,7 @@ public class EventService {
         if (!event.getActivities().isEmpty())
             throw new AgendaAlreadyDefinedException("Agenda already defined for event with name " + event.getName());
 
-        List<Activity> activities = request.stream()
+        List<Activity> activities = agenda.getActivities().stream()
                 .map(activityMapper::fromRequest)
                 .toList();
         validateActivities(activities);

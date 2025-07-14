@@ -335,6 +335,12 @@ public class EventProvider {
                                 ))
                                 .build(),
                         "Location must not exceed 50 characters"
+                ),
+
+                // empty agenda
+                Arguments.of(
+                        AgendaRequestDto.builder().activities(List.of()).build(),
+                        "Agenda must contain at least one activity."
                 )
         );
     }
