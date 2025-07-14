@@ -1,4 +1,4 @@
-package com.iss.eventorium.reservation;
+package com.iss.eventorium.solution.service;
 
 import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.company.services.CompanyService;
