@@ -44,4 +44,14 @@ public class ReservationProvider {
                 Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30))  // Company working hours completely outside the reservation request (company 6:00 - 10:30, reservation 11:00 - 15:00)
         );
     }
+
+    // NOTE: Supplies service price & discount pairs to test a reservation with a planned amount of 100.0
+    private static Stream<Arguments> providePricesAndDiscountsThatFitPlannedAmount () {
+        return Stream.of(
+                Arguments.of(100.0, 0.0), // exact price match: 100.0 with 0% discount
+                Arguments.of(200.0, 50.0), // boundary discount: 50% off 200 → 100.0
+                Arguments.of(90.0, 0.0), // price under planned amount, no discount
+                Arguments.of(105.0, 10.0) // price 105(higer than planned) but with 10% off → 94.5 (<100)
+        );
+    }
 }

@@ -200,14 +200,15 @@ public class ReservationServiceTest {
         assertEquals("You do not have enough funds for this reservation!", exception.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#providePricesAndDiscountsThatFitPlannedAmount")
     @Tag("service-funds")
-    @DisplayName("Should allow reservation when planned amount is exactly equal to service price")
-    public void givenPlannedAmountEqualsServicePrice_whenCreateReservation_thenSuccess() {
+    @DisplayName("Should allow reservation when planned amount is exactly or higher equal to service price with discount applied")
+    public void givenPlannedAmountCoversServicePriceWithDiscount_whenCreateReservation_thenSuccess(Double price, Double discount) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
-        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(4).maxDuration(4).price(100.0).discount(0.0).build();
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(4).maxDuration(4).price(price).discount(discount).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
