@@ -2,7 +2,7 @@ package com.iss.eventorium.event.service;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
-import com.iss.eventorium.event.dtos.event.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;

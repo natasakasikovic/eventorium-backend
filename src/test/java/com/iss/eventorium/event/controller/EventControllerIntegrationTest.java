@@ -2,7 +2,7 @@ package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.event.dtos.event.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.models.Privacy;

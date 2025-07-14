@@ -1,7 +1,7 @@
 package com.iss.eventorium.event.provider;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
-import com.iss.eventorium.event.dtos.event.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.shared.dtos.CityDto;

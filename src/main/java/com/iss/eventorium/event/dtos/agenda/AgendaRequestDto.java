@@ -1,6 +1,5 @@
-package com.iss.eventorium.event.dtos.event;
+package com.iss.eventorium.event.dtos.agenda;
 
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import jakarta.validation.Valid;
 import lombok.*;
 
