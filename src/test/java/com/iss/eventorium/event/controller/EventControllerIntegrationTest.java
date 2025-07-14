@@ -2,7 +2,7 @@ package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.event.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.models.Privacy;
@@ -18,8 +18,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
 
 import static com.iss.eventorium.util.TestUtil.EVENT_WITHOUT_AGENDA;
 import static com.iss.eventorium.util.TestUtil.ORGANIZER_EMAIL;
@@ -77,20 +75,17 @@ class EventControllerIntegrationTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 Bad Request");
         assertNotNull(response.getBody());
-
-        JsonNode json = objectMapper.readTree(response.getBody());
-        String actualMessage = json.get("message").asText();
-        assertEquals(expectedMessage, actualMessage, "Validation message mismatch");
+        assertValidationMessage(response, expectedMessage);
     }
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.EventProvider#provideValidAgenda")
     @DisplayName("Should set agenda to event when making PUT request to endpoint - /api/v1/events/{id}/agenda")
-    void shouldSetAgenda(List<ActivityRequestDto> requests) {
+    void shouldSetAgenda(AgendaRequestDto request) {
         ResponseEntity<Void> response = authHelper.authorizedPut(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{id}/agenda",
-                requests,
+                request,
                 Void.class,
                 EVENT_WITHOUT_AGENDA
         );
@@ -101,17 +96,24 @@ class EventControllerIntegrationTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.EventProvider#provideInvalidAgenda")
     @DisplayName("Should return expected validation message for invalid ActivityRequestDto")
-    void shouldReturnExpectedValidationMessage(List<ActivityRequestDto> invalidRequest) {
+    void shouldReturnExpectedValidationMessage(AgendaRequestDto request, String expectedMessage) throws Exception {
         ResponseEntity<String> response = authHelper.authorizedPut(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{id}/agenda",
-                invalidRequest,
+                request,
                 String.class,
                 EVENT_WITHOUT_AGENDA
         );
-
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 Bad Request");
         assertNotNull(response.getBody());
+        assertValidationMessage(response, expectedMessage);
+    }
+
+
+    private void assertValidationMessage(ResponseEntity<String> response, String expectedMessage) throws Exception {
+        JsonNode json = objectMapper.readTree(response.getBody());
+        String actualMessage = json.get("message").asText();
+        assertEquals(expectedMessage, actualMessage, "Validation message mismatch");
     }
 
 }
