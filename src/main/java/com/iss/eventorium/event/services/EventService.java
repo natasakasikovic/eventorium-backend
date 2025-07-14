@@ -219,14 +219,15 @@ public class EventService {
         return variables;
     }
 
-    public void createAgenda(Long id, List<ActivityRequestDto> request) {
+    public void createAgenda(Long id, AgendaRequestDto agenda) {
+        List<ActivityRequestDto> request = agenda.getActivities();
         if (request.isEmpty())
             throw new EmptyAgendaException("Agenda must contain at least one activity.");
 
         Event event = find(id);
         assertOwnership(event);
-        ensureEventIsDraft(event);
-
+        if (!event.isDraft())
+            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
         if (!event.getActivities().isEmpty())
             throw new AgendaAlreadyDefinedException("Agenda already defined for event with name " + event.getName());
 
@@ -238,10 +239,8 @@ public class EventService {
         event.setActivities(new ArrayList<>());
         event.getActivities().addAll(activities);
 
-        if (event.getPrivacy().equals(Privacy.OPEN))
-            setIsDraftFalse(event);
-        else
-            repository.save(event);
+        if (event.getPrivacy().equals(Privacy.OPEN)) setIsDraftFalse(event);
+        else repository.save(event);
     }
 
     private void validateActivities(List<Activity> activities) {
@@ -331,11 +330,6 @@ public class EventService {
         User organizer = authService.getCurrentUser();
         if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
             throw new OwnershipRequiredException("You are not authorized to manage this event.");
-    }
-
-    private void ensureEventIsDraft(Event event) {
-        if (!event.isDraft())
-            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
     }
 
     @Scheduled(cron = "0 0 2 * * ?") // runs daily at 2am

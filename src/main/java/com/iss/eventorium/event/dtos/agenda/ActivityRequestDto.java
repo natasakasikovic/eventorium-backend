@@ -23,7 +23,7 @@ public class ActivityRequestDto {
     @Size(max = 50, message = "Activity name must not exceed 50 characters")
     private String name;
 
-    @NotBlank(message = "Event description is required")
+    @NotBlank(message = "Activity description is required")
     @Size(max = 200, message = "Event description must not exceed 200 characters")
     private String description;
 

@@ -87,7 +87,7 @@ public class EventController implements EventApi {
     }
 
     @PutMapping("/{id}/agenda")
-    public ResponseEntity<Void> createAgenda(@Valid @RequestBody List<ActivityRequestDto> request, @PathVariable Long id) {
+    public ResponseEntity<Void> createAgenda(@Valid @RequestBody AgendaRequestDto request, @PathVariable Long id) {
         service.createAgenda(id, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }

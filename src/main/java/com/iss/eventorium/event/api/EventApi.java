@@ -324,10 +324,10 @@ public interface EventApi {
     )
     ResponseEntity<Void> createAgenda(
             @Valid @RequestBody(
-                    description = "List of activities",
-                    required = false
+                    description = "Contains list of activities",
+                    required = true
             )
-            List<ActivityRequestDto> request,
+            AgendaRequestDto request,
             @PathVariable(required = true)
             Long id
     );
