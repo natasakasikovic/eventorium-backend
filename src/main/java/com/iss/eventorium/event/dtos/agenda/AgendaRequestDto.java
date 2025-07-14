@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.dtos.agenda;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -12,6 +13,6 @@ import java.util.List;
 @Builder
 public class AgendaRequestDto {
 
-    @Valid
+    @Valid @NotNull(message = "Activities are required")
     List<ActivityRequestDto> activities;
 }

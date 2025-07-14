@@ -29,19 +29,35 @@ public class EventProvider {
         );
     }
 
-    public static Stream<EventRequestDto> provideValidEventRequest() {
-        return Stream.of(
-                EventRequestDto.builder()
-                        .name("Test event")
-                        .eventType(null)
-                        .date(LocalDate.now().plusDays(3))
-                        .city(new CityDto(1L, "Test city"))
-                        .address("Test street")
-                        .maxParticipants(20)
-                        .description("Test description")
-                        .privacy(Privacy.OPEN)
-                        .build()
-        );
+    public static AgendaRequestDto provideValidAgenda() {
+        return AgendaRequestDto.builder().activities(List.of(
+                ActivityRequestDto.builder()
+                        .name("activity 1")
+                        .description("description")
+                        .startTime(LocalTime.of(10, 0))
+                        .endTime(LocalTime.of(11, 0))
+                        .location("location")
+                        .build(),
+                ActivityRequestDto.builder()
+                        .name("activity 2")
+                        .description("description")
+                        .startTime(LocalTime.of(11, 0))
+                        .endTime(LocalTime.of(12, 0))
+                        .location("location")
+                        .build())).build();
+    }
+
+    public static EventRequestDto provideValidEventRequest() {
+        return EventRequestDto.builder()
+                .name("Test event")
+                .eventType(null)
+                .date(LocalDate.now().plusDays(3))
+                .city(new CityDto(1L, "Test city"))
+                .address("Test street")
+                .maxParticipants(20)
+                .description("Test description")
+                .privacy(Privacy.OPEN)
+                .build();
     }
 
     public static Stream<Arguments> provideInvalidEventRequestsWithExpectedError() {
@@ -192,29 +208,6 @@ public class EventProvider {
         );
     }
 
-    public static Stream<Arguments> provideValidAgenda() {
-        return Stream.of(
-                Arguments.of(
-                        AgendaRequestDto.builder().activities(List.of(
-                            ActivityRequestDto.builder()
-                                    .name("activity 1")
-                                    .description("description")
-                                    .startTime(LocalTime.of(10, 0))
-                                    .endTime(LocalTime.of(11, 0))
-                                    .location("location")
-                                    .build(),
-                            ActivityRequestDto.builder()
-                                    .name("activity 2")
-                                    .description("description")
-                                    .startTime(LocalTime.of(11, 0))
-                                    .endTime(LocalTime.of(12, 0))
-                                    .location("location")
-                                    .build())).build()
-                        )
-        );
-    }
-
-
     public static Stream<Arguments> provideInvalidAgenda() {
         return Stream.of(
                 // name is blank
@@ -346,5 +339,28 @@ public class EventProvider {
         );
     }
 
+    public static Stream<Arguments> provideActivityRequestsWithInvalidTimeRange() {
+        return Stream.of(
+                // end time before start time
+                Arguments.of(ActivityRequestDto.builder()
+                                .name("Activity1")
+                                .location("Location1")
+                                .description("Description1")
+                                .startTime(LocalTime.of(10, 0))
+                                .endTime(LocalTime.of(9, 0))
+                                .build(),
+                        "Invalid time range for activity 'Activity1': end time (09:00) must be after start time (10:00)."),
 
+                // start time == end time
+                Arguments.of(
+                        ActivityRequestDto.builder()
+                                .name("Activity2")
+                                .location("Location2")
+                                .description("Description2")
+                                .startTime(LocalTime.of(10, 0))
+                                .endTime(LocalTime.of(10, 0))
+                                .build(),
+                        "Invalid time range for activity 'Activity2': end time (10:00) must be after start time (10:00).")
+        );
+    }
 }
