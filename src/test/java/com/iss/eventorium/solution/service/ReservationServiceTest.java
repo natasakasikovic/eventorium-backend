@@ -47,10 +47,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /*
- NOTE: Certain test cases—such as attempting to reserve a logically deleted service,
- an invisible service, or a service that has not been accepted—are not written here,
- because such services are filtered out at the serviceRepository level.
- Therefore, these cases are considered part of the serviceRepository's test coverage
+ NOTE: Certain test cases—such as attempting to reserve a logically deleted service, an invisible service,
+ or a service that has not been accepted—are not included here because such services are filtered out at
+ the serviceRepository level. These cases are covered by the repository's test suite.
+
+ Additionally, cases that trigger the same behavior (e.g., non-existing, deleted, invisible, or unaccepted services)
+ have only one representative test to avoid duplication.
 */
 
 @ExtendWith(MockitoExtension.class)
@@ -131,6 +133,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("exception-handling")
     @DisplayName("Should throw EntityNotFoundException if service does not exist during reservation creation")
+    // NOTE: Same behavior if you pass id of invisible, unaccepted or deleted service, so that cases won't be tested
     void givenNonExistingService_whenCreateReservation_thenThrowEntityNotFoundException() {
         Event event = Event.builder().organizer(currentUser).build();
 
@@ -274,6 +277,7 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideInvalidWorkingHoursForCompany")
     @Tag("exception-handling")
     @Tag("working-hours")
+    @DisplayName("Should throw ReservationOutsideWorkingHoursException when trying to create reservation outside company's working hours")
     void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
@@ -294,6 +298,7 @@ public class ReservationServiceTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideValidWorkingHoursForCompany")
     @Tag("working-hours")
+    @DisplayName("Should create reservation successfully when within company's working hours")
     void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
@@ -321,6 +326,7 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithInvalidDurations")
     @Tag("exception-handling")
     @Tag("service-duration")
+    @DisplayName("Should throw InvalidServiceDurationException when reservation duration is outside the allowed service duration range [minDuration, maxDuration]")
     public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(LocalTime startingTime, LocalTime endingTime) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
@@ -340,6 +346,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("exception-handling")
     @Tag("service-duration")
+    @DisplayName("Should throw InvalidServiceDurationException when service has fixed duration and reservation duration does not match it")
     public void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
@@ -357,6 +364,7 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("service-duration")
+    @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
     public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
@@ -381,6 +389,7 @@ public class ReservationServiceTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
+    @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
     public void givenDurationBetweenMinimumAndMaximum_whenValidateServiceDuration_thenSuccess(LocalTime startingTime, LocalTime endingTime) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
