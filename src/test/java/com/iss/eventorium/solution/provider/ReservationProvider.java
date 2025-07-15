@@ -1,5 +1,6 @@
 package com.iss.eventorium.solution.provider;
 
+import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.time.LocalTime;
@@ -61,6 +62,40 @@ public class ReservationProvider {
                 Arguments.of(100.01, 0.0),      // just above planned amount, no discount
                 Arguments.of(150.0, 5.0),       // significantly above planned amount, small discount insufficient
                 Arguments.of(100.01, 0.005)     // minimal discount, but final price still slightly above 100.0 (100.01 - 0.005 = 100.005)
+        );
+    }
+
+    // NOTE: Supplies with invalid reservation requests and expected messages
+    public static Stream<Arguments> provideInvalidReservationRequests() {
+        return Stream.of(
+                // starting time is null
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(null)
+                                .endingTime(LocalTime.of(12, 0))
+                                .plannedAmount(150.0)
+                                .build(),
+                        "Starting time is required!"),
+                // ending time is null
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(9, 0))
+                                .endingTime(null)
+                                .plannedAmount(150.0)
+                                .build(),
+                        "Ending time is required!"),
+                // planned amount is negative
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(9, 0))
+                                .endingTime(LocalTime.of(12, 0))
+                                .plannedAmount(-10.0)
+                                .build(),
+                        "Planned amount must be greater than zero"),
+                // planned amount is zero
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(9, 0))
+                                .endingTime(LocalTime.of(12, 0))
+                                .plannedAmount(0.0)
+                                .build(),
+                        "Planned amount must be greater than zero")
         );
     }
 }
