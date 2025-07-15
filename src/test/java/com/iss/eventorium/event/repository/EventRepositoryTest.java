@@ -7,21 +7,25 @@ import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.shared.models.City;
 import com.iss.eventorium.user.models.Role;
 import com.iss.eventorium.user.models.User;
+import com.iss.eventorium.user.models.UserBlock;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.iss.eventorium.util.EntityFactory.*;
 import static com.iss.eventorium.util.TestUtil.resetTables;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -68,9 +72,13 @@ class EventRepositoryTest {
         entityManager.persist(event3);
         entityManager.persist(event4);
         entityManager.persist(event5);
+
+        UserBlock block = UserBlock.builder().blocker(user3).blocked(user1).build();
+        entityManager.persist(block);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Organizer ID: {0} should have {1} events")
+    @DisplayName("Should return correct number of events for each organizer")
     @CsvSource({
          "1,3",
          "2,2",
@@ -83,5 +91,41 @@ class EventRepositoryTest {
         assertEquals(expected, events.size());
     }
 
+    @Test
+    @DisplayName("Should return event when user is not blocking the organizer")
+    void givenExistingEventAndNonBlockingUser_whenFilterById_thenReturnsEvent() {
+        User organizer = entityManager.find(User.class, 1L);
+        Event event = eventRepository.findAll().get(0);
+
+        Specification<Event> spec = EventSpecification.filterById(event.getId(), organizer);
+        Optional<Event> result = eventRepository.findOne(spec);
+
+        assertTrue(result.isPresent());
+        assertEquals(event.getId(), result.get().getId());
+    }
+
+    @Test
+    @DisplayName("Should not return event when user has blocked the organizer")
+    void givenExistingEventAndBlockedOrganizer_whenFilterById_thenReturnsEmpty() {
+        User user3 = entityManager.find(User.class, 3L);
+        Event event = eventRepository.findById(1L).orElseThrow();
+
+        Specification<Event> spec = EventSpecification.filterById(event.getId(), user3);
+        Optional<Event> result = eventRepository.findOne(spec);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return empty when event with given ID does not exist")
+    void givenNonExistentEventId_whenFilterById_thenReturnsEmpty() {
+        User user = entityManager.find(User.class, 1L);
+        Long nonExistentId = 999L;
+
+        Specification<Event> spec = EventSpecification.filterById(nonExistentId, user);
+        Optional<Event> result = eventRepository.findOne(spec);
+
+        assertTrue(result.isEmpty());
+    }
 
 }
