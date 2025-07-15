@@ -235,7 +235,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should throw AlreadyProcessedException if product is already processed during purchase")
+    @DisplayName("Should throw ProductNotAvailableException if product is not available")
     void givenUnavailableProduct_whenPurchaseProduct_thenThrowProductNotAvailableException() {
         BudgetItemRequestDto request = createRequest(100.0);
         Product product = createProduct(100.0, 50.0);
