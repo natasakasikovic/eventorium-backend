@@ -24,6 +24,7 @@ import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,6 +89,7 @@ class BudgetServiceTest {
             "900, 99, 0"
     })
     @Tag("purchase-product")
+    @DisplayName("Should throw InsufficientFundsException if planned amount is less than product price after discount during purchase")
     void givenInsufficientFunds_whenPurchaseProduct_thenThrowInsufficientFundsException(double price, double discount, double plannedAmount) {
         mockProduct(price, discount);
         BudgetItemRequestDto request = createRequest(plannedAmount);
@@ -101,6 +103,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
+    @DisplayName("Should throw OwnershipRequiredException if user is not the event owner during product purchase")
     void givenUserIsNotEventOwner_thenThrowsOwnershipRequiredException() {
         Product product = createProduct(100.0, 0.0);
         when(productService.find(anyLong())).thenReturn(product);
@@ -133,6 +136,7 @@ class BudgetServiceTest {
             "0.0, 0.0, 100.0"
     })
     @Tag("purchase-product")
+    @DisplayName("Should save event if product purchase has sufficient budget")
     void givenSufficientBudget_whenPurchasingProduct_thenEventIsSaved(double price, double discount, double plannedAmount) {
         Product product = mockProduct(price, discount);
         Budget budget = mock(Budget.class);
@@ -153,6 +157,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
+    @DisplayName("Should throw EntityNotFoundException if product does not exist during product purchase")
     void givenProductDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         BudgetItemRequestDto request = createRequest(100.0);
         when(productService.find(anyLong())).thenThrow(new EntityNotFoundException("Product not found"));
@@ -165,6 +170,7 @@ class BudgetServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw EntityNotFoundException if event does not exist during product purchase")
     void givenEventDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         mockProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(100.0);
@@ -180,6 +186,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
+    @DisplayName("Should throw AlreadyProcessedException if product is already processed during purchase")
     void givenProcessedProduct_whenPurchaseProduct_thenThrowAlreadyProcessedException() {
         BudgetItemRequestDto request = createRequest(100.0);
         Product product = createProduct(100.0, 50.0);
@@ -205,6 +212,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("purchase-product")
+    @DisplayName("Should return purchased product if budget is sufficient and product is not processed")
     void givenNotProcessedProduct_whenPurchaseProduct_thenReturnPurchasedProduct() {
         BudgetItemRequestDto request = createRequest(200.0);
         Product product = createProduct(120.0, 50.0);
@@ -231,6 +239,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("get-budget")
+    @DisplayName("Should throw EntityNotFoundException if event does not exist during budget retrieval")
     void givenEventDoesNotExist_whenGetBudget_thenThrowEntityNotFoundException() {
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
 
@@ -243,6 +252,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("get-budget")
+    @DisplayName("Should return budget response if budget exists for the event")
     void givenExistingBudget_whenGetBudget_thenReturnBudgetResponse() {
         mockEvent(new Budget());
         BudgetResponseDto expectedResponse = new BudgetResponseDto();
@@ -258,6 +268,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("update-budget-item")
+    @DisplayName("Should save event with updated item when updating valid budget item")
     void givenValidBudgetItem_whenUpdateBudgetItem_thenSaveBudgetWithUpdatedItem() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
         BudgetItem item = mockProductBudgetItemProcessedAt(null);
@@ -279,6 +290,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("update-budget-item")
+    @DisplayName("Should throw AlreadyProcessedException when updating a processed budget item")
     void givenProcessedBudgetItem_whenUpdateBudgetItem_thenThrowAlreadyProcessedException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
         BudgetItem item = mockProductBudgetItemProcessedAt(LocalDateTime.now());
@@ -296,6 +308,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("update-budget-item")
+    @DisplayName("Should throw InsufficientFundsException if planned amount is insufficient during budget item update")
     void givenInsufficientBudgetItem_whenUpdateBudgetItem_thenThrowInsufficientBudgetException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(0.0);
         BudgetItem item = mockProductBudgetItemProcessedAt(null);
@@ -312,6 +325,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("update-budget-item")
+    @DisplayName("Should throw EntityNotFoundException if event does not exist during budget item update")
     void givenNonExistentEvent_whenUpdateBudgetItem_thenThrowEntityNotFoundException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
@@ -325,6 +339,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("update-budget-item")
+    @DisplayName("Should throw EntityNotFoundException if budget item does not exist during update")
     void givenNonExistentBudgetItem_whenUpdateBudgetItem_thenThrowEntityNotFoundException() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(200.0);
         mockEvent(new Budget());
@@ -338,6 +353,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("delete-budget-item")
+    @DisplayName("Should remove item and save event if budget item is planned during deletion")
     void givenPlannedBudgetItem_whenDeleteBudgetItem_thenItemIsRemovedAndEventSaved() {
         BudgetItem item = mock(BudgetItem.class);
         when(item.getId()).thenReturn(DEFAULT_BUDGET_ITEM_ID);
@@ -357,6 +373,7 @@ class BudgetServiceTest {
     @ParameterizedTest
     @Tag("delete-budget-item")
     @EnumSource(value = BudgetItemStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "PLANNED")
+    @DisplayName("Should throw AlreadyProcessedException when deleting budget item without planned status")
     void givenNonPlannedBudgetItem_whenDeleteBudgetItem_thenThrowAlreadyProcessedException(BudgetItemStatus status) {
         BudgetItem item = mock(BudgetItem.class);
         when(item.getId()).thenReturn(DEFAULT_BUDGET_ITEM_ID);
@@ -376,6 +393,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("delete-budget-item")
+    @DisplayName("Should throw EntityNotFoundException if budget item does not exist during deletion")
     void givenNonExistentBudgetItem_whenDeleteBudgetItem_thenThrowEntityNotFoundException() {
         mockEvent(new Budget());
 
@@ -388,6 +406,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("delete-budget-item")
+    @DisplayName("Should throw EntityNotFoundException if event does not exist during budget item deletion")
     void givenNonExistentEvent_whenDeleteBudgetItem_thenThrowEntityNotFoundException() {
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
 
@@ -400,6 +419,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("mark-reservation")
+    @DisplayName("Should mark reservation as processed if matching budget item is found and unprocessed")
     void givenValidReservationWithMatchingServiceBudgetItem_whenMarkAsReserved_thenSetStatusAsProcessed() {
         Service service = createService(ReservationType.AUTOMATIC);
         BudgetItem item = mock(BudgetItem.class);
@@ -415,6 +435,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("mark-reservation")
+    @DisplayName("Should throw AlreadyProcessedException if reservation budget item is already processed")
     void givenAlreadyProcessedBudgetItem_whenMarkAsReserved_thenThrowAlreadyProcessedException() {
         Service service = createService(ReservationType.AUTOMATIC);
         BudgetItem item = mock(BudgetItem.class);
@@ -429,6 +450,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("mark-reservation")
+    @DisplayName("Should throw EntityNotFoundException if reservation budget item is not found")
     void givenMissingServiceBudgetItem_whenMarkAsReserved_thenThrowEntityNotFoundException() {
         Service service = createService(ReservationType.AUTOMATIC);
         Event event = createEvent(new Budget());
@@ -446,6 +468,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
+    @DisplayName("Should return created budget item when solution is valid")
     void givenValidSolution_whenCreateBudgetItem_thenReturnCreatedBudgetItem() {
         Product product = createProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(120.0);
@@ -472,6 +495,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
+    @DisplayName("Should throw EntityNotFoundException if solution does not exist during budget item creation")
     void givenNonExistentSolution_whenCreateBudgetItem_thenThrowEntityNotFoundException() {
         BudgetItemRequestDto request = createRequest(120.0);
         when(solutionService.find(anyLong())).thenThrow(new EntityNotFoundException("Service not found"));
@@ -486,6 +510,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
+    @DisplayName("Should throw InsufficientFundsException if budget is insufficient during budget item creation")
     void givenInsufficientFunds_whenCreateBudgetItem_thenThrowInsufficientFundsException() {
         Product product = createProduct(120.0, 0.0);
         BudgetItemRequestDto request = createRequest(0.0);
@@ -503,6 +528,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
+    @DisplayName("Should update planned amount of existing budget item if not processed")
     void givenPlannedBudgetItem_whenCreateBudgetItem_thenUpdatePlannedAmount() {
         double plannedAmount = 200.0;
         Product product = createProduct(120.0, 0.0);
@@ -528,6 +554,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
+    @DisplayName("Should throw AlreadyProcessedException if existing budget item is already processed during creation")
     void givenProcessedBudgetItem_whenCreateBudgetItem_thenThrowAlreadyProcessedException() {
         Product product = createProduct(120.0, 0.0);
         BudgetItem item = new BudgetItem();
@@ -550,6 +577,7 @@ class BudgetServiceTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideReservationTypeAndExpectedStatus")
     @Tag("add-reservation")
+    @DisplayName("Should save event and add reservation as budget item with appropriate status")
     void givenReservation_whenAddToReservationAsBudgetItem_thenEventIsSaved(
             ReservationType type,
             BudgetItemStatus expectedStatus
@@ -573,6 +601,7 @@ class BudgetServiceTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideReservationTypeAndExpectedStatus")
     @Tag("add-reservation")
+    @DisplayName("Should save event and update existing reservation budget item with new status")
     void givenExistingReservation_whenAddToReservationAsBudgetItem_thenEventIsSaved(
             ReservationType type,
             BudgetItemStatus expectedStatus
@@ -595,6 +624,7 @@ class BudgetServiceTest {
 
     @Test
     @Tag("add-reservation")
+    @DisplayName("Should throw AlreadyProcessedException if reservation budget item is already processed")
     void givenProcessedItem_whenAddReservationAsBudgetItem_thenThrowAlreadyProcessedException() {
         Service service = createService(ReservationType.AUTOMATIC);
         BudgetItem budgetItem = mock(BudgetItem.class);
