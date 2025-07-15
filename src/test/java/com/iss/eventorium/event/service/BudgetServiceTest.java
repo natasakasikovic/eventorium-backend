@@ -104,21 +104,18 @@ class BudgetServiceTest {
     void givenUserIsNotEventOwner_thenThrowsOwnershipRequiredException() {
         Product product = createProduct(100.0, 0.0);
         when(productService.find(anyLong())).thenReturn(product);
-
         BudgetItem item = new BudgetItem();
         item.setSolution(product);
         item.setPlannedAmount(200.0);
-
         Budget budget = new Budget();
         budget.addItem(item);
-
         Event event = mock(Event.class);
         User user = User.builder().id(999L).build();
         when(event.getOrganizer()).thenReturn(user);
         when(eventService.find(anyLong())).thenReturn(event);
         when(authService.getCurrentUser()).thenReturn(User.builder().id(1L).build());
-
         BudgetItemRequestDto request = createRequest(100.0);
+
         OwnershipRequiredException exception = assertThrows(
                 OwnershipRequiredException.class,
                 () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request)
@@ -138,18 +135,18 @@ class BudgetServiceTest {
     @Tag("purchase-product")
     void givenSufficientBudget_whenPurchasingProduct_thenEventIsSaved(double price, double discount, double plannedAmount) {
         Product product = mockProduct(price, discount);
-        Event event = mockEvent(new Budget());
-
+        Budget budget = mock(Budget.class);
+        Event event = mockEvent(budget);
         BudgetItem item = mock(BudgetItem.class);
         item.setSolution(product);
         when(mapper.fromRequest(any(), any())).thenReturn(item);
-
         ProductResponseDto dto = mock(ProductResponseDto.class);
         when(productMapper.toResponse(any())).thenReturn(dto);
         BudgetItemRequestDto request = createRequest(plannedAmount);
 
         budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
 
+        verify(budget).addItem(item);
         verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(event);
     }
@@ -171,7 +168,6 @@ class BudgetServiceTest {
     void givenEventDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
         mockProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(100.0);
-
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
 
         EntityNotFoundException exception = assertThrows(
@@ -214,20 +210,21 @@ class BudgetServiceTest {
         Product product = createProduct(120.0, 50.0);
         when(productService.find(anyLong())).thenReturn(product);
         when(productMapper.toResponse(product)).thenReturn(ProductResponseDto.builder().id(1L).build());
-
         BudgetItem item = new BudgetItem();
-        item.setStatus(BudgetItemStatus.PROCESSED);
+        item.setStatus(BudgetItemStatus.PLANNED);
         item.setSolution(product);
         item.setProcessedAt(null);
         when(mapper.fromRequest(request, product)).thenReturn(item);
-
         Budget budget = new Budget();
         budget.setItems(List.of(item));
         mockEvent(budget);
 
         ProductResponseDto response = budgetService.purchaseProduct(DEFAULT_EVENT_ID, request);
+
         assertNotNull(response);
         assertEquals(1L, response.getId());
+        assertEquals(product, item.getSolution());
+        assertEquals(BudgetItemStatus.PROCESSED, item.getStatus());
         verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(any(Event.class));
     }
@@ -236,6 +233,7 @@ class BudgetServiceTest {
     @Tag("get-budget")
     void givenEventDoesNotExist_whenGetBudget_thenThrowEntityNotFoundException() {
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
+
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
                 () -> budgetService.getBudget(DEFAULT_EVENT_ID)
@@ -247,12 +245,15 @@ class BudgetServiceTest {
     @Tag("get-budget")
     void givenExistingBudget_whenGetBudget_thenReturnBudgetResponse() {
         mockEvent(new Budget());
-
-        when(mapper.toResponse(any(Budget.class))).thenReturn(new BudgetResponseDto());
+        BudgetResponseDto expectedResponse = new BudgetResponseDto();
+        expectedResponse.setPlannedAmount(100.0);
+        expectedResponse.setSpentAmount(100.0);
+        when(mapper.toResponse(any(Budget.class))).thenReturn(expectedResponse);
 
         BudgetResponseDto response = budgetService.getBudget(DEFAULT_EVENT_ID);
+
         verify(authService, times(1)).getCurrentUser();
-        assertNotNull(response);
+        assertEquals(expectedResponse, response);
     }
 
     @Test
@@ -262,15 +263,18 @@ class BudgetServiceTest {
         BudgetItem item = mockProductBudgetItemProcessedAt(null);
         Budget budget = new Budget();
         budget.addItem(item);
-
         mockEvent(budget);
-        when(mapper.toResponse(item)).thenReturn(new BudgetItemResponseDto());
+        BudgetItemResponseDto expectedResponse = new BudgetItemResponseDto();
+        expectedResponse.setPlannedAmount(200.0);
+        expectedResponse.setSolutionId(DEFAULT_BUDGET_ITEM_ID);
+        when(mapper.toResponse(item)).thenReturn(expectedResponse);
 
-        budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request);
+        BudgetItemResponseDto response = budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(item).setPlannedAmount(200.0);
         verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(any(Event.class));
+        assertEquals(expectedResponse, response);
     }
 
     @Test
@@ -327,8 +331,7 @@ class BudgetServiceTest {
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
-                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request),
-                "Budget item not found."
+                () -> budgetService.updateBudgetItem(DEFAULT_EVENT_ID, DEFAULT_BUDGET_ITEM_ID, request)
         );
         assertEquals("Budget item not found.", exception.getMessage());
     }
@@ -443,29 +446,33 @@ class BudgetServiceTest {
 
     @Test
     @Tag("create-budget-item")
-    void givenValidItem_whenCreateBudgetItem_thenReturnCreatedBudgetItem() {
+    void givenValidSolution_whenCreateBudgetItem_thenReturnCreatedBudgetItem() {
         Product product = createProduct(100.0, 0.0);
         BudgetItemRequestDto request = createRequest(120.0);
         BudgetItem item = new BudgetItem();
         Budget budget = mock(Budget.class);
         when(budget.getItems()).thenReturn(Collections.emptyList());
         Event event = mockEvent(budget);
-
         when(solutionService.find(anyLong())).thenReturn(product);
         when(mapper.fromRequest(request, product)).thenReturn(item);
-        when(mapper.toResponse(item)).thenReturn(new BudgetItemResponseDto());
+        BudgetItemResponseDto expectedResponse = new BudgetItemResponseDto();
+        expectedResponse.setPlannedAmount(120.0);
+        expectedResponse.setSolutionId(product.getId());
+        expectedResponse.setSolutionName(product.getName());
+        when(mapper.toResponse(item)).thenReturn(expectedResponse);
 
-        budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
+        BudgetItemResponseDto response = budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(eventRepository, times(1)).save(event);
         verify(budget, times(1)).addItem(item);
         verify(authService, times(1)).getCurrentUser();
         verify(mapper).toResponse(item);
+        assertEquals(expectedResponse, response);
     }
 
     @Test
     @Tag("create-budget-item")
-    void givenNonExistentItem_whenCreateBudgetItem_thenThrowEntityNotFoundException() {
+    void givenNonExistentSolution_whenCreateBudgetItem_thenThrowEntityNotFoundException() {
         BudgetItemRequestDto request = createRequest(120.0);
         when(solutionService.find(anyLong())).thenThrow(new EntityNotFoundException("Service not found"));
         mockEvent(new Budget());
@@ -501,18 +508,22 @@ class BudgetServiceTest {
         Product product = createProduct(120.0, 0.0);
         BudgetItem item = mock(BudgetItem.class);
         when(item.getSolution()).thenReturn(product);
-
         Budget budget = new Budget();
         budget.addItem(item);
         Event event = mockEvent(budget);
-
         BudgetItemRequestDto request = createRequest(plannedAmount);
+        BudgetItemResponseDto expectedResponse = new BudgetItemResponseDto();
+        expectedResponse.setPlannedAmount(plannedAmount);
+        expectedResponse.setSolutionName(product.getName());
+        expectedResponse.setSolutionId(product.getId());
+        when(mapper.toResponse(item)).thenReturn(expectedResponse);
 
-        budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
+        BudgetItemResponseDto response = budgetService.createBudgetItem(DEFAULT_BUDGET_ITEM_ID, request);
 
         verify(item, times(1)).setPlannedAmount(plannedAmount);
         verify(authService, times(1)).getCurrentUser();
         verify(eventRepository, times(1)).save(event);
+        assertEquals(expectedResponse, response);
     }
 
     @Test
@@ -523,7 +534,6 @@ class BudgetServiceTest {
         item.setPlannedAmount(200.0);
         item.setSolution(product);
         item.setProcessedAt(LocalDateTime.now());
-
         Budget budget = new Budget();
         budget.addItem(item);
         mockEvent(budget);
@@ -556,7 +566,6 @@ class BudgetServiceTest {
 
         verify(budget).addItem(budgetItemCaptor.capture());
         BudgetItem item = budgetItemCaptor.getValue();
-
         assertReservationStatus(item, expectedStatus);
         verify(eventRepository, times(1)).save(event);
     }
@@ -571,11 +580,9 @@ class BudgetServiceTest {
         Service service = createService(type);
         BudgetItem budgetItem = mock(BudgetItem.class);
         when(budgetItem.getSolution()).thenReturn(service);
-
         Budget budget = new Budget();
         budget.addItem(budgetItem);
         Event event = createEvent(budget);
-
         Reservation reservation = new Reservation();
         reservation.setEvent(event);
         reservation.setService(service);
@@ -590,16 +597,13 @@ class BudgetServiceTest {
     @Tag("add-reservation")
     void givenProcessedItem_whenAddReservationAsBudgetItem_thenThrowAlreadyProcessedException() {
         Service service = createService(ReservationType.AUTOMATIC);
-
         BudgetItem budgetItem = mock(BudgetItem.class);
         when(budgetItem.getSolution()).thenReturn(service);
         when(budgetItem.getProcessedAt()).thenReturn(LocalDateTime.now());
         when(budgetItem.getSolution()).thenReturn(service);
-
         Budget budget = new Budget();
         budget.addItem(budgetItem);
         Event event = createEvent(budget);
-
         Reservation reservation = new Reservation();
         reservation.setEvent(event);
         reservation.setService(service);
