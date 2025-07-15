@@ -121,6 +121,7 @@ class BudgetServiceTest {
     @DisplayName("Should throw OwnershipRequiredException if user is not the event owner during product purchase")
     void givenUserIsNotEventOwner_thenThrowsOwnershipRequiredException() {
         Product product = createProduct(100.0, 0.0);
+        product.setIsAvailable(true);
         when(productService.find(anyLong())).thenReturn(product);
         BudgetItem item = new BudgetItem();
         item.setSolution(product);
@@ -154,6 +155,7 @@ class BudgetServiceTest {
     @DisplayName("Should save event if product purchase has sufficient budget")
     void givenSufficientBudget_whenPurchasingProduct_thenEventIsSaved(double price, double discount, double plannedAmount) {
         Product product = mockProduct(price, discount);
+        when(product.getIsAvailable()).thenReturn(true);
         Budget budget = mock(Budget.class);
         Event event = mockEvent(budget);
         BudgetItem item = mock(BudgetItem.class);
@@ -187,8 +189,10 @@ class BudgetServiceTest {
     @Test
     @DisplayName("Should throw EntityNotFoundException if event does not exist during product purchase")
     void givenEventDoesNotExist_whenPurchaseProduct_thenThrowEntityNotFoundException() {
-        mockProduct(100.0, 0.0);
+        Product product = mockProduct(100.0, 0.0);
+        when(product.getIsAvailable()).thenReturn(true);
         BudgetItemRequestDto request = createRequest(100.0);
+
         when(eventService.find(anyLong())).thenThrow(new EntityNotFoundException("Event not found"));
 
         EntityNotFoundException exception = assertThrows(
@@ -205,17 +209,21 @@ class BudgetServiceTest {
     void givenProcessedProduct_whenPurchaseProduct_thenThrowAlreadyProcessedException() {
         BudgetItemRequestDto request = createRequest(100.0);
         Product product = createProduct(100.0, 50.0);
+        product.setIsAvailable(true);
         when(productService.find(anyLong())).thenReturn(product);
-
         BudgetItem processedItem = new BudgetItem();
         processedItem.setStatus(BudgetItemStatus.PROCESSED);
         processedItem.setSolution(product);
         processedItem.setProcessedAt(LocalDateTime.now());
         when(mapper.fromRequest(request, product)).thenReturn(processedItem);
-
         Budget budget = new Budget();
         budget.setItems(List.of(processedItem));
-        mockEvent(budget);
+        Event event = new Event();
+        event.setId(DEFAULT_EVENT_ID);
+        event.setOrganizer(organizer);
+        event.setBudget(budget);
+        when(eventService.find(anyLong())).thenReturn(event);
+        when(authService.getCurrentUser()).thenReturn(organizer);
 
         AlreadyProcessedException exception = assertThrows(
                 AlreadyProcessedException.class,
@@ -233,7 +241,6 @@ class BudgetServiceTest {
         Product product = createProduct(100.0, 50.0);
         product.setIsAvailable(false);
         when(productService.find(anyLong())).thenReturn(product);
-        mockEvent(new Budget());
 
         ProductNotAvailableException exception = assertThrows(
                 ProductNotAvailableException.class,
@@ -725,7 +732,6 @@ class BudgetServiceTest {
     private Product mockProduct(double price, double discount) {
         Product product = mock(Product.class);
         when(product.getPrice()).thenReturn(price);
-        when(product.getIsAvailable()).thenReturn(true);
         when(product.getDiscount()).thenReturn(discount);
         when(productService.find(anyLong())).thenReturn(product);
         return product;
