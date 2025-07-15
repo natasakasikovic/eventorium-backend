@@ -5,18 +5,14 @@ import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.time.LocalTime;
 import java.util.List;
 
 @Getter
 @Setter
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

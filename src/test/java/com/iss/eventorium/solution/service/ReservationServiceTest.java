@@ -170,7 +170,6 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-        mockCompanyWorkingHours(null, null);
 
         ReservationForPastEventException exception = assertThrows(ReservationForPastEventException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -192,8 +191,6 @@ public class ReservationServiceTest {
 
         mockMapper(request, event, service);
         mockCompanyWorkingHours(LocalTime.of(11, 0), LocalTime.of(15, 0));
-
-        when(repository.exists(any(Specification.class))).thenReturn(false);
 
         InsufficientFundsException exception = assertThrows(InsufficientFundsException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -240,7 +237,6 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-        mockCompanyWorkingHours(null, null);
 
         ReservationDeadlineExceededException exception = assertThrows(ReservationDeadlineExceededException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
@@ -334,7 +330,6 @@ public class ReservationServiceTest {
 
         ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
         mockMapper(requestDto, event, service);
-        mockCompanyWorkingHours(null, null);
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
                 () -> this.service.createReservation(requestDto, 1L, 1L));
@@ -353,7 +348,6 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(request, event, service);
-        mockCompanyWorkingHours(null, null); // working hours are not that important, because exception will occur before this validation
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
                 () -> this.service.createReservation(request, 1L, 1L));
