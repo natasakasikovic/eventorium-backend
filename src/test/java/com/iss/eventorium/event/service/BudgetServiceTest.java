@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.dtos.budget.UpdateBudgetItemRequestDto;
 import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
+import com.iss.eventorium.event.exceptions.ProductNotAvailableException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -222,6 +223,24 @@ class BudgetServiceTest {
                 "Solution is already processed"
         );
         assertEquals("Solution is already processed", exception.getMessage());
+    }
+
+    @Test
+    @Tag("purchase-product")
+    @DisplayName("Should throw AlreadyProcessedException if product is already processed during purchase")
+    void givenUnavailableProduct_whenPurchaseProduct_thenThrowProductNotAvailableException() {
+        BudgetItemRequestDto request = createRequest(100.0);
+        Product product = createProduct(100.0, 50.0);
+        product.setIsAvailable(false);
+        when(productService.find(anyLong())).thenReturn(product);
+        mockEvent(new Budget());
+
+        ProductNotAvailableException exception = assertThrows(
+                ProductNotAvailableException.class,
+                () -> budgetService.purchaseProduct(DEFAULT_EVENT_ID, request),
+                "Solution is already processed"
+        );
+        assertEquals("You cannot purchase a product marked as unavailable!", exception.getMessage());
     }
 
     @Test
@@ -706,6 +725,7 @@ class BudgetServiceTest {
     private Product mockProduct(double price, double discount) {
         Product product = mock(Product.class);
         when(product.getPrice()).thenReturn(price);
+        when(product.getIsAvailable()).thenReturn(true);
         when(product.getDiscount()).thenReturn(discount);
         when(productService.find(anyLong())).thenReturn(product);
         return product;
@@ -733,6 +753,7 @@ class BudgetServiceTest {
         Product product = new Product();
         product.setId(DEFAULT_BUDGET_ITEM_ID);
         product.setPrice(price);
+        product.setIsAvailable(true);
         product.setDiscount(discount);
         return product;
     }

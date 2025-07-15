@@ -4,6 +4,7 @@ import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
+import com.iss.eventorium.event.exceptions.ProductNotAvailableException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
@@ -57,9 +58,10 @@ public class BudgetService {
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
         double netPrice = calculateNetPrice(product);
-        if(netPrice > request.getPlannedAmount()) {
+        if(netPrice > request.getPlannedAmount())
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
-        }
+        if(Boolean.FALSE.equals(product.getIsAvailable()))
+            throw new ProductNotAvailableException("You cannot purchase a product marked as unavailable!");
 
         Event event = eventService.find(eventId);
         assertOwnership(event);
