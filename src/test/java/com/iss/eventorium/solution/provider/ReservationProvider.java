@@ -11,19 +11,54 @@ public class ReservationProvider {
     // NOTE: Provides reservations with valid durations in order to test reservations for a service whose duration is between 2 and 6 hours.
     private static Stream<Arguments> provideReservationsWithValidDurations() {
         return Stream.of(
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(12, 0)), // Exactly 2 hours (minimum valid duration)
-                Arguments.of(LocalTime.of(13, 0), LocalTime.of(17, 0)), // Exactly 4 hours (within range)
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(16, 0)) // Exactly 6 hours (maximum valid duration)
+                // Exactly 2 hours (minimum valid duration)
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(7, 0))
+                        .endingTime(LocalTime.of(9, 0))
+                        .plannedAmount(120.0)
+                        .build()),
+                // Exactly 4 hours (within range)
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(9, 0))
+                        .endingTime(LocalTime.of(13, 0))
+                        .plannedAmount(120.0)
+                        .build()),
+                // Exactly 6 hours (maximum valid duration)
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(14, 0))
+                        .endingTime(LocalTime.of(20, 0))
+                        .plannedAmount(120.0)
+                        .build())
         );
     }
 
     // NOTE: Provides reservations with invalid durations in order to test reservations for a service whose duration is between 2 and 6 hours.
     private static Stream<Arguments> provideReservationsWithInvalidDurations() {
         return Stream.of(
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(11, 59)), // One minute shorter than the minimum allowed duration (duration is 1h 59min)
-                Arguments.of(LocalTime.of(9, 0), LocalTime.of(15, 1)),   // one minute longer than the maximum allowed duration (duration is 6h 1min)
-                Arguments.of(LocalTime.of(12, 0), LocalTime.of(12, 0)),  // Duration of exactly zero hours (start and end time are the same)
-                Arguments.of(LocalTime.of(14, 0), LocalTime.of(13, 0))   // Negative duration
+                // One minute shorter than the minimum allowed duration (duration is 1h 59min)
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(10, 0))
+                                .endingTime(LocalTime.of(11, 59))
+                                .plannedAmount(100.0)
+                                .build()),
+                // One minute longer than the maximum allowed duration (duration is 6h 1min)
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(9, 0))
+                        .endingTime(LocalTime.of(15, 1))
+                        .plannedAmount(100.0)
+                        .build()),
+                // Duration of exactly zero hours (start and end time are the same)
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(12, 0))
+                        .endingTime(LocalTime.of(12, 0))
+                        .plannedAmount(100.0)
+                        .build()),
+                // Negative duration
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(14, 0))
+                        .endingTime(LocalTime.of(13, 0))
+                        .plannedAmount(100.0)
+                        .build())
         );
     }
 

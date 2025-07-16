@@ -327,18 +327,17 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("service-duration")
     @DisplayName("Should throw InvalidServiceDurationException when reservation duration is outside the allowed service duration range [minDuration, maxDuration]")
-    public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(LocalTime startingTime, LocalTime endingTime) {
+    public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
-        mockMapper(requestDto, event, service);
+        mockMapper(reservationRequest, event, service);
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
-                () -> this.service.createReservation(requestDto, 1L, 1L));
+                () -> this.service.createReservation(reservationRequest, 1L, 1L));
 
         assertEquals(String.format("The service duration must be between %d and %d hours.", service.getMinDuration(), service.getMaxDuration()), exception.getMessage());
     }
@@ -390,26 +389,25 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
-    public void givenDurationBetweenMinimumAndMaximum_whenValidateServiceDuration_thenSuccess(LocalTime startingTime, LocalTime endingTime) {
+    public void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
-        mockMapper(requestDto, event, service);
+        mockMapper(reservationRequest, event, service);
         mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
         mockDependenciesForSuccessfulReservation();
 
-        this.service.createReservation(requestDto, 1L, 1L);
+        this.service.createReservation(reservationRequest, 1L, 1L);
 
         verify(repository, times(1)).save(reservationCaptor.capture());
         verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
 
         Reservation saved = reservationCaptor.getValue();
-        assertEquals(startingTime, saved.getStartingTime());
-        assertEquals(endingTime, saved.getEndingTime());
+        assertEquals(reservationRequest.getStartingTime(), saved.getStartingTime());
+        assertEquals(reservationRequest.getEndingTime(), saved.getEndingTime());
     }
 
     @Test
