@@ -2,6 +2,7 @@ package com.iss.eventorium.event.services;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
@@ -218,7 +219,7 @@ public class EventService {
         return variables;
     }
 
-    public void createAgenda(Long id, AgendaRequestDto agenda) {
+    public AgendaResponseDto createAgenda(Long id, AgendaRequestDto agenda) {
         Event event = find(id);
         assertOwnership(event);
         if (!event.isDraft())
@@ -236,6 +237,8 @@ public class EventService {
 
         if (event.getPrivacy().equals(Privacy.OPEN)) setIsDraftFalse(event);
         else repository.save(event);
+
+        return activityMapper.toAgendaResponse(event.getId(), activities);
     }
 
     private void validateActivities(List<Activity> activities) {

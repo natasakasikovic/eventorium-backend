@@ -2,6 +2,7 @@ package com.iss.eventorium.event.api;
 
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
 import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.shared.models.ExceptionResponse;
@@ -322,7 +323,7 @@ public interface EventApi {
                     @ApiResponse(responseCode = "403", description = "Forbidden - not enough permissions")
             }
     )
-    ResponseEntity<Void> createAgenda(
+    ResponseEntity<AgendaResponseDto> createAgenda(
             @Valid @RequestBody(
                     description = "Contains list of activities",
                     required = true
