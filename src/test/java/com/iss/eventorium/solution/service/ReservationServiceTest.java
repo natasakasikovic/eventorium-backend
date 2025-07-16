@@ -42,8 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /*
@@ -412,6 +411,7 @@ public class ReservationServiceTest {
 
     @Test
     @Tag("exception-handling")
+    @Tag("overlapping-reservations")
     @DisplayName("Should throw ReservationConflictException when reservation overlaps with an existing one")
     public void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
@@ -420,15 +420,73 @@ public class ReservationServiceTest {
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
         mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
 
-        when(repository.exists(any(Specification.class))).thenReturn(true);
+        when(repository.exists(any(Specification.class)))
+                .thenReturn(false)  // No overlap for the first reservation
+                .thenReturn(true);  // Overlap detected for the second reservation
 
-        ReservationConflictException exception = assertThrows(ReservationConflictException.class,
-                () -> this.service.createReservation(request, 1L, 1L));
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(8, 0), LocalTime.of(12, 0), 100.0);
+        mockMapper(request1, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L)); // First reservation succeeds
 
-        assertEquals("The selected time slot for this service is already occupied. Please choose a different time.", exception.getMessage());
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(11, 55), LocalTime.of(14, 0), 150.0);
+        mockMapper(request2, event, service);
+        ReservationConflictException exception = assertThrows(ReservationConflictException.class, // Second reservation throws conflict exception
+                () -> this.service.createReservation(request2, 1L, 1L));
+
+        assertEquals("For your event, this service is already reserved during the selected time slot. Please choose a different time.", exception.getMessage());
+    }
+
+    @Test
+    @Tag("overlapping-reservations")
+    @DisplayName("Should create both reservations when time slots do not overlap (same service, same event)")
+    public void givenNonOverlappingReservations_whenCreateReservation_thenSuccess() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+
+        when(repository.exists(any(Specification.class)))
+                .thenReturn(false)  // No overlap for first reservation
+                .thenReturn(false); // No overlap for second reservation
+
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(8, 0), LocalTime.of(10, 0), 100.0);
+        mockMapper(request1, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L));
+
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(10, 0), LocalTime.of(12, 0), 120.0);
+        mockMapper(request2, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request2, 1L, 1L));
+    }
+
+    @Test
+    @Tag("overlapping-reservations")
+    @DisplayName("Should allow reservation of the same service at the same time for different events")
+    public void givenSameServiceDifferentEvents_whenCreateReservation_thenSuccess() {
+        Event event1 = Event.builder().id(1L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        Event event2 = Event.builder().id(2L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).id(2L).build();
+
+        when(eventService.find(1L)).thenReturn(event1);
+        when(eventService.find(2L)).thenReturn(event2);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(9, 0), LocalTime.of(11, 0), 100.0);
+        mockMapper(request1, event1, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L));
+
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(9, 0), LocalTime.of(11, 0), 120.0);
+        mockMapper(request2, event2, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request2, 2L, 1L));
     }
 
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {

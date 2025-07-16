@@ -25,7 +25,7 @@ public class ServiceReservationSpecification {
                 .and(hasStartTime(reservation.getEndingTime()))
                 .and(hasEndTime(reservation.getStartingTime()))
                 .and(hasDate(reservation.getEvent().getDate()))
-                .and(hasNotStatus(Status.DECLINED));
+                .and(statusIsNot(Status.DECLINED));
     }
 
     public static Specification<Reservation> checkForReservationsInOneHour() {
@@ -75,7 +75,7 @@ public class ServiceReservationSpecification {
         };
     }
 
-    private static Specification<Reservation> hasNotStatus(Status status) {
+    private static Specification<Reservation> statusIsNot(Status status) {
         return (root, query, cb) -> cb.notEqual(root.get("status"), status);
     }
 
@@ -96,11 +96,11 @@ public class ServiceReservationSpecification {
     }
 
     private static Specification<Reservation> hasStartTime(LocalTime endTime) {
-        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("startingTime"), endTime);
+        return (root, query, cb) -> cb.lessThan(root.get("startingTime"), endTime);
     }
 
     private static Specification<Reservation> hasEndTime(LocalTime startTime) {
-        return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("endingTime"), startTime);
+        return (root, query, cb) -> cb.greaterThan(root.get("endingTime"), startTime);
     }
 
     private static Specification<Reservation> hasDate(LocalDate date) {
