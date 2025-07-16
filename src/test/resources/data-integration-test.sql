@@ -24,6 +24,15 @@ INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, 
 
 INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5), (2, 4), (3, 3), (4,5), (5,5), (6,5);
 
+INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
+VALUES
+    (3, '9:00 pm', '7:00 am', 'Dositejeva, 6',
+     'Event Masters is your go-to partner for planning all types of events. ' ||
+     'From creating custom invitations and event banners to full-scale coordination, ' ||
+     'we bring your vision to life with precision and creativity. Contact us to make your event unforgettable.',
+     'info@eventmasters.com',
+     'Event Masters', '+15551234567', 2);
+
 INSERT INTO categories (name, description, deleted, suggested) VALUES
     ('Event Planning', 'Category for organizing event-related tasks',  false, false),
     ('Catering', 'Food and beverages arrangements',   false, false),
@@ -67,7 +76,8 @@ VALUES
     ('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 1, false, 5),
     ('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, true, 6),
     ('My birthday!!!', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '10' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, true, null),
-    ('Summer Music Festival', 'A lively outdoor music festival featuring multiple bands and food vendors.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 500, 2, 'Park Avenue 123', 1, 1, false, null);
+    ('Summer Music Festival', 'A lively outdoor music festival featuring multiple bands and food vendors.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 500, 2, 'Park Avenue 123', 1, 1, false, null),
+    ('Annual Business Workshop', 'A workshop focused on leadership development and business growth strategies.', CURRENT_DATE - INTERVAL '30' DAY, 'OPEN', 80, 2, 'Business Center, Bulevar Kralja Aleksandra 50', 1,  1,  false, null);
 
 INSERT INTO products (id, name, description, price, discount, status, is_available, is_deleted, is_visible, category_id, provider_id) VALUES
     (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 30.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
@@ -76,8 +86,10 @@ INSERT INTO products (id, name, description, price, discount, status, is_availab
     (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3);
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
-    (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 3),
-    (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 3),
-    (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3),
-    (nextval('solution_sequence'), 'DJ Service', 'Professional DJ providing music entertainment for your event.', 'Music, DJ, Entertainment', 500.00, 0.00, 'ACCEPTED', FALSE, FALSE, TRUE, 'MANUAL', 10, 2, 2, 5, 1, 3),
-    (nextval('solution_sequence'), 'Live Band Performance', 'Energetic live band performing a variety of music genres for events', 'Music, Live Performance, Entertainment', 800.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 150, 7, 3, 6, 5, 3);
+    (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 2),
+    (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 2),
+    (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 2),
+    (nextval('solution_sequence'), 'DJ Service', 'Professional DJ providing music entertainment for your event.', 'Music, DJ, Entertainment', 500.00, 0.00, 'ACCEPTED', FALSE, FALSE, TRUE, 'MANUAL', 10, 2, 2, 5, 1, 2),
+    (nextval('solution_sequence'), 'Live Band Performance', 'Energetic live band performing a variety of music genres for events', 'Music, Live Performance, Entertainment', 800.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 150, 7, 3, 6, 5, 2),
+    (nextval('solution_sequence'), 'Full Event Coordination', 'Comprehensive planning and management of events', 'Planning, Coordination', 100.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 5, 7, 2, 6, 1, 2),
+    (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 5,5 , 5, 7, 2);

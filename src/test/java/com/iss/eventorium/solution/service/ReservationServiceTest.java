@@ -397,7 +397,7 @@ public class ReservationServiceTest {
         when(serviceService.find(anyLong())).thenReturn(service);
 
         mockMapper(reservationRequest, event, service);
-        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(21, 0));
         mockDependenciesForSuccessfulReservation();
 
         this.service.createReservation(reservationRequest, 1L, 1L);

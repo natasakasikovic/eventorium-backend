@@ -22,12 +22,15 @@ public class TestUtil {
     public static final Long INVALID_EVENT = 500L;
     public static final Long EVENT_ID_NOT_OWNED_BY_LOGGED_IN_ORGANIZER = 3L;
     public static final Long VALID_EVENT_ID_FOR_RESERVATION = 8L;
+    public static final Long EVENT_IN_PAST_ID = 9L;
 
     public static final Long INVALID_PRODUCT = 500L;
 
     public static final Long UNAVAILABLE_SERVICE_ID = 8L;
     public static final Long SERVICE_ID_RESERVATION_DEADLINE_EXPIRED = 9L; // // Refers to a VALID_EVENT_ID_FOR_RESERVATION
-    public static final Long RESERVABLE_SERVICE_ID = 5L; // TODO: vidi koji ces
+    public static final Long RESERVABLE_SERVICE_ID = 5L;
+    public static final Long SERVICE_ID_WITH_DURATION_RANGE = 10L;
+    public static final Long SERVICE_ID_WITH_FIXED_DURATION = 11L;
 
     private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
         jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));

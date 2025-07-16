@@ -16,9 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static com.iss.eventorium.util.TestUtil.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -89,6 +88,7 @@ public class ReservationControllerIntegrationTest {
 
     @Test
     @DisplayName("Should return NOT_FOUND when trying to reserve service for non-existing event")
+    // NOTE: Same behavior if you pass id of invisible, unaccepted or deleted service, so that cases won't be tested
     void givenNonExistingService_whenReserveService_thenReturnNotFoundException() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
@@ -130,5 +130,51 @@ public class ReservationControllerIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
         assertEquals("Reservation deadline has passed for this service!", response.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return BAD_REQUEST when trying to reserve a service for event in past")
+    void givenPastEvent_whenCreateReservation_thenThrowBadRequestException() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                request,
+                ExceptionResponse.class,
+                EVENT_IN_PAST_ID,
+                RESERVABLE_SERVICE_ID);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
+        assertNotNull(response.getBody());
+        assertEquals("You cannot make a reservation for an event that has already passed.", response.getBody().getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithInvalidDurations")
+    @DisplayName("Should return BAD_REQUEST when trying to reserve with duration which is not in range of service duration")
+    void givenReservationDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowBadRequestException(ReservationRequestDto reservationRequest) {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                reservationRequest,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION,
+                SERVICE_ID_WITH_DURATION_RANGE);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
+        assertNotNull(response.getBody());
+        assertEquals("The service duration must be between 2 and 6 hours.", response.getBody().getMessage());
+    }
+
+    @Test
+    @DisplayName("Should return BAD_REQUEST when trying to reserve with duration which is not equal to fixed service duration")
+    void givenReservationDurationNotEqualToFixedServiceDuration_whenValidateServiceDuration_thenThrowBadRequestException() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                request,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION,
+                SERVICE_ID_WITH_FIXED_DURATION);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
+        assertNotNull(response.getBody());
+        assertEquals("The service duration must be exactly 5 hours.", response.getBody().getMessage());
     }
 }
