@@ -14,6 +14,7 @@ public class TestUtil {
     public static final Long NOT_PROCESSED_PRODUCT = 5L;
     public static final Long DELETED_PRODUCT = 6L;
     public static final Long INVISIBLE_PRODUCT = 7L;
+    public static final Long UNAVAILABLE_PRODUCT = 8L;
 
     private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
         jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));

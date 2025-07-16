@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
-import com.iss.eventorium.event.dtos.budget.UpdateBudgetItemRequestDto;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.util.TestRestTemplateAuthHelper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,9 +50,10 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("get-budget")
     void givenExistingEventWithBudget_whenGetBudget_thenReturnBudgetDetails() {
         ResponseEntity<BudgetResponseDto> response = authHelper.authorizedGet(
-                ORGANIZER_EMAIL,
+                "organizer2@gmail.com",
                 "/api/v1/events/{event-id}/budget",
                 BudgetResponseDto.class,
                 2L
@@ -64,6 +65,22 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("get-budget")
+    void givenWrongOrganizer_whenGetBudget_thenReturnForbidden() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
+                "organizer2@gmail.com",
+                "/api/v1/events/{event-id}/budget",
+                ExceptionResponse.class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("You are not authorized to change this event.", response.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("get-budget")
     void givenNonExistentEvent_whenGetBudget_thenReturnNotFoundWithMessage() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL,
@@ -78,6 +95,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
     void givenValidBudgetItemRequest_whenPurchaseProduct_thenReturnCreatedBudgetItemDetails() {
         BudgetItemRequestDto request = createBudgetItemRequest(10.0, NEW_BUDGET_ITEM);
 
@@ -99,6 +117,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
     void givenInsufficientFunds_whenPurchaseProduct_thenReturnErrorMessage() {
         BudgetItemRequestDto request = createBudgetItemRequest(9.0, NEW_BUDGET_ITEM);
 
@@ -117,6 +136,7 @@ class BudgetControllerIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidProducts")
+    @Tag("purchase-product")
     void givenInvalidSolution_whenPurchaseProduct_thenReturnErrorMessage(Long id) {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
 
@@ -134,6 +154,25 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
+    void givenUnavailableProduct_whenPurchaseProduct_thenReturnErrorMessage() {
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, UNAVAILABLE_PRODUCT);
+
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/purchase",
+                request,
+                ExceptionResponse.class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("You cannot purchase a product marked as unavailable!", response.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("purchase-product")
     void givenAlreadyPurchasedProduct_whenPurchaseProduct_thenReturnConflictWithMessage() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, PURCHASED_PRODUCT);
 
@@ -151,6 +190,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
     void givenNonExistentProduct_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, INVALID_PRODUCT);
 
@@ -167,22 +207,9 @@ class BudgetControllerIntegrationTest {
         assertEquals("Product not found", response.getBody().getMessage());
     }
 
-    @Test
-    void givenWrongOrganizer_whenGetBudget_thenReturnForbidden() {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
-                "organizer2@gmail.com",
-                "/api/v1/events/{event-id}/budget",
-                ExceptionResponse.class,
-                EXISTING_EVENT
-        );
-
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("You are not authorized to change this event.", response.getBody().getMessage());
-    }
-
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
+    @Tag("purchase-product")
     void givenInvalidBudgetItemRequest_whenPurchaseProduct_thenThrowValidationError(
             BudgetItemRequestDto request,
             String expectedMessage
@@ -201,6 +228,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
     void givenNonExistentEvent_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, NEW_BUDGET_ITEM);
 
@@ -218,6 +246,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("purchase-product")
     void givenValidRequest_whenPurchaseProduct_thenBudgetItemIsCreated() {
         BudgetItemRequestDto request = createBudgetItemRequest(15.0, NOT_PROCESSED_PRODUCT);
 
@@ -242,6 +271,7 @@ class BudgetControllerIntegrationTest {
             "organizer2@gmail.com,2",
             "organizer3@gmail.com,1",
     })
+    @Tag("get-budget-items")
     void givenUserEmail_whenGetAllBudgetItems_thenReturnExpectedSize(String email, int expectedSize) {
         ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
                 email,
@@ -256,6 +286,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @Test
+    @Tag("get-budget-items")
     void givenEventWithBudgetItems_whenGetBudgetItems_thenReturnListOfItemsWithRestoredPrices() {
         ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL,

@@ -75,7 +75,8 @@ INSERT INTO products (id, name, description, price, discount, status, is_availab
     (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
     (nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
     (nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, TRUE, TRUE, 9, 4),
-    (nextval('solution_sequence'), 'Invisible Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 9, 4);
+    (nextval('solution_sequence'), 'Invisible Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 9, 4),
+    (nextval('solution_sequence'), 'Unavailable Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', FALSE, FALSE, TRUE, 9, 4);
 
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
