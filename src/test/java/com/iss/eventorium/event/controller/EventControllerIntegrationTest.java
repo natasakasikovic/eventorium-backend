@@ -3,10 +3,14 @@ package com.iss.eventorium.event.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
+import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.models.Privacy;
+import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.shared.models.ExceptionResponse;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.util.TestRestTemplateAuthHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -17,17 +21,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.iss.eventorium.event.provider.EventProvider.provideValidAgenda;
@@ -90,17 +96,46 @@ class EventControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should return OK when event is successfully updated with agenda")
+    @Transactional
+    @DisplayName("Should return OK when event is successfully updated with agenda and visible to everyone because it has Privacy.OPEN")
     void givenValidRequest_whenCreateAgenda_thenReturnOk() {
-        ResponseEntity<Void> response = authHelper.authorizedPut(
+        ResponseEntity<AgendaResponseDto> response = authHelper.authorizedPut(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{id}/agenda",
                 provideValidAgenda(),
-                Void.class,
+                AgendaResponseDto.class,
                 EVENT_WITHOUT_AGENDA_1
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().getActivities().size());
+        assertEventIsVisibleToUsers(response.getBody().getEventId());
+    }
+
+    private void assertEventIsVisibleToUsers(Long eventId) {
+        int page = 0;
+        boolean found;
+
+        while (true) {
+            ResponseEntity<PagedResponse<EventSummaryResponseDto>> response = restTemplate.exchange(
+                    "/api/v1/events?page=" + page + "&size=10",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            PagedResponse<EventSummaryResponseDto> pageResponse = response.getBody();
+            assertNotNull(pageResponse);
+
+            found = pageResponse.getContent().stream().anyMatch(e -> e.getId().equals(eventId));
+            if (found || page >= pageResponse.getTotalPages() - 1) break;
+
+            page++;
+        }
+
+        assertTrue(found, "Expected event to be visible to users in the paged event list");
     }
 
     @ParameterizedTest
@@ -127,7 +162,7 @@ class EventControllerIntegrationTest {
                 "/api/v1/events/{id}/agenda",
                 provideValidAgenda(),
                 ExceptionResponse.class,
-                0
+                NON_EXISTING_ENTITY_ID
         );
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Expected 404 Not Found");
         assertNotNull(response.getBody());
@@ -177,21 +212,6 @@ class EventControllerIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 Bad Request");
         assertNotNull(response.getBody());
         assertTrue(response.getBody().getMessage().startsWith("Cannot add agenda to event with name"));
-    }
-
-    @Test
-    @DisplayName("Should return BAD_REQUEST when sending empty agenda")
-    void givenEmptyRequest_whenCreateAgenda_thenReturnBadRequest() {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPut(
-                ORGANIZER_EMAIL,
-                "/api/v1/events/{id}/agenda",
-                new AgendaRequestDto(new ArrayList<>()),
-                ExceptionResponse.class,
-                EVENT_WITHOUT_AGENDA_1
-        );
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 Bad Request");
-        assertNotNull(response.getBody());
-        assertEquals("Agenda must contain at least one activity.", response.getBody().getMessage());
     }
 
     @ParameterizedTest

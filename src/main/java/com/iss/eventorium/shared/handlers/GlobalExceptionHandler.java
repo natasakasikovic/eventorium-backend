@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(OwnershipRequiredException .class)
+    @ExceptionHandler(OwnershipRequiredException.class)
     public ResponseEntity<ExceptionResponse> handleForbiddenEdit(OwnershipRequiredException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ExceptionResponse.builder()

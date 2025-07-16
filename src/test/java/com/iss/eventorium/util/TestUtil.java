@@ -16,6 +16,7 @@ public class TestUtil {
     public static final Long FORBIDDEN_EVENT_ID = 2L;
     public static final Long INVALID_EVENT = 500L;
     public static final Long INVALID_PRODUCT = 500L;
+    public static final Long NON_EXISTING_ENTITY_ID = 0L;
 
     private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
         jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));

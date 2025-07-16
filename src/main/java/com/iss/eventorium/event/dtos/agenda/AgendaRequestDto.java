@@ -16,5 +16,5 @@ public class AgendaRequestDto {
     @Valid
     @NotEmpty(message = "Agenda must contain at least one activity.")
     @NotNull(message = "Activities are required")
-    List<ActivityRequestDto> activities;
+    private List<ActivityRequestDto> activities;
 }

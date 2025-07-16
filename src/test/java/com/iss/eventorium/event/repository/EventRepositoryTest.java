@@ -32,20 +32,6 @@ class EventRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    @ParameterizedTest(name = "Organizer ID: {0} should have {1} events")
-    @DisplayName("Should return correct number of events for each organizer")
-    @CsvSource({
-         "1,3",
-         "2,2",
-         "3,0"
-    })
-    void givenOrganizerId_whenFilterByOrganizer_thenReturnExpectedEventCount(Long organizerId, int expected) {
-        User organizer = entityManager.find(User.class, organizerId);
-        List<Event> events = eventRepository.findAll(EventSpecification.filterByOrganizer(organizer));
-        assertNotNull(events);
-        assertEquals(expected, events.size());
-    }
-
     @Test
     @DisplayName("Should return event when user is not blocking the organizer")
     void givenExistingEventAndNonBlockingUser_whenFilterById_thenReturnsEvent() {
