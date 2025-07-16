@@ -7,8 +7,6 @@ import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.user.models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -70,12 +68,21 @@ class EventRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should return only CLOSED events")
-    void givenPrivacyOpen_whenFindAllWithSpec_thenOnlyOpenEventsReturned() {
+    @DisplayName("Should return only OPEN events")
+    void givenPrivacyOpen_whenFindAll_thenOnlyOpenEventsReturned() {
         Specification<Event> spec = EventSpecification.filterByPrivacy(Privacy.OPEN, null);
         List<Event> events = eventRepository.findAll(spec);
         assertEquals(4, events.size());
         assertTrue(events.stream().allMatch(event -> event.getPrivacy() == Privacy.OPEN));
+    }
+
+    @Test
+    @DisplayName("Should return only CLOSED events")
+    void givenPrivacyClosed_whenFindAll_thenOnlyClosedEventsReturned() {
+        Specification<Event> spec = EventSpecification.filterByPrivacy(Privacy.CLOSED, null);
+        List<Event> events = eventRepository.findAll(spec);
+        assertEquals(1, events.size());
+        assertTrue(events.stream().allMatch(event -> event.getPrivacy() == Privacy.CLOSED));
     }
 
 }
