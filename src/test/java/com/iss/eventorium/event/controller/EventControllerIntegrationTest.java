@@ -79,22 +79,6 @@ class EventControllerIntegrationTest {
         assertEquals(Privacy.OPEN, body.getPrivacy());
     }
 
-    @Test
-    @DisplayName("Should find created OPEN event on the last page")
-    void givenOpenEvent_whenCreated_thenEventIsOnLastPage() {
-        ResponseEntity<EventResponseDto> createResponse = authHelper.authorizedPost(
-                ORGANIZER_EMAIL,
-                "/api/v1/events",
-                provideValidEventRequest(),
-                EventResponseDto.class
-        );
-
-        assertEquals(HttpStatus.CREATED, createResponse.getStatusCode());
-        EventResponseDto createdEvent = createResponse.getBody();
-        assertNotNull(createdEvent);
-    }
-
-
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.EventProvider#provideInvalidEventRequestsWithExpectedError")
     @DisplayName("Should return BAD_REQUEST and expected validation message for invalid EventRequestDto")
