@@ -2,11 +2,11 @@ package com.iss.eventorium.event.service;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
 import com.iss.eventorium.event.dtos.event.EventRequestDto;
 import com.iss.eventorium.event.dtos.event.EventResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
-import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -126,7 +126,7 @@ class EventServiceTest {
         when(activityMapper.fromRequest(requests.get(1))).thenReturn(activities.get(1));
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
-        assertThatCode(() -> eventService.createAgenda(EVENT_ID, requests))
+        assertThatCode(() -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(requests)))
                 .doesNotThrowAnyException();
         verify(eventRepository, times(1)).save(eventCaptor.capture());
 
@@ -152,32 +152,20 @@ class EventServiceTest {
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
         InvalidTimeRangeException exception = assertThrows(InvalidTimeRangeException.class,
-                () -> eventService.createAgenda(EVENT_ID, requests));
+                () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(requests)));
 
         assertEquals(expectedMessage, exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when agenda has no activities")
-    void givenNoActivities_whenCreateAgenda_shouldThrowEmptyAgendaException() {
-        List<ActivityRequestDto> requests = new ArrayList<>();
-
-        EmptyAgendaException exception = assertThrows(EmptyAgendaException.class,
-                () -> eventService.createAgenda(EVENT_ID, requests));
-
-        assertEquals("Agenda must contain at least one activity.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Should throw exception when agenda is already defined")
     void givenEventWithAgenda_whenCreateAgenda_shouldThrowAgendaAlreadyDefinedException() {
         event.setActivities(List.of(new Activity()));
-        List<ActivityRequestDto> requests = List.of(new ActivityRequestDto());
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
         when(authService.getCurrentUser()).thenReturn(currentUser);
 
         AgendaAlreadyDefinedException exception = assertThrows(AgendaAlreadyDefinedException.class,
-                () -> eventService.createAgenda(EVENT_ID, requests));
+                () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(List.of(new ActivityRequestDto()))));
 
         assertEquals("Agenda already defined for event with name First Event", exception.getMessage());
     }
@@ -190,7 +178,7 @@ class EventServiceTest {
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
         OwnershipRequiredException exception = assertThrows(OwnershipRequiredException.class,
-                () -> eventService.createAgenda(EVENT_ID, List.of(new ActivityRequestDto())));
+                () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(List.of(new ActivityRequestDto()))));
 
         assertEquals("You are not authorized to manage this event.", exception.getMessage());
     }
@@ -203,7 +191,7 @@ class EventServiceTest {
         when(eventRepository.findOne(any(Specification.class))).thenReturn(Optional.of(event));
 
         InvalidEventStateException exception = assertThrows(InvalidEventStateException.class,
-                () -> eventService.createAgenda(EVENT_ID, List.of(new ActivityRequestDto())));
+                () -> eventService.createAgenda(EVENT_ID, new AgendaRequestDto(List.of(new ActivityRequestDto()))));
 
         assertEquals("Cannot add agenda to event with name First Event", exception.getMessage());
     }
