@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.budget.UpdateBudgetItemRequestDto;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.models.SolutionType;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.iss.eventorium.event.provider.BudgetProvider.VALID_CATEGORY;
 import static com.iss.eventorium.util.TestUtil.*;
@@ -111,6 +115,24 @@ class BudgetControllerIntegrationTest {
         assertEquals("You do not have enough funds for this purchase!", response.getBody().getMessage());
     }
 
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidProducts")
+    void givenInvalidSolution_whenPurchaseProduct_thenReturnErrorMessage(Long id) {
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
+
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/purchase",
+                request,
+                ExceptionResponse.class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Product not found", response.getBody().getMessage());
+    }
+
     @Test
     void givenAlreadyPurchasedProduct_whenPurchaseProduct_thenReturnConflictWithMessage() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, PURCHASED_PRODUCT);
@@ -143,6 +165,20 @@ class BudgetControllerIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Product not found", response.getBody().getMessage());
+    }
+
+    @Test
+    void givenWrongOrganizer_whenGetBudget_thenReturnForbidden() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
+                "organizer2@gmail.com",
+                "/api/v1/events/{event-id}/budget",
+                ExceptionResponse.class,
+                2L
+        );
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("You are not allowed to access this resource", response.getBody().getMessage());
     }
 
     @ParameterizedTest
@@ -181,8 +217,31 @@ class BudgetControllerIntegrationTest {
         assertEquals("Event not found", response.getBody().getMessage());
     }
 
+    @Test
+    void givenValidRequest_whenPurchaseProduct_thenBudgetItemIsCreated() {
+        BudgetItemRequestDto request = createBudgetItemRequest(15.0, NOT_PROCESSED_PRODUCT);
+
+        ResponseEntity<ProductResponseDto> response = authHelper.authorizedPost(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/purchase",
+                request,
+                ProductResponseDto.class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ProductResponseDto body = response.getBody();
+        assertNotNull(body);
+        assertEquals(request.getItemId(), body.getId());
+        assertTrue(request.getPlannedAmount() > body.getPrice() * (1 - body.getDiscount() / 100));
+    }
+
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideBudgetItems")
+    @CsvSource({
+            "organizernoevents@gmail.com,0",
+            "organizer2@gmail.com,2",
+            "organizer3@gmail.com,1",
+    })
     void givenUserEmail_whenGetAllBudgetItems_thenReturnExpectedSize(String email, int expectedSize) {
         ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
                 email,
@@ -195,6 +254,30 @@ class BudgetControllerIntegrationTest {
         assertNotNull(items);
         assertEquals(expectedSize, items.length);
     }
+
+    @Test
+    void givenEventWithBudgetItems_whenGetBudgetItems_thenReturnListOfItemsWithRestoredPrices() {
+        ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/budget-items",
+                BudgetItemResponseDto[].class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        BudgetItemResponseDto[] items = response.getBody();
+        assertNotNull(items);
+        assertTrue(items.length > 0);
+
+        Optional<BudgetItemResponseDto> match = Arrays.stream(items)
+                .filter(i -> i.getSolutionId().equals(1L))
+                .findFirst();
+
+        assertTrue(match.isPresent());
+        assertEquals("Custom Invitations", match.get().getSolutionName());
+        assertEquals(15.0, match.get().getSpentAmount());
+    }
+
 
     private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount, Long itemId) {
         return BudgetItemRequestDto.builder()

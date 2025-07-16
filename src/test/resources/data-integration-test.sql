@@ -44,7 +44,7 @@ INSERT INTO event_types (name, description, deleted) VALUES
 INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (0.0,0.0);
 
 INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type, status) VALUES
-    (20.0,9,CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
+    (20.0,9,DATE '2024-12-14', 1, 'PRODUCT', 'PROCESSED'),
     (45.0, 10, CURRENT_DATE, 2, 'PRODUCT', 'PROCESSED'),
     (20.0,1, CURRENT_DATE, 3, 'PRODUCT', 'PROCESSED'),
 
@@ -72,9 +72,26 @@ INSERT INTO products (id, name, description, price, discount, status, is_availab
     (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 30.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
     (nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
     (nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 20.0, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
-    (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3);
+    (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
+    (nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
+    (nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, TRUE, TRUE, 9, 4),
+    (nextval('solution_sequence'), 'Invisible Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 9, 4);
+
 
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
     (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 3),
     (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 3),
     (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3);
+
+
+INSERT INTO mementos (solution_id, name, price, discount, valid_from, valid_to) VALUES
+    (1, 'Custom Invitations', 30.00, 50.00, DATE '2024-11-01', DATE '2024-12-15'),
+    (2, 'Event Banner', 50.00, 10.00, CURRENT_DATE, NULL),
+    (3, 'Party Favors', 20.00, 0.00, CURRENT_DATE, NULL),
+    (4, 'Decorative Balloons', 10.00, 0.00, CURRENT_DATE, NULL),
+    (5, 'Party Hats', 2.00, 50.00, CURRENT_DATE, NULL),
+    (6, 'Event Photography', 150.00, 30.00, CURRENT_DATE, NULL),
+    (7, 'Catering Service', 500.00, 50.00, CURRENT_DATE, NULL),
+    (8, 'Event Planning', 1200.00, 0.00, CURRENT_DATE, NULL),
+    (9, 'Custom Invitations', 40.00, 10.00, DATE '2024-12-16', NULL),
+    (7, 'Event Mugs', 5.00, 20.00, CURRENT_DATE, NULL);

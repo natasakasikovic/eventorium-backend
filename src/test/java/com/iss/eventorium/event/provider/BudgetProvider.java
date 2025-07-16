@@ -2,20 +2,21 @@ package com.iss.eventorium.event.provider;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
+import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.solution.models.SolutionType;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
+import static com.iss.eventorium.util.TestUtil.DELETED_PRODUCT;
+import static com.iss.eventorium.util.TestUtil.INVISIBLE_PRODUCT;
+
 public class BudgetProvider {
 
     public static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
 
-    public static Stream<Arguments> provideBudgetItems() {
-        return Stream.of(
-                Arguments.of("organizer2@gmail.com", 2),
-                Arguments.of("organizer3@gmail.com", 1)
-        );
+    public static Stream<Long> provideInvalidProducts() {
+        return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT);
     }
 
     public static Stream<Arguments> provideInvalidBudgetItems() {
