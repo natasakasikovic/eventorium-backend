@@ -1,6 +1,7 @@
 package com.iss.eventorium.event.repository;
 
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.user.models.User;
@@ -80,6 +81,15 @@ class EventRepositoryTest {
         Optional<Event> result = eventRepository.findOne(spec);
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return only CLOSED events")
+    void givenPrivacyOpen_whenFindAllWithSpec_thenOnlyOpenEventsReturned() {
+        Specification<Event> spec = EventSpecification.filterByPrivacy(Privacy.OPEN, null);
+        List<Event> events = eventRepository.findAll(spec);
+        assertEquals(4, events.size());
+        assertTrue(events.stream().allMatch(event -> event.getPrivacy() == Privacy.OPEN));
     }
 
 }

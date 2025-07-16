@@ -21,7 +21,7 @@ VALUES
 (2, 'Corporate Event in Novi Sad', 'A corporate networking event with speakers and workshops.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 50, 1, 'Futoška 25', 1, 1, false, null),
 (3, 'Birthday Bash in Sombor', 'A fun-filled birthday party with music and food.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 30, 1, 'Trg Cara Uroša 6', 1, 1, false, null),
 (4, 'Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 1, 'Čitaonička 15', 1, 2, false, null),
-(5, 'Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, 'Žarka Zrenjanina 48', 1, 2, false, null);
+(5, 'Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'CLOSED', 80, 1, 'Žarka Zrenjanina 48', 1, 2, false, null);
 
 -- USER_BLOCKS
 INSERT INTO user_blocks (id, blocker_id, blocked_id) VALUES (1, 3, 1);
