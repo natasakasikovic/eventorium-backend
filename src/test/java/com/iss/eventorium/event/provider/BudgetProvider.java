@@ -66,7 +66,7 @@ public class BudgetProvider {
         );
     }
 
-    private static Stream<Arguments> provideReservationTypeAndExpectedStatus() {
+    public static Stream<Arguments> provideReservationTypeAndExpectedStatus() {
         return Stream.of(
                 Arguments.of(ReservationType.AUTOMATIC, BudgetItemStatus.PROCESSED),
                 Arguments.of(ReservationType.MANUAL, BudgetItemStatus.PENDING)

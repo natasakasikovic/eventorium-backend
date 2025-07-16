@@ -173,12 +173,12 @@ class BudgetControllerIntegrationTest {
                 "organizer2@gmail.com",
                 "/api/v1/events/{event-id}/budget",
                 ExceptionResponse.class,
-                2L
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("You are not allowed to access this resource", response.getBody().getMessage());
+        assertEquals("You are not authorized to change this event.", response.getBody().getMessage());
     }
 
     @ParameterizedTest
