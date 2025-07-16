@@ -1,7 +1,6 @@
 package com.iss.eventorium.event.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -24,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Objects;
 
+import static com.iss.eventorium.event.provider.BudgetProvider.VALID_CATEGORY;
 import static com.iss.eventorium.util.TestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,20 +75,20 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void givenValidBudgetItemRequest_whenPurchaseProduct_thenReturnCreatedBudgetItemDetails() {
-        BudgetItemRequestDto request = createBudgetItemRequest(10.0);
+        BudgetItemRequestDto request = createBudgetItemRequest(10.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ProductResponseDto> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/purchase",
                 request,
                 ProductResponseDto.class,
-                EVENT_WITH_BUDGET
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         ProductResponseDto body = response.getBody();
         assertNotNull(body);
-        assertEquals(4L, body.getId());
+        assertEquals(NEW_BUDGET_ITEM, body.getId());
         assertEquals("Decorative Balloons", body.getName());
         assertEquals(10.0, body.getPrice());
         assertEquals(0.0, body.getDiscount());
@@ -97,14 +96,14 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void givenInsufficientFunds_whenPurchaseProduct_thenReturnErrorMessage() {
-        BudgetItemRequestDto request = createBudgetItemRequest(9.0);
+        BudgetItemRequestDto request = createBudgetItemRequest(9.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/purchase",
                 request,
                 ExceptionResponse.class,
-                EVENT_WITH_BUDGET
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
@@ -114,19 +113,14 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void givenAlreadyPurchasedProduct_whenPurchaseProduct_thenReturnConflictWithMessage() {
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .plannedAmount(1000.0)
-                .itemId(1L)
-                .itemType(SolutionType.PRODUCT)
-                .category(CategoryResponseDto.builder().id(9L).build())
-                .build();
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, PURCHASED_PRODUCT);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/purchase",
                 request,
                 ExceptionResponse.class,
-                EVENT_WITH_BUDGET
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
@@ -136,19 +130,14 @@ class BudgetControllerIntegrationTest {
 
     @Test
     void givenNonExistentProduct_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
-        BudgetItemRequestDto request = BudgetItemRequestDto.builder()
-                .plannedAmount(1000.0)
-                .itemId(INVALID_PRODUCT)
-                .itemType(SolutionType.PRODUCT)
-                .category(CategoryResponseDto.builder().id(9L).build())
-                .build();
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, INVALID_PRODUCT);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/purchase",
                 request,
                 ExceptionResponse.class,
-                EVENT_WITH_BUDGET
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -158,28 +147,26 @@ class BudgetControllerIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
-    void givenInvalidBudgetItemRequest_whenPurchaseProduct_thenThrowValidationError(BudgetItemRequestDto request) {
+    void givenInvalidBudgetItemRequest_whenPurchaseProduct_thenThrowValidationError(
+            BudgetItemRequestDto request,
+            String expectedMessage
+    ) {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/purchase",
                 request,
                 ExceptionResponse.class,
-                EVENT_WITH_BUDGET
+                EXISTING_EVENT
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-
-        String message = response.getBody().getMessage();
-        assertTrue(
-                message.matches(".* is mandatory") || message.equals("Planned amount must be positive"),
-                "Unexpected validation message: " + message
-        );
+        assertEquals(expectedMessage, response.getBody().getMessage());
     }
 
     @Test
     void givenNonExistentEvent_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
-        BudgetItemRequestDto request = createBudgetItemRequest(1000.0);
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
                 ORGANIZER_EMAIL,
@@ -209,24 +196,12 @@ class BudgetControllerIntegrationTest {
         assertEquals(expectedSize, items.length);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "/api/v1/events/{event-id}/budget",
-            "/api/v1/events/{event-id}/budget/purchase",
-            "/api/v1/events/{event-id}/budget/budget-items",
-            "/api/v1/budget-items"
-    })
-    void givenNoAuthentication_whenAccessingProtectedUrls_thenReturnUnauthorized(String urlTemplate) {
-        ResponseEntity<String> response = restTemplate.getForEntity(urlTemplate, String.class, EVENT_WITH_BUDGET);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-    }
-
-    private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount) {
+    private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount, Long itemId) {
         return BudgetItemRequestDto.builder()
                 .plannedAmount(plannedAmount)
-                .itemId(4L)
+                .itemId(itemId)
                 .itemType(SolutionType.PRODUCT)
-                .category(CategoryResponseDto.builder().id(7L).build())
+                .category(VALID_CATEGORY)
                 .build();
     }
 

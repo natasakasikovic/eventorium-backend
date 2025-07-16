@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class BudgetProvider {
 
-    private static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
+    public static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
 
     public static Stream<Arguments> provideBudgetItems() {
         return Stream.of(
@@ -20,35 +20,46 @@ public class BudgetProvider {
 
     public static Stream<Arguments> provideInvalidBudgetItems() {
         return Stream.of(
-                Arguments.of(BudgetItemRequestDto.builder().build()),
                 Arguments.of(
-                    BudgetItemRequestDto.builder()
-                            .itemId(1L)
-                            .category(VALID_CATEGORY)
-                            .plannedAmount(-50.0)
-                            .itemType(SolutionType.PRODUCT)
-                            .build()
+                        BudgetItemRequestDto.builder()
+                                .itemId(1L)
+                                .category(VALID_CATEGORY)
+                                .plannedAmount(-50.0)
+                                .itemType(SolutionType.PRODUCT)
+                                .build(),
+                        "Planned amount must be positive"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .category(VALID_CATEGORY)
                                 .plannedAmount(1000.0)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Item is mandatory"
+                ),
+                Arguments.of(
+                        BudgetItemRequestDto.builder()
+                                .itemId(1L)
+                                .plannedAmount(1000.0)
+                                .category(VALID_CATEGORY)
+                                .build(),
+                        "Item type is mandatory"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .itemId(1L)
                                 .category(VALID_CATEGORY)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Planned amount is mandatory"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .itemId(1L)
                                 .plannedAmount(1000.0)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Category is mandatory"
                 )
         );
     }
