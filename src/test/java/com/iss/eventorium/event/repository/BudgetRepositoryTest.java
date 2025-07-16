@@ -7,6 +7,7 @@ import com.iss.eventorium.event.specifications.BudgetSpecification;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -42,9 +43,10 @@ class BudgetRepositoryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "organizer@gmail.com, 3",
-            "organizer2@gmail.com, 4",
+            "organizer@gmail.com,3",
+            "organizer2@gmail.com,4",
     })
+    @DisplayName("Should return only processed budget items for given organizer")
     void givenValidItem_whenFilterAllBudgetItems_thenItemReturned(String email, int expectedSize) {
         organizer = userRepository.findByEmail(email).orElseThrow();
         List<BudgetItem> items = budgetItemRepository.findAll(
@@ -56,6 +58,7 @@ class BudgetRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should exclude budget item when related solution is marked as deleted")
     void givenDeletedSolution_whenFilterAllBudgetItems_thenItemExcluded() {
         BudgetItem item = budgetItemRepository.findAll().get(0);
         item.getSolution().setIsDeleted(true);
@@ -69,6 +72,7 @@ class BudgetRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should exclude budget item when status is not processed")
     void givenUnprocessedItem_whenFilterAllBudgetItems_thenItemExcluded() {
         BudgetItem item = budgetItemRepository.findAll().get(0);
         item.setStatus(BudgetItemStatus.PLANNED);
@@ -83,6 +87,7 @@ class BudgetRepositoryTest {
 
 
     @Test
+    @DisplayName("Should exclude budget item when related solution is not visible")
     void givenInvisibleSolution_whenFilterAllBudgetItems_thenItemExcluded() {
         BudgetItem item = budgetItemRepository.findAll().get(0);
         item.getSolution().setIsVisible(false);
