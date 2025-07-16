@@ -1,12 +1,12 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
 import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
-import com.iss.eventorium.event.exceptions.EmptyAgendaException;
 import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
@@ -219,18 +219,15 @@ public class EventService {
         return variables;
     }
 
-    public void createAgenda(Long id, List<ActivityRequestDto> request) {
-        if (request.isEmpty())
-            throw new EmptyAgendaException("Agenda must contain at least one activity.");
-
+    public AgendaResponseDto createAgenda(Long id, AgendaRequestDto agenda) {
         Event event = find(id);
         assertOwnership(event);
-        ensureEventIsDraft(event);
-
+        if (!event.isDraft())
+            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
         if (!event.getActivities().isEmpty())
             throw new AgendaAlreadyDefinedException("Agenda already defined for event with name " + event.getName());
 
-        List<Activity> activities = request.stream()
+        List<Activity> activities = agenda.getActivities().stream()
                 .map(activityMapper::fromRequest)
                 .toList();
         validateActivities(activities);
@@ -238,10 +235,10 @@ public class EventService {
         event.setActivities(new ArrayList<>());
         event.getActivities().addAll(activities);
 
-        if (event.getPrivacy().equals(Privacy.OPEN))
-            setIsDraftFalse(event);
-        else
-            repository.save(event);
+        if (event.getPrivacy().equals(Privacy.OPEN)) setIsDraftFalse(event);
+        else repository.save(event);
+
+        return activityMapper.toAgendaResponse(event.getId(), activities);
     }
 
     private void validateActivities(List<Activity> activities) {
@@ -331,11 +328,6 @@ public class EventService {
         User organizer = authService.getCurrentUser();
         if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
             throw new OwnershipRequiredException("You are not authorized to manage this event.");
-    }
-
-    private void ensureEventIsDraft(Event event) {
-        if (!event.isDraft())
-            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
     }
 
     @Scheduled(cron = "0 0 2 * * ?") // runs daily at 2am
