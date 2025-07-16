@@ -24,7 +24,8 @@ public class ServiceReservationSpecification {
                 .and(hasServiceId(reservation.getService().getId()))
                 .and(hasStartTime(reservation.getEndingTime()))
                 .and(hasEndTime(reservation.getStartingTime()))
-                .and(hasDate(reservation.getEvent().getDate()));
+                .and(hasDate(reservation.getEvent().getDate()))
+                .and(hasNotStatus(Status.DECLINED));
     }
 
     public static Specification<Reservation> checkForReservationsInOneHour() {
@@ -72,6 +73,10 @@ public class ServiceReservationSpecification {
             Join<Reservation, Service> reservations = root.join("service", JoinType.INNER);
             return cb.equal(reservations.get("provider").get("id"), providerId);
         };
+    }
+
+    private static Specification<Reservation> hasNotStatus(Status status) {
+        return (root, query, cb) -> cb.notEqual(root.get("status"), status);
     }
 
     private static Specification<Reservation> hasEventDateToday() {
