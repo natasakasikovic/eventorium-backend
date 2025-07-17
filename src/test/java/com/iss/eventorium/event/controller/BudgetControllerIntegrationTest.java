@@ -9,10 +9,7 @@ import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.models.SolutionType;
 import com.iss.eventorium.util.TestRestTemplateAuthHelper;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,6 +51,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget")
+    @DisplayName("Should return budget details for event with budget")
     void givenExistingEventWithBudget_whenGetBudget_thenReturnBudgetDetails() {
         ResponseEntity<BudgetResponseDto> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL_2,
@@ -69,6 +67,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget")
+    @DisplayName("Should return forbidden when organizer does not own the event")
     void givenWrongOrganizer_whenGetBudget_thenReturnForbidden() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
                 "organizer2@gmail.com",
@@ -84,6 +83,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget")
+    @DisplayName("Should return not found when event does not exist")
     void givenNonExistentEvent_whenGetBudget_thenReturnNotFoundWithMessage() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL,
@@ -99,7 +99,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenValidBudgetItemRequest_whenPurchaseProduct_thenReturnCreatedBudgetItemDetails() {
+    @DisplayName("Should create budget item when purchase is valid")
+    void givenValidProductPurchaseRequest_whenPostPurchase_thenReturnCreatedItem() {
         BudgetItemRequestDto request = createBudgetItemRequest(10.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ProductResponseDto> response = authHelper.authorizedPost(
@@ -121,7 +122,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenInsufficientFunds_whenPurchaseProduct_thenReturnErrorMessage() {
+    @DisplayName("Should return error when user has insufficient funds")
+    void givenInsufficientFunds_whenPostPurchase_thenReturnUnprocessableEntity() {
         BudgetItemRequestDto request = createBudgetItemRequest(9.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -140,7 +142,8 @@ class BudgetControllerIntegrationTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidProducts")
     @Tag("purchase-product")
-    void givenInvalidSolution_whenPurchaseProduct_thenReturnErrorMessage(Long id) {
+    @DisplayName("Should return error when trying to purchase invalid product")
+    void givenInvalidProduct_whenPostPurchase_thenReturnNotFound(Long id) {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -158,7 +161,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenUnavailableProduct_whenPurchaseProduct_thenReturnErrorMessage() {
+    @DisplayName("Should return conflict when purchasing unavailable product")
+    void givenUnavailableProduct_whenPostPurchase_thenReturnConflict() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, UNAVAILABLE_PRODUCT);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -176,7 +180,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenAlreadyPurchasedProduct_whenPurchaseProduct_thenReturnConflictWithMessage() {
+    @DisplayName("Should return conflict when product is already purchased")
+    void givenAlreadyPurchasedProduct_whenPostPurchase_thenReturnConflict() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, PURCHASED_PRODUCT);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -194,7 +199,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenNonExistentProduct_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
+    @DisplayName("Should return not found when product does not exist")
+    void givenNonExistentProduct_whenPostPurchase_thenReturnNotFoundResponse() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, INVALID_PRODUCT);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -213,7 +219,8 @@ class BudgetControllerIntegrationTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
     @Tag("purchase-product")
-    void givenInvalidBudgetItemRequest_whenPurchaseProduct_thenThrowValidationError(
+    @DisplayName("Should return bad request with proper message for invalid purchase data")
+    void givenInvalidBudgetItemRequest_whenPostPurchase_thenReturnValidationError(
             BudgetItemRequestDto request,
             String expectedMessage
     ) {
@@ -232,7 +239,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenNonExistentEvent_whenPurchaseProduct_thenReturnNotFoundWithMessage() {
+    @DisplayName("Should return not found when event does not exist for purchase")
+    void givenInvalidEvent_whenPostPurchase_thenReturnNotFound() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, NEW_BUDGET_ITEM);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
@@ -250,7 +258,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    void givenValidRequest_whenPurchaseProduct_thenBudgetItemIsCreated() {
+    @DisplayName("Should create budget item and return it when purchase is valid")
+    void givenValidRequest_whenPostPurchase_thenCreateBudgetItem() {
         BudgetItemRequestDto request = createBudgetItemRequest(15.0, NOT_PROCESSED_PRODUCT);
 
         ResponseEntity<ProductResponseDto> response = authHelper.authorizedPost(
@@ -275,7 +284,8 @@ class BudgetControllerIntegrationTest {
             "organizer3@gmail.com,1",
     })
     @Tag("get-budget-items")
-    void givenUserEmail_whenGetAllBudgetItems_thenReturnExpectedSize(String email, int expectedSize) {
+    @DisplayName("Should return correct number of budget items for given user email")
+    void givenUserEmail_whenGetAllBudgetItems_thenReturnExpectedItemCount(String email, int expectedSize) {
         ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
                 email,
                 "/api/v1/budget-items",
@@ -290,7 +300,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget-items")
-    void givenEventWithBudgetItems_whenGetBudgetItems_thenReturnListOfItemsWithRestoredPrices() {
+    @DisplayName("Should return budget items for given event with accurate data")
+    void givenEventWithItems_whenGetBudgetItems_thenReturnItemsWithRestoredPrices() {
         ResponseEntity<BudgetItemResponseDto[]> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/budget-items",
@@ -314,7 +325,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("delete-item")
-    void givenExistingBudgetItem_whenDelete_thenItemIsDeleted() {
+    @DisplayName("Should delete budget item successfully when it exists and is not processed")
+    void givenExistingUnprocessedBudgetItem_whenDelete_thenReturnNoContent() {
         ResponseEntity<Void> deleteResponse = authHelper.authorizedDelete(
                 ORGANIZER_EMAIL_2,
                 "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
@@ -328,7 +340,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("delete-item")
-    void givenProcessedBudgetItem_whenDelete_thenReturnErrorMessage() {
+    @DisplayName("Should return conflict when deleting already processed budget item")
+    void givenProcessedItem_whenDelete_thenReturnConflict() {
         ResponseEntity<ExceptionResponse> deleteResponse = authHelper.authorizedDelete(
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
@@ -344,7 +357,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("update-item")
-    void givenNotEnoughFoundUpdate_whenUpdateBudgetItem_thenReturnErrorMessage() {
+    @DisplayName("Should return error when updated amount exceeds remaining funds")
+    void givenNotEnoughFunds_whenPatchUpdateItem_thenReturnUnprocessableEntity() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(0.0);
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
                 ORGANIZER_EMAIL_2,
@@ -362,7 +376,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("update-item")
-    void givenUpdateRequestOnProcessedItem_whenUpdateBudgetItem_thenReturnErrorMessage() {
+    @DisplayName("Should return error when updating already processed item")
+    void givenProcessedItem_whenPatchUpdateItem_thenReturnConflict() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(20.0);
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
                 ORGANIZER_EMAIL,
@@ -380,7 +395,8 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("update-item")
-    void givenValidItemUpdate_whenUpdateBudgetItem_thenBudgetItemIsUpdated() {
+    @DisplayName("Should update planned amount of budget item when valid request is provided")
+    void givenValidUpdateRequest_whenPatchUpdateItem_thenReturnUpdatedItem() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(25.0);
         ResponseEntity<BudgetItemResponseDto> response = authHelper.authorizedPatch(
                 ORGANIZER_EMAIL_2,
