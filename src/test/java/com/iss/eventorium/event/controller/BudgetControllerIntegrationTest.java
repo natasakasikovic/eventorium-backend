@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
+import com.iss.eventorium.event.dtos.budget.UpdateBudgetItemRequestDto;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.models.SolutionType;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
@@ -47,6 +49,7 @@ class BudgetControllerIntegrationTest {
     @BeforeAll
     void setup() {
         authHelper = new TestRestTemplateAuthHelper(restTemplate, objectMapper);
+        restTemplate.getRestTemplate().setRequestFactory(new JdkClientHttpRequestFactory());
     }
 
     @Test
@@ -56,7 +59,7 @@ class BudgetControllerIntegrationTest {
                 ORGANIZER_EMAIL_2,
                 "/api/v1/events/{event-id}/budget",
                 BudgetResponseDto.class,
-                ORGANIZER_2_EVENT
+                ORGANIZER_2_BUDGET_ITEM
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -330,13 +333,68 @@ class BudgetControllerIntegrationTest {
                 ORGANIZER_EMAIL,
                 "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
                 ExceptionResponse.class,
-                EVENT_WITH_BUDGET,
-                PROCESSED_ITEM
+                EXISTING_EVENT,
+                PROCESSED_BUDGET_ITEM
         );
 
         assertEquals(HttpStatus.CONFLICT, deleteResponse.getStatusCode());
         assertNotNull(deleteResponse.getBody());
         assertEquals("Solution is already processed", deleteResponse.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("update-item")
+    void givenNotEnoughFoundUpdate_whenUpdateBudgetItem_thenReturnErrorMessage() {
+        UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(0.0);
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
+                ORGANIZER_EMAIL_2,
+                "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
+                request,
+                ExceptionResponse.class,
+                ORGANIZER_2_EVENT,
+                PLANNED_BUDGET_ITEM_2
+        );
+
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("You do not have enough funds for this purchase/reservation!", response.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("update-item")
+    void givenUpdateRequestOnProcessedItem_whenUpdateBudgetItem_thenReturnErrorMessage() {
+        UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(20.0);
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
+                request,
+                ExceptionResponse.class,
+                EXISTING_EVENT,
+                PROCESSED_BUDGET_ITEM
+        );
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Solution is already processed", response.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("update-item")
+    void givenValidItemUpdate_whenUpdateBudgetItem_thenBudgetItemIsUpdated() {
+        UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(25.0);
+        ResponseEntity<BudgetItemResponseDto> response = authHelper.authorizedPatch(
+                ORGANIZER_EMAIL_2,
+                "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
+                request,
+                BudgetItemResponseDto.class,
+                ORGANIZER_2_EVENT,
+                PLANNED_BUDGET_ITEM_2
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Custom Invitations", response.getBody().getSolutionName());
+        assertEquals(25.0, response.getBody().getPlannedAmount());
     }
 
     private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount, Long itemId) {
