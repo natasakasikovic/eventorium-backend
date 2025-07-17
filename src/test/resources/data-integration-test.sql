@@ -54,9 +54,11 @@ INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id
 
     (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED');
+    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (2,4), (3,5), (4,6), (5,7);
+    (20.0,9,CURRENT_DATE, 1, 'PRODUCT', 'PLANNED');
+
+INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (2,4), (3,5), (4,6), (5,7), (2,8);
 
 INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft, budget_id)
 VALUES

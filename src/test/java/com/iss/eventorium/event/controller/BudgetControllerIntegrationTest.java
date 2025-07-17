@@ -53,10 +53,10 @@ class BudgetControllerIntegrationTest {
     @Tag("get-budget")
     void givenExistingEventWithBudget_whenGetBudget_thenReturnBudgetDetails() {
         ResponseEntity<BudgetResponseDto> response = authHelper.authorizedGet(
-                "organizer2@gmail.com",
+                ORGANIZER_EMAIL_2,
                 "/api/v1/events/{event-id}/budget",
                 BudgetResponseDto.class,
-                2L
+                ORGANIZER_2_EVENT
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -309,6 +309,35 @@ class BudgetControllerIntegrationTest {
         assertEquals(15.0, match.get().getSpentAmount());
     }
 
+    @Test
+    @Tag("delete-item")
+    void givenExistingBudgetItem_whenDelete_thenItemIsDeleted() {
+        ResponseEntity<Void> deleteResponse = authHelper.authorizedDelete(
+                ORGANIZER_EMAIL_2,
+                "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
+                Void.class,
+                ORGANIZER_2_EVENT,
+                PLANNED_BUDGET_ITEM
+        );
+
+        assertEquals(HttpStatus.NO_CONTENT, deleteResponse.getStatusCode());
+    }
+
+    @Test
+    @Tag("delete-item")
+    void givenProcessedBudgetItem_whenDelete_thenReturnErrorMessage() {
+        ResponseEntity<ExceptionResponse> deleteResponse = authHelper.authorizedDelete(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/budget-items/{item-id}",
+                ExceptionResponse.class,
+                EVENT_WITH_BUDGET,
+                PROCESSED_ITEM
+        );
+
+        assertEquals(HttpStatus.CONFLICT, deleteResponse.getStatusCode());
+        assertNotNull(deleteResponse.getBody());
+        assertEquals("Solution is already processed", deleteResponse.getBody().getMessage());
+    }
 
     private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount, Long itemId) {
         return BudgetItemRequestDto.builder()

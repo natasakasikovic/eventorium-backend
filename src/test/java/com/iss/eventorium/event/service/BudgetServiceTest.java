@@ -518,18 +518,38 @@ class BudgetServiceTest {
 
     @Test
     @Tag("mark-reservation")
-    @DisplayName("Should throw AlreadyProcessedException if reservation budget item is already processed")
-    void givenAlreadyProcessedBudgetItem_whenMarkAsReserved_thenThrowAlreadyProcessedException() {
+    @DisplayName("Should throw AlreadyReservedException if all matching budget items are already reserved")
+    void givenAllBudgetItemsProcessed_whenMarkAsReserved_thenThrowAlreadyReservedException() {
         Service service = createService(ReservationType.AUTOMATIC);
-        BudgetItem item = mock(BudgetItem.class);
-        Reservation reservation = createReservationProcessedAt(LocalDateTime.now(), item, service);
+        BudgetItem processed1 = new BudgetItem();
+        processed1.setId(DEFAULT_BUDGET_ITEM_ID);
+        processed1.setSolution(service);
+        processed1.setPlannedAmount(200.0);
+        processed1.setItemType(SolutionType.SERVICE);
+        processed1.setProcessedAt(LocalDateTime.now());
+        processed1.setStatus(BudgetItemStatus.PROCESSED);
+        BudgetItem processed2 = new BudgetItem();
+        processed2.setId(DEFAULT_BUDGET_ITEM_ID + 1);
+        processed2.setSolution(service);
+        processed2.setPlannedAmount(200.0);
+        processed2.setItemType(SolutionType.SERVICE);
+        processed2.setProcessedAt(LocalDateTime.now());
+        processed2.setStatus(BudgetItemStatus.PROCESSED);
+        Budget budget = new Budget();
+        budget.addItem(processed1);
+        budget.addItem(processed2);
+        Event event = createEvent(budget);
+        Reservation reservation = new Reservation();
+        reservation.setService(service);
+        reservation.setEvent(event);
 
         AlreadyProcessedException exception = assertThrows(
                 AlreadyProcessedException.class,
-                () ->  budgetService.markAsReserved(reservation)
+                () -> budgetService.markAsReserved(reservation)
         );
-        assertEquals("Service is already reserved", exception.getMessage());
+        assertEquals("All matching budget items are already reserved.", exception.getMessage());
     }
+
 
     @Test
     @Tag("mark-reservation")
@@ -548,6 +568,38 @@ class BudgetServiceTest {
         );
         assertEquals("Matching budget item not found.", exception.getMessage());
     }
+
+    @Test
+    @Tag("mark-reservation")
+    @DisplayName("Should mark the first unprocessed duplicated BudgetItem as reserved")
+    void givenMultipleDuplicatedBudgetItems_whenMarkAsReserved_thenMarkFirstUnprocessedAsReserved() {
+        Service service = createService(ReservationType.AUTOMATIC);
+        BudgetItem processedItem = new BudgetItem();
+        processedItem.setId(DEFAULT_BUDGET_ITEM_ID);
+        processedItem.setSolution(service);
+        processedItem.setPlannedAmount(200.0);
+        processedItem.setItemType(SolutionType.SERVICE);
+        processedItem.setProcessedAt(LocalDateTime.now());
+        processedItem.setStatus(BudgetItemStatus.PROCESSED);
+        BudgetItem toBeReserved = mock(BudgetItem.class);
+        when(toBeReserved.getSolution()).thenReturn(service);
+        when(toBeReserved.getPlannedAmount()).thenReturn(200.0);
+        when(toBeReserved.getItemType()).thenReturn(SolutionType.SERVICE);
+        Budget budget = new Budget();
+        budget.addItem(processedItem);
+        budget.addItem(toBeReserved);
+        Event event = createEvent(budget);
+        Reservation reservation = new Reservation();
+        reservation.setService(service);
+        reservation.setEvent(event);
+
+        budgetService.markAsReserved(reservation);
+
+        verify(toBeReserved, times(1)).setStatus(BudgetItemStatus.PROCESSED);
+        verify(toBeReserved, times(1)).setProcessedAt(any(LocalDateTime.class));
+        verify(budgetItemRepository, times(1)).save(toBeReserved);
+    }
+
 
     @Test
     @Tag("create-budget-item")

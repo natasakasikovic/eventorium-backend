@@ -126,18 +126,22 @@ public class BudgetService {
         Budget budget = event.getBudget();
         Long serviceId = reservation.getService().getId();
 
-        BudgetItem budgetItem = budget.getItems().stream()
+        List<BudgetItem> matchingItems = budget.getItems().stream()
                 .filter(item -> Objects.equals(item.getSolution().getId(), serviceId)
                         && item.getItemType() == SolutionType.SERVICE)
+                .toList();
+
+        if (matchingItems.isEmpty())
+            throw new EntityNotFoundException("Matching budget item not found.");
+
+        BudgetItem unprocessedItem = matchingItems.stream()
+                .filter(item -> item.getProcessedAt() == null)
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
+                .orElseThrow(() -> new AlreadyProcessedException("All matching budget items are already reserved."));
 
-        if(budgetItem.getProcessedAt() != null)
-            throw new AlreadyProcessedException("Service is already reserved");
-
-        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
-        budgetItem.setProcessedAt(LocalDateTime.now());
-        budgetItemRepository.save(budgetItem);
+        unprocessedItem.setStatus(BudgetItemStatus.PROCESSED);
+        unprocessedItem.setProcessedAt(LocalDateTime.now());
+        budgetItemRepository.save(unprocessedItem);
     }
 
     @SkipFilter
