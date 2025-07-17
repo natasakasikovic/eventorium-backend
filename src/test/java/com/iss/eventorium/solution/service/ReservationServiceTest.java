@@ -273,50 +273,53 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideInvalidWorkingHoursForCompany")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsOutsideCompanyWorkingHours")
     @Tag("exception-handling")
     @Tag("working-hours")
     @DisplayName("Should throw ReservationOutsideWorkingHoursException when trying to create reservation outside company's working hours")
-    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing) {
+    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
-        mockCompanyWorkingHours(opening, closing);
+        LocalTime companyOpeningHours = LocalTime.of(8, 0);
+        LocalTime companyClosingHours = LocalTime.of(14, 0);
+
+        mockMapper(reservationRequest, event, service);
+        mockCompanyWorkingHours(companyOpeningHours, companyClosingHours);
 
         ReservationOutsideWorkingHoursException exception = assertThrows(ReservationOutsideWorkingHoursException.class,
-                () -> this.service.createReservation(request, 1L, 1L)
+                () -> this.service.createReservation(reservationRequest, 1L, 1L)
         );
 
-        assertEquals(String.format("Reservations can only be made between %s and %s", opening, closing), exception.getMessage());
+        assertEquals(String.format("Reservations can only be made between %s and %s", companyOpeningHours, companyClosingHours), exception.getMessage());
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideValidWorkingHoursForCompany")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithinCompanyWorkingHours")
     @Tag("working-hours")
     @DisplayName("Should create reservation successfully when within company's working hours")
-    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
+    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
+        mockMapper(reservationRequest, event, service);
         mockDependenciesForSuccessfulReservation();
-        mockCompanyWorkingHours(opening, closing);
+        mockCompanyWorkingHours(LocalTime.of(8, 0), LocalTime.of(14, 0));
 
-        this.service.createReservation(request, 1L, 1L);
+        this.service.createReservation(reservationRequest, 1L, 1L);
 
         verify(repository, times(1)).save(reservationCaptor.capture());
         verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
 
         Reservation savedReservation = reservationCaptor.getValue();
-        assertThat(savedReservation.getStartingTime()).isEqualTo(LocalTime.of(11, 0));
-        assertThat(savedReservation.getEndingTime()).isEqualTo(LocalTime.of(15, 0));
+        assertThat(savedReservation.getStartingTime()).isEqualTo(reservationRequest.getStartingTime());
+        assertThat(savedReservation.getEndingTime()).isEqualTo(reservationRequest.getEndingTime());
         assertThat(savedReservation.getEvent()).isEqualTo(event);
         assertThat(savedReservation.getService()).isEqualTo(service);
     }

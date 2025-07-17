@@ -62,23 +62,58 @@ public class ReservationProvider {
         );
     }
 
-    // NOTE: Provides valid company working hours for testing reservations that occur between 11:00 and 15:00.
-    private static Stream<Arguments> provideValidWorkingHoursForCompany () {
+    private static Stream<Arguments> provideReservationsWithinCompanyWorkingHours() {
         return Stream.of(
-                Arguments.of(LocalTime.of(11, 0), LocalTime.of(15, 0)), // Company working hours exactly match the reservation (11:00 - 15:00)
-                Arguments.of(LocalTime.of(8, 0), LocalTime.of(17, 0)), // Company working hours fully include the reservation (8:00 - 17:00)
-                Arguments.of(LocalTime.of(11, 0), LocalTime.of(16, 0)), // Reservation starts exactly at opening time, ends before closing (11:00 - 16:00)
-                Arguments.of(LocalTime.of(10, 0), LocalTime.of(15, 0)) // Reservation starts after opening, ends exactly at closing time (10:00 - 15:00)
+                // // The reservation time is fully within the company working hours
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(10, 0))
+                                .endingTime(LocalTime.of(12, 0))
+                                .plannedAmount(150.0)
+                                .build()),
+                // Reservation starts exactly at company's opening time, ends before closing
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(8, 0))
+                                .endingTime(LocalTime.of(10, 0))
+                                .plannedAmount(150.0)
+                                .build()),
+                // Reservation starts after opening, ends exactly at closing time
+                Arguments.of(ReservationRequestDto.builder()
+                                .startingTime(LocalTime.of(12, 0))
+                                .endingTime(LocalTime.of(14, 0))
+                                .plannedAmount(150.0)
+                                .build())
+                );
+    }
+
+    private static Stream<Arguments> provideReservationsOutsideCompanyWorkingHours() {
+        return Stream.of(
+                // The reservation lasts one minute beyond the company's working hours.
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(10, 0))
+                        .endingTime(LocalTime.of(14, 1))
+                        .plannedAmount(150.0)
+                        .build()),
+                // The reservation starts one minute before the company’s opening time.
+                Arguments.of(ReservationRequestDto.builder()
+                         .startingTime(LocalTime.of(7, 59))
+                         .endingTime(LocalTime.of(10, 0))
+                         .plannedAmount(150.0)
+                         .build()),
+                // The reservation is completely outside the company’s working hours.
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(18, 0))
+                        .endingTime(LocalTime.of(20, 0))
+                        .plannedAmount(150.0)
+                        .build())
         );
     }
 
-    // NOTE: Supplies company hours that will reject a reservation from 11:00 to 15:00.
-    private static Stream<Arguments> provideInvalidWorkingHoursForCompany () {
-        return Stream.of(
-                Arguments.of(LocalTime.of(7, 0), LocalTime.of(14, 59)), // Company closes one minute before reservation ends (closing at 14:59, reservation ends at 15:00)
-                Arguments.of(LocalTime.of(11, 1), LocalTime.of(16, 0)), // Company opens one minute after reservation starts (opening at 11:01, reservation starts at 11:00)
-                Arguments.of(LocalTime.of(6, 0), LocalTime.of(10, 30))  // Company working hours completely outside the reservation request (company 6:00 - 10:30, reservation 11:00 - 15:00)
-        );
+    public static ReservationRequestDto provideReservationToCauseOverlapping() {
+        return ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(11, 59))
+                        .endingTime(LocalTime.of(14, 0))
+                        .plannedAmount(150.0)
+                        .build();
     }
 
     // NOTE: Supplies service price & discount pairs to test a reservation with a planned amount of 100.0

@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalTime;
 
+import static com.iss.eventorium.solution.provider.ReservationProvider.provideReservationToCauseOverlapping;
 import static com.iss.eventorium.util.TestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,8 +49,8 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 invalidRequest,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
-                RESERVABLE_SERVICE_ID);
+                VALID_EVENT_ID_FOR_RESERVATION_1,
+                RESERVABLE_SERVICE_ID_1);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
@@ -64,7 +65,7 @@ public class ReservationControllerIntegrationTest {
                 request,
                 ExceptionResponse.class,
                 NON_EXISTENT_ENTITY_ID,
-                RESERVABLE_SERVICE_ID);
+                RESERVABLE_SERVICE_ID_1);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Expected 404 Not Found");
         assertNotNull(response.getBody());
@@ -79,7 +80,7 @@ public class ReservationControllerIntegrationTest {
                 request,
                 ExceptionResponse.class,
                 EVENT_ID_NOT_OWNED_BY_LOGGED_IN_ORGANIZER,
-                RESERVABLE_SERVICE_ID);
+                RESERVABLE_SERVICE_ID_1);
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Expected 403 Forbidden");
         assertNotNull(response.getBody());
@@ -94,7 +95,7 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 request,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
                 NON_EXISTENT_ENTITY_ID);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "Expected 404 Not Found");
@@ -109,7 +110,7 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 request,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
                 UNAVAILABLE_SERVICE_ID);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode(), "Expected 409 Conflict");
@@ -124,7 +125,7 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 request,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_RESERVATION_DEADLINE_EXPIRED);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
@@ -140,7 +141,7 @@ public class ReservationControllerIntegrationTest {
                 request,
                 ExceptionResponse.class,
                 EVENT_IN_PAST_ID,
-                RESERVABLE_SERVICE_ID);
+                RESERVABLE_SERVICE_ID_1);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
@@ -155,7 +156,7 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 reservationRequest,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_WITH_DURATION_RANGE);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
@@ -170,11 +171,73 @@ public class ReservationControllerIntegrationTest {
                 RESERVATION_ENDPOINT,
                 request,
                 ExceptionResponse.class,
-                VALID_EVENT_ID_FOR_RESERVATION,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_WITH_FIXED_DURATION);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
         assertEquals("The service duration must be exactly 5 hours.", response.getBody().getMessage());
     }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsOutsideCompanyWorkingHours")
+    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowBadRequestException() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                request,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_2,
+                12);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
+        assertNotNull(response.getBody());
+        assertEquals("Reservations can only be made between 08:00 and 14:00", response.getBody().getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
+    @DisplayName("Should return CREATED when successfully reserved")
+    void givenReservationsForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                reservationRequest,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
+                SERVICE_ID_WITH_DURATION_RANGE);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithinCompanyWorkingHours")
+    @DisplayName("Should return CREATED when successfully reserved")
+    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                reservationRequest,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
+                RESERVABLE_SERVICE_ID_2);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    @DisplayName("Should return CONFLICT when reservations overlap, even for a minute (as in this case)")
+    void givenOverlappingReservation_whenCreateReservation_thenReturnConflictException() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                provideReservationToCauseOverlapping(),
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_2,
+                OVERLAPPING_SERVICE_ID);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode(), "Expected 409 Conflict");
+        assertNotNull(response.getBody());
+        assertEquals("For your event, this service is already reserved during the selected time slot. Please choose a different time.", response.getBody().getMessage());
+    }
+
+
 }
