@@ -419,7 +419,7 @@ class BudgetControllerIntegrationTest {
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidSolutions")
     @Tag("create-budget-item")
     @DisplayName("Should return error when trying to add invalid solution to planner")
-    void givenInvalidProduct_whenPostBudgetItem_thenReturnErrorMessage(Long id) {
+    void givenInvalidSolution_whenPostBudgetItem_thenReturnErrorMessage(Long id) {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
 
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
