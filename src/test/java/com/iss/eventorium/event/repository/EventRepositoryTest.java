@@ -7,6 +7,8 @@ import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.user.models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -67,22 +69,20 @@ class EventRepositoryTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    @DisplayName("Should return only OPEN events")
-    void givenPrivacyOpen_whenFindAll_thenOnlyOpenEventsReturned() {
-        Specification<Event> spec = EventSpecification.filterByPrivacy(Privacy.OPEN, null);
+    @ParameterizedTest
+    @EnumSource(Privacy.class)
+    @DisplayName("Should return only events with given privacy")
+    void givenPrivacy_whenFindAll_thenOnlyEventsWithThatPrivacyReturned(Privacy privacy) {
+        Specification<Event> spec = EventSpecification.filterByPrivacy(privacy, null);
         List<Event> events = eventRepository.findAll(spec);
-        assertEquals(4, events.size());
-        assertTrue(events.stream().allMatch(event -> event.getPrivacy() == Privacy.OPEN));
-    }
 
-    @Test
-    @DisplayName("Should return only CLOSED events")
-    void givenPrivacyClosed_whenFindAll_thenOnlyClosedEventsReturned() {
-        Specification<Event> spec = EventSpecification.filterByPrivacy(Privacy.CLOSED, null);
-        List<Event> events = eventRepository.findAll(spec);
-        assertEquals(1, events.size());
-        assertTrue(events.stream().allMatch(event -> event.getPrivacy() == Privacy.CLOSED));
+        int expectedSize = switch (privacy) {
+            case OPEN -> 4;
+            case CLOSED -> 1;
+        };
+
+        assertEquals(expectedSize, events.size());
+        assertTrue(events.stream().allMatch(event -> event.getPrivacy() == privacy));
     }
 
 }
