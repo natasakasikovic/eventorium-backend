@@ -16,7 +16,6 @@ public class TestUtil {
     public static final Long DELETED_PRODUCT = 6L;
     public static final Long INVISIBLE_PRODUCT = 7L;
     public static final Long UNAVAILABLE_PRODUCT = 8L;
-    public static final Long EVENT_WITH_BUDGET = 1L;
     public static final Long EVENT_WITHOUT_AGENDA_1 = 1L;
     public static final Long EVENT_WITHOUT_AGENDA_2 = 7L;
     public static final Long EVENT_WITH_AGENDA = 6L;
