@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -32,23 +33,23 @@ class BudgetRepositoryTest {
     private BudgetItemRepository budgetItemRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private TestEntityManager entityManager;
 
     private User organizer;
 
     @BeforeEach
     void setUp() {
-        organizer = userRepository.findByEmail("organizer@gmail.com").orElseThrow();
+        organizer = entityManager.find(User.class, 1L);
     }
 
     @ParameterizedTest
     @CsvSource({
-            "organizer@gmail.com,3",
-            "organizer2@gmail.com,4",
+            "1,3",
+            "2,4",
     })
     @DisplayName("Should return only processed budget items for given organizer")
-    void givenValidItem_whenFilterAllBudgetItems_thenItemReturned(String email, int expectedSize) {
-        organizer = userRepository.findByEmail(email).orElseThrow();
+    void givenValidItem_whenFilterAllBudgetItems_thenItemReturned(Long id, int expectedSize) {
+        organizer = entityManager.find(User.class, id);
         List<BudgetItem> items = budgetItemRepository.findAll(
                 BudgetSpecification.filterAllBudgetItems(organizer)
         );
