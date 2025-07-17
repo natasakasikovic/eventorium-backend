@@ -43,7 +43,6 @@ public class ServiceService {
 
     private final ServiceRepository repository;
     private final AuthService authService;
-    private final EventService eventService;
     private final CompanyService companyService;
     private final EventTypeService eventTypeService;
     private final ReservationRepository reservationRepository;

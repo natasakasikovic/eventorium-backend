@@ -25,6 +25,18 @@ public class SolutionSpecification {
                 .and(filterOutBlockedContent(user));
     }
 
+    public static Specification<Solution> filterById(Long id, User user, boolean includeDeleted) {
+        Specification<Solution> spec = Specification.where(hasId(id))
+                .and(filterOutBlockedContent(user))
+                .and(applyUserRoleFilter(user));
+
+        if (!includeDeleted) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("isDeleted")));
+        }
+
+        return spec;
+    }
+
     private static Specification<Solution> isVisible() {
         return (root, query, cb) -> cb.isTrue(root.get("isVisible"));
     }
