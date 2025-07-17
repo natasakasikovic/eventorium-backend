@@ -1,8 +1,9 @@
 package com.iss.eventorium.event.controllers;
 
 import com.iss.eventorium.event.api.EventApi;
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.services.EventService;
@@ -87,9 +88,8 @@ public class EventController implements EventApi {
     }
 
     @PutMapping("/{id}/agenda")
-    public ResponseEntity<Void> createAgenda(@Valid @RequestBody List<ActivityRequestDto> request, @PathVariable Long id) {
-        service.createAgenda(id, request);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<AgendaResponseDto> createAgenda(@Valid @RequestBody AgendaRequestDto request, @PathVariable Long id) {
+        return new ResponseEntity<>(service.createAgenda(id, request), HttpStatus.OK);
     }
 
     @GetMapping("/{id}/agenda")

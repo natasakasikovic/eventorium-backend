@@ -2,6 +2,8 @@ package com.iss.eventorium.event.provider;
 
 import com.iss.eventorium.category.dtos.CategoryResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
+import com.iss.eventorium.event.models.BudgetItemStatus;
+import com.iss.eventorium.solution.models.ReservationType;
 import com.iss.eventorium.solution.models.SolutionType;
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -50,6 +52,13 @@ public class BudgetProvider {
                                 .itemType(SolutionType.PRODUCT)
                                 .build()
                 )
+        );
+    }
+
+    private static Stream<Arguments> provideReservationTypeAndExpectedStatus() {
+        return Stream.of(
+                Arguments.of(ReservationType.AUTOMATIC, BudgetItemStatus.PROCESSED),
+                Arguments.of(ReservationType.MANUAL, BudgetItemStatus.PENDING)
         );
     }
 

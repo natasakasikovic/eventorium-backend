@@ -26,6 +26,7 @@ public class TestUtil {
     public static final Long EVENT_IN_PAST_ID = 9L;
 
     public static final Long INVALID_PRODUCT = 500L;
+    public static final Long NON_EXISTING_ENTITY_ID = 0L;
 
     public static final Long UNAVAILABLE_SERVICE_ID = 8L;
     public static final Long SERVICE_ID_RESERVATION_DEADLINE_EXPIRED = 9L; // // Refers to a VALID_EVENT_ID_FOR_RESERVATION
