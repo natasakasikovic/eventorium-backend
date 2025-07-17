@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalTime;
 
 import static com.iss.eventorium.solution.provider.ReservationProvider.provideReservationToCauseOverlapping;
+import static com.iss.eventorium.solution.provider.ReservationProvider.provideValidReservationForFixedServiceDurationTest;
 import static com.iss.eventorium.util.TestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -88,7 +89,7 @@ public class ReservationControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should return NOT_FOUND when trying to reserve service for non-existing event")
+    @DisplayName("Should return NOT_FOUND when trying to reserve service for non-existing service")
     // NOTE: Same behavior if you pass id of invisible, unaccepted or deleted service, so that cases won't be tested
     void givenNonExistingService_whenReserveService_thenReturnNotFoundException() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
@@ -157,14 +158,31 @@ public class ReservationControllerIntegrationTest {
                 reservationRequest,
                 ExceptionResponse.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
-                SERVICE_ID_WITH_DURATION_RANGE);
+                SERVICE_ID_WITH_DURATION_RANGE_1);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
         assertEquals("The service duration must be between 2 and 6 hours.", response.getBody().getMessage());
     }
 
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
+    @Tag("service-duration")
+    @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
+    public void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                reservationRequest,
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
+                SERVICE_ID_WITH_DURATION_RANGE_2);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
     @Test
+    @Tag("service-duration")
     @DisplayName("Should return BAD_REQUEST when trying to reserve with duration which is not equal to fixed service duration")
     void givenReservationDurationNotEqualToFixedServiceDuration_whenValidateServiceDuration_thenThrowBadRequestException() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
@@ -177,6 +195,21 @@ public class ReservationControllerIntegrationTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());
         assertEquals("The service duration must be exactly 5 hours.", response.getBody().getMessage());
+    }
+
+    @Test
+    @Tag("service-duration")
+    @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
+    public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                provideValidReservationForFixedServiceDurationTest(),
+                ExceptionResponse.class,
+                VALID_EVENT_ID_FOR_RESERVATION_1,
+                SERVICE_ID_WITH_FIXED_DURATION);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNull(response.getBody());
     }
 
     @ParameterizedTest
@@ -203,7 +236,7 @@ public class ReservationControllerIntegrationTest {
                 reservationRequest,
                 ExceptionResponse.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
-                SERVICE_ID_WITH_DURATION_RANGE);
+                SERVICE_ID_WITH_DURATION_RANGE_1);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNull(response.getBody());
@@ -238,6 +271,4 @@ public class ReservationControllerIntegrationTest {
         assertNotNull(response.getBody());
         assertEquals("For your event, this service is already reserved during the selected time slot. Please choose a different time.", response.getBody().getMessage());
     }
-
-
 }

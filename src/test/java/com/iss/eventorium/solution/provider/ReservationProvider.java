@@ -108,33 +108,6 @@ public class ReservationProvider {
         );
     }
 
-    public static ReservationRequestDto provideReservationToCauseOverlapping() {
-        return ReservationRequestDto.builder()
-                        .startingTime(LocalTime.of(11, 59))
-                        .endingTime(LocalTime.of(14, 0))
-                        .plannedAmount(150.0)
-                        .build();
-    }
-
-    // NOTE: Supplies service price & discount pairs to test a reservation with a planned amount of 100.0
-    private static Stream<Arguments> providePricesAndDiscountsThatFitPlannedAmount () {
-        return Stream.of(
-                Arguments.of(100.0, 0.0), // exact price match: 100.0 with 0% discount
-                Arguments.of(200.0, 50.0), // boundary discount: 50% off 200 → 100.0
-                Arguments.of(90.0, 0.0), // price under planned amount, no discount
-                Arguments.of(105.0, 10.0) // price 105(higer than planned) but with 10% off → 94.5 (<100)
-        );
-    }
-
-    // NOTE: Supplies service price & discount pairs to test cases where final price exceeds planned amount of 100.0
-    private static Stream<Arguments> providePricesAndDiscountsThatDoNotFitPlannedAmount() {
-        return Stream.of(
-                Arguments.of(100.01, 0.0),      // just above planned amount, no discount
-                Arguments.of(150.0, 5.0),       // significantly above planned amount, small discount insufficient
-                Arguments.of(100.01, 0.005)     // minimal discount, but final price still slightly above 100.0 (100.01 - 0.005 = 100.005)
-        );
-    }
-
     // NOTE: Supplies with invalid reservation requests and expected messages
     public static Stream<Arguments> provideInvalidReservationRequests() {
         return Stream.of(
@@ -166,6 +139,41 @@ public class ReservationProvider {
                                 .plannedAmount(0.0)
                                 .build(),
                         "Planned amount must be greater than zero")
+        );
+    }
+
+    public static ReservationRequestDto provideReservationToCauseOverlapping() {
+        return ReservationRequestDto.builder()
+                .startingTime(LocalTime.of(11, 59))
+                .endingTime(LocalTime.of(14, 0))
+                .plannedAmount(150.0)
+                .build();
+    }
+
+    public static ReservationRequestDto provideValidReservationForFixedServiceDurationTest() {
+        return ReservationRequestDto.builder()
+                .startingTime(LocalTime.of(8, 0))
+                .endingTime(LocalTime.of(13, 0))
+                .plannedAmount(1000.0)
+                .build();
+    }
+
+    // NOTE: Supplies service price & discount pairs to test a reservation with a planned amount of 100.0
+    private static Stream<Arguments> providePricesAndDiscountsThatFitPlannedAmount () {
+        return Stream.of(
+                Arguments.of(100.0, 0.0), // exact price match: 100.0 with 0% discount
+                Arguments.of(200.0, 50.0), // boundary discount: 50% off 200 → 100.0
+                Arguments.of(90.0, 0.0), // price under planned amount, no discount
+                Arguments.of(105.0, 10.0) // price 105(higer than planned) but with 10% off → 94.5 (<100)
+        );
+    }
+
+    // NOTE: Supplies service price & discount pairs to test cases where final price exceeds planned amount of 100.0
+    private static Stream<Arguments> providePricesAndDiscountsThatDoNotFitPlannedAmount() {
+        return Stream.of(
+                Arguments.of(100.01, 0.0),      // just above planned amount, no discount
+                Arguments.of(150.0, 5.0),       // significantly above planned amount, small discount insufficient
+                Arguments.of(100.01, 0.005)     // minimal discount, but final price still slightly above 100.0 (100.01 - 0.005 = 100.005)
         );
     }
 }

@@ -30,7 +30,8 @@ public class TestUtil {
     public static final Long UNAVAILABLE_SERVICE_ID = 8L;
     public static final Long SERVICE_ID_RESERVATION_DEADLINE_EXPIRED = 9L; // // Refers to a VALID_EVENT_ID_FOR_RESERVATION
     public static final Long RESERVABLE_SERVICE_ID_1 = 5L;
-    public static final Long SERVICE_ID_WITH_DURATION_RANGE = 10L;
+    public static final Long SERVICE_ID_WITH_DURATION_RANGE_1 = 10L;
+    public static final Long SERVICE_ID_WITH_DURATION_RANGE_2 = 14L;
     public static final Long SERVICE_ID_WITH_FIXED_DURATION = 11L;
     public static final Long RESERVABLE_SERVICE_ID_2 = 12L;
     public static final Long OVERLAPPING_SERVICE_ID = 13L;

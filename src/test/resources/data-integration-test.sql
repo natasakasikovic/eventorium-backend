@@ -21,9 +21,10 @@ INSERT INTO users (verified, city_id, suspended, activation_timestamp, address, 
 (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer2@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '2', null, false),
 (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizer3@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '4', null, false),
 (true, 6,  null, '2024-12-07 12:00:00', 'Staparski put 18', 'organizernoevents@gmail.com', 'Doe', 'John', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1234567890', '2017-10-01 21:58:58.508-07', '6', null, false),
-(true, 6,  null, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '7', null, false);
+(true, 6,  null, '2024-12-05 12:00:00', 'Venac Radomira Putnika 5', 'michael.brown@example.com', 'Brown', 'Michael', '$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W', '1112223333', '2017-10-01 21:58:58.508-07', '7', null, false),
+(true, 3, null, '2024-12-08 12:00:00','Vuka Karadžića 10','jane.doe@example.com','Doe','Jane','$2a$10$Z3JiBldbaNQ4qGPjtr7TV.FeT2He/KgqxT68impZ9.H3XeyQAZ03W','9876543210','2025-01-01 00:00:00','8', null, false);
 
-INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5), (2, 4), (3, 3), (4,5), (5,5), (6,5), (7, 4);
+INSERT INTO USER_ROLE (user_id, role_id) VALUES (1, 5), (2, 4), (3, 3), (4,5), (5,5), (6,5), (7, 4), (8, 4);
 
 INSERT INTO companies (city_id, closing_hours, opening_hours, address, description, email, name, phone_number, provider_id)
 VALUES
@@ -37,7 +38,12 @@ VALUES
      'Celebrate in style with Party Supplies Hub! Offering a wide range of balloons, party decorations, sound systems, and catering options. ' ||
      'We are your one-stop shop for making every celebration unforgettable.',
      'support@partysupplies.com',
-     'Party Supplies Hub', '+15554567890', 7);
+     'Party Supplies Hub', '+15554567890', 7),
+    (1, '10:00 pm', '7:00 am', 'Knez Mihailova 10',
+     'Jane''s Event Services offers bespoke event planning, coordination, and on‑site support from start to finish. ' ||
+     'Whether it''s a wedding, corporate function, or private party, we tailor every detail to your vision.',
+     'contact@janesevents.com',
+     'Jane''s Event Services', '+38761234567', 8);
 
 INSERT INTO categories (name, description, deleted, suggested) VALUES
     ('Event Planning', 'Category for organizing event-related tasks',  false, false),
@@ -100,7 +106,8 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
     (nextval('solution_sequence'), 'Full Event Coordination', 'Comprehensive planning and management of events', 'Planning, Coordination', 100.00, 5.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 5, 7, 2, 6, 1, 2),
     (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 5,5 , 5, 7, 2),
     (nextval('solution_sequence'), 'Banquet Hall Booking', 'Spacious venue rental for events and receptions', 'Venue, Hall Rental', 120.00, 25.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 5, 2, 6, 3, 7),
-    (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 100.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 7, 1, 8, 3, 7);
+    (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 100.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 7, 1, 8, 3, 7),
+    (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 20.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 2, 6, 5, 8);
 
 INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
 VALUES ('12:01:00', False, '10:00:00', 5, 13, 'ACCEPTED');
