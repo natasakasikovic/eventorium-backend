@@ -5,6 +5,7 @@ import com.iss.eventorium.event.dtos.budget.BudgetItemRequestDto;
 import com.iss.eventorium.event.dtos.budget.BudgetItemResponseDto;
 import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.dtos.budget.UpdateBudgetItemRequestDto;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.shared.models.ExceptionResponse;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.models.SolutionType;
@@ -239,25 +240,6 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should return not found when event does not exist for purchase")
-    void givenInvalidEvent_whenPostPurchase_thenReturnNotFound() {
-        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, NEW_BUDGET_ITEM);
-
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
-                ORGANIZER_EMAIL,
-                "/api/v1/events/{event-id}/budget/purchase",
-                request,
-                ExceptionResponse.class,
-                INVALID_EVENT
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Event not found", response.getBody().getMessage());
-    }
-
-    @Test
-    @Tag("purchase-product")
     @DisplayName("Should create budget item and return it when purchase is valid")
     void givenValidRequest_whenPostPurchase_thenCreateBudgetItem() {
         BudgetItemRequestDto request = createBudgetItemRequest(15.0, NOT_PROCESSED_PRODUCT);
@@ -411,6 +393,46 @@ class BudgetControllerIntegrationTest {
         assertNotNull(response.getBody());
         assertEquals("Custom Invitations", response.getBody().getSolutionName());
         assertEquals(25.0, response.getBody().getPlannedAmount());
+    }
+
+    @Test
+    @Tag("create-budget-item")
+    @DisplayName("Should create budget item with PLANNED status")
+    void givenValidRequest_whenPostBudgetItem_thenReturnCreateItem() {
+        BudgetItemRequestDto request = createBudgetItemRequest(100.0, PURCHASABLE_PRODUCT);
+        ResponseEntity<BudgetItemResponseDto> response = authHelper.authorizedPost(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/budget-items",
+                request,
+                BudgetItemResponseDto.class,
+                EMPTY_BUDGET_EVENT
+        );
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(PURCHASABLE_PRODUCT, response.getBody().getSolutionId());
+        assertEquals(BudgetItemStatus.PLANNED, response.getBody().getStatus());
+        assertEquals("Party Favors", response.getBody().getSolutionName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidSolutions")
+    @Tag("create-budget-item")
+    @DisplayName("Should return error when trying to add invalid solution to planner")
+    void givenInvalidProduct_whenPostBudgetItem_thenReturnErrorMessage(Long id) {
+        BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
+
+        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(
+                ORGANIZER_EMAIL,
+                "/api/v1/events/{event-id}/budget/budget-items",
+                request,
+                ExceptionResponse.class,
+                EXISTING_EVENT
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Solution not found", response.getBody().getMessage());
     }
 
     private BudgetItemRequestDto createBudgetItemRequest(double plannedAmount, Long itemId) {

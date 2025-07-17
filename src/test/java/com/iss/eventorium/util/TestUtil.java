@@ -29,6 +29,10 @@ public class TestUtil {
     public static final Long PROCESSED_BUDGET_ITEM = 1L;
     public static final Long PLANNED_BUDGET_ITEM_2 = 9L;
     public static final Long ORGANIZER_2_BUDGET_ITEM = 3L;
+    public static final Long EMPTY_BUDGET_EVENT = 7L;
+    public static final Long PURCHASABLE_PRODUCT = 3L;
+    public static final Long DELETED_SERVICE = 12L;
+    public static final Long INVISIBLE_SERVICE = 13L;
 
     private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
         jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));

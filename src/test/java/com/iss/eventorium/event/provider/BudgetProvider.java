@@ -9,8 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
-import static com.iss.eventorium.util.TestUtil.DELETED_PRODUCT;
-import static com.iss.eventorium.util.TestUtil.INVISIBLE_PRODUCT;
+import static com.iss.eventorium.util.TestUtil.*;
 
 public class BudgetProvider {
 
@@ -18,6 +17,10 @@ public class BudgetProvider {
 
     public static Stream<Long> provideInvalidProducts() {
         return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT);
+    }
+
+    public static Stream<Long> provideInvalidSolutions() {
+        return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT, DELETED_SERVICE, INVISIBLE_SERVICE);
     }
 
     public static Stream<Arguments> provideInvalidBudgetItems() {
