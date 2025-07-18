@@ -96,7 +96,7 @@ public class ReservationServiceTest {
     private ReservationRequestDto request;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         currentUser = User.builder().id(1L).build();
         provider = User.builder().id(2L).build();
         city = City.builder().name("Trebinje").build();
@@ -204,7 +204,7 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#providePricesAndDiscountsThatFitPlannedAmount")
     @Tag("service-funds")
     @DisplayName("Should allow reservation when planned amount is exactly or higher equal to service price with discount applied")
-    public void givenPlannedAmountCoversServicePriceWithDiscount_whenCreateReservation_thenSuccess(Double price, Double discount) {
+    void givenPlannedAmountCoversServicePriceWithDiscount_whenCreateReservation_thenSuccess(Double price, Double discount) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -249,7 +249,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("reservation-deadline")
     @DisplayName("Should allow reservation exactly on the reservation deadline")
-    public void givenReservationExactlyOnDeadline_whenValidateReservationDeadline_thenSuccess() {
+    void givenReservationExactlyOnDeadline_whenValidateReservationDeadline_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -329,7 +329,7 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("service-duration")
     @DisplayName("Should throw InvalidServiceDurationException when reservation duration is outside the allowed service duration range [minDuration, maxDuration]")
-    public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(ReservationRequestDto reservationRequest) {
+    void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -348,7 +348,7 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("service-duration")
     @DisplayName("Should throw InvalidServiceDurationException when service has fixed duration and reservation duration does not match it")
-    public void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
+    void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -366,7 +366,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
-    public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
+    void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -391,7 +391,7 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
-    public void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
+    void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -416,7 +416,7 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("overlapping-reservations")
     @DisplayName("Should throw ReservationConflictException when reservation overlaps with an existing one")
-    public void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
+    void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -444,7 +444,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("overlapping-reservations")
     @DisplayName("Should create both reservations when time slots do not overlap (same service, same event)")
-    public void givenNonOverlappingReservations_whenCreateReservation_thenSuccess() {
+    void givenNonOverlappingReservations_whenCreateReservation_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -469,7 +469,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("overlapping-reservations")
     @DisplayName("Should allow reservation of the same service at the same time for different events")
-    public void givenSameServiceDifferentEvents_whenCreateReservation_thenSuccess() {
+    void givenSameServiceDifferentEvents_whenCreateReservation_thenSuccess() {
         Event event1 = Event.builder().id(1L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         Event event2 = Event.builder().id(2L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).id(2L).build();
 

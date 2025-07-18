@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("integration-test")
-public class ReservationControllerIntegrationTest {
+class ReservationControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -169,7 +169,7 @@ public class ReservationControllerIntegrationTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
-    public void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
+    void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 reservationRequest,
@@ -200,7 +200,7 @@ public class ReservationControllerIntegrationTest {
     @Test
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
-    public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
+    void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 provideValidReservationForFixedServiceDurationTest(),
@@ -214,6 +214,7 @@ public class ReservationControllerIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsOutsideCompanyWorkingHours")
+    @DisplayName("Should return BAD_REQUEST when trying to create reservation outside company working hours")
     void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowBadRequestException() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
