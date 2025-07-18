@@ -21,7 +21,7 @@ public class BudgetExceptionHandler {
     }
 
     @ExceptionHandler(ProductNotAvailableException.class)
-    public ResponseEntity<ExceptionResponse> handleServiceNotAvailable(ProductNotAvailableException ex){
+    public ResponseEntity<ExceptionResponse> handleProductNotAvailableException(ProductNotAvailableException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.CONFLICT.getReasonPhrase())
