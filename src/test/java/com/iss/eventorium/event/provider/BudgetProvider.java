@@ -15,7 +15,7 @@ public class BudgetProvider {
 
     public static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
 
-    public static Stream<Long> provideArchiveProducts() {
+    public static Stream<Long> provideArchivedProducts() {
         return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT);
     }
 

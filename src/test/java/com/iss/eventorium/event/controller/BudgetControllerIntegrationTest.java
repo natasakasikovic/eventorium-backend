@@ -141,7 +141,7 @@ class BudgetControllerIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideArchiveProducts")
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideArchivedProducts")
     @Tag("purchase-product")
     @DisplayName("Should return NOT_FOUND when trying to purchase invalid product")
     void givenInvalidProduct_whenPostPurchase_thenReturnNotFound(Long id) {
