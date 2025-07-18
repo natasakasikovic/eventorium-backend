@@ -1,6 +1,7 @@
 package com.iss.eventorium.solution.provider;
 
 import com.iss.eventorium.solution.dtos.services.ReservationRequestDto;
+import com.iss.eventorium.solution.models.Reservation;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.time.LocalTime;
@@ -171,6 +172,55 @@ public class ReservationProvider {
                         .startingTime(LocalTime.of(12, 0))
                         .endingTime(LocalTime.of(14, 0))
                         .plannedAmount(40.0)
+                        .build())
+        );
+    }
+
+    public static Stream<Arguments> provideBoundaryReservations() {
+        return Stream.of(
+                // starts exactly when existing ends
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(15, 0))
+                        .endingTime(LocalTime.of(17, 0))
+                        .build()),
+                // ends exactly when existing starts
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(11, 0))
+                        .endingTime(LocalTime.of(13, 0))
+                        .build())
+        );
+    }
+
+    public static Stream<Arguments> provideReservationsThatOverlapExisting() {
+        return Stream.of(
+                // Exactly the same time as the existing reservation
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(19, 0))
+                        .endingTime(LocalTime.of(21, 0))
+                        .build()),
+
+                // Starts before and ends during the existing reservation (overlap)
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(17, 30))
+                        .endingTime(LocalTime.of(19, 30))
+                        .build()),
+
+                // Starts during and ends after the existing reservation (overlap)
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(20, 0))
+                        .endingTime(LocalTime.of(22, 0))
+                        .build()),
+
+                // Fully inside the existing reservation (overlap)
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(19, 30))
+                        .endingTime(LocalTime.of(20, 30))
+                        .build()),
+
+                // Starts before and ends after the existing reservation (overlap)
+                Arguments.of(Reservation.builder()
+                        .startingTime(LocalTime.of(18, 30))
+                        .endingTime(LocalTime.of(22, 0))
                         .build())
         );
     }
