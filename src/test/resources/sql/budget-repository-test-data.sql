@@ -1,5 +1,3 @@
-INSERT INTO roles (id, name) VALUES (5, 'EVENT_ORGANIZER');
-
 INSERT INTO cities (id, name) VALUES (1, 'Beograd');
 
 INSERT INTO categories (id, name, description, deleted, suggested) VALUES
