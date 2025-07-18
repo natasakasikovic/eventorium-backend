@@ -54,6 +54,9 @@ public class ReservationService {
 
     private final SpringTemplateEngine templateEngine;
 
+    /** NOTE: The same service can be reserved simultaneously for different events (since one service can be available in multiple locations at the same time).
+     For the same event, the same service can be reserved multiple times, but the reservation time periods must not overlap.
+     To create a new reservation for the same service, same event, and same time range, the previous reservation must first be rejected.*/
     public void createReservation (ReservationRequestDto request, Long eventId, Long serviceId) {
         Event event = eventService.find(eventId);
         assertEventOwnership(event);

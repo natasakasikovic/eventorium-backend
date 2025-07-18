@@ -42,8 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /*
@@ -97,7 +96,7 @@ public class ReservationServiceTest {
     private ReservationRequestDto request;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         currentUser = User.builder().id(1L).build();
         provider = User.builder().id(2L).build();
         city = City.builder().name("Trebinje").build();
@@ -205,7 +204,7 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#providePricesAndDiscountsThatFitPlannedAmount")
     @Tag("service-funds")
     @DisplayName("Should allow reservation when planned amount is exactly or higher equal to service price with discount applied")
-    public void givenPlannedAmountCoversServicePriceWithDiscount_whenCreateReservation_thenSuccess(Double price, Double discount) {
+    void givenPlannedAmountCoversServicePriceWithDiscount_whenCreateReservation_thenSuccess(Double price, Double discount) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -250,7 +249,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("reservation-deadline")
     @DisplayName("Should allow reservation exactly on the reservation deadline")
-    public void givenReservationExactlyOnDeadline_whenValidateReservationDeadline_thenSuccess() {
+    void givenReservationExactlyOnDeadline_whenValidateReservationDeadline_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -274,50 +273,53 @@ public class ReservationServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideInvalidWorkingHoursForCompany")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsOutsideCompanyWorkingHours")
     @Tag("exception-handling")
     @Tag("working-hours")
     @DisplayName("Should throw ReservationOutsideWorkingHoursException when trying to create reservation outside company's working hours")
-    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(LocalTime opening, LocalTime closing) {
+    void givenReservationOutsideWorkingHours_whenCreateReservation_thenThrowReservationOutsideWorkingHours(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
-        mockCompanyWorkingHours(opening, closing);
+        LocalTime companyOpeningHours = LocalTime.of(8, 0);
+        LocalTime companyClosingHours = LocalTime.of(14, 0);
+
+        mockMapper(reservationRequest, event, service);
+        mockCompanyWorkingHours(companyOpeningHours, companyClosingHours);
 
         ReservationOutsideWorkingHoursException exception = assertThrows(ReservationOutsideWorkingHoursException.class,
-                () -> this.service.createReservation(request, 1L, 1L)
+                () -> this.service.createReservation(reservationRequest, 1L, 1L)
         );
 
-        assertEquals(String.format("Reservations can only be made between %s and %s", opening, closing), exception.getMessage());
+        assertEquals(String.format("Reservations can only be made between %s and %s", companyOpeningHours, companyClosingHours), exception.getMessage());
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideValidWorkingHoursForCompany")
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithinCompanyWorkingHours")
     @Tag("working-hours")
     @DisplayName("Should create reservation successfully when within company's working hours")
-    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(LocalTime opening, LocalTime closing) {
+    void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().isAvailable(true).reservationDeadline(5).minDuration(1).maxDuration(6).provider(provider).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
+        mockMapper(reservationRequest, event, service);
         mockDependenciesForSuccessfulReservation();
-        mockCompanyWorkingHours(opening, closing);
+        mockCompanyWorkingHours(LocalTime.of(8, 0), LocalTime.of(14, 0));
 
-        this.service.createReservation(request, 1L, 1L);
+        this.service.createReservation(reservationRequest, 1L, 1L);
 
         verify(repository, times(1)).save(reservationCaptor.capture());
         verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
 
         Reservation savedReservation = reservationCaptor.getValue();
-        assertThat(savedReservation.getStartingTime()).isEqualTo(LocalTime.of(11, 0));
-        assertThat(savedReservation.getEndingTime()).isEqualTo(LocalTime.of(15, 0));
+        assertThat(savedReservation.getStartingTime()).isEqualTo(reservationRequest.getStartingTime());
+        assertThat(savedReservation.getEndingTime()).isEqualTo(reservationRequest.getEndingTime());
         assertThat(savedReservation.getEvent()).isEqualTo(event);
         assertThat(savedReservation.getService()).isEqualTo(service);
     }
@@ -327,18 +329,17 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("service-duration")
     @DisplayName("Should throw InvalidServiceDurationException when reservation duration is outside the allowed service duration range [minDuration, maxDuration]")
-    public void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(LocalTime startingTime, LocalTime endingTime) {
+    void givenDurationOutsideAllowedRange_whenValidateServiceDuration_thenThrowInvalidServiceDurationException(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
-        mockMapper(requestDto, event, service);
+        mockMapper(reservationRequest, event, service);
 
         InvalidServiceDurationException exception = assertThrows(InvalidServiceDurationException.class,
-                () -> this.service.createReservation(requestDto, 1L, 1L));
+                () -> this.service.createReservation(reservationRequest, 1L, 1L));
 
         assertEquals(String.format("The service duration must be between %d and %d hours.", service.getMinDuration(), service.getMaxDuration()), exception.getMessage());
     }
@@ -347,7 +348,7 @@ public class ReservationServiceTest {
     @Tag("exception-handling")
     @Tag("service-duration")
     @DisplayName("Should throw InvalidServiceDurationException when service has fixed duration and reservation duration does not match it")
-    public void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
+    void givenDurationNotEqualToFixedDuration_whenValidateServiceDuration_thenThrowInvalidServiceDurationException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -365,7 +366,7 @@ public class ReservationServiceTest {
     @Test
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
-    public void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
+    void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
@@ -390,47 +391,105 @@ public class ReservationServiceTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
-    public void givenDurationBetweenMinimumAndMaximum_whenValidateServiceDuration_thenSuccess(LocalTime startingTime, LocalTime endingTime) {
+    void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        ReservationRequestDto requestDto = ReservationRequestDto.builder().startingTime(startingTime).endingTime(endingTime).plannedAmount(100.0).build();
-        mockMapper(requestDto, event, service);
-        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+        mockMapper(reservationRequest, event, service);
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(21, 0));
         mockDependenciesForSuccessfulReservation();
 
-        this.service.createReservation(requestDto, 1L, 1L);
+        this.service.createReservation(reservationRequest, 1L, 1L);
 
         verify(repository, times(1)).save(reservationCaptor.capture());
         verify(emailService, times(2)).sendSimpleMail(any(EmailDetails.class));
 
         Reservation saved = reservationCaptor.getValue();
-        assertEquals(startingTime, saved.getStartingTime());
-        assertEquals(endingTime, saved.getEndingTime());
+        assertEquals(reservationRequest.getStartingTime(), saved.getStartingTime());
+        assertEquals(reservationRequest.getEndingTime(), saved.getEndingTime());
     }
 
     @Test
     @Tag("exception-handling")
+    @Tag("overlapping-reservations")
     @DisplayName("Should throw ReservationConflictException when reservation overlaps with an existing one")
-    public void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
+    void givenOverlappingReservation_whenCreateReservation_thenThrowReservationConflictException() {
         Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
         when(eventService.find(anyLong())).thenReturn(event);
 
         Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
         when(serviceService.find(anyLong())).thenReturn(service);
 
-        mockMapper(request, event, service);
         mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
 
-        when(repository.exists(any(Specification.class))).thenReturn(true);
+        when(repository.exists(any(Specification.class)))
+                .thenReturn(false)  // No overlap for the first reservation
+                .thenReturn(true);  // Overlap detected for the second reservation
 
-        ReservationConflictException exception = assertThrows(ReservationConflictException.class,
-                () -> this.service.createReservation(request, 1L, 1L));
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(8, 0), LocalTime.of(12, 0), 100.0);
+        mockMapper(request1, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L)); // First reservation succeeds
 
-        assertEquals("The selected time slot for this service is already occupied. Please choose a different time.", exception.getMessage());
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(11, 55), LocalTime.of(14, 0), 150.0);
+        mockMapper(request2, event, service);
+        ReservationConflictException exception = assertThrows(ReservationConflictException.class, // Second reservation throws conflict exception
+                () -> this.service.createReservation(request2, 1L, 1L));
+
+        assertEquals("For your event, this service is already reserved during the selected time slot. Please choose a different time.", exception.getMessage());
+    }
+
+    @Test
+    @Tag("overlapping-reservations")
+    @DisplayName("Should create both reservations when time slots do not overlap (same service, same event)")
+    void givenNonOverlappingReservations_whenCreateReservation_thenSuccess() {
+        Event event = Event.builder().organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        when(eventService.find(anyLong())).thenReturn(event);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+
+        when(repository.exists(any(Specification.class)))
+                .thenReturn(false)  // No overlap for first reservation
+                .thenReturn(false); // No overlap for second reservation
+
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(8, 0), LocalTime.of(10, 0), 100.0);
+        mockMapper(request1, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L));
+
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(10, 0), LocalTime.of(12, 0), 120.0);
+        mockMapper(request2, event, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request2, 1L, 1L));
+    }
+
+    @Test
+    @Tag("overlapping-reservations")
+    @DisplayName("Should allow reservation of the same service at the same time for different events")
+    void givenSameServiceDifferentEvents_whenCreateReservation_thenSuccess() {
+        Event event1 = Event.builder().id(1L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).build();
+        Event event2 = Event.builder().id(2L).organizer(currentUser).date(LocalDate.now().plusDays(10)).city(city).id(2L).build();
+
+        when(eventService.find(1L)).thenReturn(event1);
+        when(eventService.find(2L)).thenReturn(event2);
+
+        Service service = Service.builder().provider(provider).reservationDeadline(5).isAvailable(true).minDuration(2).maxDuration(6).price(10.0).discount(0.0).build();
+        when(serviceService.find(anyLong())).thenReturn(service);
+
+        mockCompanyWorkingHours(LocalTime.of(7, 0), LocalTime.of(17, 0));
+
+        when(repository.exists(any(Specification.class))).thenReturn(false);
+
+        ReservationRequestDto request1 = new ReservationRequestDto(LocalTime.of(9, 0), LocalTime.of(11, 0), 100.0);
+        mockMapper(request1, event1, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request1, 1L, 1L));
+
+        ReservationRequestDto request2 = new ReservationRequestDto(LocalTime.of(9, 0), LocalTime.of(11, 0), 120.0);
+        mockMapper(request2, event2, service);
+        assertDoesNotThrow(() -> this.service.createReservation(request2, 2L, 1L));
     }
 
     private void mockMapper(ReservationRequestDto request, Event event, Service service) {
