@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 @Sql(scripts = "/sql/reservation-repository-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public class ReservationRepositoryTest {
+class ReservationRepositoryTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
