@@ -175,6 +175,21 @@ public class ReservationProvider {
         );
     }
 
+    public static Stream<Arguments> provideNonOverlappingReservations() {
+        return Stream.of(
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(9,0))
+                        .endingTime(LocalTime.of(12, 0))
+                        .plannedAmount(150.0)
+                        .build()),
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(12, 0))
+                        .endingTime(LocalTime.of(14, 0))
+                        .plannedAmount(150.0)
+                        .build())
+        );
+    }
+
     public static ReservationRequestDto provideReservationToCauseOverlapping() {
         return ReservationRequestDto.builder()
                 .startingTime(LocalTime.of(11, 59))

@@ -171,10 +171,10 @@ class ReservationControllerIntegrationTest {
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when reservation duration is within the allowed service duration range [minDuration, maxDuration]")
     void givenReservationDurationForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+        ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 reservationRequest,
-                ExceptionResponse.class,
+                Void.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_WITH_DURATION_RANGE_2);
 
@@ -202,10 +202,10 @@ class ReservationControllerIntegrationTest {
     @Tag("service-duration")
     @DisplayName("Should successfully reserve when service has fixed duration and reservation duration matches it")
     void givenDurationEqualToFixedDuration_whenValidateServiceDuration_thenSuccess() {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+        ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 provideValidReservationForFixedServiceDurationTest(),
-                ExceptionResponse.class,
+                Void.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_WITH_FIXED_DURATION);
 
@@ -233,10 +233,10 @@ class ReservationControllerIntegrationTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithValidDurations")
     @DisplayName("Should return CREATED when successfully reserved")
     void givenReservationsForServiceWithRangeDuration_whenValidateServiceDuration_thenSuccess(ReservationRequestDto reservationRequest) {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+        ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 reservationRequest,
-                ExceptionResponse.class,
+                Void.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
                 SERVICE_ID_WITH_DURATION_RANGE_1);
 
@@ -248,10 +248,10 @@ class ReservationControllerIntegrationTest {
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsWithinCompanyWorkingHours")
     @DisplayName("Should return CREATED when successfully reserved")
     void givenReservationWithinCompanyWorkingHours_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
-        ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+        ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                 RESERVATION_ENDPOINT,
                 reservationRequest,
-                ExceptionResponse.class,
+                Void.class,
                 VALID_EVENT_ID_FOR_RESERVATION_1,
                 RESERVABLE_SERVICE_ID_2);
 
@@ -275,15 +275,30 @@ class ReservationControllerIntegrationTest {
     }
 
     @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideNonOverlappingReservations")
+    @DisplayName("Should create both reservations when time slots do not overlap (same service, same event)")
+    void givenNonOverlappingReservations_whenCreateReservation_thenSuccess(ReservationRequestDto request) {
+        ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                RESERVATION_ENDPOINT,
+                request,
+                Void.class,
+                VALID_EVENT_ID_FOR_RESERVATION_2,
+                RESERVABLE_SERVICE_ID_2);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @ParameterizedTest
     @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsThatFitPlannedAmount")
     @DisplayName("Should return CREATED when successfully reserved")
     void givenEnoughFunds_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
         Stream.of(SERVICE_WITH_DISCOUNT, SERVICE_WITHOUT_DISCOUNT)
                 .forEach(serviceId -> {
-                    ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                    ResponseEntity<Void> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
                             RESERVATION_ENDPOINT,
                             reservationRequest,
-                            ExceptionResponse.class,
+                            Void.class,
                             VALID_EVENT_ID_FOR_RESERVATION_2,
                             serviceId);
 
