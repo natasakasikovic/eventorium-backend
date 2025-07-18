@@ -41,6 +41,13 @@ public class TestRestTemplateAuthHelper {
         return restTemplate.exchange(url, HttpMethod.PUT, entity, responseType, uriVars);
     }
 
+    public<T> ResponseEntity<T> authorizedPatch(String email, String url, Object body, Class<T> responseType, Object... uriVars) {
+        HttpHeaders headers = getAuthHeaders(email);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> entity = new HttpEntity<>(body, headers);
+        return restTemplate.exchange(url, HttpMethod.PATCH, entity, responseType, uriVars);
+    }
+
     public<T> ResponseEntity<T> authorizedDelete(String email, String url, Class<T> responseType, Object... uriVars) {
         HttpHeaders headers = getAuthHeaders(email);
         HttpEntity<?> entity = new HttpEntity<>(headers);

@@ -9,53 +9,67 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
+import static com.iss.eventorium.util.TestUtil.*;
+
 public class BudgetProvider {
 
-    private static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
+    public static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
 
-    public static Stream<Arguments> provideBudgetItems() {
-        return Stream.of(
-                Arguments.of("organizer2@gmail.com", 2),
-                Arguments.of("organizer3@gmail.com", 1)
-        );
+    public static Stream<Long> provideArchivedProducts() {
+        return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT);
+    }
+
+    public static Stream<Long> provideArchivedSolutions() {
+        return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT, DELETED_SERVICE, INVISIBLE_SERVICE);
     }
 
     public static Stream<Arguments> provideInvalidBudgetItems() {
         return Stream.of(
-                Arguments.of(BudgetItemRequestDto.builder().build()),
                 Arguments.of(
-                    BudgetItemRequestDto.builder()
-                            .itemId(1L)
-                            .category(VALID_CATEGORY)
-                            .plannedAmount(-50.0)
-                            .itemType(SolutionType.PRODUCT)
-                            .build()
+                        BudgetItemRequestDto.builder()
+                                .itemId(1L)
+                                .category(VALID_CATEGORY)
+                                .plannedAmount(-50.0)
+                                .itemType(SolutionType.PRODUCT)
+                                .build(),
+                        "Planned amount must be positive"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .category(VALID_CATEGORY)
                                 .plannedAmount(1000.0)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Item is mandatory"
+                ),
+                Arguments.of(
+                        BudgetItemRequestDto.builder()
+                                .itemId(1L)
+                                .plannedAmount(1000.0)
+                                .category(VALID_CATEGORY)
+                                .build(),
+                        "Item type is mandatory"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .itemId(1L)
                                 .category(VALID_CATEGORY)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Planned amount is mandatory"
                 ),
                 Arguments.of(
                         BudgetItemRequestDto.builder()
                                 .itemId(1L)
                                 .plannedAmount(1000.0)
                                 .itemType(SolutionType.PRODUCT)
-                                .build()
+                                .build(),
+                        "Category is mandatory"
                 )
         );
     }
 
-    private static Stream<Arguments> provideReservationTypeAndExpectedStatus() {
+    public static Stream<Arguments> provideReservationTypeAndExpectedStatus() {
         return Stream.of(
                 Arguments.of(ReservationType.AUTOMATIC, BudgetItemStatus.PROCESSED),
                 Arguments.of(ReservationType.MANUAL, BudgetItemStatus.PENDING)

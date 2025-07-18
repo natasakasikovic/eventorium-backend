@@ -62,10 +62,10 @@ INSERT INTO event_types (name, description, deleted) VALUES
     ('Corporate Event', 'Event type for organizing corporate events', false),
     ('Birthday Party', 'Event type for organizing birthdays', false);
 
-INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (0.0,0.0), (0.0, 0.0);
+INSERT INTO budgets VALUES (85.0, 80.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (20.0, 20.0), (0.0,0.0), (0.0,0.0), (0.0,0.0);
 
 INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id, item_type, status) VALUES
-    (20.0,9,CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
+    (20.0,9,DATE '2024-12-14', 1, 'PRODUCT', 'PROCESSED'),
     (45.0, 10, CURRENT_DATE, 2, 'PRODUCT', 'PROCESSED'),
     (20.0,1, CURRENT_DATE, 3, 'PRODUCT', 'PROCESSED'),
 
@@ -75,9 +75,12 @@ INSERT INTO budget_items (planned_amount, category_id, processed_at, solution_id
 
     (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED');
+    (20.0,9, CURRENT_DATE, 1, 'PRODUCT', 'PROCESSED'),
 
-INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (2,4), (3,5), (4,6), (5,7);
+    (20.0,9,null, 1, 'PRODUCT', 'PLANNED'),
+    (20.0,9,null, 1, 'PRODUCT', 'PLANNED');
+
+INSERT INTO budgets_items VALUES (1,1), (1,2), (1,3), (2,4), (3,5), (4,6), (5,7), (2,8), (2,9);
 
 INSERT INTO events (name, description, date, privacy, max_participants, type_id, address, city_id, organizer_id, is_draft, budget_id)
 VALUES
@@ -87,7 +90,7 @@ VALUES
     ('Sombor Business Meetup', 'A professional business networking event in Sombor.', CURRENT_DATE + INTERVAL '3' DAY, 'OPEN', 40, 2, '234 Business Rd', 6, 5, false, 4),
     ('Wedding Reception in Novi Sad', 'An elegant wedding reception with dinner and music.', CURRENT_DATE + INTERVAL '4' DAY, 'OPEN', 80, 1, '321 Reception St', 2, 1, false, 5),
     ('Birthday Celebration in Beograd', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '5' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, true, 6),
-    ('My birthday!!!', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '10' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, true, null),
+    ('My birthday!!!', 'A lively birthday party with a band and dancing.', CURRENT_DATE + INTERVAL '10' DAY, 'OPEN', 150, 3, '101 Celebration Ave', 1, 1, true, 8),
     ('Summer Music Festival', 'A lively outdoor music festival featuring multiple bands and food vendors.', CURRENT_DATE + INTERVAL '100' DAY, 'OPEN', 500, 2, 'Park Avenue 123', 1, 1, false, 7),
     ('Annual Business Workshop', 'A workshop focused on leadership development and business growth strategies.', CURRENT_DATE - INTERVAL '30' DAY, 'OPEN', 80, 2, 'Business Center, Bulevar Kralja Aleksandra 50', 1,  1,  false, null);
 
@@ -100,8 +103,13 @@ INSERT INTO products (id, name, description, price, discount, status, is_availab
     (nextval('solution_sequence'), 'Custom Invitations', 'Beautifully designed customizable invitations for all events', 30.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 9, 3),
     (nextval('solution_sequence'), 'Event Banner', 'High-quality banners for event promotion', 50.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 10, 3),
     (nextval('solution_sequence'), 'Party Favors', 'Unique and personalized party favors for any occasion', 20.0, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 1, 3),
-    (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3);
+    (nextval('solution_sequence'), 'Decorative Balloons', 'Colorful balloons for all events', 10.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 3),
+    (nextval('solution_sequence'), 'Party Hats', 'Fun and colorful hats for parties and events', 2.00, 50.0, 'ACCEPTED', TRUE, FALSE, TRUE, 7, 4),
+    (nextval('solution_sequence'), 'Event Mugs', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, TRUE, TRUE, 9, 4),
+    (nextval('solution_sequence'), 'Invisible Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 9, 4),
+    (nextval('solution_sequence'), 'Unavailable Product', 'Personalized mugs for event souvenirs', 25.00, 0.00, 'ACCEPTED', FALSE, FALSE, TRUE, 9, 4);
 
+-- id starts with 9
 INSERT INTO services (id, name, description, specialties, price, discount, status, is_available, is_deleted, is_visible, type, reservation_deadline, cancellation_deadline, min_duration, max_duration, category_id, provider_id) VALUES
     (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 2),
     (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 2),
@@ -114,9 +122,27 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
     (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 100.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 7, 1, 8, 3, 7),
     (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 20.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 2, 6, 5, 8),
     (nextval('solution_sequence'), 'Basic Photo Package', 'Standard event photography service with no discount', 'Photography, Basic Package', 90.00,0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 3, 1, 4, 4, 2),
-    (nextval('solution_sequence'), 'DJ Package', 'DJ service with limited-time offer', 'Music, DJ, Package', 100.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 2, 1, 4, 5, 2);
+    (nextval('solution_sequence'), 'DJ Package', 'DJ service with limited-time offer', 'Music, DJ, Package', 100.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 2, 1, 4, 5, 2),
+    (nextval('solution_sequence'), 'Event Photography', 'Professional photography services for all types of events', 'Photography, Event', 150.00, 30.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 3, 2, 6, 4, 3),
+    (nextval('solution_sequence'), 'Catering Service', 'Delicious and customizable catering for events', 'Catering, Customizable', 500.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 21, 5, 3, 8, 2, 3),
+    (nextval('solution_sequence'), 'Event Planning', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3),
+    (nextval('solution_sequence'), 'Deleted Service', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, TRUE, TRUE, 'MANUAL', 30, 10, 4, 10, 1, 3),
+    (nextval('solution_sequence'), 'Invisible Service', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 'MANUAL', 30, 10, 4, 10, 1, 3);
 
 INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
-VALUES ('12:01:00', False, '10:00:00', 5, 13, 'ACCEPTED');
+VALUES ('12:01:00', False, '10:00:00', 5, 17, 'ACCEPTED');
 
 INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 6), (2, 6), (3, 6);
+
+
+INSERT INTO mementos (solution_id, name, price, discount, valid_from, valid_to) VALUES
+    (1, 'Custom Invitations', 30.00, 50.00, DATE '2024-11-01', DATE '2024-12-15'),
+    (2, 'Event Banner', 50.00, 10.00, CURRENT_DATE, NULL),
+    (3, 'Party Favors', 20.00, 0.00, CURRENT_DATE, NULL),
+    (4, 'Decorative Balloons', 10.00, 0.00, CURRENT_DATE, NULL),
+    (5, 'Party Hats', 2.00, 50.00, CURRENT_DATE, NULL),
+    (6, 'Event Photography', 150.00, 30.00, CURRENT_DATE, NULL),
+    (7, 'Catering Service', 500.00, 50.00, CURRENT_DATE, NULL),
+    (8, 'Event Planning', 1200.00, 0.00, CURRENT_DATE, NULL),
+    (9, 'Custom Invitations', 40.00, 10.00, DATE '2024-12-16', NULL),
+    (7, 'Event Mugs', 5.00, 20.00, CURRENT_DATE, NULL);

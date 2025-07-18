@@ -222,7 +222,7 @@ class ReservationControllerIntegrationTest {
                 request,
                 ExceptionResponse.class,
                 VALID_EVENT_ID_FOR_RESERVATION_2,
-                12);
+                RESERVABLE_SERVICE_ID_2);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "Expected 400 BadRequest");
         assertNotNull(response.getBody());

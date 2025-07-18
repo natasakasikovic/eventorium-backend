@@ -30,7 +30,8 @@ public class SolutionService {
     }
 
     public Solution find(Long id) {
-        return repository.findById(id).orElseThrow( () -> new EntityNotFoundException("Solution not found"));
+        Specification<Solution> specification = SolutionSpecification.filterById(id, authService.getCurrentUser(), false);
+        return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Solution not found"));
     }
 
     public void addRating(Solution solution, Rating rating) {
