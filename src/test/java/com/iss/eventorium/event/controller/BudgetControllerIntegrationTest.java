@@ -68,7 +68,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget")
-    @DisplayName("Should return forbidden when organizer does not own the event")
+    @DisplayName("Should return FOBIDDEN when organizer does not own the event")
     void givenWrongOrganizer_whenGetBudget_thenReturnForbidden() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
                 "organizer2@gmail.com",
@@ -84,7 +84,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("get-budget")
-    @DisplayName("Should return not found when event does not exist")
+    @DisplayName("Should return NOT_FOUND when event does not exist")
     void givenNonExistentEvent_whenGetBudget_thenReturnNotFoundWithMessage() {
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedGet(
                 ORGANIZER_EMAIL,
@@ -123,7 +123,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should return error when user has insufficient funds")
+    @DisplayName("Should return UNPROCESSABLE_ENTITY when user has insufficient funds")
     void givenInsufficientFunds_whenPostPurchase_thenReturnUnprocessableEntity() {
         BudgetItemRequestDto request = createBudgetItemRequest(9.0, NEW_BUDGET_ITEM);
 
@@ -141,9 +141,9 @@ class BudgetControllerIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidProducts")
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideArchiveProducts")
     @Tag("purchase-product")
-    @DisplayName("Should return error when trying to purchase invalid product")
+    @DisplayName("Should return NOT_FOUND when trying to purchase invalid product")
     void givenInvalidProduct_whenPostPurchase_thenReturnNotFound(Long id) {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
 
@@ -162,7 +162,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should return conflict when purchasing unavailable product")
+    @DisplayName("Should return CONFLICT when purchasing unavailable product")
     void givenUnavailableProduct_whenPostPurchase_thenReturnConflict() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, UNAVAILABLE_PRODUCT);
 
@@ -181,7 +181,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should return conflict when product is already purchased")
+    @DisplayName("Should return CONFLICT when product is already purchased")
     void givenAlreadyPurchasedProduct_whenPostPurchase_thenReturnConflict() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, PURCHASED_PRODUCT);
 
@@ -200,7 +200,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("purchase-product")
-    @DisplayName("Should return not found when product does not exist")
+    @DisplayName("Should return NOT_FOUND when product does not exist")
     void givenNonExistentProduct_whenPostPurchase_thenReturnNotFoundResponse() {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, INVALID_PRODUCT);
 
@@ -220,7 +220,7 @@ class BudgetControllerIntegrationTest {
     @ParameterizedTest
     @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidBudgetItems")
     @Tag("purchase-product")
-    @DisplayName("Should return bad request with proper message for invalid purchase data")
+    @DisplayName("Should return BAD_REQUEST with proper message for invalid purchase data")
     void givenInvalidBudgetItemRequest_whenPostPurchase_thenReturnValidationError(
             BudgetItemRequestDto request,
             String expectedMessage
@@ -322,7 +322,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("delete-item")
-    @DisplayName("Should return conflict when deleting already processed budget item")
+    @DisplayName("Should return CONFLICT when deleting already processed budget item")
     void givenProcessedItem_whenDelete_thenReturnConflict() {
         ResponseEntity<ExceptionResponse> deleteResponse = authHelper.authorizedDelete(
                 ORGANIZER_EMAIL,
@@ -339,7 +339,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("update-item")
-    @DisplayName("Should return error when updated amount exceeds remaining funds")
+    @DisplayName("Should return UNPROCESSABLE_ENTITY when updated amount exceeds remaining funds")
     void givenNotEnoughFunds_whenPatchUpdateItem_thenReturnUnprocessableEntity() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(0.0);
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
@@ -358,7 +358,7 @@ class BudgetControllerIntegrationTest {
 
     @Test
     @Tag("update-item")
-    @DisplayName("Should return error when updating already processed item")
+    @DisplayName("Should return CONFLICT when updating already processed item")
     void givenProcessedItem_whenPatchUpdateItem_thenReturnConflict() {
         UpdateBudgetItemRequestDto request = new UpdateBudgetItemRequestDto(20.0);
         ResponseEntity<ExceptionResponse> response = authHelper.authorizedPatch(
@@ -416,9 +416,9 @@ class BudgetControllerIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideInvalidSolutions")
+    @MethodSource("com.iss.eventorium.event.provider.BudgetProvider#provideArchivedSolutions")
     @Tag("create-budget-item")
-    @DisplayName("Should return error when trying to add invalid solution to planner")
+    @DisplayName("Should return NOT_FOUND when trying to add invalid solution to planner")
     void givenInvalidSolution_whenPostBudgetItem_thenReturnErrorMessage(Long id) {
         BudgetItemRequestDto request = createBudgetItemRequest(1000.0, id);
 

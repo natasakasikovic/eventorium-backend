@@ -15,11 +15,11 @@ public class BudgetProvider {
 
     public static final CategoryResponseDto VALID_CATEGORY = new CategoryResponseDto(2L, "Catering", "Food and beverages arrangements");
 
-    public static Stream<Long> provideInvalidProducts() {
+    public static Stream<Long> provideArchiveProducts() {
         return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT);
     }
 
-    public static Stream<Long> provideInvalidSolutions() {
+    public static Stream<Long> provideArchivedSolutions() {
         return Stream.of(DELETED_PRODUCT, INVISIBLE_PRODUCT, DELETED_SERVICE, INVISIBLE_SERVICE);
     }
 
