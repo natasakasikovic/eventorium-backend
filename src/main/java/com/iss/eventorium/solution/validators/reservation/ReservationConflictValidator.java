@@ -16,6 +16,6 @@ public class ReservationConflictValidator implements ReservationValidator {
     public void validate(Reservation reservation) {
         Specification<Reservation> specification = ServiceReservationSpecification.checkForOverlappingReservations(reservation);
         if (repository.exists(specification))
-            throw new ReservationConflictException("The selected time slot for this service is already occupied. Please choose a different time.");
+            throw new ReservationConflictException("For your event, this service is already reserved during the selected time slot. Please choose a different time.");
     }
 }
