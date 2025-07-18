@@ -130,7 +130,7 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
     (nextval('solution_sequence'), 'Invisible Service', 'Comprehensive event planning services from start to finish', 'Event Planning, Full Service', 1200.00, 0.00, 'ACCEPTED', TRUE, FALSE, FALSE, 'MANUAL', 30, 10, 4, 10, 1, 3);
 
 INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
-VALUES ('12:01:00', False, '10:00:00', 5, 13, 'ACCEPTED');
+VALUES ('12:01:00', False, '10:00:00', 5, 17, 'ACCEPTED');
 
 INSERT INTO users_attending_events (user_id, attending_events_id) VALUES (1, 6), (2, 6), (3, 6);
 
