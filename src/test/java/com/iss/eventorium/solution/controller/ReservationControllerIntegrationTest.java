@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalTime;
+import java.util.stream.Stream;
 
 import static com.iss.eventorium.solution.provider.ReservationProvider.provideReservationToCauseOverlapping;
 import static com.iss.eventorium.solution.provider.ReservationProvider.provideValidReservationForFixedServiceDurationTest;
@@ -271,5 +272,42 @@ class ReservationControllerIntegrationTest {
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode(), "Expected 409 Conflict");
         assertNotNull(response.getBody());
         assertEquals("For your event, this service is already reserved during the selected time slot. Please choose a different time.", response.getBody().getMessage());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsThatFitPlannedAmount")
+    @DisplayName("Should return CREATED when successfully reserved")
+    void givenEnoughFunds_whenCreateReservation_thenSuccess(ReservationRequestDto reservationRequest) {
+        Stream.of(SERVICE_WITH_DISCOUNT, SERVICE_WITHOUT_DISCOUNT)
+                .forEach(serviceId -> {
+                    ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                            RESERVATION_ENDPOINT,
+                            reservationRequest,
+                            ExceptionResponse.class,
+                            VALID_EVENT_ID_FOR_RESERVATION_2,
+                            serviceId);
+
+                    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+                    assertNull(response.getBody());
+                });
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.iss.eventorium.solution.provider.ReservationProvider#provideReservationsThatDoNotFitPlannedAmount")
+    @DisplayName("Should return UNPROCESSABLE_ENTITY when there is not enough funds for reservation")
+    void givenInsufficientFundsForServiceWithDiscount_whenCreateReservation_thenReturnUnprocessableEntityException(ReservationRequestDto reservationRequest) {
+        Stream.of(SERVICE_WITH_DISCOUNT, SERVICE_WITHOUT_DISCOUNT)
+                .forEach(serviceId -> {
+                    ResponseEntity<ExceptionResponse> response = authHelper.authorizedPost(ORGANIZER_EMAIL,
+                            RESERVATION_ENDPOINT,
+                            reservationRequest,
+                            ExceptionResponse.class,
+                            VALID_EVENT_ID_FOR_RESERVATION_1,
+                            serviceId);
+
+                    assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode(), "Expected 409 Unprocessable entity");
+                    assertNotNull(response.getBody());
+                    assertEquals("You do not have enough funds for this reservation!", response.getBody().getMessage());
+                });
     }
 }

@@ -112,7 +112,9 @@ INSERT INTO services (id, name, description, specialties, price, discount, statu
     (nextval('solution_sequence'), 'Decorative Lighting', 'Stunning lighting setups for all events', 'Lighting, Decorative', 300.00, 50.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 14, 5,5 , 5, 7, 2),
     (nextval('solution_sequence'), 'Banquet Hall Booking', 'Spacious venue rental for events and receptions', 'Venue, Hall Rental', 120.00, 25.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 5, 2, 6, 3, 7),
     (nextval('solution_sequence'), 'Venue Booking', 'Booking service for event venues', 'Venue, Booking', 100.00, 100.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 7, 1, 8, 3, 7),
-    (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 20.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 2, 6, 5, 8);
+    (nextval('solution_sequence'), 'Sound System Setup', 'High-quality sound system rental and setup for events', 'Sound System, Setup', 20.00, 40.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 7, 2, 2, 6, 5, 8),
+    (nextval('solution_sequence'), 'Basic Photo Package', 'Standard event photography service with no discount', 'Photography, Basic Package', 90.00,0.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 3, 1, 4, 4, 2),
+    (nextval('solution_sequence'), 'DJ Package', 'DJ service with limited-time offer', 'Music, DJ, Package', 100.00, 10.00, 'ACCEPTED', TRUE, FALSE, TRUE, 'MANUAL', 2, 2, 1, 4, 5, 2);
 
 INSERT INTO service_reservations (ending_time, is_canceled, starting_time, event_id, service_id, status)
 VALUES ('12:01:00', False, '10:00:00', 5, 13, 'ACCEPTED');

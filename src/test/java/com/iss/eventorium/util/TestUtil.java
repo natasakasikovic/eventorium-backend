@@ -36,6 +36,8 @@ public class TestUtil {
     public static final Long SERVICE_ID_WITH_FIXED_DURATION = 11L;
     public static final Long RESERVABLE_SERVICE_ID_2 = 12L;
     public static final Long OVERLAPPING_SERVICE_ID = 13L;
+    public static final Long SERVICE_WITHOUT_DISCOUNT = 15L;
+    public static final Long SERVICE_WITH_DISCOUNT = 16L;
 
     private static void resetTable(JdbcTemplate jdbcTemplate, String tableName) {
         jdbcTemplate.execute(String.format("DELETE FROM %s;", tableName));
@@ -49,5 +51,4 @@ public class TestUtil {
         resetTable(jdbcTemplate, "event_types");
         resetTable(jdbcTemplate, "events");
     }
-
 }

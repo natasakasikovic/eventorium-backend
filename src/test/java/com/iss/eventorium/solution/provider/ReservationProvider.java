@@ -142,6 +142,39 @@ public class ReservationProvider {
         );
     }
 
+    // NOTE: Supplies reservations where plannedAmount is enough for the service price with discount applied
+    public static Stream<Arguments> provideReservationsThatFitPlannedAmount() {
+        return Stream.of(
+                // an edge case -  exactly matches final price (90.0)
+                Arguments.of(ReservationRequestDto.builder()
+                            .startingTime(LocalTime.of(9, 0))
+                            .endingTime(LocalTime.of(11, 0))
+                            .plannedAmount(90.0)
+                            .build()),
+                Arguments.of(ReservationRequestDto.builder()
+                            .startingTime(LocalTime.of(12, 0))
+                            .endingTime(LocalTime.of(14, 0))
+                            .plannedAmount(190.0)
+                            .build())
+        );
+    }
+
+    // NOTE: Supplies reservations where plannedAmount is not enough for the service price  with discount applied
+    public static Stream<Arguments> provideReservationsThatDoNotFitPlannedAmount() {
+        return Stream.of(
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(9, 0))
+                        .endingTime(LocalTime.of(11, 0))
+                        .plannedAmount(89.99)
+                        .build()),
+                Arguments.of(ReservationRequestDto.builder()
+                        .startingTime(LocalTime.of(12, 0))
+                        .endingTime(LocalTime.of(14, 0))
+                        .plannedAmount(40.0)
+                        .build())
+        );
+    }
+
     public static ReservationRequestDto provideReservationToCauseOverlapping() {
         return ReservationRequestDto.builder()
                 .startingTime(LocalTime.of(11, 59))
