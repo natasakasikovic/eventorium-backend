@@ -1,9 +1,9 @@
 package com.iss.eventorium.user.controllers;
 
 import com.iss.eventorium.user.api.UserReportApi;
-import com.iss.eventorium.user.dtos.report.UserReportResponseDto;
 import com.iss.eventorium.user.dtos.report.UpdateReportRequestDto;
 import com.iss.eventorium.user.dtos.report.UserReportRequestDto;
+import com.iss.eventorium.user.dtos.report.UserReportResponseDto;
 import com.iss.eventorium.user.services.UserReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

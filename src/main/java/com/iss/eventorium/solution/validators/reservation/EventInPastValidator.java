@@ -4,7 +4,6 @@ import com.iss.eventorium.solution.exceptions.ReservationForPastEventException;
 import com.iss.eventorium.solution.models.Reservation;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 public class EventInPastValidator implements ReservationValidator{
     @Override

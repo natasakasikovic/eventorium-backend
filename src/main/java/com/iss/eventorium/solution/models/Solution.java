@@ -9,8 +9,13 @@ import com.iss.eventorium.shared.utils.ImageHolder;
 import com.iss.eventorium.user.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
@@ -22,7 +27,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@SQLRestriction("is_deleted = false")
+@FilterDef(name = "activeFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "activeFilter", condition = "is_deleted = :isDeleted")
 public abstract class Solution implements ImageHolder {
 
     @Id

@@ -8,18 +8,18 @@ import com.iss.eventorium.event.services.EventService;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
+import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.shared.models.Status;
 import com.iss.eventorium.shared.services.ImageService;
-import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.services.*;
 import com.iss.eventorium.solution.exceptions.ServiceAlreadyReservedException;
 import com.iss.eventorium.solution.mappers.ServiceMapper;
+import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.repositories.ReservationRepository;
 import com.iss.eventorium.solution.repositories.ServiceRepository;
-import com.iss.eventorium.solution.models.Service;
 import com.iss.eventorium.solution.specifications.ServiceSpecification;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -42,7 +43,6 @@ public class ServiceService {
 
     private final ServiceRepository repository;
     private final AuthService authService;
-    private final EventService eventService;
     private final CompanyService companyService;
     private final EventTypeService eventTypeService;
     private final ReservationRepository reservationRepository;
@@ -126,8 +126,13 @@ public class ServiceService {
     }
 
     public Service find(Long id) {
-        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser());
+        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser(), false);
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Service not found"));
+    }
+
+    public Optional<Service> findEvenIfDeleted(Long id) {
+        Specification<Service> specification = ServiceSpecification.filterById(id, authService.getCurrentUser(), true);
+        return repository.findOne(specification);
     }
 
     public ImagePath getImagePath(Long serviceId) {
@@ -196,7 +201,7 @@ public class ServiceService {
     private void assertOwnership(Service service) {
         User provider = authService.getCurrentUser();
         if(!Objects.equals(provider.getId(), service.getProvider().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this service.");
+            throw new OwnershipRequiredException("You are not authorized to change this service.");
         }
     }
 }

@@ -1,16 +1,15 @@
 package com.iss.eventorium.user.services;
 
 import com.iss.eventorium.shared.models.Status;
-import com.iss.eventorium.user.dtos.report.UserReportResponseDto;
 import com.iss.eventorium.user.dtos.report.UpdateReportRequestDto;
 import com.iss.eventorium.user.dtos.report.UserReportRequestDto;
+import com.iss.eventorium.user.dtos.report.UserReportResponseDto;
 import com.iss.eventorium.user.mappers.UserReportMapper;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.models.UserReport;
 import com.iss.eventorium.user.repositories.UserReportRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

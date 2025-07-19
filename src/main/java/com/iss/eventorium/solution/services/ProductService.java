@@ -7,7 +7,7 @@ import com.iss.eventorium.event.models.EventType;
 import com.iss.eventorium.event.services.EventTypeService;
 import com.iss.eventorium.shared.dtos.ImageResponseDto;
 import com.iss.eventorium.shared.dtos.RemoveImageRequestDto;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.models.ImagePath;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -110,8 +111,13 @@ public class ProductService {
     }
 
     public Product find(Long id) {
-        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser());
+        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser(), false);
         return repository.findOne(specification).orElseThrow(() -> new EntityNotFoundException("Product not found"));
+    }
+
+    public Optional<Product> findEvenIfDeleted(Long id) {
+        Specification<Product> specification = ProductSpecification.filterById(id, authService.getCurrentUser(), true);
+        return repository.findOne(specification);
     }
 
     public ProductResponseDto createProduct(CreateProductRequestDto request) {
@@ -188,7 +194,7 @@ public class ProductService {
     private void assertOwnership(Product product) {
         User provider = authService.getCurrentUser();
         if(!Objects.equals(provider.getId(), product.getProvider().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this product.");
+            throw new OwnershipRequiredException("You are not authorized to change this product.");
         }
     }
 

@@ -1,10 +1,8 @@
 package com.iss.eventorium.solution.specifications;
 
-import com.iss.eventorium.interaction.models.Rating;
 import com.iss.eventorium.solution.dtos.products.ProductFilterDto;
 import com.iss.eventorium.solution.models.Product;
 import com.iss.eventorium.user.models.User;
-import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import static com.iss.eventorium.solution.specifications.SolutionSpecification.*;
@@ -49,10 +47,16 @@ public class ProductSpecification {
                 .and(applyUserRoleFilter(user)));
     }
 
-    public static Specification<Product> filterById(Long id, User user) {
-        return Specification.where(SolutionSpecification.<Product>hasId(id)
-                .and(filterOutBlockedContent(user)))
+    public static Specification<Product> filterById(Long id, User user, boolean includeDeleted) {
+        Specification<Product> spec = SolutionSpecification.<Product>hasId(id)
+                .and(filterOutBlockedContent(user))
                 .and(applyUserRoleFilter(user));
+
+        if (!includeDeleted) {
+            spec = spec.and((root, query, cb) -> cb.isFalse(root.get("isDeleted")));
+        }
+
+        return spec;
     }
 
     public static Specification<Product> filterTopProducts(User user) {

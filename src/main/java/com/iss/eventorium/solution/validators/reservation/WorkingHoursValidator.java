@@ -1,8 +1,8 @@
 package com.iss.eventorium.solution.validators.reservation;
 
+import com.iss.eventorium.company.models.Company;
 import com.iss.eventorium.solution.exceptions.ReservationOutsideWorkingHoursException;
 import com.iss.eventorium.solution.models.Reservation;
-import com.iss.eventorium.company.models.Company;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

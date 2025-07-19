@@ -1,9 +1,9 @@
 package com.iss.eventorium.notifications.services;
 
-import com.iss.eventorium.notifications.repositories.NotificationRepository;
 import com.iss.eventorium.notifications.dtos.NotificationResponseDto;
 import com.iss.eventorium.notifications.mappers.NotificationMapper;
 import com.iss.eventorium.notifications.models.Notification;
+import com.iss.eventorium.notifications.repositories.NotificationRepository;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.repositories.UserRepository;
 import com.iss.eventorium.user.services.AuthService;
@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 
@@ -31,6 +30,7 @@ public class NotificationService {
     private final NotificationMapper mapper;
 
     public void sendNotification(User user, Notification notification) {
+        if(user == null) return;
         if(Boolean.FALSE.equals(user.getNotificationsSilenced())) {
             log.info("Sending notification to {}: {}", user.getId(), notification.getMessage());
             messagingTemplate.convertAndSendToUser(

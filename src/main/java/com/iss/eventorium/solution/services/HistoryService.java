@@ -1,7 +1,8 @@
 package com.iss.eventorium.solution.services;
 
 import com.iss.eventorium.solution.mappers.SolutionMapper;
-import com.iss.eventorium.solution.models.*;
+import com.iss.eventorium.solution.models.Memento;
+import com.iss.eventorium.solution.models.Solution;
 import com.iss.eventorium.solution.repositories.MementoRepository;
 import com.iss.eventorium.solution.specifications.MementoSpecification;
 import jakarta.persistence.EntityNotFoundException;

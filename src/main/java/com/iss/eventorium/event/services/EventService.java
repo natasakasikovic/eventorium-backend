@@ -1,11 +1,13 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.event.dtos.agenda.ActivityRequestDto;
 import com.iss.eventorium.event.dtos.agenda.ActivityResponseDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaRequestDto;
+import com.iss.eventorium.event.dtos.agenda.AgendaResponseDto;
 import com.iss.eventorium.event.dtos.event.*;
 import com.iss.eventorium.event.dtos.statistics.EventRatingsStatisticsDto;
 import com.iss.eventorium.event.events.EventDateChangedEvent;
-import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
+import com.iss.eventorium.event.exceptions.AgendaAlreadyDefinedException;
+import com.iss.eventorium.event.exceptions.InvalidEventStateException;
 import com.iss.eventorium.event.mappers.ActivityMapper;
 import com.iss.eventorium.event.mappers.EventMapper;
 import com.iss.eventorium.event.mappers.EventTypeMapper;
@@ -15,7 +17,8 @@ import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.interaction.models.Rating;
-import com.iss.eventorium.shared.exceptions.ForbiddenEditException;
+import com.iss.eventorium.shared.exceptions.InvalidTimeRangeException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
 import com.iss.eventorium.shared.mappers.CityMapper;
 import com.iss.eventorium.shared.models.EmailDetails;
 import com.iss.eventorium.shared.models.PagedResponse;
@@ -25,22 +28,26 @@ import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
 import com.iss.eventorium.user.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.util.*;
 import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class EventService {
 
     private final EventRepository repository;
@@ -212,21 +219,26 @@ public class EventService {
         return variables;
     }
 
-    public void createAgenda(Long id, List<ActivityRequestDto> request) {
+    public AgendaResponseDto createAgenda(Long id, AgendaRequestDto agenda) {
         Event event = find(id);
+        assertOwnership(event);
+        if (!event.isDraft())
+            throw new InvalidEventStateException("Cannot add agenda to event with name " + event.getName());
+        if (!event.getActivities().isEmpty())
+            throw new AgendaAlreadyDefinedException("Agenda already defined for event with name " + event.getName());
 
-        List<Activity> activities = request.stream()
+        List<Activity> activities = agenda.getActivities().stream()
                 .map(activityMapper::fromRequest)
                 .toList();
         validateActivities(activities);
 
-        event.getActivities().clear();
+        event.setActivities(new ArrayList<>());
         event.getActivities().addAll(activities);
 
-        if (event.getPrivacy().equals(Privacy.OPEN))
-            setIsDraftFalse(event);
-        else
-            repository.save(event);
+        if (event.getPrivacy().equals(Privacy.OPEN)) setIsDraftFalse(event);
+        else repository.save(event);
+
+        return activityMapper.toAgendaResponse(event.getId(), activities);
     }
 
     private void validateActivities(List<Activity> activities) {
@@ -261,6 +273,7 @@ public class EventService {
     }
 
     public byte[] generateGuestListPdf(Long id) {
+        assertOwnership(find(id));
         List<User> guests = userService.findByEventAttendance(id);
         return pdfService.generate("/templates/guest-list-pdf.jrxml", guests, generateParams(find(id)));
     }
@@ -312,10 +325,15 @@ public class EventService {
     }
 
     private void assertOwnership(Event event) {
-        User provider = authService.getCurrentUser();
-        if(!Objects.equals(provider.getId(), event.getOrganizer().getId())) {
-            throw new ForbiddenEditException("You are not authorized to change this event.");
-        }
+        User organizer = authService.getCurrentUser();
+        if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
+            throw new OwnershipRequiredException("You are not authorized to manage this event.");
     }
 
+    @Scheduled(cron = "0 0 2 * * ?") // runs daily at 2am
+    @Transactional
+    public void deleteAllDrafts() {
+        int deleted = repository.deleteByIsDraftTrue();
+        log.info("Deleted {} drafts", deleted);
+    }
 }

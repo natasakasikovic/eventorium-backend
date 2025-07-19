@@ -4,10 +4,7 @@ import com.iss.eventorium.event.dtos.budget.BudgetResponseDto;
 import com.iss.eventorium.event.dtos.eventtype.EventTypeResponseDto;
 import com.iss.eventorium.event.models.Privacy;
 import com.iss.eventorium.shared.models.City;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -17,6 +14,7 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class EventResponseDto {
     private Long id;
     private String name;

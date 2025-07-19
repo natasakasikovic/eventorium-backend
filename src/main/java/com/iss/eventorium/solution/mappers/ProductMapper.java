@@ -7,7 +7,6 @@ import com.iss.eventorium.event.mappers.EventTypeMapper;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.solution.dtos.products.*;
 import com.iss.eventorium.solution.models.Product;
-
 import com.iss.eventorium.user.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

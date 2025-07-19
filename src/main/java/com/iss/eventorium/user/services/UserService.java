@@ -3,8 +3,8 @@ package com.iss.eventorium.user.services;
 import com.iss.eventorium.shared.exceptions.ImageNotFoundException;
 import com.iss.eventorium.shared.exceptions.ImageUploadException;
 import com.iss.eventorium.shared.models.ImagePath;
-import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.shared.services.ImageService;
+import com.iss.eventorium.shared.utils.HashUtils;
 import com.iss.eventorium.user.dtos.auth.AuthRequestDto;
 import com.iss.eventorium.user.dtos.auth.AuthResponseDto;
 import com.iss.eventorium.user.dtos.auth.QuickRegistrationRequestDto;
@@ -170,7 +170,10 @@ public class UserService {
     }
 
     public AccountDetailsDto getUser(Long id) {
-        Long currentUserId = authService.getCurrentUser().getId();
+        User currentUser = authService.getCurrentUser();
+        if (currentUser == null) return mapper.toAccountDetails(find(id));
+
+        Long currentUserId = currentUser.getId();
         Specification<User> specification = UserSpecification.filterByIdAndNotBlockedBy(id, currentUserId);
 
         User user = repository.findOne(specification)

@@ -33,20 +33,24 @@ public class ChatRoomSpecification {
         };
     }
 
-    private static Specification<ChatRoom> filterOutBlockedContent(User blocker) {
+    private static Specification<ChatRoom> filterOutBlockedContent(User currentUser) {
         return (root, query, cb) -> {
-            if (blocker == null) return cb.conjunction();
+            if (currentUser == null) return cb.conjunction();
 
-            Long blockerId = blocker.getId();
+            Long currentUserId = currentUser.getId();
 
             assert query != null;
-            Subquery<Long> subquery = query.subquery(Long.class);
-            Root<UserBlock> userBlockRoot = subquery.from(UserBlock.class);
 
-            subquery.select(userBlockRoot.get("blocked").get("id"))
-                    .where(cb.equal(userBlockRoot.get("blocker").get("id"), blockerId));
+            Subquery<Long> blockedSubquery = query.subquery(Long.class);
+            Root<UserBlock> blockedRoot = blockedSubquery.from(UserBlock.class);
+            blockedSubquery.select(blockedRoot.get("blocked").get("id"))
+                    .where(cb.equal(blockedRoot.get("blocker").get("id"), currentUserId));
 
-            return cb.not(root.get("lastMessage").get("recipient").get("id").in(subquery));
+            return cb.and(
+                    cb.not(root.get("lastMessage").get("recipient").get("id").in(blockedSubquery)),
+                    cb.not(root.get("lastMessage").get("sender").get("id").in(blockedSubquery))
+            );
         };
     }
+
 }

@@ -4,8 +4,8 @@ import com.iss.eventorium.event.dtos.event.CalendarEventDto;
 import com.iss.eventorium.event.dtos.event.EventSummaryResponseDto;
 import com.iss.eventorium.event.exceptions.EventAlreadyPassedException;
 import com.iss.eventorium.event.mappers.EventMapper;
-import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.models.Event;
+import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.EventSpecification;
 import com.iss.eventorium.shared.models.PagedResponse;
 import com.iss.eventorium.user.models.Person;
@@ -37,8 +37,7 @@ public class AccountEventService {
     }
 
     public List<CalendarEventDto> getOrganizerEvents() {
-        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(mapper::toCalendarEvent).toList();
+        return findOrganizerEvents(authService.getCurrentUser()).stream().map(mapper::toCalendarEvent).toList();
     }
 
     public List<CalendarEventDto> getAttendingEvents() {
@@ -104,8 +103,7 @@ public class AccountEventService {
     }
 
     public List<EventSummaryResponseDto> getAll() {
-        Specification<Event> specification = EventSpecification.filterByOrganizer(authService.getCurrentUser());
-        return repository.findAll(specification).stream().map(mapper::toSummaryResponse).toList();
+        return findOrganizerEvents(authService.getCurrentUser()).stream().map(mapper::toSummaryResponse).toList();
     }
 
     public PagedResponse<EventSummaryResponseDto> getEventsPaged(Pageable pageable) {
@@ -121,5 +119,10 @@ public class AccountEventService {
     public PagedResponse<EventSummaryResponseDto> searchEvents(String keyword, Pageable pageable) {
         Specification<Event> specification = EventSpecification.filterByNameForOrganizer(keyword, authService.getCurrentUser());
         return mapper.toPagedResponse(repository.findAll(specification, pageable));
+    }
+
+    private List<Event> findOrganizerEvents(User organizer) {
+        Specification<Event> specification = EventSpecification.filterByOrganizer(organizer);
+        return repository.findAll(specification);
     }
 }

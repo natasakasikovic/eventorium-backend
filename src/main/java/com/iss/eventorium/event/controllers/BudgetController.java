@@ -1,6 +1,5 @@
 package com.iss.eventorium.event.controllers;
 
-import com.iss.eventorium.category.dtos.CategoryRequestDto;
 import com.iss.eventorium.event.api.BudgetApi;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.services.BudgetService;
@@ -24,6 +23,14 @@ public class BudgetController implements BudgetApi {
     @GetMapping("/events/{event-id}/budget")
     public ResponseEntity<BudgetResponseDto> getBudget(@PathVariable("event-id") Long eventId) {
         return ResponseEntity.ok(budgetService.getBudget(eventId));
+    }
+
+    @PostMapping("/events/{event-id}/budget/purchase")
+    public ResponseEntity<ProductResponseDto> purchaseProduct(
+            @PathVariable("event-id") Long eventId,
+            @Valid @RequestBody BudgetItemRequestDto budgetItemRequestDto
+    ) {
+        return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/events/{event-id}/budget/budget-items")
@@ -51,14 +58,6 @@ public class BudgetController implements BudgetApi {
             @Valid @RequestBody BudgetItemRequestDto request
     ) {
         return new ResponseEntity<>(budgetService.createBudgetItem(eventId, request), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/events/{event-id}/budget/purchase")
-    public ResponseEntity<ProductResponseDto> purchaseProduct(
-            @PathVariable("event-id") Long eventId,
-            @Valid @RequestBody BudgetItemRequestDto budgetItemRequestDto
-    ) {
-        return new ResponseEntity<>(budgetService.purchaseProduct(eventId, budgetItemRequestDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("/events/{event-id}/budget/budget-items/{item-id}")

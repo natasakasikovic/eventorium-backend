@@ -1,20 +1,21 @@
 package com.iss.eventorium.event.services;
 
-import com.iss.eventorium.category.dtos.CategoryRequestDto;
-import com.iss.eventorium.category.mappers.CategoryMapper;
 import com.iss.eventorium.category.models.Category;
 import com.iss.eventorium.category.services.CategoryService;
 import com.iss.eventorium.event.dtos.budget.*;
 import com.iss.eventorium.event.exceptions.AlreadyProcessedException;
-import com.iss.eventorium.event.models.BudgetItemStatus;
-import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.event.exceptions.ProductNotAvailableException;
 import com.iss.eventorium.event.mappers.BudgetMapper;
 import com.iss.eventorium.event.models.Budget;
 import com.iss.eventorium.event.models.BudgetItem;
+import com.iss.eventorium.event.models.BudgetItemStatus;
 import com.iss.eventorium.event.models.Event;
 import com.iss.eventorium.event.repositories.BudgetItemRepository;
 import com.iss.eventorium.event.repositories.EventRepository;
 import com.iss.eventorium.event.specifications.BudgetSpecification;
+import com.iss.eventorium.shared.exceptions.InsufficientFundsException;
+import com.iss.eventorium.shared.exceptions.OwnershipRequiredException;
+import com.iss.eventorium.shared.utils.SkipFilter;
 import com.iss.eventorium.solution.dtos.products.ProductResponseDto;
 import com.iss.eventorium.solution.dtos.products.SolutionReviewResponseDto;
 import com.iss.eventorium.solution.mappers.ProductMapper;
@@ -25,9 +26,10 @@ import com.iss.eventorium.solution.services.ProductService;
 import com.iss.eventorium.solution.services.SolutionService;
 import com.iss.eventorium.user.models.User;
 import com.iss.eventorium.user.services.AuthService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -35,7 +37,6 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-@Slf4j
 public class BudgetService {
 
     private final SolutionService solutionService;
@@ -51,16 +52,20 @@ public class BudgetService {
     private final BudgetMapper mapper;
     private final ProductMapper productMapper;
     private final SolutionMapper solutionMapper;
-    private final CategoryMapper categoryMapper;
+
+    private final EntityManager entityManager;
 
     public ProductResponseDto purchaseProduct(Long eventId, BudgetItemRequestDto request) {
         Product product = productService.find(request.getItemId());
         double netPrice = calculateNetPrice(product);
-        if(netPrice > request.getPlannedAmount()) {
+        if(netPrice > request.getPlannedAmount())
             throw new InsufficientFundsException("You do not have enough funds for this purchase!");
-        }
+        if(Boolean.FALSE.equals(product.getIsAvailable()))
+            throw new ProductNotAvailableException("You cannot purchase a product marked as unavailable!");
 
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         updateBudget(event, mapper.fromRequest(request, product));
         return productMapper.toResponse(product);
     }
@@ -68,12 +73,14 @@ public class BudgetService {
     public List<BudgetSuggestionResponseDto> getBudgetSuggestions(Long eventId, Long categoryId, double price) {
         Category category = categoryService.find(categoryId);
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         List<Solution> solutions = solutionService.findSuggestions(category, price, event.getDate());
         return solutions.stream().map(mapper::toSuggestionResponse).toList();
     }
 
     public BudgetResponseDto getBudget(Long eventId) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
         return mapper.toResponse(budget);
     }
@@ -89,6 +96,7 @@ public class BudgetService {
 
     public void addReservationAsBudgetItem(Reservation reservation, double plannedAmount) {
         Budget budget = reservation.getEvent().getBudget();
+        assertOwnership(reservation.getEvent());
         Service service = reservation.getService();
         boolean isAutomatic = service.getType() == ReservationType.AUTOMATIC;
 
@@ -114,22 +122,35 @@ public class BudgetService {
 
     public void markAsReserved(Reservation reservation) {
         Event event = reservation.getEvent();
+        assertOwnership(event);
         Budget budget = event.getBudget();
         Long serviceId = reservation.getService().getId();
 
-        BudgetItem budgetItem = budget.getItems().stream()
+        List<BudgetItem> matchingItems = budget.getItems().stream()
                 .filter(item -> Objects.equals(item.getSolution().getId(), serviceId)
                         && item.getItemType() == SolutionType.SERVICE)
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Matching budget item not found."));
+                .toList();
 
-        budgetItem.setStatus(BudgetItemStatus.PROCESSED);
-        budgetItem.setProcessedAt(LocalDateTime.now());
-        budgetItemRepository.save(budgetItem);
+        if (matchingItems.isEmpty())
+            throw new EntityNotFoundException("Matching budget item not found.");
+
+        BudgetItem unprocessedItem = matchingItems.stream()
+                .filter(item -> item.getProcessedAt() == null)
+                .findFirst()
+                .orElseThrow(() -> new AlreadyProcessedException("All matching budget items are already reserved."));
+
+        unprocessedItem.setStatus(BudgetItemStatus.PROCESSED);
+        unprocessedItem.setProcessedAt(LocalDateTime.now());
+        budgetItemRepository.save(unprocessedItem);
     }
 
+    @SkipFilter
     public List<BudgetItemResponseDto> getBudgetItems(Long eventId) {
+        Session session = entityManager.unwrap(Session.class);
+        session.disableFilter("activeFilter");
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         List<BudgetItem> items = event.getBudget().getItems();
         for(BudgetItem item : items) {
             if(item.getProcessedAt() != null) {
@@ -137,11 +158,13 @@ public class BudgetService {
                 item.getSolution().restore(memento);
             }
         }
+        session.enableFilter("activeFilter").setParameter("isDeleted", false);
         return items.stream().map(mapper::toResponse).toList();
     }
 
     public BudgetItemResponseDto createBudgetItem(Long eventId, BudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
 
         BudgetItem item = budget.getItems().stream()
@@ -149,7 +172,7 @@ public class BudgetService {
                 .findFirst()
                 .map(existingItem -> {
                     if(existingItem.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
 
                     existingItem.setPlannedAmount(request.getPlannedAmount());
                     return existingItem;
@@ -172,11 +195,12 @@ public class BudgetService {
 
     public BudgetItemResponseDto updateBudgetItem(Long eventId, Long itemId, UpdateBudgetItemRequestDto request) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
 
         if(item.getProcessedAt() != null)
-            throw new AlreadyProcessedException("Solution is already precessed");
+            throw new AlreadyProcessedException("Solution is already processed");
 
         if(request.getPlannedAmount() < calculateNetPrice(item.getSolution()))
             throw new InsufficientFundsException("You do not have enough funds for this purchase/reservation!");
@@ -188,6 +212,8 @@ public class BudgetService {
 
     public void deleteBudgetItem(Long eventId, Long itemId) {
         Event event = eventService.find(eventId);
+        assertOwnership(event);
+
         Budget budget = event.getBudget();
         BudgetItem item = getFromBudget(budget, itemId);
         if(!item.getStatus().equals(BudgetItemStatus.PLANNED))
@@ -195,6 +221,17 @@ public class BudgetService {
 
         budget.removeItem(item);
         eventRepository.save(event);
+    }
+
+    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
+        Event event = eventService.find(eventId);
+        assertOwnership(event);
+
+        Budget budget = event.getBudget();
+        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
+        budget.setActiveCategories(new ArrayList<>(categories));
+        eventRepository.save(event);
+        return mapper.toResponse(budget);
     }
 
     private void updateBudget(Event event, BudgetItem item) {
@@ -219,7 +256,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 })
                 .orElseGet(() -> {
@@ -241,7 +278,7 @@ public class BudgetService {
                 .findFirst()
                 .map(bi -> {
                     if (bi.getProcessedAt() != null)
-                        throw new AlreadyProcessedException("Solution is already precessed");
+                        throw new AlreadyProcessedException("Solution is already processed");
                     return bi;
                 });
     }
@@ -250,12 +287,9 @@ public class BudgetService {
         return solution.getPrice() * (1 - solution.getDiscount() / 100);
     }
 
-    public BudgetResponseDto updateBudgetActiveCategories(Long eventId, List<Long> categoryIds) {
-        Event event = eventService.find(eventId);
-        Budget budget = event.getBudget();
-        List<Category> categories = categoryIds.stream().map(categoryService::find).toList();
-        budget.setActiveCategories(new ArrayList<>(categories));
-        eventRepository.save(event);
-        return mapper.toResponse(budget);
+    private void assertOwnership(Event event) {
+        User organizer = authService.getCurrentUser();
+        if(!Objects.equals(organizer.getId(), event.getOrganizer().getId()))
+            throw new OwnershipRequiredException("You are not authorized to change this event.");
     }
 }

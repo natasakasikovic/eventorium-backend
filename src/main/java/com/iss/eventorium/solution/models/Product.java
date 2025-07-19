@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 
 @Getter
@@ -15,6 +16,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table (name = "products")
 @SQLDelete(sql = "UPDATE products SET is_deleted = true WHERE id = ?")
+@Filter(name = "activeFilter", condition = "is_deleted = :isDeleted")
 public class Product extends Solution {
 
     @Override

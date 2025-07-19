@@ -2,8 +2,12 @@ package com.iss.eventorium.solution.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 
 
@@ -15,6 +19,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table (name = "services")
 @SQLDelete(sql = "UPDATE services SET is_deleted = true WHERE id = ?")
+@Filter(name = "activeFilter", condition = "is_deleted = :isDeleted")
 public class Service extends Solution {
 
     @Enumerated(EnumType.STRING)

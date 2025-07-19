@@ -2,7 +2,6 @@ package com.iss.eventorium.shared.handlers;
 
 import com.iss.eventorium.shared.exceptions.*;
 import com.iss.eventorium.shared.models.ExceptionResponse;
-import jakarta.annotation.Priority;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -65,8 +64,8 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(ForbiddenEditException.class)
-    public ResponseEntity<ExceptionResponse> handleForbiddenEdit(ForbiddenEditException ex) {
+    @ExceptionHandler(OwnershipRequiredException.class)
+    public ResponseEntity<ExceptionResponse> handleForbiddenEdit(OwnershipRequiredException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ExceptionResponse.builder()
                         .error(HttpStatus.FORBIDDEN.getReasonPhrase())
