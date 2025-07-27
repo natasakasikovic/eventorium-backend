@@ -2,7 +2,7 @@
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Unlicense License][license-shield]][license-url]
-[![Last Commit](https://img.shields.io/github/last-commit/kzi-nastava/iss-project-event-planner-siit-2024-team-13?branch=main&style=for-the-badge)](https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/commits/main)
+[![Last Commit](https://img.shields.io/github/last-commit/natasakasikovic/eventorium-backend?branch=main&style=for-the-badge)](https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/commits/main)
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 
   <p align="center">
     <br />
-    <a href="https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/issues/new?labels=bug">Report Bug</a>
+    <a href="https://github.com/natasakasikovic/eventorium-backend/issues/new?labels=bug">Report Bug</a>
   </p>
 </div>
 
@@ -68,8 +68,8 @@ Follow the steps below to set up and run the project locally.
 1. 🔁 Clone the repository
 
     ```sh
-    git clone https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13.git
-    cd eventorium
+    git clone https://github.com/natasakasikovic/eventorium-backend.git
+    cd eventorium-backend
     ```
 
 2. ⚙️ Update configuration
@@ -177,7 +177,7 @@ The system supports the following roles with corresponding credentials:
 [PostgreSQL-img]: https://img.shields.io/badge/Database-PostgreSQL-336791?logo=postgresql&logoColor=white
 [PostgreSQL-url]: https://www.postgresql.org/
 
-[contributors-shield]: https://img.shields.io/github/contributors/kzi-nastava/iss-project-event-planner-siit-2024-team-13.svg?style=for-the-badge
-[contributors-url]: https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/graphs/contributors
-[license-shield]: https://img.shields.io/github/license/kzi-nastava/iss-project-event-planner-siit-2024-team-13.svg?style=for-the-badge
-[license-url]: https://github.com/kzi-nastava/iss-project-event-planner-siit-2024-team-13/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/natasakasikovic/eventorium-backend.svg?style=for-the-badge
+[contributors-url]: https://github.com/natasakasikovic/eventorium-backend/graphs/contributors
+[license-shield]: https://img.shields.io/github/license/natasakasikovic/eventorium-backend.svg?style=for-the-badge
+[license-url]: https://github.com/natasakasikovic/eventorium-backend/blob/master/LICENSE.txt
